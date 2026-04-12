@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://jemcik.github.io/the-radio-bench/",
+  "homepage": "https://radiobench.dev",
   "scripts": {
     "build": "tsc -b && vite build",
     "check:gitignore": "sh -c '! git ls-files | git check-ignore --no-index --stdin -q || (echo \"Tracked paths match .gitignore (remove with git rm --cached):\"; git ls-files | git check-ignore --no-index --stdin -v; exit 1)'",
