@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, FileText, BookOpen, ArrowRight, ChevronDown } from 'lucide-react'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { cn } from '@/lib/utils'
 import { getAllChapters } from '@/data/chapters'
 import { glossary, type GlossaryEntry } from '@/data/glossary'
@@ -58,7 +60,7 @@ function matchScore(query: string, text: string): number {
   return 0
 }
 
-function search(query: string, all: SearchResult[]): SearchResult[] {
+function searchFn(query: string, all: SearchResult[]): SearchResult[] {
   if (!query.trim()) return []
   return all
     .map(r => ({
@@ -74,7 +76,7 @@ function search(query: string, all: SearchResult[]): SearchResult[] {
     .map(r => r.result)
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Components ──────────────────────────────────────────────────────────────
 
 export function SearchTrigger({ onClick }: { onClick: () => void }) {
   const isMac = navigator.platform.toUpperCase().includes('MAC')
@@ -99,13 +101,22 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
   )
 }
 
-/** Wrapper that unmounts the inner dialog when closed, giving us a clean state reset for free. */
 export default function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  if (!open) return null
-  return <SearchDialogInner onClose={onClose} />
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+      <DialogContent
+        hideClose
+        className="top-[12vh] translate-y-0 p-0 gap-0 max-w-lg overflow-hidden rounded-xl data-[state=open]:slide-in-from-top-[10vh]"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <VisuallyHidden><DialogTitle>Search</DialogTitle></VisuallyHidden>
+        <SearchDialogBody onClose={onClose} />
+      </DialogContent>
+    </Dialog>
+  )
 }
 
-function SearchDialogInner({ onClose }: { onClose: () => void }) {
+function SearchDialogBody({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -113,7 +124,7 @@ function SearchDialogInner({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate()
 
   const allResults = useMemo(() => buildResults(), [])
-  const results = useMemo(() => search(query, allResults), [query, allResults])
+  const results = useMemo(() => searchFn(query, allResults), [query, allResults])
 
   // Focus input on mount
   useEffect(() => {
@@ -126,8 +137,8 @@ function SearchDialogInner({ onClose }: { onClose: () => void }) {
 
   const handleQueryChange = useCallback((value: string) => {
     setQuery(value)
-    setExpanded(null)   // collapse expanded card when query changes
-    setActive(0)        // reset selection on new search
+    setExpanded(null)
+    setActive(0)
   }, [])
 
   const activate = useCallback((result: SearchResult) => {
@@ -140,9 +151,7 @@ function SearchDialogInner({ onClose }: { onClose: () => void }) {
   }, [navigate, onClose])
 
   const onKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose()
-    } else if (e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActive(i => Math.min(i + 1, results.length - 1))
     } else if (e.key === 'ArrowUp') {
@@ -151,141 +160,126 @@ function SearchDialogInner({ onClose }: { onClose: () => void }) {
     } else if (e.key === 'Enter' && results[active]) {
       activate(results[active])
     }
-  }, [results, active, activate, onClose])
+  }, [results, active, activate])
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      {/* Input */}
+      <div className="flex items-center gap-3 px-4 border-b border-border">
+        <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={e => handleQueryChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Search chapters and terms..."
+          className="flex-1 h-12 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+        />
+        <kbd className="px-1.5 h-5 rounded border border-border bg-muted text-[10px] font-mono text-muted-foreground inline-flex items-center">
+          Esc
+        </kbd>
+      </div>
 
-      {/* Dialog */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4 pointer-events-none">
-        <div
-          className="w-full max-w-lg bg-popover border border-border rounded-xl shadow-2xl overflow-hidden pointer-events-auto"
-          role="dialog"
-          aria-label="Search"
-        >
-          {/* Input */}
-          <div className="flex items-center gap-3 px-4 border-b border-border">
-            <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={e => handleQueryChange(e.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder="Search chapters and terms..."
-              className="flex-1 h-12 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-            />
-            <kbd className="px-1.5 h-5 rounded border border-border bg-muted text-[10px] font-mono text-muted-foreground inline-flex items-center">
-              Esc
-            </kbd>
+      {/* Results */}
+      <div className="max-h-[60vh] overflow-y-auto p-2">
+        {query && results.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            No results for &ldquo;{query}&rdquo;
+          </p>
+        )}
+
+        {!query && (
+          <div className="py-6 text-center">
+            <p className="text-sm text-muted-foreground">Type to search chapters and glossary terms</p>
           </div>
+        )}
 
-          {/* Results */}
-          <div className="max-h-[60vh] overflow-y-auto p-2">
-            {query && results.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No results for "{query}"
-              </p>
-            )}
+        {results.map((r, i) => {
+          const isExpanded = expanded === r.id
+          const isGlossary = r.type === 'glossary'
+          const isComingSoon = r.type === 'chapter' && !r.href
 
-            {!query && (
-              <div className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">Type to search chapters and glossary terms</p>
-              </div>
-            )}
+          return (
+            <div key={r.id}>
+              <button
+                onMouseEnter={() => setActive(i)}
+                onClick={() => activate(r)}
+                className={cn(
+                  'flex items-start gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors',
+                  i === active ? 'bg-accent text-accent-foreground' : 'text-foreground',
+                )}
+              >
+                {/* Icon */}
+                <span className={cn(
+                  'flex items-center justify-center w-7 h-7 rounded-md shrink-0 mt-0.5',
+                  r.type === 'chapter' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-500'
+                )}>
+                  {r.type === 'chapter' ? <FileText className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
+                </span>
 
-            {results.map((r, i) => {
-              const isExpanded = expanded === r.id
-              const isGlossary = r.type === 'glossary'
-              const isComingSoon = r.type === 'chapter' && !r.href
+                {/* Text */}
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-medium">{r.title}</span>
+                  <span className="block text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                    {r.subtitle}
+                  </span>
+                </span>
 
-              return (
-                <div key={r.id}>
-                  <button
-                    onMouseEnter={() => setActive(i)}
-                    onClick={() => activate(r)}
-                    className={cn(
-                      'flex items-start gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors',
-                      i === active ? 'bg-accent text-accent-foreground' : 'text-foreground',
-                    )}
-                  >
-                    {/* Icon */}
-                    <span className={cn(
-                      'flex items-center justify-center w-7 h-7 rounded-md shrink-0 mt-0.5',
-                      r.type === 'chapter' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-500'
-                    )}>
-                      {r.type === 'chapter' ? <FileText className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
-                    </span>
+                {/* Action indicator */}
+                {r.href && (
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1.5" />
+                )}
+                {isComingSoon && (
+                  <span className="text-[10px] text-muted-foreground shrink-0 mt-1">soon</span>
+                )}
+                {isGlossary && (
+                  <ChevronDown className={cn(
+                    'w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1.5 transition-transform',
+                    isExpanded && 'rotate-180'
+                  )} />
+                )}
+              </button>
 
-                    {/* Text */}
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-sm font-medium">{r.title}</span>
-                      <span className="block text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                        {r.subtitle}
-                      </span>
-                    </span>
+              {/* Expanded glossary preview */}
+              {isGlossary && isExpanded && r.entry && (
+                <div className="mx-3 mb-2 px-3 py-3 rounded-md bg-muted/50 border border-border/50 text-xs leading-relaxed">
+                  <p className="text-foreground/90">{r.entry.detail}</p>
 
-                    {/* Action indicator */}
-                    {r.href && (
-                      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1.5" />
-                    )}
-                    {isComingSoon && (
-                      <span className="text-[10px] text-muted-foreground shrink-0 mt-1">soon</span>
-                    )}
-                    {isGlossary && (
-                      <ChevronDown className={cn(
-                        'w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1.5 transition-transform',
-                        isExpanded && 'rotate-180'
-                      )} />
-                    )}
-                  </button>
-
-                  {/* Expanded glossary preview */}
-                  {isGlossary && isExpanded && r.entry && (
-                    <div className="mx-3 mb-2 px-3 py-3 rounded-md bg-muted/50 border border-border/50 text-xs leading-relaxed">
-                      <p className="text-foreground/90">{r.entry.detail}</p>
-
-                      {(r.entry.unit || r.entry.formula) && (
-                        <div className="mt-2 pt-2 border-t border-border/40 space-y-0.5">
-                          {r.entry.unit && (
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground/70">Unit:</span> {r.entry.unit}
-                            </p>
-                          )}
-                          {r.entry.formula && (
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground/70">Formula:</span>{' '}
-                              <span className="font-mono">{r.entry.formula}</span>
-                            </p>
-                          )}
-                        </div>
+                  {(r.entry.unit || r.entry.formula) && (
+                    <div className="mt-2 pt-2 border-t border-border/40 space-y-0.5">
+                      {r.entry.unit && (
+                        <p className="text-muted-foreground">
+                          <span className="font-semibold text-foreground/70">Unit:</span> {r.entry.unit}
+                        </p>
                       )}
-
-                      {r.entry.see && r.entry.see.length > 0 && (
-                        <p className="mt-2 pt-2 border-t border-border/40 text-muted-foreground">
-                          <span className="font-semibold text-foreground/70">See also:</span>{' '}
-                          {r.entry.see.join(', ')}
+                      {r.entry.formula && (
+                        <p className="text-muted-foreground">
+                          <span className="font-semibold text-foreground/70">Formula:</span>{' '}
+                          <span className="font-mono">{r.entry.formula}</span>
                         </p>
                       )}
                     </div>
                   )}
-                </div>
-              )
-            })}
-          </div>
 
-          {/* Footer */}
-          <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
-            <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd> navigate</span>
-            <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd> open / expand</span>
-            <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd> close</span>
-          </div>
-        </div>
+                  {r.entry.see && r.entry.see.length > 0 && (
+                    <p className="mt-2 pt-2 border-t border-border/40 text-muted-foreground">
+                      <span className="font-semibold text-foreground/70">See also:</span>{' '}
+                      {r.entry.see.join(', ')}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd> navigate</span>
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd> open / expand</span>
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd> close</span>
       </div>
     </>
   )

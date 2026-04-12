@@ -16,7 +16,7 @@
  *
  *   <Circuit width={360} height={220} caption="Simple circuit">
  *     <Resistor x={180} y={40} label="R1" value="1 kΩ" />
- *     <Battery x={60} y={120} orient="down" label="B1" value="9 V" />
+ *     <Battery x={60} y={120} orient="down" label="B1" value="1.5 V" />
  *     <Wire points={[b1.p1, {x:60, y:40}, r1.p1]} />
  *     <Wire points={[r1.p2, {x:300, y:40}, {x:300, y:200}, {x:60, y:200}, b1.p2]} />
  *     <Junction x={60} y={40} />

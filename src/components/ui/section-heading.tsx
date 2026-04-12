@@ -20,9 +20,9 @@ export function Section({ id, children }: SectionHeadingProps) {
   return (
     <h2
       id={id}
-      className="group flex items-center gap-2 scroll-mt-20"
+      className="group flex items-center gap-1 scroll-mt-20"
     >
-      <span className="flex-1">{children}</span>
+      <span>{children}</span>
       {chapterId && (
         <BookmarkButton
           chapterId={chapterId}

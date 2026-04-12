@@ -6,19 +6,19 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
 export interface LabStep {
-  text: string
-  note?: string
+  text: React.ReactNode
+  note?: React.ReactNode
 }
 
 export interface LabActivityProps {
   label?: string
-  goal: string
-  equipment: string[]
-  components?: string[]
+  goal: React.ReactNode
+  equipment: React.ReactNode[]
+  components?: React.ReactNode[]
   procedure: LabStep[]
-  expectedResult: string
-  connectionToTheory: string
-  troubleshooting?: string[]
+  expectedResult: React.ReactNode
+  connectionToTheory: React.ReactNode
+  troubleshooting?: React.ReactNode[]
 }
 
 function Section({ icon: Icon, title, children }: {

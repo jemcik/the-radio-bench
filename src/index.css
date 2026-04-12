@@ -219,7 +219,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -245,7 +245,6 @@
     color: hsl(var(--foreground));
     font-size: 1.0625rem;   /* 17px — slightly larger than browser default */
     line-height: 1.75;
-    max-width: 80ch;
   }
 
   .prose-chapter > * + * {
@@ -301,7 +300,7 @@
   }
 
   .prose-chapter code {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono, 'IBM Plex Mono', monospace);
     font-size: 0.875em;
     background: hsl(var(--muted));
     color: hsl(var(--primary));
@@ -334,5 +333,61 @@
   .callout-warning {
     border-color: hsl(var(--destructive) / 0.4);
     background: hsl(var(--destructive) / 0.05);
+  }
+
+  /* Sidebar button pulse when bookmark added while sidebar is closed */
+  @keyframes sidebar-notify {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.6); }
+    20%  { transform: scale(1.25); box-shadow: 0 0 0 8px hsl(var(--primary) / 0.3); }
+    50%  { transform: scale(1);    box-shadow: 0 0 0 14px hsl(var(--primary) / 0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  }
+
+  .sidebar-pulse {
+    animation: sidebar-notify 0.8s ease-out 3;
+    color: hsl(var(--primary)) !important;
+    border-color: hsl(var(--primary) / 0.7) !important;
+    background: hsl(var(--primary) / 0.12) !important;
+  }
+
+  /* Floating toast notification for bookmarks */
+  @keyframes toast-in {
+    0%   { transform: translateX(-120%); opacity: 0; }
+    100% { transform: translateX(0);     opacity: 1; }
+  }
+
+  @keyframes toast-out {
+    0%   { transform: translateX(0);     opacity: 1; }
+    100% { transform: translateX(-120%); opacity: 0; }
+  }
+
+  .bookmark-toast {
+    position: fixed;
+    top: 4.5rem;
+    left: 1rem;
+    z-index: 9990;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid hsl(var(--primary) / 0.4);
+    background: hsl(var(--card));
+    color: hsl(var(--primary));
+    font-size: 0.8125rem;
+    font-weight: 600;
+    box-shadow:
+      0 4px 24px hsl(var(--primary) / 0.15),
+      0 0 0 1px hsl(var(--primary) / 0.05);
+    animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    pointer-events: none;
+  }
+
+  .bookmark-toast svg {
+    flex-shrink: 0;
+  }
+
+  .bookmark-toast-out {
+    animation: toast-out 0.35s ease-in forwards;
   }
 }

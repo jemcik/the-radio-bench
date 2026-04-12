@@ -1,82 +1,131 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { THEMES } from '@/lib/themes'
+import { FONTS } from '@/lib/fonts'
 import { useTheme } from '@/context/ThemeContext'
+import { useFont, FONT_SIZES } from '@/context/FontContext'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  const { font, setFont, sizeIndex, setSizeIndex } = useFont()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
 
   const current = THEMES.find(t => t.id === theme)
   const isDark = current?.isDark ?? false
 
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
-
-  // Close on Escape
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [open])
-
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        aria-label="Change theme"
-        className={cn(
-          'flex items-center justify-center w-8 h-8 rounded-md transition-colors',
-          'text-muted-foreground hover:text-foreground hover:bg-accent'
-        )}
-      >
-        {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-      </button>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          aria-label="Change theme"
+          className={cn(
+            'flex items-center justify-center w-8 h-8 rounded-md transition-colors',
+            'text-muted-foreground hover:text-foreground hover:bg-accent'
+          )}
+        >
+          {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+        </button>
+      </PopoverTrigger>
 
-      {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-52 rounded-lg border border-border bg-popover p-3 shadow-xl">
-          <p className="text-[11px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Theme</p>
-          <div className="grid grid-cols-6 gap-1.5">
-            {THEMES.map(t => (
-              <button
-                key={t.id}
-                title={t.label}
-                onClick={() => { setTheme(t.id); setOpen(false) }}
+      <PopoverContent align="end" className="w-64 p-3">
+        {/* Theme section */}
+        <p className="text-[11px] font-medium text-muted-foreground mb-2.5 uppercase tracking-wider">Theme</p>
+        <div className="grid grid-cols-3 gap-2">
+          {THEMES.map(t => (
+            <button
+              key={t.id}
+              title={t.description}
+              onClick={() => { setTheme(t.id); }}
+              className={cn(
+                'relative flex flex-col items-center justify-center h-14 rounded-lg border-2 transition-all',
+                theme === t.id
+                  ? 'border-primary shadow-md ring-1 ring-primary/30'
+                  : 'border-transparent hover:border-border hover:scale-[1.03]'
+              )}
+              style={{ backgroundColor: t.swatch }}
+            >
+              <span
                 className={cn(
-                  'relative h-7 w-full rounded-md border-2 transition-all',
-                  theme === t.id
-                    ? 'border-primary scale-110 shadow-md'
-                    : 'border-transparent hover:border-border hover:scale-105'
+                  'text-[11px] font-medium leading-none',
+                  t.isDark ? 'text-white/70' : 'text-black/50'
                 )}
-                style={{ backgroundColor: t.swatch }}
+              >
+                {t.label}
+              </span>
+              {/* Light/dark indicator dot */}
+              <span
+                className={cn(
+                  'mt-1.5 w-1.5 h-1.5 rounded-full',
+                  t.isDark ? 'bg-white/25' : 'bg-black/15'
+                )}
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Font size section */}
+        <div className="mt-3 pt-3 border-t border-border/50">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Size</p>
+            <span className="text-[11px] tabular-nums text-muted-foreground">{FONT_SIZES[sizeIndex]}px</span>
+          </div>
+          <div className="flex items-center gap-3 px-0.5">
+            <span className="text-[10px] text-muted-foreground leading-none">A</span>
+            <Slider
+              value={[sizeIndex]}
+              onValueChange={([v]) => setSizeIndex(v)}
+              min={0}
+              max={FONT_SIZES.length - 1}
+              step={1}
+              aria-label="Font size"
+            />
+            <span className="text-sm text-muted-foreground leading-none font-medium">A</span>
+          </div>
+        </div>
+
+        {/* Font section */}
+        <div className="mt-3 pt-3 border-t border-border/50">
+          <p className="text-[11px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Font</p>
+          <div className="flex flex-col gap-1">
+            {FONTS.map(f => (
+              <button
+                key={f.id}
+                onClick={() => { setFont(f.id); }}
+                className={cn(
+                  'flex items-center gap-2.5 w-full px-2.5 py-2 rounded-md text-left transition-all',
+                  font === f.id
+                    ? 'bg-primary/10 ring-1 ring-primary/30'
+                    : 'hover:bg-accent'
+                )}
               >
                 <span
-                  className={cn(
-                    'absolute bottom-0.5 right-0.5 w-1.5 h-1.5 rounded-full border border-white/30',
-                    t.isDark ? 'bg-white/20' : 'bg-black/20'
-                  )}
-                />
-                <span className="sr-only">{t.label}</span>
+                  className="text-lg leading-none w-7 text-center text-foreground"
+                  style={{ fontFamily: f.sans }}
+                >
+                  Aa
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className={cn(
+                    'text-xs font-medium block leading-tight',
+                    font === f.id ? 'text-primary' : 'text-foreground'
+                  )}>
+                    {f.label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground/60 leading-tight">
+                    {f.category}
+                  </span>
+                </span>
+                {font === f.id && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                )}
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2 capitalize">
-            {current?.label} · {isDark ? 'Dark' : 'Light'}
-          </p>
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -86,7 +86,7 @@ export default function Chapter0_2() {
         The VNA is — for amateur radio purposes — the most powerful instrument of the three.
         It sweeps a range of frequencies and measures how a component or circuit responds to
         each one. This makes it ideal for measuring antenna <G>impedance</G> and <G k="swr">SWR</G>,
-        finding resonant frequencies of LC circuits, and plotting filter responses.
+        finding resonant frequencies of <G k="lc">LC</G> circuits, and plotting filter responses.
       </p>
 
       <Callout variant="caution">
@@ -108,14 +108,14 @@ export default function Chapter0_2() {
         Throughout the lab activities, we use the Arduino not as a microcontroller project but
         purely as a convenient, programmable voltage source. Specifically:{' '}
         <G k="pwm">PWM output</G> (Pulse Width Modulation) gives us a <G k="square wave">square wave</G> at
-        a controllable <G k="frequency">frequency</G> and duty cycle, which is good enough for demonstrating AC behaviour,
+        a controllable <G k="frequency">frequency</G> and duty cycle, which is good enough for demonstrating <G k="ac">AC</G> behaviour,
         charging curves, and simple modulation concepts.
       </p>
 
       <p>
-        The Arduino's PWM pins (typically pins 3, 5, 6, 9, 10, 11 on an Uno) output 5V
-        amplitude square waves at frequencies between ~490 Hz and ~8 kHz depending on the pin
-        and timer settings. For our early experiments, this is perfectly adequate.
+        The Arduino's <G k="pwm">PWM</G> pins (typically pins 3, 5, 6, 9, 10, 11 on an Uno)
+        output 5V amplitude square waves at frequencies between ~490 Hz and ~8 kHz depending
+        on the pin and timer settings. For our early experiments, this is perfectly adequate.
       </p>
 
       <Callout variant="note">
@@ -150,7 +150,7 @@ export default function Chapter0_2() {
       <Section id="voltage-safety">Voltage safety</Section>
 
       <p>
-        All the lab activities in this course operate at <strong>5V or 9V DC</strong> —
+        All the lab activities in this course operate at <strong>5V <G k="dc">DC</G> or less</strong> —
         completely safe to touch. The only time mains voltage appears is in the safety chapter
         (4.3), and even there the activity is limited to inspecting and measuring grounding,
         not opening live equipment.
@@ -166,45 +166,45 @@ export default function Chapter0_2() {
         equipment={[
           'Multimeter',
           'Oscilloscope with probe',
-          'Arduino Uno (or similar) with USB cable',
+          <><G k="arduino">Arduino</G> Uno (or similar) with <G k="usb">USB</G> cable</>,
           'Breadboard',
         ]}
         components={[
-          '9V battery with connector leads',
+          'AA battery with holder (or clip leads)',
           '470Ω resistor',
           'Short jumper wires',
         ]}
         procedure={[
           {
-            text: 'Set your multimeter to DC voltage (20V range). Touch the red probe to the 9V battery positive terminal and the black probe to negative. Read the voltage.',
-            note: 'Real 9V batteries measure 8.4–9.2V depending on charge level. This is normal.',
+            text: <>Set your multimeter to <G k="dc">DC</G> voltage (2V or 20V range). Touch the red probe to the AA battery positive terminal (+) and the black probe to negative (−). Read the voltage.</>,
+            note: 'A fresh AA battery reads about 1.5–1.6V. A partially used one might show 1.2–1.4V. This is normal.',
           },
           {
-            text: 'Connect the Arduino to your computer with the USB cable. Open the Arduino IDE, load File → Examples → 01.Basics → Blink, and upload it. Pin 13 LED should blink once per second.',
+            text: <>Connect the <G k="arduino">Arduino</G> to your computer with the <G k="usb">USB</G> cable. Open the <G k="ide">Arduino IDE</G>, load File → Examples → 01.Basics → Blink, and upload it. Pin 13 <G k="led">LED</G> should blink once per second.</>,
           },
           {
             text: 'Open File → Examples → 01.Basics → AnalogReadSerial... actually, load this simple sketch instead:',
-            note: 'void setup() { pinMode(9, OUTPUT); } void loop() { tone(9, 1000); } — This outputs a 1 kHz square wave on pin 9 continuously.',
+            note: <>void setup() {'{'} pinMode(9, OUTPUT); {'}'} void loop() {'{'} tone(9, 1000); {'}'} — This outputs a 1 kHz <G k="square wave">square wave</G> on pin 9 continuously.</>,
           },
           {
-            text: 'Connect the oscilloscope probe tip to Arduino pin 9. Clip the probe ground to Arduino GND. Set time/div to 0.5ms and volt/div to 2V.',
+            text: <>Connect the oscilloscope probe tip to <G k="arduino">Arduino</G> pin 9. Clip the probe ground to <G k="arduino">Arduino</G> <G k="gnd">GND</G>. Set <G k="time/div">time/div</G> to 0.5ms and <G k="volt/div">volt/div</G> to 2V.</>,
           },
           {
-            text: 'You should see a clean square wave. Measure its period with the oscilloscope cursors (two full cycles should take 2ms, confirming 1 kHz).',
+            text: <>You should see a clean <G k="square wave">square wave</G>. Measure its period with the oscilloscope <G k="cursor">cursors</G> (two full cycles should take 2ms, confirming 1 kHz).</>,
           },
           {
-            text: 'Switch your multimeter to AC voltage. Probe pin 9 and GND. Read the RMS voltage — it should read approximately 2.5V AC (the RMS value of a 0\u20135V square wave).',
+            text: <>Switch your multimeter to <G k="ac">AC</G> voltage. Probe pin 9 and <G k="gnd">GND</G>. Read the <G k="rms">RMS</G> voltage — it should read approximately 2.5V <G k="ac">AC</G> (the <G k="rms">RMS</G> value of a 0–5V <G k="square wave">square wave</G>).</>,
           },
           {
-            text: 'Insert the 470Ω resistor between pin 9 and GND on the breadboard. Probe across the resistor with the oscilloscope. Signal should be unchanged (the scope\'s input impedance is much higher than 470Ω).',
+            text: <>Insert the 470Ω resistor between pin 9 and <G k="gnd">GND</G> on the <G k="breadboard">breadboard</G>. Probe across the resistor with the oscilloscope. Signal should be unchanged (the scope's <G k="input impedance">input impedance</G> is much higher than 470Ω).</>,
           },
         ]}
-        expectedResult="Multimeter shows ~8.5V for the battery. Oscilloscope shows a clean 1 kHz square wave at 5V peak-to-peak. Multimeter reads ~2.5V AC on the PWM pin. All connections register."
-        connectionToTheory="The oscilloscope is showing you something the multimeter cannot: the shape of the signal over time. Both instruments are measuring the same voltage, but they tell you different things about it. This distinction — DC value vs. waveform — runs through every chapter that follows."
+        expectedResult={<>Multimeter shows ~1.5V for the battery. Oscilloscope shows a clean 1 kHz <G k="square wave">square wave</G> at 5V <G k="peak-to-peak">peak-to-peak</G>. Multimeter reads ~2.5V <G k="ac">AC</G> on the <G k="pwm">PWM</G> pin. All connections register.</>}
+        connectionToTheory={<>The oscilloscope is showing you something the multimeter cannot: the shape of the signal over time. Both instruments are measuring the same voltage, but they tell you different things about it. This distinction — <G k="dc">DC</G> value vs. waveform — runs through every chapter that follows.</>}
         troubleshooting={[
-          "Oscilloscope shows noise / flat line: check the ground clip is connected to Arduino GND, and try adjusting volt/div.",
-          "No signal on pin 9: confirm the sketch uploaded successfully and the tone() call uses pin 9.",
-          "Battery reads 0V: check probe polarity and multimeter is in DC voltage mode (not resistance or current).",
+          <>Oscilloscope shows noise / flat line: check the ground clip is connected to <G k="arduino">Arduino</G> <G k="gnd">GND</G>, and try adjusting <G k="volt/div">volt/div</G>.</>,
+          'No signal on pin 9: confirm the sketch uploaded successfully and the tone() call uses pin 9.',
+          <>Battery reads 0V: check probe polarity and multimeter is in <G k="dc">DC</G> voltage mode (not resistance or current).</>,
         ]}
       />
     </>
