@@ -17,6 +17,65 @@ export interface GlossaryEntry {
 }
 
 export const glossary: Record<string, GlossaryEntry> = {
+  // ── Common abbreviations ─────────────────────────────────────────
+  ac: {
+    tip: 'Alternating Current — electric current that reverses direction periodically.',
+    detail:
+      'AC (Alternating Current) flows back and forth, changing direction many times per second. The number of direction changes per second is the frequency (measured in Hz). Household mains power is AC (50 or 60 Hz depending on country). Most radio signals are AC at much higher frequencies. AC behaves differently from DC in circuits — capacitors and inductors respond to it in ways they don\'t to DC.',
+    see: ['dc', 'frequency', 'rms'],
+  },
+  dc: {
+    tip: 'Direct Current — electric current that flows in one direction only.',
+    detail:
+      'DC (Direct Current) flows steadily from positive to negative. Batteries produce DC. Most electronic circuits run on DC power internally, even if they plug into an AC wall outlet (a power supply converts AC to DC). When you measure a battery with a multimeter, you use the DC voltage mode.',
+    see: ['ac', 'voltage'],
+  },
+  led: {
+    tip: 'Light-Emitting Diode — a diode that gives off light when current flows through it.',
+    detail:
+      'An LED is a special type of diode that emits light when forward-biased. LEDs are polarised — the longer leg is positive (anode) and the shorter leg is negative (cathode). They always need a current-limiting resistor in series to avoid burning out. Different colours have different forward voltage drops (red ≈ 1.8V, blue/white ≈ 3.0V).',
+    see: ['diode', 'resistor'],
+  },
+  usb: {
+    tip: 'Universal Serial Bus — standard connector for data transfer and power.',
+    detail:
+      'USB (Universal Serial Bus) is the most common way to connect peripherals to a computer. In electronics prototyping, USB provides both a data connection (for programming microcontrollers like Arduino) and a 5V power supply. USB-A is the rectangular plug; USB-B and USB-C are other shapes you\'ll see on development boards.',
+  },
+  gnd: {
+    tip: 'Ground — the zero-volt reference point in a circuit.',
+    detail:
+      'GND (ground) is the common reference point that all voltages in a circuit are measured against. It\'s the "zero" level. On a breadboard, the blue rail is typically used for ground. On an Arduino, the pin labelled GND connects to the board\'s ground plane. Every circuit needs a complete path back to ground for current to flow.',
+    see: ['voltage', 'power rails'],
+  },
+  ide: {
+    tip: 'Integrated Development Environment — software for writing and uploading code.',
+    detail:
+      'An IDE (Integrated Development Environment) is an application where you write, edit, and upload code to a microcontroller. The Arduino IDE is a simple, beginner-friendly IDE that lets you write sketches (programs), compile them, and upload them to your Arduino board over USB with a single click.',
+  },
+  arrl: {
+    tip: 'American Radio Relay League — the main ham radio organisation in the US.',
+    detail:
+      'The ARRL (American Radio Relay League) is the national association for amateur radio in the United States, founded in 1914. They publish The ARRL Handbook, one of the most comprehensive references for radio and electronics. They also administer licence exams, represent amateurs to regulators, and run contests and award programs.',
+  },
+  cept: {
+    tip: 'European Conference of Postal and Telecommunications Administrations.',
+    detail:
+      'CEPT (Conférence Européenne des administrations des Postes et des Télécommunications) is a European organisation that coordinates telecommunications policy. For ham radio operators, the CEPT licence is important because it allows European amateurs to operate in other CEPT member countries without obtaining a separate licence. The CEPT Novice syllabus defines what beginner radio operators need to learn.',
+  },
+  erc: {
+    tip: 'European Radiocommunications Committee — sets radio regulation guidelines.',
+    detail:
+      'The ERC (European Radiocommunications Committee) was part of CEPT, responsible for radio spectrum regulation in Europe. ERC Report 32 defines the syllabus and examination standards for amateur radio licences across CEPT member countries. It has since been succeeded by the ECC (Electronic Communications Committee), but the report numbers are still widely referenced.',
+    see: ['cept'],
+  },
+  lc: {
+    tip: 'Inductor-Capacitor circuit — resonates at a specific frequency.',
+    detail:
+      'An LC circuit combines an inductor (L) and a capacitor (C). Together they pass energy back and forth between the magnetic field of the inductor and the electric field of the capacitor, oscillating at a natural resonant frequency. LC circuits are fundamental to radio — they are used in tuning circuits, filters, and oscillators to select or reject specific frequencies.',
+    formula: 'f = 1 / (2π√(LC))',
+    see: ['inductor', 'capacitor', 'frequency'],
+  },
+
   // ── Electrical fundamentals ──────────────────────────────────────
   voltage: {
     tip: 'The electrical "pressure" that pushes charges through a circuit.',
@@ -116,6 +175,13 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['impedance', 'vna'],
   },
 
+  arduino: {
+    tip: 'A small, inexpensive microcontroller board popular for electronics projects.',
+    detail:
+      'An Arduino is an open-source circuit board with a programmable chip. You write simple programs (called sketches) on your computer and upload them via USB. The board can then generate signals, read sensors, and control outputs. In this course we use it purely as a handy signal source — its PWM pins produce square waves at controllable frequencies, which is all we need for bench experiments.',
+    see: ['pwm', 'ide', 'usb'],
+  },
+
   // ── Signals & waveforms ──────────────────────────────────────────
   pwm: {
     tip: 'Pulse Width Modulation — square wave with controllable on/off ratio.',
@@ -182,6 +248,27 @@ export const glossary: Record<string, GlossaryEntry> = {
       'An antenna is a conductor sized to efficiently radiate or receive electromagnetic waves at a particular frequency. A half-wave dipole (the most fundamental antenna) has a total length of approximately half the wavelength. Impedance matching between the antenna and feedline is critical — poor matching means reflected power and reduced range.',
     formula: 'λ/2 dipole length ≈ 143 / f(MHz) metres',
     see: ['impedance', 'swr', 'frequency'],
+  },
+
+  'input impedance': {
+    tip: 'How much an instrument resists the signal it is measuring — higher is better.',
+    detail:
+      'Input impedance is the resistance (and reactance) that a measuring instrument presents to the circuit under test. An oscilloscope typically has 1 MΩ (one million ohms) input impedance, meaning it draws almost no current from the circuit and barely affects the measurement. A multimeter in voltage mode also has very high input impedance. The rule of thumb: the measuring device should have at least 10× the impedance of the circuit being measured so it doesn\'t change what you\'re trying to observe.',
+    unit: 'Ohm (Ω)',
+    see: ['impedance', 'oscilloscope'],
+  },
+  'peak-to-peak': {
+    tip: 'The full swing of a signal from its lowest point to its highest point.',
+    detail:
+      'Peak-to-peak voltage (Vpp) measures the total vertical distance of a waveform — from its minimum to its maximum. For a 0–5 V square wave, Vpp is 5 V. For a sine wave centered on zero with peaks at ±3 V, Vpp is 6 V. This is different from RMS voltage (which gives the effective DC-equivalent value) and from peak voltage (measured from zero to the top). Oscilloscopes commonly display Vpp; multimeters typically display RMS.',
+    unit: 'Volts (V)',
+    see: ['rms', 'voltage', 'oscilloscope'],
+  },
+  cursor: {
+    tip: 'Moveable measurement lines on an oscilloscope screen.',
+    detail:
+      'Cursors are on-screen markers you can drag across the waveform to measure precise time intervals or voltage differences. Most oscilloscopes have two horizontal cursors (for voltage) and two vertical cursors (for time). Place one cursor on the start of a feature and the other on the end — the oscilloscope calculates the difference automatically. Cursors are more accurate than eyeballing the grid divisions.',
+    see: ['oscilloscope', 'time/div', 'volt/div'],
   },
 
   // ── Breadboard ───────────────────────────────────────────────────

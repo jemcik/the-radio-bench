@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useState, useCallback } from 'react'
-import { FlaskConical, HelpCircle, ChevronRight, PanelLeftClose, Bookmark, X } from 'lucide-react'
-import LogoIcon from '@/components/LogoIcon'
+import { FlaskConical, HelpCircle, ChevronRight, Bookmark, X, Mail, Github, Home } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +15,7 @@ function ChapterRow({ chapter, onNavigation }: { chapter: ChapterMeta; onNavigat
   const isClickable = chapter.status !== 'coming-soon'
 
   const baseClass = cn(
-    'flex items-center gap-2 w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors',
+    'flex items-baseline gap-2 w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors',
     isClickable
       ? 'hover:bg-accent hover:text-accent-foreground cursor-pointer'
       : 'opacity-50 cursor-default'
@@ -30,18 +29,22 @@ function ChapterRow({ chapter, onNavigation }: { chapter: ChapterMeta; onNavigat
       <span className="flex-1 leading-tight text-sidebar-foreground">
         {chapter.title}
       </span>
-      <span className="flex items-center gap-1 shrink-0">
-        {chapter.hasLab && (
-          <FlaskConical className="w-3 h-3 text-teal-500 opacity-70" />
-        )}
-        {chapter.hasQuiz && (
-          <HelpCircle className="w-3 h-3 text-primary opacity-70" />
-        )}
+      <span className="flex items-center shrink-0 self-center">
+        <span className="w-4 flex justify-center">
+          {chapter.hasLab && (
+            <FlaskConical className="w-3 h-3 text-teal-500 opacity-70" />
+          )}
+        </span>
+        <span className="w-4 flex justify-center">
+          {chapter.hasQuiz && (
+            <HelpCircle className="w-3 h-3 text-primary opacity-70" />
+          )}
+        </span>
         {chapter.status === 'draft' && (
-          <Badge variant="warning" className="text-[10px] px-1 py-0">draft</Badge>
+          <Badge variant="warning" className="text-[10px] px-1 py-0 ml-1">draft</Badge>
         )}
         {chapter.status === 'coming-soon' && (
-          <Badge variant="muted" className="text-[10px] px-1 py-0">soon</Badge>
+          <Badge variant="muted" className="text-[10px] px-1 py-0 ml-1">soon</Badge>
         )}
       </span>
     </>
@@ -214,6 +217,7 @@ function BookmarkRow({
         {label}
       </button>
       <button
+        data-tour="bookmark-remove"
         onClick={(e) => { e.stopPropagation(); onRemove() }}
         className="opacity-0 group-hover:opacity-100 shrink-0 w-5 h-5 flex items-center justify-center rounded text-muted-foreground hover:text-destructive transition-all"
         aria-label="Remove bookmark"
@@ -226,38 +230,35 @@ function BookmarkRow({
 
 // ─── Sidebar root ─────────────────────────────────────────────────────────────
 
-export default function Sidebar({ onNavigation, onClose }: { onNavigation?: () => void; onClose?: () => void }) {
+export default function Sidebar({ onNavigation }: { onNavigation?: () => void }) {
   return (
     <div className="h-full w-full min-w-0 flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden">
-      {/* Logo + close button */}
-      <div className="flex items-center">
+      {/* Start page link */}
+      <div className="shrink-0 px-2 pt-2">
         <NavLink
           to="/"
           onClick={onNavigation}
-          className="flex-1 flex items-center gap-3 px-4 py-4 hover:bg-accent/50 transition-colors min-w-0"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-sm font-medium transition-colors',
+              'hover:bg-accent hover:text-accent-foreground',
+              isActive && 'bg-primary/10 text-primary'
+            )
+          }
+          end
         >
-          <LogoIcon size={38} />
-          <div className="min-w-0">
-            <div className="text-base font-bold text-foreground leading-tight">The Radio Bench</div>
-            <div className="text-xs text-muted-foreground leading-tight">Radio & electronics from ground up</div>
-          </div>
+          <Home className="w-4 h-4 shrink-0" />
+          <span>Home Base</span>
         </NavLink>
-        {onClose && (
-          <button
-            onClick={onClose}
-            aria-label="Close sidebar"
-            className="hidden lg:flex items-center justify-center w-8 h-8 mr-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
-          >
-            <PanelLeftClose className="w-4 h-4" />
-          </button>
-        )}
       </div>
 
-      <Separator />
+      {/* Bookmarks — pinned above scrollable chapters, own scroll if too many */}
+      <div className="shrink-0 px-2 pt-1 max-h-[40%] overflow-y-auto">
+        <BookmarksSection onNavigation={onNavigation} />
+      </div>
 
       {/* Chapter list */}
       <ScrollArea className="flex-1 px-2 py-2">
-        <BookmarksSection onNavigation={onNavigation} />
         <nav className="space-y-0.5">
           {PARTS.map(part => (
             <PartSection key={part.number} part={part} onNavigation={onNavigation} />
@@ -273,6 +274,28 @@ export default function Sidebar({ onNavigation, onClose }: { onNavigation?: () =
           </span>
         </div>
       </ScrollArea>
+
+      {/* Footer — contact & links */}
+      <div data-tour="feedback" className="shrink-0 border-t border-sidebar-border px-4 py-2.5 flex items-center gap-3">
+        <a
+          href="mailto:jemcik@gmail.com"
+          title="Send feedback"
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        >
+          <Mail className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">Feedback</span>
+        </a>
+        <a
+          href="https://github.com/jemcik/the-radio-bench"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View source on GitHub"
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        >
+          <Github className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">GitHub</span>
+        </a>
+      </div>
 
     </div>
   )

@@ -21,7 +21,7 @@ export function BookmarkButton({
   const { isBookmarked, toggle } = useBookmarks()
   const active = isBookmarked(chapterId, sectionId)
 
-  const iconSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
+  const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
   const btnSize = size === 'sm' ? 'w-8 h-8' : 'w-9 h-9'
 
   return (
@@ -34,18 +34,18 @@ export function BookmarkButton({
       aria-label={active ? 'Remove bookmark' : 'Bookmark this'}
       title={active ? 'Remove bookmark' : 'Bookmark'}
       className={cn(
-        'inline-flex items-center justify-center rounded-md transition-all',
+        'inline-flex items-center justify-center rounded-md transition-all shrink-0',
         btnSize,
         active
-          ? 'text-primary hover:text-primary/80'
-          : 'text-muted-foreground/40 hover:text-muted-foreground',
+          ? 'text-red-600 hover:text-red-700'
+          : 'text-muted-foreground/30 hover:text-red-400',
         className,
       )}
     >
       <Bookmark
         className={cn(iconSize, 'transition-all')}
         fill={active ? 'currentColor' : 'none'}
-        strokeWidth={active ? 1.5 : 1.5}
+        strokeWidth={1.5}
       />
     </button>
   )

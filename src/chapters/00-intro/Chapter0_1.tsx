@@ -2,6 +2,7 @@
 import ChapterFlowDiagram from '@/components/diagrams/ChapterFlowDiagram'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
+import { G } from '@/components/ui/glossary-term'
 
 export default function Chapter0_1() {
   return (
@@ -132,10 +133,10 @@ export default function Chapter0_1() {
       <Section id="one-more-thing">One more thing</Section>
 
       <p>
-        The goal is not to prepare you for an exam (though the content covers the full ERC
-        Report 32 syllabus). The goal is to give you the kind of understanding where, when
-        something odd happens on the air, you have a hypothesis — and when you read the ARRL
-        Handbook, it makes sense rather than feeling impenetrable.
+        The goal is not to prepare you for an exam (though the content covers the full{' '}
+        <G k="erc">ERC</G> Report 32 syllabus). The goal is to give you the kind of understanding
+        where, when something odd happens on the air, you have a hypothesis — and when you read
+        the <G k="arrl">ARRL</G> Handbook, it makes sense rather than feeling impenetrable.
       </p>
 
       <p>

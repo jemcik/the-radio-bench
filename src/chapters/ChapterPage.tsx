@@ -115,13 +115,13 @@ function ChapterHeader({ id }: { id: string }) {
           <Badge variant="muted">ERC 32: {meta.erc32.join(', ')}</Badge>
         )}
       </div>
-      <div className="flex items-start gap-2">
-        <h1 className="text-3xl font-bold text-foreground flex-1">{meta.title}</h1>
+      <div className="flex items-center gap-1">
+        <h1 className="text-3xl font-bold text-foreground">{meta.title}</h1>
         <BookmarkButton
           chapterId={meta.id}
           sectionId={null}
           label={`${meta.number} ${meta.title}`}
-          className="mt-1"
+          size="sm"
         />
       </div>
       <p className="text-muted-foreground mt-2">{meta.subtitle}</p>
@@ -147,7 +147,7 @@ export default function ChapterPage() {
   if (!ChapterContent) return <ComingSoon id={chapterId} />
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-6 py-10">
       <ChapterHeader id={chapterId} />
       <Suspense
         fallback={
@@ -160,6 +160,21 @@ export default function ChapterPage() {
           <ChapterContent />
         </div>
       </Suspense>
+      {/* Feedback link */}
+      <div className="mt-12 pt-6 border-t border-border/50 flex items-center gap-4 text-[13px] text-muted-foreground/60">
+        <span>Found a mistake or have a suggestion?</span>
+        <a
+          href={`https://github.com/jemcik/the-radio-bench/issues/new?title=Feedback: Chapter ${meta.number} — ${meta.title}&labels=content`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-primary/70 hover:text-primary transition-colors"
+        >
+          Open an issue
+          <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+            <path d="M3.75 2h3.5a.75.75 0 010 1.5H4.56l7.22 7.22a.75.75 0 11-1.06 1.06L3.5 4.56v2.69a.75.75 0 01-1.5 0v-3.5A1.75 1.75 0 013.75 2z" />
+          </svg>
+        </a>
+      </div>
       <ChapterNav currentId={chapterId} />
     </div>
   )
