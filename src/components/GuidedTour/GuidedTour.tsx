@@ -118,6 +118,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     steps[step]?.onExit?.()
     localStorage.setItem(TOUR_STEP_KEY, String(step))
     setPhase('done')
+    window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
 
   // Complete = finished all steps
@@ -126,6 +127,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     localStorage.setItem(TOUR_STORAGE_KEY, '1')
     localStorage.removeItem(TOUR_STEP_KEY)
     setPhase('done')
+    window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
 
   const nextStep = useCallback(() => {

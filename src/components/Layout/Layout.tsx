@@ -47,6 +47,13 @@ export default function Layout() {
     return () => window.removeEventListener('radiopedia:open-sidebar', handler)
   }, [])
 
+  // Scroll to top when tour ends
+  useEffect(() => {
+    const handler = () => mainRef.current?.scrollTo(0, 0)
+    window.addEventListener('radiopedia:scroll-top', handler)
+    return () => window.removeEventListener('radiopedia:scroll-top', handler)
+  }, [])
+
   // Show a floating notification when a bookmark is added while sidebar is closed
   // Uses direct DOM manipulation to avoid set-state-in-effect lint rule
   useEffect(() => {
