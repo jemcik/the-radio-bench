@@ -86,6 +86,10 @@ Contributions are welcome — whether it's fixing a typo, improving an explanati
 
 If you find a mistake in any chapter, you can also use the "Open an issue" link at the bottom of each chapter page — it pre-fills the issue title and labels for you.
 
+## Author
+
+**UT3UVC** — [QRZ page](https://www.qrz.com/db/UT3UVC)
+
 ## License
 
 [MIT](LICENSE)
