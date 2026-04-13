@@ -1,5 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getChapterById, getAdjacentChapters } from '@/data/chapters'
+import { useTranslatedChapter } from '@/data/useTranslatedChapters'
 import { lazy, Suspense } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { BookmarkButton } from '@/components/ui/bookmark-button'
@@ -43,7 +45,8 @@ function ChapterNavLink({
   edge: 'prev' | 'next'
   chapterTitle: string
 }) {
-  const label = edge === 'prev' ? 'Previous' : 'Next'
+  const { t } = useTranslation('ui')
+  const label = edge === 'prev' ? t('chapter.previous') : t('chapter.next')
 
   return (
     <Link to={to} className={chapterNavLinkClass}>
@@ -60,18 +63,21 @@ function ChapterNavLink({
 }
 
 function ChapterNav({ currentId }: { currentId: string }) {
+  const { t } = useTranslation('ui')
   const { prev, next } = getAdjacentChapters(currentId)
+  const prevTitle = prev ? t(`chapterTitles.${prev.id}`, { defaultValue: prev.title }) : ''
+  const nextTitle = next ? t(`chapterTitles.${next.id}`, { defaultValue: next.title }) : ''
 
   return (
     <div className="flex items-center justify-between pt-10 mt-10 border-t border-border">
       {prev ? (
-        <ChapterNavLink to={`/chapter/${prev.id}`} edge="prev" chapterTitle={prev.title} />
+        <ChapterNavLink to={`/chapter/${prev.id}`} edge="prev" chapterTitle={prevTitle} />
       ) : (
         <div />
       )}
 
       {next && next.status !== 'coming-soon' ? (
-        <ChapterNavLink to={`/chapter/${next.id}`} edge="next" chapterTitle={next.title} />
+        <ChapterNavLink to={`/chapter/${next.id}`} edge="next" chapterTitle={nextTitle} />
       ) : (
         <div />
       )}
@@ -82,14 +88,16 @@ function ChapterNav({ currentId }: { currentId: string }) {
 // ─── Coming soon placeholder ──────────────────────────────────────────────────
 
 function ComingSoon({ id }: { id: string }) {
-  const meta = getChapterById(id)
+  const { t } = useTranslation('ui')
+  const rawMeta = getChapterById(id)
+  const meta = useTranslatedChapter(rawMeta)
   return (
     <div className="max-w-2xl mx-auto px-6 py-16 text-center space-y-4">
       <div className="text-5xl">🔧</div>
       <h1 className="text-2xl font-bold text-foreground">{meta?.title}</h1>
-      <p className="text-muted-foreground">This chapter is being written. Check back soon.</p>
+      <p className="text-muted-foreground">{t('chapter.comingSoon')}</p>
       <Link to="/" className="inline-block text-sm text-primary hover:opacity-80 transition-opacity">
-        ← Back to home
+        {t('chapter.backToHome')}
       </Link>
     </div>
   )
@@ -98,21 +106,23 @@ function ComingSoon({ id }: { id: string }) {
 // ─── Chapter header ───────────────────────────────────────────────────────────
 
 function ChapterHeader({ id }: { id: string }) {
-  const meta = getChapterById(id)
+  const { t } = useTranslation('ui')
+  const rawMeta = getChapterById(id)
+  const meta = useTranslatedChapter(rawMeta)
   if (!meta) return null
 
   return (
     <div className="mb-10 pb-8 border-b border-border">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <span className="text-xs font-mono text-muted-foreground">Chapter {meta.number}</span>
+        <span className="text-xs font-mono text-muted-foreground">{t('chapter.chapter')} {meta.number}</span>
         {meta.hasLab && (
-          <Badge variant="lab">Lab activity</Badge>
+          <Badge variant="lab">{t('chapter.labActivity')}</Badge>
         )}
         {meta.hasQuiz && (
-          <Badge variant="warning">Quiz</Badge>
+          <Badge variant="warning">{t('chapter.quiz')}</Badge>
         )}
         {meta.erc32 && meta.erc32.length > 0 && (
-          <Badge variant="muted">ERC 32: {meta.erc32.join(', ')}</Badge>
+          <Badge variant="muted">{t('chapter.erc32')} {meta.erc32.join(', ')}</Badge>
         )}
       </div>
       <div className="flex items-center gap-1">
@@ -132,6 +142,7 @@ function ChapterHeader({ id }: { id: string }) {
 // ─── Page root ────────────────────────────────────────────────────────────────
 
 export default function ChapterPage() {
+  const { t } = useTranslation('ui')
   const { chapterId } = useParams<{ chapterId: string }>()
 
   if (!chapterId) return <Navigate to="/" replace />
@@ -162,14 +173,14 @@ export default function ChapterPage() {
       </Suspense>
       {/* Feedback link */}
       <div className="mt-12 pt-6 border-t border-border/50 flex items-center gap-4 text-[13px] text-muted-foreground/60">
-        <span>Found a mistake or have a suggestion?</span>
+        <span>{t('chapter.feedbackIntro')}</span>
         <a
           href={`https://github.com/jemcik/the-radio-bench/issues/new?title=Feedback: Chapter ${meta.number} — ${meta.title}&labels=content`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-primary/70 hover:text-primary transition-colors"
         >
-          Open an issue
+          {t('chapter.openIssue')}
           <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
             <path d="M3.75 2h3.5a.75.75 0 010 1.5H4.56l7.22 7.22a.75.75 0 11-1.06 1.06L3.5 4.56v2.69a.75.75 0 01-1.5 0v-3.5A1.75 1.75 0 013.75 2z" />
           </svg>

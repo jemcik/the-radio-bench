@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   IconDanger,
   IconKeyConcept,
@@ -104,6 +105,8 @@ interface CalloutProps {
 
 export function Callout({ variant, title, children, className = '' }: CalloutProps) {
   const v = variants[variant];
+  const { t } = useTranslation('ui');
+  const translatedLabel = t(`calloutLabels.${variant}`, { defaultValue: v.label });
 
   return (
     <div
@@ -114,7 +117,7 @@ export function Callout({ variant, title, children, className = '' }: CalloutPro
         <p
           className={`text-[10px] font-bold uppercase tracking-[0.15em] mb-1 ${v.text}`}
         >
-          {title ?? v.label}
+          {title ?? translatedLabel}
         </p>
         <div className="text-sm leading-relaxed text-foreground/90">
           {children}

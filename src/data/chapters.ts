@@ -112,7 +112,7 @@ export const PARTS: Part[] = [
         number: '1.3',
         part: 1,
         title: 'DC and AC',
-        subtitle: 'Two kinds of electricity, RMS voltage, sine waves',
+        subtitle: 'Two kinds of electricity, RMS (Root Mean Square) voltage, sine waves',
         status: 'coming-soon',
         hasLab: true,
         hasQuiz: true,

@@ -1,4 +1,5 @@
 import { useState, useRef, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import type { GlossaryEntry } from '@/data/glossary'
@@ -22,6 +23,7 @@ interface TermProps {
 }
 
 export function Term({ def, children, className = 'text-[hsl(var(--term-accent))]' }: TermProps) {
+  const { t } = useTranslation('ui')
   // Normalize: support plain string (legacy) or full GlossaryEntry
   const entry: GlossaryEntry =
     typeof def === 'string' ? { tip: def, detail: def } : def
@@ -94,7 +96,7 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
           {/* Header */}
           <div className="flex items-center justify-between mb-1.5 not-prose">
             <span className={`text-[11px] font-semibold uppercase tracking-wider ${className}`}>
-              Reference
+              {t('glossary._ui.reference')}
             </span>
             <button
               className="text-muted-foreground hover:text-foreground cursor-pointer text-base leading-none px-0.5"
@@ -105,7 +107,7 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
                 suppressTooltip.current = true
                 setTimeout(() => { suppressTooltip.current = false }, 400)
               }}
-              aria-label="Close"
+              aria-label={t('glossary._ui.close')}
             >
               ×
             </button>
@@ -121,13 +123,13 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
             <div className="mt-2.5 pt-2 border-t border-border/50">
               {entry.unit && (
                 <p className="text-[11px] text-muted-foreground">
-                  <span className="font-semibold text-foreground/70">Unit:</span>{' '}
+                  <span className="font-semibold text-foreground/70">{t('glossary._ui.unit')}</span>{' '}
                   {entry.unit}
                 </p>
               )}
               {entry.formula && (
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  <span className="font-semibold text-foreground/70">Formula:</span>{' '}
+                  <span className="font-semibold text-foreground/70">{t('glossary._ui.formula')}</span>{' '}
                   <span className="font-mono">{entry.formula}</span>
                 </p>
               )}
@@ -137,8 +139,8 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
           {/* Related terms */}
           {entry.see && entry.see.length > 0 && (
             <p className="mt-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground">
-              <span className="font-semibold text-foreground/70">See also:</span>{' '}
-              {entry.see.join(', ')}
+              <span className="font-semibold text-foreground/70">{t('glossary._ui.seeAlso')}</span>{' '}
+              {entry.see.map(key => t(`glossary._names.${key}`, { defaultValue: key })).join(', ')}
             </p>
           )}
         </PopoverContent>

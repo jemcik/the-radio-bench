@@ -5,6 +5,8 @@ import { BookmarkButton } from './bookmark-button'
 interface SectionHeadingProps {
   /** Used as the anchor id and bookmark key */
   id: string
+  /** i18n key for the heading — stored in the bookmark so label follows language */
+  labelKey?: string
   children: ReactNode
 }
 
@@ -13,7 +15,7 @@ interface SectionHeadingProps {
  * - auto-generated anchor for deep linking
  * - bookmark button visible on hover
  */
-export function Section({ id, children }: SectionHeadingProps) {
+export function Section({ id, labelKey, children }: SectionHeadingProps) {
   const { chapterId } = useParams<{ chapterId: string }>()
   const label = typeof children === 'string' ? children : id.replace(/-/g, ' ')
 
@@ -28,6 +30,7 @@ export function Section({ id, children }: SectionHeadingProps) {
           chapterId={chapterId}
           sectionId={id}
           label={label}
+          labelKey={labelKey}
           size="sm"
           className=""
         />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Sun, Moon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Moon, Sun } from 'lucide-react'
 import { THEMES } from '@/lib/themes'
 import { FONTS } from '@/lib/fonts'
 import { useTheme } from '@/context/ThemeContext'
@@ -9,20 +10,21 @@ import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 
 export default function ThemeToggle() {
+  const { t } = useTranslation('ui')
   const { theme, setTheme } = useTheme()
   const { font, setFont, sizeIndex, setSizeIndex } = useFont()
   const [open, setOpen] = useState(false)
 
-  const current = THEMES.find(t => t.id === theme)
+  const current = THEMES.find(th => th.id === theme)
   const isDark = current?.isDark ?? false
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          aria-label="Change theme"
+          aria-label={t('theme.changeTheme')}
           className={cn(
-            'flex items-center justify-center w-8 h-8 rounded-md transition-colors',
+            'flex items-center justify-center w-8 h-8 rounded-md border border-border transition-colors',
             'text-muted-foreground hover:text-foreground hover:bg-accent'
           )}
         >
@@ -32,34 +34,34 @@ export default function ThemeToggle() {
 
       <PopoverContent align="end" className="w-64 p-3">
         {/* Theme section */}
-        <p className="text-[11px] font-medium text-muted-foreground mb-2.5 uppercase tracking-wider">Theme</p>
+        <p className="text-[11px] font-medium text-muted-foreground mb-2.5 uppercase tracking-wider">{t('theme.theme')}</p>
         <div className="grid grid-cols-3 gap-2">
-          {THEMES.map(t => (
+          {THEMES.map(th => (
             <button
-              key={t.id}
-              title={t.description}
-              onClick={() => { setTheme(t.id); }}
+              key={th.id}
+              title={th.description}
+              onClick={() => { setTheme(th.id); }}
               className={cn(
                 'relative flex flex-col items-center justify-center h-14 rounded-lg border-2 transition-all',
-                theme === t.id
+                theme === th.id
                   ? 'border-primary shadow-md ring-1 ring-primary/30'
                   : 'border-transparent hover:border-border hover:scale-[1.03]'
               )}
-              style={{ backgroundColor: t.swatch }}
+              style={{ backgroundColor: th.swatch }}
             >
               <span
                 className={cn(
                   'text-[11px] font-medium leading-none',
-                  t.isDark ? 'text-white/70' : 'text-black/50'
+                  th.isDark ? 'text-white/70' : 'text-black/50'
                 )}
               >
-                {t.label}
+                {th.label}
               </span>
               {/* Light/dark indicator dot */}
               <span
                 className={cn(
                   'mt-1.5 w-1.5 h-1.5 rounded-full',
-                  t.isDark ? 'bg-white/25' : 'bg-black/15'
+                  th.isDark ? 'bg-white/25' : 'bg-black/15'
                 )}
               />
             </button>
@@ -69,7 +71,7 @@ export default function ThemeToggle() {
         {/* Font size section */}
         <div className="mt-3 pt-3 border-t border-border/50">
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Size</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{t('theme.size')}</p>
             <span className="text-[11px] tabular-nums text-muted-foreground">{FONT_SIZES[sizeIndex]}px</span>
           </div>
           <div className="flex items-center gap-3 px-0.5">
@@ -88,7 +90,7 @@ export default function ThemeToggle() {
 
         {/* Font section */}
         <div className="mt-3 pt-3 border-t border-border/50">
-          <p className="text-[11px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Font</p>
+          <p className="text-[11px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">{t('theme.font')}</p>
           <div className="flex flex-col gap-1">
             {FONTS.map(f => (
               <button
@@ -125,6 +127,7 @@ export default function ThemeToggle() {
             ))}
           </div>
         </div>
+
       </PopoverContent>
     </Popover>
   )

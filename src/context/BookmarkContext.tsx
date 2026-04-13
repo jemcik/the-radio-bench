@@ -7,8 +7,10 @@ export interface Bookmark {
   chapterId: string
   /** Section anchor (h2 id), or null if bookmarking the whole chapter */
   sectionId: string | null
-  /** Human-readable label */
+  /** Human-readable label (fallback when labelKey is absent) */
   label: string
+  /** i18n key — resolved at render time so the label follows the active language */
+  labelKey?: string
   /** Timestamp when bookmarked */
   ts: number
 }
@@ -16,7 +18,7 @@ export interface Bookmark {
 interface BookmarkContextValue {
   bookmarks: Bookmark[]
   isBookmarked: (chapterId: string, sectionId?: string | null) => boolean
-  toggle: (chapterId: string, sectionId: string | null, label: string) => void
+  toggle: (chapterId: string, sectionId: string | null, label: string, labelKey?: string) => void
   remove: (chapterId: string, sectionId?: string | null) => void
   clear: () => void
 }
@@ -62,7 +64,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   )
 
   const toggle = useCallback(
-    (chapterId: string, sectionId: string | null, label: string) => {
+    (chapterId: string, sectionId: string | null, label: string, labelKey?: string) => {
       setBookmarks(prev => {
         const exists = prev.some(b => b.chapterId === chapterId && b.sectionId === sectionId)
         if (exists) {
@@ -70,7 +72,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
           return prev.filter(b => !(b.chapterId === chapterId && b.sectionId === sectionId))
         }
         window.dispatchEvent(new CustomEvent('radiopedia:bookmark-added'))
-        return [...prev, { chapterId, sectionId, label, ts: Date.now() }]
+        return [...prev, { chapterId, sectionId, label, ...(labelKey && { labelKey }), ts: Date.now() }]
       })
     },
     []
@@ -104,11 +106,11 @@ export function useBookmarks() {
 // ─── Imperative helpers (for guided tour — no React context needed) ─────────
 
 /** Add a bookmark directly via localStorage + dispatch a sync event */
-export function addBookmarkImperative(chapterId: string, sectionId: string | null, label: string) {
+export function addBookmarkImperative(chapterId: string, sectionId: string | null, label: string, labelKey?: string) {
   const bookmarks = load()
   const exists = bookmarks.some(b => b.chapterId === chapterId && b.sectionId === sectionId)
   if (!exists) {
-    bookmarks.push({ chapterId, sectionId, label, ts: Date.now() })
+    bookmarks.push({ chapterId, sectionId, label, ...(labelKey && { labelKey }), ts: Date.now() })
     save(bookmarks)
     window.dispatchEvent(new CustomEvent('radiopedia:bookmark-sync'))
   }

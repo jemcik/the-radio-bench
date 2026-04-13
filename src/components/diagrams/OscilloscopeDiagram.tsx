@@ -2,9 +2,11 @@
  * Chapter 0.2 — Oscilloscope screen
  * Shows a square wave on a labelled grid with time/div and volt/div callouts.
  */
+import { useTranslation, Trans } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 
 export default function OscilloscopeDiagram() {
+  const { t } = useTranslation('ui')
   const W = 480, H = 250
   const scrX = 30, scrY = 20, scrW = 280, scrH = 180
   const cols = 10, rows = 8
@@ -45,7 +47,7 @@ export default function OscilloscopeDiagram() {
           width={W} height={H}
           style={{ maxWidth: W, margin: '0 auto' }}
           fontFamily="inherit"
-          aria-label="Oscilloscope screen showing a 1 kHz square wave at 5V peak-to-peak"
+          aria-label={t('ch0_2.scopeDiagramAria')}
         >
           {/* Screen bezel */}
           <rect x={scrX - 8} y={scrY - 8} width={scrW + 16} height={scrH + 16}
@@ -157,9 +159,9 @@ export default function OscilloscopeDiagram() {
         </SVGDiagram>
       </div>
       <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        Oscilloscope screen showing the 1 kHz square wave from the lab activity.
-        Amplitude = 2.5 div × 2 V/div = 5 V<sub>pp</sub>.
-        Period = 4 div × 0.5 ms/div = 2 ms → <strong>1 kHz</strong>.
+        {t('ch0_2.scopeDiagramCaption1')}{' '}
+        {t('ch0_2.scopeDiagramCaption2')}<sub>pp</sub>.{' '}
+        <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong /> }} />
       </figcaption>
     </figure>
   )

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, useLayoutEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { TourStepDef } from './tourSteps'
 import TourBuddy from './TourBuddy'
 
@@ -26,6 +27,7 @@ interface TourOverlayProps {
  * using the step's `placement` hint but adapting to viewport bounds.
  */
 export default function TourOverlay({ step, current, total, onNext, onSkip, onDismiss }: TourOverlayProps) {
+  const { t } = useTranslation('ui')
   const [rect, setRect] = useState<Rect | null>(null)
   const isLast = current === total - 1
 
@@ -62,7 +64,24 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
   }, [measure])
 
   // Card position relative to spotlight
-  const cardStyle = computeCardStyle(rect, step.placement)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [measuredCardHeight, setMeasuredCardHeight] = useState<number | null>(null)
+
+  useLayoutEffect(() => {
+    // Defer setState so ESLint's set-state-in-effect rule is satisfied; layout still runs before paint.
+    queueMicrotask(() => {
+      if (!cardRef.current || !rect) {
+        setMeasuredCardHeight(null)
+        return
+      }
+      setMeasuredCardHeight(cardRef.current.offsetHeight)
+    })
+  }, [rect, step.placement, step.titleKey, step.bodyKey])
+
+  const cardStyle = useMemo(
+    () => computeCardStyle(rect, step.placement, measuredCardHeight ?? 280),
+    [rect, step.placement, measuredCardHeight],
+  )
 
   return (
     <div className="fixed inset-0 z-[9999]" aria-modal="true" role="dialog">
@@ -109,6 +128,7 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
 
       {/* Tour card */}
       <div
+        ref={cardRef}
         className="absolute z-[10000] w-80 max-w-[calc(100vw-2rem)]"
         style={cardStyle}
       >
@@ -120,10 +140,10 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
 
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-bold text-foreground leading-tight">
-                  {step.title}
+                  {t(step.titleKey)}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-                  {step.body}
+                  {t(step.bodyKey)}
                 </p>
               </div>
             </div>
@@ -147,13 +167,13 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
                   onClick={onSkip}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {isLast ? '' : 'Skip tour'}
+                  {isLast ? '' : t('guidedTour.skipTour')}
                 </button>
                 <button
                   onClick={onNext}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
                 >
-                  {isLast ? 'Start reading' : 'Next'}
+                  {isLast ? t('guidedTour.startReading') : t('guidedTour.next')}
                   {!isLast && (
                     <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
                       <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06L7.28 12.78a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z" />
@@ -175,12 +195,12 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
 function computeCardStyle(
   rect: Rect | null,
   placement: TourStepDef['placement'],
+  ch = 280,
 ): React.CSSProperties {
   if (!rect) return { opacity: 0 }
 
-  // Fixed estimates — the card has `w-80` (320px) and content ~180-220px tall
+  // Card width is `w-80` (320px); height is either measured or estimated
   const cw = 320
-  const ch = 210
   const gap = 16
   const vw = window.innerWidth
   const vh = window.innerHeight

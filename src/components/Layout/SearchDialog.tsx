@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { Search, FileText, BookOpen, ArrowRight, ChevronDown } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -18,27 +20,52 @@ interface SearchResult {
   href: string | null
   /** Full glossary entry for inline preview */
   entry?: GlossaryEntry
+  /** Original glossary key (for matching and “See also” labels) */
+  glossaryKey?: string
 }
 
 // ─── Build search index ──────────────────────────────────────────────────────
 
-function buildResults(): SearchResult[] {
-  const chapters: SearchResult[] = getAllChapters().map(ch => ({
-    type: 'chapter',
-    id: ch.id,
-    title: `${ch.number} — ${ch.title}`,
-    subtitle: ch.subtitle,
-    href: ch.status !== 'coming-soon' ? `/chapter/${ch.id}` : null,
-  }))
+function mergeGlossaryEntry(key: string, base: GlossaryEntry, t: TFunction<'ui'>): GlossaryEntry {
+  const translatedTip = t(`glossary.${key}.tip`, { defaultValue: '' })
+  const translatedDetail = t(`glossary.${key}.detail`, { defaultValue: '' })
+  return {
+    ...base,
+    tip: translatedTip || base.tip,
+    detail: translatedDetail || base.detail,
+  }
+}
 
-  const terms: SearchResult[] = Object.entries(glossary).map(([key, entry]) => ({
-    type: 'glossary',
-    id: `g-${key}`,
-    title: key.charAt(0).toUpperCase() + key.slice(1),
-    subtitle: entry.tip,
-    href: null,
-    entry,
-  }))
+function glossaryDisplayTitle(key: string, t: TFunction<'ui'>): string {
+  const fallback = key.charAt(0).toUpperCase() + key.slice(1)
+  return t(`glossary._names.${key}`, { defaultValue: fallback })
+}
+
+function buildResults(t: TFunction<'ui'>): SearchResult[] {
+  const chapters: SearchResult[] = getAllChapters().map(ch => {
+    const title = t(`chapterTitles.${ch.id}`, { defaultValue: ch.title })
+    const subtitle = t(`chapterSubtitles.${ch.id}`, { defaultValue: ch.subtitle })
+    return {
+      type: 'chapter',
+      id: ch.id,
+      title: `${ch.number} — ${title}`,
+      subtitle,
+      href: ch.status !== 'coming-soon' ? `/chapter/${ch.id}` : null,
+    }
+  })
+
+  const terms: SearchResult[] = Object.entries(glossary).map(([key, entry]) => {
+    const merged = mergeGlossaryEntry(key, entry, t)
+    return {
+      type: 'glossary' as const,
+      id: `g-${key}`,
+      title: glossaryDisplayTitle(key, t),
+      subtitle: merged.tip,
+      href: null,
+      entry: merged,
+      glossaryKey: key,
+    }
+  })
 
   return [...chapters, ...terms]
 }
@@ -63,13 +90,20 @@ function matchScore(query: string, text: string): number {
 function searchFn(query: string, all: SearchResult[]): SearchResult[] {
   if (!query.trim()) return []
   return all
-    .map(r => ({
-      result: r,
-      score: Math.max(
-        matchScore(query, r.title),
-        matchScore(query, r.subtitle) * 0.7
-      ),
-    }))
+    .map(r => {
+      const keyScore =
+        r.type === 'glossary' && r.glossaryKey
+          ? matchScore(query, r.glossaryKey) * 0.85
+          : 0
+      return {
+        result: r,
+        score: Math.max(
+          matchScore(query, r.title),
+          matchScore(query, r.subtitle) * 0.7,
+          keyScore,
+        ),
+      }
+    })
     .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 12)
@@ -79,6 +113,7 @@ function searchFn(query: string, all: SearchResult[]): SearchResult[] {
 // ─── Components ──────────────────────────────────────────────────────────────
 
 export function SearchTrigger({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation('ui')
   const isMac = navigator.platform.toUpperCase().includes('MAC')
 
   return (
@@ -93,7 +128,7 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
       )}
     >
       <Search className="w-3.5 h-3.5 shrink-0" />
-      <span className="flex-1 text-left text-xs">Search...</span>
+      <span className="flex-1 text-left text-xs">{t('search.placeholder')}</span>
       <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 h-5 rounded border border-border bg-muted text-[10px] font-mono text-muted-foreground">
         {isMac ? '⌘' : 'Ctrl'}K
       </kbd>
@@ -102,6 +137,8 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
 }
 
 export default function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('ui')
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent
@@ -109,7 +146,7 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
         className="top-[12vh] translate-y-0 p-0 gap-0 max-w-lg overflow-hidden rounded-xl data-[state=open]:slide-in-from-top-[10vh]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <VisuallyHidden><DialogTitle>Search</DialogTitle></VisuallyHidden>
+        <VisuallyHidden><DialogTitle>{t('search.title')}</DialogTitle></VisuallyHidden>
         <SearchDialogBody onClose={onClose} />
       </DialogContent>
     </Dialog>
@@ -117,23 +154,23 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
 }
 
 function SearchDialogBody({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation('ui')
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [expanded, setExpanded] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
-  const allResults = useMemo(() => buildResults(), [])
+  const allResults = useMemo(() => buildResults(t), [t])
   const results = useMemo(() => searchFn(query, allResults), [query, allResults])
+
+  const maxIdx = Math.max(results.length - 1, 0)
+  const safeActive = Math.min(active, maxIdx)
 
   // Focus input on mount
   useEffect(() => {
     requestAnimationFrame(() => inputRef.current?.focus())
   }, [])
-
-  // Clamp active index to results bounds (derived during render)
-  const clampedActive = Math.min(active, Math.max(results.length - 1, 0))
-  if (clampedActive !== active) setActive(clampedActive)
 
   const handleQueryChange = useCallback((value: string) => {
     setQuery(value)
@@ -150,17 +187,27 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
     }
   }, [navigate, onClose])
 
-  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActive(i => Math.min(i + 1, results.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActive(i => Math.max(i - 1, 0))
-    } else if (e.key === 'Enter' && results[active]) {
-      activate(results[active])
-    }
-  }, [results, active, activate])
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const cap = Math.max(results.length - 1, 0)
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setActive(i => {
+          const cur = Math.min(i, cap)
+          return Math.min(cur + 1, cap)
+        })
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setActive(i => {
+          const cur = Math.min(i, cap)
+          return Math.max(cur - 1, 0)
+        })
+      } else if (e.key === 'Enter' && results[safeActive]) {
+        activate(results[safeActive])
+      }
+    },
+    [results, safeActive, activate],
+  )
 
   return (
     <>
@@ -173,7 +220,7 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
           value={query}
           onChange={e => handleQueryChange(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Search chapters and terms..."
+          placeholder={t('search.inputPlaceholder')}
           className="flex-1 h-12 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         />
         <kbd className="px-1.5 h-5 rounded border border-border bg-muted text-[10px] font-mono text-muted-foreground inline-flex items-center">
@@ -185,13 +232,13 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
       <div className="max-h-[60vh] overflow-y-auto p-2">
         {query && results.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-8">
-            No results for &ldquo;{query}&rdquo;
+            {t('search.noResults', { query })}
           </p>
         )}
 
         {!query && (
           <div className="py-6 text-center">
-            <p className="text-sm text-muted-foreground">Type to search chapters and glossary terms</p>
+            <p className="text-sm text-muted-foreground">{t('search.typeToSearch')}</p>
           </div>
         )}
 
@@ -207,7 +254,7 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
                 onClick={() => activate(r)}
                 className={cn(
                   'flex items-start gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors',
-                  i === active ? 'bg-accent text-accent-foreground' : 'text-foreground',
+                  i === safeActive ? 'bg-accent text-accent-foreground' : 'text-foreground',
                 )}
               >
                 {/* Icon */}
@@ -231,7 +278,7 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
                   <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1.5" />
                 )}
                 {isComingSoon && (
-                  <span className="text-[10px] text-muted-foreground shrink-0 mt-1">soon</span>
+                  <span className="text-[10px] text-muted-foreground shrink-0 mt-1">{t('sidebar.soon')}</span>
                 )}
                 {isGlossary && (
                   <ChevronDown className={cn(
@@ -250,12 +297,13 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
                     <div className="mt-2 pt-2 border-t border-border/40 space-y-0.5">
                       {r.entry.unit && (
                         <p className="text-muted-foreground">
-                          <span className="font-semibold text-foreground/70">Unit:</span> {r.entry.unit}
+                          <span className="font-semibold text-foreground/70">{t('glossary._ui.unit')}</span>{' '}
+                          {r.entry.unit}
                         </p>
                       )}
                       {r.entry.formula && (
                         <p className="text-muted-foreground">
-                          <span className="font-semibold text-foreground/70">Formula:</span>{' '}
+                          <span className="font-semibold text-foreground/70">{t('glossary._ui.formula')}</span>{' '}
                           <span className="font-mono">{r.entry.formula}</span>
                         </p>
                       )}
@@ -264,8 +312,8 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
 
                   {r.entry.see && r.entry.see.length > 0 && (
                     <p className="mt-2 pt-2 border-t border-border/40 text-muted-foreground">
-                      <span className="font-semibold text-foreground/70">See also:</span>{' '}
-                      {r.entry.see.join(', ')}
+                      <span className="font-semibold text-foreground/70">{t('glossary._ui.seeAlso')}</span>{' '}
+                      {r.entry.see.map(sk => t(`glossary._names.${sk}`, { defaultValue: sk })).join(', ')}
                     </p>
                   )}
                 </div>
@@ -277,9 +325,9 @@ function SearchDialogBody({ onClose }: { onClose: () => void }) {
 
       {/* Footer */}
       <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd> navigate</span>
-        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd> open / expand</span>
-        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd> close</span>
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd> {t('search.hintNavigate')}</span>
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd> {t('search.hintOpen')}</span>
+        <span className="flex items-center gap-1"><kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd> {t('search.hintClose')}</span>
       </div>
     </>
   )

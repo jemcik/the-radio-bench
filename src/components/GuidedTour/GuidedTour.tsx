@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, createContext, useContext, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import { TOUR_STEPS, TOUR_STORAGE_KEY, TOUR_STEP_KEY } from './tourSteps'
@@ -188,6 +189,8 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
 /* ── Initial prompt card ──────────────────────────────────────────────────── */
 
 function TourPrompt({ onStart, onSkip }: { onStart: () => void; onSkip: () => void }) {
+  const { t } = useTranslation('ui')
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
@@ -202,11 +205,10 @@ function TourPrompt({ onStart, onSkip }: { onStart: () => void; onSkip: () => vo
           <WelcomeBuddy size={80} className="text-primary mx-auto mb-3" />
 
           <h2 className="text-lg font-bold text-foreground">
-            First time here?
+            {t('guidedTour.firstTimeHere')}
           </h2>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-            Take a 30-second tour to learn how to get the most out of the site — themes, search,
-            bookmarks, and interactive glossary terms.
+            {t('guidedTour.tourDescription')}
           </p>
 
           <div className="flex flex-col gap-2 mt-5">
@@ -214,13 +216,13 @@ function TourPrompt({ onStart, onSkip }: { onStart: () => void; onSkip: () => vo
               onClick={onStart}
               className="w-full px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
             >
-              Show me around
+              {t('guidedTour.showMeAround')}
             </button>
             <button
               onClick={onSkip}
               className="w-full px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              I'll explore on my own
+              {t('guidedTour.exploreOnMyOwn')}
             </button>
           </div>
         </div>
