@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FlaskConical, ChevronDown, Zap, Wrench, ListOrdered, Eye, Link2, AlertTriangle } from 'lucide-react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
@@ -43,8 +44,9 @@ export default function LabActivity({
   label, goal, equipment, components, procedure,
   expectedResult, connectionToTheory, troubleshooting,
 }: LabActivityProps) {
+  const { t } = useTranslation('ui')
   const [open, setOpen] = useState(false)
-  const title = label ? `Lab Activity ${label}` : 'Lab Activity'
+  const title = label ? `${t('lab.title')} ${label}` : t('lab.title')
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="my-8">
@@ -61,7 +63,7 @@ export default function LabActivity({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <Badge variant="lab" className="text-[10px]">Optional</Badge>
+              <Badge variant="lab" className="text-[10px]">{t('lab.optional')}</Badge>
               <span className="text-sm font-semibold text-foreground">{title}</span>
             </div>
             <p className="text-sm text-muted-foreground truncate">{goal}</p>
@@ -79,24 +81,24 @@ export default function LabActivity({
 
             {/* Equipment + Components */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Section icon={Wrench} title="Equipment">
+              <Section icon={Wrench} title={t('lab.equipment')}>
                 <ul className="space-y-1.5">
                   {equipment.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-card-foreground">
                       <span className="text-teal-500 shrink-0 mt-0.5">›</span>
-                      {item}
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </Section>
 
               {components && components.length > 0 && (
-                <Section icon={Zap} title="Components">
+                <Section icon={Zap} title={t('lab.components')}>
                   <ul className="space-y-1.5">
                     {components.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-card-foreground">
                         <span className="text-teal-500 shrink-0 mt-0.5">›</span>
-                        {item}
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -107,7 +109,7 @@ export default function LabActivity({
             <Separator className="opacity-30" />
 
             {/* Procedure */}
-            <Section icon={ListOrdered} title="Procedure">
+            <Section icon={ListOrdered} title={t('lab.procedure')}>
               <ol className="space-y-3">
                 {procedure.map((step, i) => (
                   <li key={i} className="flex gap-3 text-sm">
@@ -130,13 +132,13 @@ export default function LabActivity({
             {/* Expected result + Connection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="rounded-lg border border-border bg-card/60 p-4">
-                <Section icon={Eye} title="Expected result">
+                <Section icon={Eye} title={t('lab.expectedResult')}>
                   <p className="text-sm text-card-foreground">{expectedResult}</p>
                 </Section>
               </div>
 
               <div className="rounded-lg border border-teal-500/25 bg-teal-500/8 p-4">
-                <Section icon={Link2} title="Connection to theory">
+                <Section icon={Link2} title={t('lab.connectionToTheory')}>
                   <p className="text-sm text-teal-700 dark:text-teal-300">{connectionToTheory}</p>
                 </Section>
               </div>
@@ -144,12 +146,12 @@ export default function LabActivity({
 
             {/* Troubleshooting */}
             {troubleshooting && troubleshooting.length > 0 && (
-              <Section icon={AlertTriangle} title="Troubleshooting">
+              <Section icon={AlertTriangle} title={t('lab.troubleshooting')}>
                 <ul className="space-y-1.5">
                   {troubleshooting.map((tip, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="text-primary shrink-0 mt-0.5">•</span>
-                      {tip}
+                      <span>{tip}</span>
                     </li>
                   ))}
                 </ul>

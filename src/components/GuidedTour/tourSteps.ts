@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import { addBookmarkImperative, removeBookmarkImperative } from '@/context/BookmarkContext'
 
 /**
@@ -10,10 +11,10 @@ import { addBookmarkImperative, removeBookmarkImperative } from '@/context/Bookm
 export interface TourStepDef {
   /** Selector used to find the spotlight target (data-tour attribute value or CSS selector). */
   target: string
-  /** Card title */
-  title: string
-  /** Card body text */
-  body: string
+  /** i18n key for card title (under tour namespace, e.g. 'step1Title') */
+  titleKey: string
+  /** i18n key for card body text (under tour namespace, e.g. 'step1Body') */
+  bodyKey: string
   /** Preferred card placement relative to the spotlight */
   placement: 'right' | 'bottom' | 'left' | 'top'
   /** Extra padding around the spotlight cutout (px) */
@@ -25,53 +26,57 @@ export interface TourStepDef {
 }
 
 /** Demo bookmark used during the guided tour */
-const TOUR_BOOKMARK = { chapterId: '0-1', sectionId: 'what-youll-need', label: "What you'll need" } as const
+const TOUR_BOOKMARK = { chapterId: '0-1', sectionId: 'what-youll-need' } as const
+
+function tourBookmarkLabel() {
+  return i18n.t('tour.bookmarkDemoLabel', { ns: 'ui' })
+}
 
 export const TOUR_STEPS: TourStepDef[] = [
   {
     target: '[data-tour="sidebar"]',
-    title: 'Your map',
-    body: 'Chapters are grouped by topic. The sidebar shows your progress — click any chapter to jump in. Chapters marked "soon" are on the way.',
+    titleKey: 'tour.step1Title',
+    bodyKey: 'tour.step1Body',
     placement: 'right',
     padding: 0,
     onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),
   },
   {
     target: '[data-tour="search"]',
-    title: 'Quick search',
-    body: 'Press ⌘K (or Ctrl+K) from anywhere to search chapters and glossary terms instantly. Try typing "voltage" or "antenna".',
+    titleKey: 'tour.step2Title',
+    bodyKey: 'tour.step2Body',
     placement: 'bottom',
     padding: 6,
   },
   {
     target: '[data-tour="theme"]',
-    title: 'Pick a theme',
-    body: 'Prefer dark mode? A warm paper look? Choose the theme that\'s easiest on your eyes — there are six to pick from.',
+    titleKey: 'tour.step3Title',
+    bodyKey: 'tour.step3Body',
     placement: 'bottom',
     padding: 6,
   },
   {
     target: '[data-tour="glossary-term"]',
-    title: 'Interactive terms',
-    body: 'Highlighted words are glossary terms. Hover for a quick definition, or click to pin a full reference card with formulas and related terms.',
+    titleKey: 'tour.step4Title',
+    bodyKey: 'tour.step4Body',
     placement: 'top',
     padding: 8,
   },
   {
     target: '[data-tour="bookmark-demo"]',
-    title: 'Bookmark anything',
-    body: 'Every section heading has a bookmark icon. We just saved "What you\'ll need" for you — look at the sidebar!',
+    titleKey: 'tour.step5Title',
+    bodyKey: 'tour.step5Body',
     placement: 'top',
     padding: 8,
     onEnter: () => {
-      addBookmarkImperative(TOUR_BOOKMARK.chapterId, TOUR_BOOKMARK.sectionId, TOUR_BOOKMARK.label)
+      addBookmarkImperative(TOUR_BOOKMARK.chapterId, TOUR_BOOKMARK.sectionId, tourBookmarkLabel())
       window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar'))
     },
   },
   {
     target: '[data-tour="sidebar"]',
-    title: 'Quick access',
-    body: 'Bookmarks appear at the top of the sidebar. Click any saved item to jump straight back. The × removes it when you\'re done.',
+    titleKey: 'tour.step6Title',
+    bodyKey: 'tour.step6Body',
     placement: 'right',
     padding: 0,
     onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),
@@ -81,8 +86,8 @@ export const TOUR_STEPS: TourStepDef[] = [
   },
   {
     target: '[data-tour="feedback"]',
-    title: 'Get in touch',
-    body: 'Spotted a mistake? Have a suggestion? Use the links at the bottom of the sidebar to send feedback by email or open an issue on GitHub.',
+    titleKey: 'tour.step7Title',
+    bodyKey: 'tour.step7Body',
     placement: 'right',
     padding: 8,
     onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),

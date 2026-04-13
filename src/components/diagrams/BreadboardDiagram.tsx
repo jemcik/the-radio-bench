@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 
 /**
@@ -11,6 +12,7 @@ import SVGDiagram from './SVGDiagram'
  * A highlighted column group shows exactly which holes share one node.
  */
 export default function BreadboardDiagram() {
+  const { t } = useTranslation('ui')
   const W = 520, H = 220
 
   // Board body
@@ -54,7 +56,7 @@ export default function BreadboardDiagram() {
           width={W} height={H}
           style={{ maxWidth: W, margin: '0 auto' }}
           fontFamily="inherit"
-          aria-label="Breadboard anatomy: power rails run horizontally, tie-point columns connect 5 holes vertically"
+          aria-label={t('ch0_2.breadboardAria')}
         >
           {/* ── Board body ──────────────────────────────────────────── */}
           <rect x={bx} y={by} width={bw} height={bh} rx="6"
@@ -105,7 +107,7 @@ export default function BreadboardDiagram() {
             y={tieTop + halfH + midGapH / 2 + 3}
             textAnchor="middle" fontSize="10"
             fill="hsl(142 30% 72%)">
-            ← DIP gap — separates the two sides →
+            {t('ch0_2.breadboardDipGap')}
           </text>
 
           {/* ── Row labels ───────────────────────────────────────── */}
@@ -193,22 +195,22 @@ export default function BreadboardDiagram() {
             x={hlX + holeR + 18}
             y={tieTop + ((numRows - 1) * rowStep) / 2 - 5}
             fontSize="11" fill="hsl(38 92% 55%)" fontWeight="600">
-            col {hlColNum}
+            {t('ch0_2.breadboardCol', { num: hlColNum })}
           </text>
           <text
             x={hlX + holeR + 18}
             y={tieTop + ((numRows - 1) * rowStep) / 2 + 6}
             fontSize="10" fill="hsl(38 92% 55%)" opacity="0.8">
-            a–e: one node
+            {t('ch0_2.breadboardNode')}
           </text>
         </SVGDiagram>
       </div>
       <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        Breadboard anatomy.{' '}
-        <span style={{ color: 'hsl(0 70% 55%)' }}>Red</span>/
-        <span style={{ color: 'hsl(221 80% 60%)' }}>blue</span> rails run the full length
-        (power &amp; ground). In the main area, the <strong>5 holes in each column</strong> (a–e,
-        or f–j) share one electrical node — inserting two legs into the same column connects them.
+        {t('ch0_2.breadboardCaption1')}{' '}
+        <span style={{ color: 'hsl(0 70% 55%)' }}>{t('ch0_2.breadboardRed')}</span>/
+        <span style={{ color: 'hsl(221 80% 60%)' }}>{t('ch0_2.breadboardBlue')}</span> {t('ch0_2.breadboardCaptionRails')}{' '}
+        {t('ch0_2.breadboardCaption5holes')}{' '}
+        {t('ch0_2.breadboardCaptionNode')}
       </figcaption>
     </figure>
   )

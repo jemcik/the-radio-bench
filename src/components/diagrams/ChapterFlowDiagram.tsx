@@ -1,27 +1,53 @@
 /**
  * Chapter 0.1 — How a chapter is structured
  * Shows the Concept → Formula → Widget → Lab → Quiz flow.
+ * Box widths are computed dynamically from translated text.
  */
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 
-export default function ChapterFlowDiagram() {
-  const steps = [
-    { label: 'Analogy', sub: 'Real-world hook', color: 'hsl(38 92% 50%)',  w: 120 },
-    { label: 'Formula', sub: 'Made precise',    color: 'hsl(38 92% 50%)',  w: 104 },
-    { label: 'Widget',  sub: 'Interactive',     color: 'hsl(221 83% 53%)', w: 104 },
-    { label: 'Lab',     sub: 'Optional ✦',      color: 'hsl(172 66% 40%)', w: 96  },
-    { label: 'Quiz',    sub: 'Check recall',    color: 'hsl(250 60% 60%)', w: 100 },
-  ]
+/** Estimate text width using an off-screen canvas (accurate to ±2 px). */
+function measureText(text: string, font: string): number {
+  if (typeof document === 'undefined') return text.length * 8
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return text.length * 8
+  ctx.font = font
+  return Math.ceil(ctx.measureText(text).width)
+}
 
-  const BOX_H  = 56
-  const GAP    = 32   // space between box edges where the arrow lives
-  const PAD_X  = 20
-  const PAD_Y  = 20
+export default function ChapterFlowDiagram() {
+  const { t } = useTranslation('ui')
+
+  const stepDefs = useMemo(() => [
+    { label: t('chapterFlow.analogy'), sub: t('chapterFlow.analogySub'), color: 'hsl(38 92% 50%)' },
+    { label: t('chapterFlow.formula'), sub: t('chapterFlow.formulaSub'), color: 'hsl(38 92% 50%)' },
+    { label: t('chapterFlow.widget'),  sub: t('chapterFlow.widgetSub'),  color: 'hsl(221 83% 53%)' },
+    { label: t('chapterFlow.lab'),     sub: t('chapterFlow.labSub'),     color: 'hsl(172 66% 40%)' },
+    { label: t('chapterFlow.quiz'),    sub: t('chapterFlow.quizSub'),    color: 'hsl(250 60% 60%)' },
+  ], [t])
+
+  const BOX_H = 56
+  const GAP = 32
+  const PAD_X = 20
+  const PAD_Y = 20
+  const H_PAD = 24 // horizontal padding inside each box
+  const MIN_W = 80
+
+  // Compute dynamic widths
+  const steps = useMemo(() => stepDefs.map(s => {
+    const labelW = measureText(s.label, '600 15px sans-serif')
+    const subW = measureText(s.sub, '400 12px sans-serif')
+    const w = Math.max(MIN_W, Math.max(labelW, subW) + H_PAD)
+    return { ...s, w }
+  }), [stepDefs])
+
   const TOTAL_W = PAD_X * 2 + steps.reduce((s, st) => s + st.w, 0) + (steps.length - 1) * GAP
   const TOTAL_H = BOX_H + PAD_Y * 2
   const CY = PAD_Y + BOX_H / 2
 
-  // Pre-compute X positions based on variable widths
+  // Pre-compute X positions
   const boxXs: number[] = []
   let cursor = PAD_X
   for (const step of steps) {
@@ -35,20 +61,18 @@ export default function ChapterFlowDiagram() {
         <SVGDiagram
           width={TOTAL_W} height={TOTAL_H}
           style={{ maxWidth: TOTAL_W, margin: '0 auto' }}
-          aria-label="Chapter structure flow: Analogy → Formula → Widget → Lab → Quiz"
+          aria-label={t('chapterFlow.ariaLabel')}
         >
           {steps.map((step, i) => {
             const boxX = boxXs[i]
             const boxW = step.w
-            // Arrow: shaft from previous box edge to just before this box
-            const ax1 = boxX - GAP + 2   // shaft start
-            const ax2 = boxX - 5         // chevron tip
+            const ax1 = boxX - GAP + 2
+            const ax2 = boxX - 5
             const headLen = 7
             const headW = 5
 
             return (
-              <g key={step.label}>
-                {/* Arrow — single path, no marker opacity mismatch */}
+              <g key={i}>
                 {i > 0 && (
                   <path
                     d={[
@@ -67,7 +91,6 @@ export default function ChapterFlowDiagram() {
                   />
                 )}
 
-                {/* Box */}
                 <rect
                   x={boxX} y={PAD_Y}
                   width={boxW} height={BOX_H}
@@ -79,7 +102,6 @@ export default function ChapterFlowDiagram() {
                   strokeOpacity="0.5"
                 />
 
-                {/* Label */}
                 <text
                   x={boxX + boxW / 2}
                   y={CY - 7}
@@ -92,7 +114,6 @@ export default function ChapterFlowDiagram() {
                   {step.label}
                 </text>
 
-                {/* Sub-label */}
                 <text
                   x={boxX + boxW / 2}
                   y={CY + 10}
@@ -110,7 +131,7 @@ export default function ChapterFlowDiagram() {
         </SVGDiagram>
       </div>
       <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        Every chapter follows this structure. Lab activities are optional; everything else is always present.
+        {t('chapterFlow.caption')}
       </figcaption>
     </figure>
   )

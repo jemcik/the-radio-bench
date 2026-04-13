@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, Compass } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -6,6 +7,7 @@ import { cn } from '@/lib/utils'
 import LogoIcon from '@/components/LogoIcon'
 import Sidebar from './Sidebar'
 import ThemeToggle from './ThemeToggle'
+import LanguageToggle from './LanguageToggle'
 import SearchDialog, { SearchTrigger } from './SearchDialog'
 import { useTour } from '@/components/GuidedTour/GuidedTour'
 import { useBookmarks } from '@/context/BookmarkContext'
@@ -16,6 +18,7 @@ const LG = 1024
 const SIDEBAR_KEY = 'radiopedia-sidebar-open'
 
 export default function Layout() {
+  const { t } = useTranslation('ui')
   const navigate = useNavigate()
   const { startTour } = useTour()
   const { bookmarks } = useBookmarks()
@@ -132,7 +135,7 @@ export default function Layout() {
             ref={sidebarBtnRef}
             variant="ghost"
             size="icon"
-            aria-label={desktopOpen ? 'Close sidebar' : 'Open sidebar'}
+            aria-label={desktopOpen ? t('sidebar.closeSidebar') : t('sidebar.openSidebar')}
             onClick={() => {
               // On mobile, open the slide-in drawer; on desktop, toggle the panel
               if (window.innerWidth < LG) {
@@ -153,8 +156,8 @@ export default function Layout() {
           >
             <LogoIcon size={32} />
             <div className="min-w-0 text-left">
-              <div className="text-base font-bold text-foreground leading-tight">The Radio Bench</div>
-              <div className="text-xs text-muted-foreground leading-tight hidden sm:block">Radio & electronics from ground up</div>
+              <div className="text-base font-bold text-foreground leading-tight">{t('site.title')}</div>
+              <div className="text-xs text-muted-foreground leading-tight hidden sm:block">{t('site.subtitle')}</div>
             </div>
           </button>
 
@@ -166,6 +169,9 @@ export default function Layout() {
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
 
+          {/* Language toggle */}
+          <LanguageToggle />
+
           {/* Theme toggle */}
           <div data-tour="theme">
             <ThemeToggle />
@@ -176,11 +182,11 @@ export default function Layout() {
             variant="ghost"
             size="icon"
             onClick={startTour}
-            aria-label="Take a guided tour"
-            title="Guided tour"
-            className="w-9 h-9 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-colors"
+            aria-label={t('guidedTour.takeATour')}
+            title={t('guidedTour.guidedTour')}
+            className="w-8 h-8 rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
           >
-            <Compass className="w-[18px] h-[18px]" />
+            <Compass className="w-4 h-4" />
           </Button>
         </header>
 

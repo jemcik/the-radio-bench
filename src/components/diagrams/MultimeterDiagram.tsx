@@ -5,6 +5,7 @@
  * Uses the local circuit schematic library (@/lib/circuit) with
  * ARRL-standard symbols and explicit waypoint wiring.
  */
+import { useTranslation } from 'react-i18next'
 import { Circuit, Wire, Junction, Resistor, Battery, Meter, pins2 } from '@/lib/circuit'
 
 const W = 360
@@ -38,10 +39,10 @@ const AMP_ACCENT  = 'hsl(142 55% 42%)'
  */
 const L = 75, R = 285, TOP = 40, MID = 100, BOT = 195
 
-function VoltmeterParallel() {
+function VoltmeterParallel({ caption }: { caption: string }) {
   return (
     <Circuit width={W} height={H}
-      caption="Voltmeter in parallel — probes tap across the component, never break the circuit">
+      caption={caption}>
 
       {/* ── main loop wires ── */}
       <Wire points={[vBat.p1, { x: L, y: TOP }, vR1.p1]} />
@@ -80,10 +81,10 @@ function VoltmeterParallel() {
  */
 const AL = 65, AR = 295, ATOP = 48, ABOT = 190
 
-function AmmeterSeries() {
+function AmmeterSeries({ caption }: { caption: string }) {
   return (
     <Circuit width={W} height={H}
-      caption="Ammeter in series — break the circuit and insert the meter in the gap">
+      caption={caption}>
 
       {/* ── wires ── */}
       <Wire points={[aBat.p1, { x: AL, y: ATOP }, aAm.p1]} />
@@ -110,10 +111,11 @@ function AmmeterSeries() {
 /* ── exported component ────────────────────────────────────────────────── */
 
 export default function MultimeterDiagram() {
+  const { t } = useTranslation('ui')
   return (
     <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
-      <VoltmeterParallel />
-      <AmmeterSeries />
+      <VoltmeterParallel caption={t('ch0_2.voltmeterCaption')} />
+      <AmmeterSeries caption={t('ch0_2.ammeterCaption')} />
     </div>
   )
 }

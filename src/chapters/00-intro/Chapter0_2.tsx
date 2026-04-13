@@ -1,4 +1,5 @@
 // Chapter 0.2 — Lab Bench Setup
+import { useTranslation, Trans } from 'react-i18next'
 import LabActivity from '@/components/LabActivity/LabActivity'
 import MultimeterDiagram from '@/components/diagrams/MultimeterDiagram'
 import OscilloscopeDiagram from '@/components/diagrams/OscilloscopeDiagram'
@@ -8,203 +9,217 @@ import { Section } from '@/components/ui/section-heading'
 import { G } from '@/components/ui/glossary-term'
 
 export default function Chapter0_2() {
+  const { t } = useTranslation('ui')
+
   return (
     <>
-      <p>
-        Before we touch a single resistor or frequency formula, let's get comfortable with the
-        instruments. A bench without working, understood tools is just a flat surface with
-        expensive decorations on it.
-      </p>
+      <p>{t('ch0_2.intro')}</p>
 
       <p>
-        This chapter covers the four instruments you'll use throughout the course:{' '}
-        <G k="multimeter">multimeter</G>, <G k="oscilloscope">oscilloscope</G>,{' '}
-        <G k="vna">VNA (Vector Network Analyser)</G>, and the{' '}
-        <strong>Arduino</strong> in its role as a signal generator.
+        <Trans i18nKey="ch0_2.coversInstruments" ns="ui"
+          components={{
+            multimeter: <G k="multimeter" />,
+            oscilloscope: <G k="oscilloscope" />,
+            vna: <G k="vna" />,
+            strong: <strong />,
+          }}
+        />
       </p>
 
-      <Section id="multimeter">The multimeter</Section>
+      <Section id="multimeter" labelKey="ch0_2.sectionMultimeter">{t('ch0_2.sectionMultimeter')}</Section>
 
       <p>
-        The multimeter is the most fundamental instrument in electronics. It measures three
-        things you'll use constantly: <G>voltage</G>, <G>current</G>, and{' '}
-        <G>resistance</G>. Most also do <G>continuity</G> (beeps when connected),{' '}
-        <G k="diode testing">diode testing</G>, and <G k="capacitance">capacitance</G>.
+        <Trans i18nKey="ch0_2.multimeterIntro" ns="ui"
+          components={{
+            voltage: <G k="voltage" />,
+            current: <G k="current" />,
+            resistance: <G k="resistance" />,
+            continuity: <G k="continuity" />,
+            diode: <G k="diode testing" />,
+            capacitance: <G k="capacitance" />,
+          }}
+        />
       </p>
 
-      <Callout variant="danger">
-        Always check which mode you're in before probing. Measuring voltage in current mode
-        blows the fuse. Measuring mains voltage in resistance mode can damage the meter — or
-        injure you.
-      </Callout>
+      <Callout variant="danger">{t('ch0_2.multimeterDanger')}</Callout>
 
       <MultimeterDiagram />
 
       <ul>
         <li>
-          <strong>Voltage:</strong> probes go in parallel with the thing you're measuring.
-          Red probe to the positive side, black to ground.
+          <strong>{t('ch0_2.voltageLabel')}</strong> {t('ch0_2.voltageDesc')}
         </li>
         <li>
-          <strong>Current:</strong> the meter goes in series — you must break the circuit and
-          put the meter in the gap. Use the mA input for small currents, the A input for large
-          ones. Most meters have a separate socket for the red probe in current mode.
+          <strong>{t('ch0_2.currentLabel')}</strong> {t('ch0_2.currentDesc')}
         </li>
         <li>
-          <strong>Resistance:</strong> power must be off. The meter applies its own small
-          voltage to measure resistance — an external voltage will give wrong readings and may
-          damage it.
+          <strong>{t('ch0_2.resistanceLabel')}</strong> {t('ch0_2.resistanceDesc')}
         </li>
       </ul>
 
-      <Section id="oscilloscope">The oscilloscope</Section>
+      <Section id="oscilloscope" labelKey="ch0_2.sectionOscilloscope">{t('ch0_2.sectionOscilloscope')}</Section>
+
+      <p>{t('ch0_2.scopeIntro')}</p>
 
       <p>
-        The oscilloscope is the instrument that turns invisible electrical behaviour into a
-        picture. It draws a graph of voltage against time — and once you have that habit, so
-        much of electronics clicks into place.
-      </p>
-
-      <p>
-        The two main controls are <G>time/div</G> (how stretched the time axis is) and{' '}
-        <G>volt/div</G> (how stretched the voltage axis is). If you can't see a signal, it's
-        almost always one of these two settings that needs adjusting.
+        <Trans i18nKey="ch0_2.scopeControls" ns="ui"
+          components={{
+            timediv: <G k="time/div" />,
+            voltdiv: <G k="volt/div" />,
+          }}
+        />
       </p>
 
       <OscilloscopeDiagram />
 
       <Callout variant="key">
-        The oscilloscope probe has a ground clip (usually a crocodile clip on a short wire near
-        the probe tip). This <strong>must</strong> be connected to the circuit's ground —
-        otherwise you'll see noise or incorrect readings. On a bench with multiple instruments,
-        all grounds should share a common point.
+        <Trans i18nKey="ch0_2.scopeKey" ns="ui"
+          components={{ strong: <strong /> }}
+        />
       </Callout>
 
-      <Section id="vna">The VNA (Vector Network Analyser)</Section>
+      <Section id="vna" labelKey="ch0_2.sectionVna">{t('ch0_2.sectionVna')}</Section>
 
       <p>
-        The VNA is — for amateur radio purposes — the most powerful instrument of the three.
-        It sweeps a range of frequencies and measures how a component or circuit responds to
-        each one. This makes it ideal for measuring antenna <G>impedance</G> and <G k="swr">SWR</G>,
-        finding resonant frequencies of <G k="lc">LC</G> circuits, and plotting filter responses.
+        <Trans i18nKey="ch0_2.vnaIntro" ns="ui"
+          components={{
+            impedance: <G k="impedance" />,
+            swr: <G k="swr" />,
+            lc: <G k="lc" />,
+          }}
+        />
       </p>
 
       <Callout variant="caution">
-        Before any measurement, a VNA must be <G>calibrated</G> using an open, short, and
-        load standard (usually supplied as three small terminations). Calibration removes the
-        effect of cables and adapters between the VNA port and your circuit. One minute of
-        calibration saves many minutes of puzzling over wrong results.
+        <Trans i18nKey="ch0_2.vnaCaution" ns="ui"
+          components={{ calibrated: <G k="calibrated" /> }}
+        />
       </Callout>
 
+      <p>{t('ch0_2.vnaNote')}</p>
+
+      <Section id="arduino" labelKey="ch0_2.sectionArduino">{t('ch0_2.sectionArduino')}</Section>
+
       <p>
-        We'll use the VNA starting in Chapter 1.6. For now: know where the calibration
-        standards are, and read your VNA's quick-start guide for the calibration procedure —
-        each model is slightly different.
+        <Trans i18nKey="ch0_2.arduinoIntro" ns="ui"
+          components={{
+            pwm: <G k="pwm" />,
+            square: <G k="square wave" />,
+            freq: <G k="frequency" />,
+            ac: <G k="ac" />,
+          }}
+        />
       </p>
 
-      <Section id="arduino">The Arduino as a signal source</Section>
-
       <p>
-        Throughout the lab activities, we use the Arduino not as a microcontroller project but
-        purely as a convenient, programmable voltage source. Specifically:{' '}
-        <G k="pwm">PWM output</G> (Pulse Width Modulation) gives us a <G k="square wave">square wave</G> at
-        a controllable <G k="frequency">frequency</G> and duty cycle, which is good enough for demonstrating <G k="ac">AC</G> behaviour,
-        charging curves, and simple modulation concepts.
+        <Trans i18nKey="ch0_2.arduinoPins" ns="ui"
+          components={{ pwm: <G k="pwm" /> }}
+        />
       </p>
 
-      <p>
-        The Arduino's <G k="pwm">PWM</G> pins (typically pins 3, 5, 6, 9, 10, 11 on an Uno)
-        output 5V amplitude square waves at frequencies between ~490 Hz and ~8 kHz depending
-        on the pin and timer settings. For our early experiments, this is perfectly adequate.
-      </p>
+      <Callout variant="note">{t('ch0_2.arduinoNote')}</Callout>
 
-      <Callout variant="note">
-        You don't need deep Arduino programming knowledge. The sketches used in the lab
-        activities are short and provided inline — typically 10–15 lines of code.
-      </Callout>
-
-      <Section id="breadboard">Breadboard basics</Section>
+      <Section id="breadboard" labelKey="ch0_2.sectionBreadboard">{t('ch0_2.sectionBreadboard')}</Section>
 
       <p>
-        A <G>breadboard</G> lets you build circuits without soldering. Understanding how the rows and
-        columns connect is essential before the first experiment:
+        <Trans i18nKey="ch0_2.breadboardIntro" ns="ui"
+          components={{ breadboard: <G k="breadboard" /> }}
+        />
       </p>
 
       <BreadboardDiagram />
 
       <ul>
+        <li>{t('ch0_2.breadboardRails')}</li>
+        <li>{t('ch0_2.breadboardRows')}</li>
         <li>
-          The long rails at the top and bottom (marked + and −) run the full length of the
-          board horizontally. Use them for power (5V) and ground.
-        </li>
-        <li>
-          The short rows in the middle run horizontally in groups of 5, separated by a gap.
-          A component leg in one hole connects to every other hole in that row of 5.
-        </li>
-        <li>
-          The gap in the middle is intentional — it separates the two sides so you can bridge
-          a <G k="dip chip">DIP chip</G> across it.
+          <Trans i18nKey="ch0_2.breadboardGap" ns="ui"
+            components={{ dip: <G k="dip chip" /> }}
+          />
         </li>
       </ul>
 
-      <Section id="voltage-safety">Voltage safety</Section>
+      <Section id="voltage-safety" labelKey="ch0_2.sectionSafety">{t('ch0_2.sectionSafety')}</Section>
 
       <p>
-        All the lab activities in this course operate at <strong>5V <G k="dc">DC</G> or less</strong> —
-        completely safe to touch. The only time mains voltage appears is in the safety chapter
-        (4.3), and even there the activity is limited to inspecting and measuring grounding,
-        not opening live equipment.
+        <Trans i18nKey="ch0_2.safetyIntro" ns="ui"
+          components={{
+            strong: <strong />,
+            dc: <G k="dc" />,
+          }}
+        />
       </p>
 
-      <Callout variant="tip">
-        Always disconnect power before rewiring. It takes two seconds and prevents the majority
-        of "it's not working" puzzles from ever arising.
-      </Callout>
+      <Callout variant="tip">{t('ch0_2.safetyTip')}</Callout>
 
       <LabActivity
-        goal="Verify that all four instruments work correctly and that you can read basic measurements from each one."
+        goal={t('ch0_2.labGoal')}
         equipment={[
-          'Multimeter',
-          'Oscilloscope with probe',
-          <><G k="arduino">Arduino</G> Uno (or similar) with <G k="usb">USB</G> cable</>,
-          'Breadboard',
+          t('ch0_2.labEquip1'),
+          t('ch0_2.labEquip2'),
+          <Trans key="equip3" i18nKey="ch0_2.labEquip3" ns="ui"
+            components={{ arduino: <G k="arduino" />, usb: <G k="usb" /> }}
+          />,
+          t('ch0_2.labEquip4'),
         ]}
         components={[
-          'AA battery with holder (or clip leads)',
-          '470Ω resistor',
-          'Short jumper wires',
+          t('ch0_2.labComp1'),
+          t('ch0_2.labComp2'),
+          t('ch0_2.labComp3'),
         ]}
         procedure={[
           {
-            text: <>Set your multimeter to <G k="dc">DC</G> voltage (2V or 20V range). Touch the red probe to the AA battery positive terminal (+) and the black probe to negative (−). Read the voltage.</>,
-            note: 'A fresh AA battery reads about 1.5–1.6V. A partially used one might show 1.2–1.4V. This is normal.',
+            text: <Trans i18nKey="ch0_2.labStep1" ns="ui" components={{ dc: <G k="dc" /> }} />,
+            note: t('ch0_2.labStep1Note'),
           },
           {
-            text: <>Connect the <G k="arduino">Arduino</G> to your computer with the <G k="usb">USB</G> cable. Open the <G k="ide">Arduino IDE</G>, load File → Examples → 01.Basics → Blink, and upload it. Pin 13 <G k="led">LED</G> should blink once per second.</>,
+            text: <Trans i18nKey="ch0_2.labStep2" ns="ui"
+              components={{ arduino: <G k="arduino" />, usb: <G k="usb" />, ide: <G k="ide" />, led: <G k="led" /> }}
+            />,
           },
           {
-            text: 'Open File → Examples → 01.Basics → AnalogReadSerial... actually, load this simple sketch instead:',
-            note: <>void setup() {'{'} pinMode(9, OUTPUT); {'}'} void loop() {'{'} tone(9, 1000); {'}'} — This outputs a 1 kHz <G k="square wave">square wave</G> on pin 9 continuously.</>,
+            text: t('ch0_2.labStep3'),
+            note: <Trans i18nKey="ch0_2.labStep3Note" ns="ui" components={{ square: <G k="square wave" /> }} />,
           },
           {
-            text: <>Connect the oscilloscope probe tip to <G k="arduino">Arduino</G> pin 9. Clip the probe ground to <G k="arduino">Arduino</G> <G k="gnd">GND</G>. Set <G k="time/div">time/div</G> to 0.5ms and <G k="volt/div">volt/div</G> to 2V.</>,
+            text: <Trans i18nKey="ch0_2.labStep4" ns="ui"
+              components={{ arduino: <G k="arduino" />, arduino2: <G k="arduino" />, gnd: <G k="gnd" />, timediv: <G k="time/div" />, voltdiv: <G k="volt/div" /> }}
+            />,
           },
           {
-            text: <>You should see a clean <G k="square wave">square wave</G>. Measure its period with the oscilloscope <G k="cursor">cursors</G> (two full cycles should take 2ms, confirming 1 kHz).</>,
+            text: <Trans i18nKey="ch0_2.labStep5" ns="ui"
+              components={{ square: <G k="square wave" />, cursor: <G k="cursor" /> }}
+            />,
           },
           {
-            text: <>Switch your multimeter to <G k="ac">AC</G> voltage. Probe pin 9 and <G k="gnd">GND</G>. Read the <G k="rms">RMS</G> voltage — it should read approximately 2.5V <G k="ac">AC</G> (the <G k="rms">RMS</G> value of a 0–5V <G k="square wave">square wave</G>).</>,
+            text: <Trans i18nKey="ch0_2.labStep6" ns="ui"
+              components={{ ac: <G k="ac" />, ac2: <G k="ac" />, gnd: <G k="gnd" />, rms: <G k="rms" />, rms2: <G k="rms" />, square: <G k="square wave" /> }}
+            />,
           },
           {
-            text: <>Insert the 470Ω resistor between pin 9 and <G k="gnd">GND</G> on the <G k="breadboard">breadboard</G>. Probe across the resistor with the oscilloscope. Signal should be unchanged (the scope's <G k="input impedance">input impedance</G> is much higher than 470Ω).</>,
+            text: <Trans i18nKey="ch0_2.labStep7" ns="ui"
+              components={{ gnd: <G k="gnd" />, breadboard: <G k="breadboard" />, inputz: <G k="input impedance" /> }}
+            />,
           },
         ]}
-        expectedResult={<>Multimeter shows ~1.5V for the battery. Oscilloscope shows a clean 1 kHz <G k="square wave">square wave</G> at 5V <G k="peak-to-peak">peak-to-peak</G>. Multimeter reads ~2.5V <G k="ac">AC</G> on the <G k="pwm">PWM</G> pin. All connections register.</>}
-        connectionToTheory={<>The oscilloscope is showing you something the multimeter cannot: the shape of the signal over time. Both instruments are measuring the same voltage, but they tell you different things about it. This distinction — <G k="dc">DC</G> value vs. waveform — runs through every chapter that follows.</>}
+        expectedResult={
+          <Trans i18nKey="ch0_2.labExpected" ns="ui"
+            components={{ square: <G k="square wave" />, pp: <G k="peak-to-peak" />, ac: <G k="ac" />, pwm: <G k="pwm" /> }}
+          />
+        }
+        connectionToTheory={
+          <Trans i18nKey="ch0_2.labConnection" ns="ui"
+            components={{ dc: <G k="dc" /> }}
+          />
+        }
         troubleshooting={[
-          <>Oscilloscope shows noise / flat line: check the ground clip is connected to <G k="arduino">Arduino</G> <G k="gnd">GND</G>, and try adjusting <G k="volt/div">volt/div</G>.</>,
-          'No signal on pin 9: confirm the sketch uploaded successfully and the tone() call uses pin 9.',
-          <>Battery reads 0V: check probe polarity and multimeter is in <G k="dc">DC</G> voltage mode (not resistance or current).</>,
+          <Trans key="t1" i18nKey="ch0_2.labTrouble1" ns="ui"
+            components={{ arduino: <G k="arduino" />, gnd: <G k="gnd" />, voltdiv: <G k="volt/div" /> }}
+          />,
+          t('ch0_2.labTrouble2'),
+          <Trans key="t3" i18nKey="ch0_2.labTrouble3" ns="ui"
+            components={{ dc: <G k="dc" /> }}
+          />,
         ]}
       />
     </>
