@@ -1,329 +1,495 @@
-import type { ReactNode } from 'react'
 import SVGDiagram from './diagrams/SVGDiagram'
 
 /**
- * Welcome page hero illustration.
+ * Welcome page hero illustration — HF Skywave Propagation.
  *
- * Shows an HF propagation path: signal leaves a transmitting antenna,
- * arcs through the ionosphere, and arrives at a distant receiver.
- * Three staggered animated wave paths keep the illustration alive.
+ * Shows a superheterodyne TX/RX pair communicating via ionospheric skip.
+ * Earth rendered with procedural SVG feTurbulence noise (land/ocean).
+ * Circuit symbols use ARRL standard notation.
  *
- * A component-symbol strip along the bottom ties the "from fundamentals
- * to radio waves" theme together.
+ * Variant C v3 — strong curvature, procedural Earth, two-row legend.
  */
 export default function HeroIllustration() {
-  const W = 800, H = 340
-  const earthY   = 215          // horizon line at edges
-  const earthBow = 18           // convex bow: earth peaks earthBow px above earthY at center
-  const ionoY    = 62           // ionosphere mid-line
-  const txX      = 138          // TX antenna base x
-  const rxX      = 662          // RX antenna base x
-  const antH     = 52           // antenna height above ground
-
-  // Ground Y at a given x (quadratic bezier: edges at earthY, peaks at earthY - earthBow)
-  const groundAt = (x: number) => {
-    const t = (x + 4) / (W + 8) // parameter along the bezier (account for -4..W+4 domain)
-    return (1 - t) * (1 - t) * earthY + 2 * (1 - t) * t * (earthY - earthBow) + t * t * earthY
-  }
-  const txGround = groundAt(txX)
-  const rxGround = groundAt(rxX)
-  const txTop    = txGround - antH
-  const rxTop    = rxGround - antH
-
-  // Ray-path propagation: straight lines bouncing between ionosphere and earth
-  // This is how HF skywave actually works and how the ARRL Handbook illustrates it.
-  // Three rays at different launch angles = different hop counts.
-  const ionoHit = ionoY + 5 // Y where rays hit the ionosphere (just below the band)
-  const midX = (txX + rxX) / 2
-
-  // Ground bounce Y at a given X (follows earth curvature)
-  const bounceY = (x: number) => groundAt(x) + 2 // slightly into the ground visually
-
-  const rays = [
-    // Ray 1: single hop — high angle, direct path
-    {
-      points: `${txX},${txTop} ${midX},${ionoHit} ${rxX},${rxTop}`,
-      w: 2, cls: 'ray1', opacity: 1,
-      bounces: [] as number[],
-    },
-    // Ray 2: two hops — moderate angle
-    {
-      points: `${txX},${txTop} ${txX + (rxX - txX) * 0.25},${ionoHit} ${midX},${bounceY(midX)} ${txX + (rxX - txX) * 0.75},${ionoHit} ${rxX},${rxTop}`,
-      w: 1.5, cls: 'ray2', opacity: 0.8,
-      bounces: [midX],
-    },
-    // Ray 3: three hops — shallow angle, max range
-    {
-      points: (() => {
-        const seg = (rxX - txX) / 6
-        const b1x = txX + seg * 2
-        const b2x = txX + seg * 4
-        return `${txX},${txTop} ${txX + seg},${ionoHit} ${b1x},${bounceY(b1x)} ${txX + seg * 3},${ionoHit} ${b2x},${bounceY(b2x)} ${txX + seg * 5},${ionoHit} ${rxX},${rxTop}`
-      })(),
-      w: 1.2, cls: 'ray3', opacity: 0.6,
-      bounces: (() => {
-        const seg = (rxX - txX) / 6
-        return [txX + seg * 2, txX + seg * 4]
-      })(),
-    },
-  ]
-
   return (
-    <div className="rounded-2xl overflow-hidden border border-border bg-card my-8">
+    <div className="rounded-2xl overflow-hidden border border-border bg-card mt-8 mb-8">
       <SVGDiagram
-        width={W} height={H}
-        aria-label="HF radio propagation: signal rays bounce between the ionosphere and earth from transmitter to receiver"
+        width={820}
+        height={500}
+        aria-label="HF radio propagation: superheterodyne transmitter and receiver communicate via ionospheric skywave multi-hop"
       >
-        {/* ── Keyframe animations ─────────────────────────────────────── */}
+        <defs>
+          {/* Station glow halos */}
+          <radialGradient id="gTx" cx=".5" cy=".5" r=".5">
+            <stop offset="0%" stopColor="#d4a030" stopOpacity=".2" />
+            <stop offset="100%" stopColor="#d4a030" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="gRx" cx=".5" cy=".5" r=".5">
+            <stop offset="0%" stopColor="#3daa90" stopOpacity=".2" />
+            <stop offset="100%" stopColor="#3daa90" stopOpacity="0" />
+          </radialGradient>
+
+          {/* Ocean depth gradient */}
+          <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1a5a8a" />
+            <stop offset="30%" stopColor="#0f4470" />
+            <stop offset="100%" stopColor="#081e3a" />
+          </linearGradient>
+
+          {/* Fractal noise → land texture (coarse continents) */}
+          <filter id="landNoise" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves={4} seed={42} result="noise" />
+            <feComponentTransfer in="noise" result="thresh">
+              <feFuncR type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1" />
+              <feFuncG type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1" />
+              <feFuncB type="discrete" tableValues="0 0 0 0 0 1 1 1 1 1" />
+            </feComponentTransfer>
+            <feColorMatrix
+              in="thresh"
+              type="matrix"
+              values="0   0   0   0  0.11
+                      0.4 0.1 0   0  0.28
+                      0   0   0   0  0.08
+                      0.8 0   0   0  0"
+            />
+          </filter>
+
+          {/* Finer terrain detail overlay */}
+          <filter id="terrainDetail" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.025 0.035" numOctaves={5} seed={77} result="fine" />
+            <feComponentTransfer in="fine" result="fineThresh">
+              <feFuncR type="discrete" tableValues="0 0 0 0.3 0.5 0.7 1 1" />
+              <feFuncG type="discrete" tableValues="0 0 0 0.3 0.5 0.7 1 1" />
+              <feFuncB type="discrete" tableValues="0 0 0 0.3 0.5 0.7 1 1" />
+            </feComponentTransfer>
+            <feColorMatrix
+              in="fineThresh"
+              type="matrix"
+              values="0   0   0   0  0.06
+                      0.3 0.1 0   0  0.22
+                      0   0   0   0  0.04
+                      0.6 0   0   0  0"
+            />
+          </filter>
+
+          {/* Ocean surface texture (subtle ripple) */}
+          <filter id="oceanTexture" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04 0.02" numOctaves={3} seed={99} result="water" />
+            <feColorMatrix
+              in="water"
+              type="matrix"
+              values="0   0   0   0  0.06
+                      0   0   0   0  0.15
+                      0.3 0.1 0   0  0.35
+                      0.15 0  0   0  0"
+            />
+          </filter>
+
+          {/* Cloud wisps */}
+          <filter id="clouds" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.006" numOctaves={3} seed={31} result="cloud" />
+            <feComponentTransfer in="cloud" result="cloudThresh">
+              <feFuncR type="discrete" tableValues="0 0 0 0 0 0 0 0 1 1" />
+              <feFuncG type="discrete" tableValues="0 0 0 0 0 0 0 0 1 1" />
+              <feFuncB type="discrete" tableValues="0 0 0 0 0 0 0 0 1 1" />
+            </feComponentTransfer>
+            <feColorMatrix
+              in="cloudThresh"
+              type="matrix"
+              values="0   0   0   0  1
+                      0   0   0   0  1
+                      0   0   0   0  1
+                      0.12 0  0   0  0"
+            />
+          </filter>
+
+          {/* Atmospheric glow at horizon */}
+          <linearGradient id="atmosGlow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4db8d4" stopOpacity=".2" />
+            <stop offset="50%" stopColor="#2a8ab0" stopOpacity=".08" />
+            <stop offset="100%" stopColor="#1a5a8a" stopOpacity="0" />
+          </linearGradient>
+
+          {/* Earth clip path — strong curvature (bow≈80) */}
+          <clipPath id="earthClip">
+            <path d="M-10 280 Q 410 200 830 280 L830 500 L-10 500Z" />
+          </clipPath>
+
+          {/* Atmosphere haze clip (slightly above earth) */}
+          <clipPath id="atmosClip">
+            <path d="M-10 264 Q 410 184 830 264 L830 300 Q 410 220 -10 300Z" />
+          </clipPath>
+        </defs>
+
+        {/* ── Keyframe animations ── */}
         <style>{`
-          @keyframes travelRay {
-            0%   { stroke-dashoffset: 800; opacity: 0;   }
-            8%   { opacity: 0.9; }
-            85%  { opacity: 0.85; }
-            100% { stroke-dashoffset: 0;   opacity: 0;   }
+          @keyframes ray {
+            0%   { stroke-dashoffset: 1200; opacity: 0; }
+            6%   { opacity: .95; }
+            80%  { opacity: .85; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
           }
-          .ray1 { stroke-dasharray:800; stroke-dashoffset:800;
-                  animation: travelRay 2.8s ease-in-out infinite; }
-          .ray2 { stroke-dasharray:800; stroke-dashoffset:800;
-                  animation: travelRay 2.8s ease-in-out 0.93s infinite; }
-          .ray3 { stroke-dasharray:800; stroke-dashoffset:800;
-                  animation: travelRay 2.8s ease-in-out 1.87s infinite; }
-
           @keyframes blink {
-            0%,100% { opacity:.55; } 50% { opacity:1; }
+            0%, 100% { opacity: .45; }
+            50%      { opacity: 1; }
           }
-          .tx-dot { animation: blink 1.4s ease-in-out infinite; }
-          .rx-dot { animation: blink 1.4s ease-in-out .7s infinite; }
-
-          @keyframes ionoFloat {
-            0%,100% { opacity:.18; } 50% { opacity:.28; }
-          }
-          .iono-band { animation: ionoFloat 5s ease-in-out infinite; }
         `}</style>
 
-        {/* ── Subtle dot grid ─────────────────────────────────────────── */}
-        {Array.from({ length: 21 }).map((_, col) =>
-          Array.from({ length: 7 }).map((_, row) => (
-            <circle key={`dot-${col}-${row}`}
-              cx={col * 40 + 8} cy={row * 34 + 10}
-              r={0.9} fill="currentColor" opacity="0.07" />
-          ))
-        )}
+        {/* ── SKY ── */}
+        <rect width="820" height="500" fill="#353b50" />
 
-        {/* ── Ionosphere band ─────────────────────────────────────────── */}
-        <rect className="iono-band"
-          x={0} y={ionoY - 13} width={W} height={24}
-          fill="hsl(172 55% 38%)" />
-        {/* Inner shimmer stripe */}
-        <rect className="iono-band"
-          x={0} y={ionoY - 5} width={W} height={8}
-          fill="hsl(172 60% 55%)" opacity="0.25" />
-        {/* Ionosphere label — pill background for contrast */}
-        <rect x={W - 112} y={ionoY - 10} width={100} height={20}
-          rx="4" fill="hsl(172 40% 18%)" opacity="0.7" />
-        <text x={W - 62} y={ionoY + 5}
-          textAnchor="middle" fontSize="13" fontStyle="italic" fontWeight="600"
-          fill="hsl(172 80% 82%)" opacity="1">ionosphere</text>
+        {/* Stars */}
+        <g fill="white">
+          <circle cx={48} cy={16} r={0.8} opacity={0.1} />
+          <circle cx={140} cy={9} r={0.7} opacity={0.14} />
+          <circle cx={270} cy={32} r={0.8} opacity={0.1} />
+          <circle cx={400} cy={12} r={0.9} opacity={0.14} />
+          <circle cx={540} cy={26} r={0.7} opacity={0.1} />
+          <circle cx={680} cy={14} r={0.8} opacity={0.14} />
+          <circle cx={780} cy={30} r={0.7} opacity={0.1} />
+          <circle cx={90} cy={46} r={0.8} opacity={0.12} />
+          <circle cx={350} cy={44} r={0.7} opacity={0.1} />
+          <circle cx={600} cy={40} r={0.9} opacity={0.12} />
+          <circle cx={200} cy={22} r={0.6} opacity={0.08} />
+          <circle cx={470} cy={37} r={0.7} opacity={0.1} />
+          <circle cx={740} cy={42} r={0.8} opacity={0.09} />
+          <circle cx={30} cy={34} r={0.6} opacity={0.11} />
+          <circle cx={810} cy={11} r={0.7} opacity={0.08} />
+          <circle cx={160} cy={40} r={0.5} opacity={0.07} />
+          <circle cx={320} cy={18} r={0.6} opacity={0.09} />
+          <circle cx={510} cy={8} r={0.7} opacity={0.11} />
+          <circle cx={630} cy={30} r={0.5} opacity={0.08} />
+          <circle cx={760} cy={20} r={0.6} opacity={0.1} />
+        </g>
 
-        {/* ── Earth surface ────────────────────────────────────────────── */}
-        {/* Filled ground mass — convex curvature (earth bulges upward) */}
+        {/* Title */}
+        <text
+          x={410} y={36}
+          textAnchor="middle" fontSize={16} fill="#d4a44a"
+          letterSpacing={3} fontWeight={700} opacity={0.85}
+        >
+          HIGH FREQUENCY SKYWAVE PROPAGATION
+        </text>
+
+        {/* ── Ionosphere band (curved to match earth) ── */}
+        <path d="M-10 72 Q 410 40 830 72 L830 98 Q 410 66 -10 98 Z" fill="#2d9c8a" opacity={0.18}>
+          <animate attributeName="opacity" values=".14;.26;.14" dur="5s" repeatCount="indefinite" />
+        </path>
+        <path d="M-10 82 Q 410 52 830 82 L830 90 Q 410 60 -10 90 Z" fill="#5cc4b0" opacity={0.1} />
+        {/* Ionosphere label */}
+        <rect x={340} y={62} width={140} height={20} rx={10} fill="#15362e" opacity={0.85} />
+        <text
+          x={410} y={76}
+          textAnchor="middle" fontSize={11.5} fontWeight={600}
+          fill="#7edcc9" letterSpacing={1}
+        >
+          IONOSPHERE
+        </text>
+
+        {/* ════════════════════════════════════════════════
+            EARTH — Procedural texture layers
+            Curvature bow: 80px (edges at y=280, center at y=200)
+            ════════════════════════════════════════════════ */}
+
+        {/* Layer 1: Deep ocean base */}
+        <path d="M-10 280 Q 410 200 830 280 L830 500 L-10 500Z" fill="url(#oceanGrad)" />
+
+        {/* Layer 2: Ocean surface texture */}
+        <g clipPath="url(#earthClip)">
+          <rect x={0} y={180} width={820} height={320} filter="url(#oceanTexture)" opacity={0.7} />
+        </g>
+
+        {/* Layer 3: Land masses (fractal noise → thresholded green) */}
+        <g clipPath="url(#earthClip)">
+          <rect x={0} y={180} width={820} height={320} filter="url(#landNoise)" opacity={0.95} />
+        </g>
+
+        {/* Layer 4: Finer terrain detail */}
+        <g clipPath="url(#earthClip)">
+          <rect x={0} y={180} width={820} height={320} filter="url(#terrainDetail)" opacity={0.4} />
+        </g>
+
+        {/* Layer 5: Cloud wisps */}
+        <g clipPath="url(#earthClip)">
+          <rect x={0} y={180} width={820} height={320} filter="url(#clouds)" />
+        </g>
+
+        {/* Layer 6: Atmospheric haze band at horizon */}
+        <g clipPath="url(#atmosClip)">
+          <rect x={0} y={170} width={820} height={140} fill="url(#atmosGlow)" />
+        </g>
+
+        {/* Horizon highlight line */}
+        <path d="M-10 280 Q 410 200 830 280" fill="none" stroke="#4db8d4" strokeWidth={1.5} opacity={0.3} />
+        <path d="M-10 280 Q 410 200 830 280" fill="none" stroke="#8ad4e8" strokeWidth={0.6} opacity={0.25} />
+
+        {/* ── Station glow halos ── */}
+        <circle cx={148} cy={242} r={90} fill="url(#gTx)" />
+        <circle cx={672} cy={242} r={90} fill="url(#gRx)" />
+
+        {/* ── SIGNAL RAYS ── */}
+        {/* Single hop */}
+        <polyline
+          points="148,188 410,84 672,188"
+          fill="none" stroke="#daa030" strokeWidth={3}
+          strokeLinecap="round" strokeLinejoin="round"
+          strokeDasharray="1200" strokeDashoffset="1200"
+          style={{ animation: 'ray 3.2s ease-in-out 0s infinite' }}
+        />
+        {/* Two hops */}
+        <polyline
+          points="148,188 278,84 410,268 542,84 672,188"
+          fill="none" stroke="#daa030" strokeWidth={2.2}
+          strokeLinecap="round" strokeLinejoin="round"
+          strokeDasharray="1200" strokeDashoffset="1200"
+          style={{ animation: 'ray 3.2s ease-in-out 1.1s infinite' }}
+        />
+        {/* Three hops */}
+        <polyline
+          points="148,188 235,84 322,260 410,80 498,260 585,84 672,188"
+          fill="none" stroke="#daa030" strokeWidth={1.5}
+          strokeLinecap="round" strokeLinejoin="round"
+          strokeDasharray="1200" strokeDashoffset="1200"
+          style={{ animation: 'ray 3.2s ease-in-out 2.1s infinite' }}
+        />
+
+        {/* Ground bounce glows */}
+        <circle cx={410} cy={268} r={5} fill="#daa030" opacity={0.12} />
+        <circle cx={322} cy={260} r={4} fill="#daa030" opacity={0.08} />
+        <circle cx={498} cy={260} r={4} fill="#daa030" opacity={0.08} />
+
+        {/* ════════════════════════════════════════════════
+            TX STATION
+            ════════════════════════════════════════════════ */}
+        {/* Antenna */}
+        <g stroke="#d0d0d0" strokeWidth={1.5} strokeLinecap="round">
+          <line x1={148} y1={216} x2={148} y2={188} />
+          <line x1={148} y1={188} x2={131} y2={170} />
+          <line x1={148} y1={188} x2={165} y2={170} />
+        </g>
+        <circle cx={148} cy={188} r={4.5} fill="#daa030">
+          <animate attributeName="opacity" values=".4;1;.4" dur="1.4s" repeatCount="indefinite" />
+        </circle>
+
+        {/* TX schematic box */}
+        <rect x={71} y={220} width={154} height={64} rx={8} fill="#12161f" stroke="#daa030" strokeWidth={1.3} />
+
+        {/* MIC */}
+        <circle cx={85} cy={256} r={5.5} fill="none" stroke="#bbb" strokeWidth={0.9} opacity={0.5} />
+        <text x={85} y={270} textAnchor="middle" fontSize={5.5} fill="#999" opacity={0.5}>MIC</text>
+
+        {/* AF amp */}
+        <line x1={91} y1={256} x2={99} y2={256} stroke="#888" strokeWidth={0.8} />
+        <polygon points="101,250 101,262 113,256" fill="none" stroke="#daa030" strokeWidth={1.2} />
+        <text x={107} y={272} textAnchor="middle" fontSize={5.5} fill="#daa030" opacity={0.6}>AF</text>
+
+        {/* Mixer */}
+        <line x1={113} y1={256} x2={121} y2={256} stroke="#888" strokeWidth={0.8} />
+        <circle cx={131} cy={256} r={7.5} fill="none" stroke="#daa030" strokeWidth={1.2} />
+        <line x1={126} y1={251} x2={136} y2={261} stroke="#daa030" strokeWidth={1} />
+        <line x1={136} y1={251} x2={126} y2={261} stroke="#daa030" strokeWidth={1} />
+        <text x={131} y={274} textAnchor="middle" fontSize={5.5} fill="#daa030" opacity={0.6}>MIX</text>
+
+        {/* VFO */}
+        <line x1={131} y1={264} x2={131} y2={276} stroke="#888" strokeWidth={0.6} strokeDasharray="2 1.5" />
         <path
-          d={`M -4 ${earthY} Q ${W / 2} ${earthY - 18} ${W + 4} ${earthY} L ${W + 4} ${H} L -4 ${H} Z`}
-          fill="hsl(142 18% 22%)" opacity="0.6" />
-        {/* Horizon line */}
-        <path
-          d={`M -4 ${earthY} Q ${W / 2} ${earthY - 18} ${W + 4} ${earthY}`}
-          fill="none" stroke="hsl(142 30% 42%)" strokeWidth="1" opacity="0.5" />
+          d="M 123 277 C 126 272 130 272 133 277 C 136 282 140 282 143 277"
+          fill="none" stroke="#b88a20" strokeWidth={1} strokeLinecap="round" opacity={0.6}
+        />
 
-        {/* ── Propagation ray paths (ionospheric skip) ─────────────────── */}
-        {rays.map(r => (
-          <g key={r.cls}>
-            <polyline className={r.cls} points={r.points}
-              fill="none"
-              stroke="hsl(38 92% 52%)"
-              strokeWidth={r.w}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity={r.opacity} />
-            {/* Ground bounce point glows */}
-            {r.bounces.map((bx, i) => (
-              <circle key={`${r.cls}-b${i}`}
-                cx={bx} cy={bounceY(bx)} r={3}
-                fill="hsl(38 92% 52%)" opacity={0.15} />
-            ))}
+        {/* LC filter: inductor then capacitor */}
+        <line x1={139} y1={256} x2={145} y2={256} stroke="#888" strokeWidth={0.8} />
+        {/* Inductor arcs */}
+        <path
+          d="M 145 256 a 2.8 3.8 0 0 0 5.5 0 a 2.8 3.8 0 0 0 5.5 0"
+          fill="none" stroke="#5cc4b0" strokeWidth={1.2} strokeLinecap="round"
+        />
+        {/* Wire from inductor to capacitor */}
+        <line x1={156} y1={256} x2={161} y2={256} stroke="#888" strokeWidth={0.8} />
+        {/* Capacitor plates */}
+        <line x1={161} y1={249} x2={161} y2={263} stroke="#5cc4b0" strokeWidth={1} />
+        <line x1={165} y1={249} x2={165} y2={263} stroke="#5cc4b0" strokeWidth={1} />
+        {/* Wire from capacitor to PA */}
+        <line x1={165} y1={256} x2={171} y2={256} stroke="#888" strokeWidth={0.8} />
+
+        {/* PA */}
+        <polygon points="173,250 173,262 187,256" fill="none" stroke="#daa030" strokeWidth={1.3} />
+        <text x={180} y={272} textAnchor="middle" fontSize={5.5} fill="#daa030" opacity={0.7}>PA</text>
+
+        {/* Wire from PA up to antenna mast */}
+        <line x1={187} y1={256} x2={201} y2={256} stroke="#888" strokeWidth={0.7} />
+        <line x1={201} y1={256} x2={201} y2={226} stroke="#888" strokeWidth={0.7} />
+        <line x1={201} y1={226} x2={148} y2={226} stroke="#888" strokeWidth={0.7} />
+        <line x1={148} y1={226} x2={148} y2={220} stroke="#888" strokeWidth={0.7} />
+
+        <text
+          x={148} y={304}
+          textAnchor="middle" fontSize={14} fontWeight={700}
+          fill="#daa030" letterSpacing={2}
+        >
+          TX
+        </text>
+
+        {/* ════════════════════════════════════════════════
+            RX STATION
+            ════════════════════════════════════════════════ */}
+        {/* Antenna */}
+        <g stroke="#d0d0d0" strokeWidth={1.5} strokeLinecap="round">
+          <line x1={672} y1={216} x2={672} y2={188} />
+          <line x1={672} y1={188} x2={655} y2={170} />
+          <line x1={672} y1={188} x2={689} y2={170} />
+        </g>
+        <circle cx={672} cy={188} r={4.5} fill="#5cc4b0">
+          <animate attributeName="opacity" values=".4;1;.4" dur="1.4s" begin=".7s" repeatCount="indefinite" />
+        </circle>
+
+        <rect x={595} y={220} width={154} height={64} rx={8} fill="#12161f" stroke="#5cc4b0" strokeWidth={1.3} />
+
+        {/* Wire from antenna down to RF amp */}
+        <line x1={672} y1={220} x2={672} y2={226} stroke="#888" strokeWidth={0.7} />
+        <line x1={672} y1={226} x2={619} y2={226} stroke="#888" strokeWidth={0.7} />
+        <line x1={619} y1={226} x2={619} y2={250} stroke="#888" strokeWidth={0.7} />
+        {/* RF amp */}
+        <polygon points="609,250 609,262 623,256" fill="none" stroke="#5cc4b0" strokeWidth={1.2} />
+        <text x={615} y={272} textAnchor="middle" fontSize={5.5} fill="#5cc4b0" opacity={0.6}>RF</text>
+
+        {/* Mixer */}
+        <line x1={623} y1={256} x2={631} y2={256} stroke="#888" strokeWidth={0.8} />
+        <circle cx={641} cy={256} r={7.5} fill="none" stroke="#5cc4b0" strokeWidth={1.2} />
+        <line x1={636} y1={251} x2={646} y2={261} stroke="#5cc4b0" strokeWidth={1} />
+        <line x1={646} y1={251} x2={636} y2={261} stroke="#5cc4b0" strokeWidth={1} />
+        <text x={641} y={274} textAnchor="middle" fontSize={5.5} fill="#5cc4b0" opacity={0.6}>MIX</text>
+
+        {/* VFO */}
+        <line x1={641} y1={264} x2={641} y2={276} stroke="#888" strokeWidth={0.6} strokeDasharray="2 1.5" />
+        <path
+          d="M 633 277 C 636 272 640 272 643 277 C 646 282 650 282 653 277"
+          fill="none" stroke="#4aaa96" strokeWidth={1} strokeLinecap="round" opacity={0.6}
+        />
+
+        {/* IF filter: inductor then capacitor */}
+        <line x1={649} y1={256} x2={655} y2={256} stroke="#888" strokeWidth={0.8} />
+        {/* Inductor arcs */}
+        <path
+          d="M 655 256 a 2.8 3.8 0 0 0 5.5 0 a 2.8 3.8 0 0 0 5.5 0"
+          fill="none" stroke="#5cc4b0" strokeWidth={1.2} strokeLinecap="round"
+        />
+        {/* Wire from inductor to capacitor */}
+        <line x1={666} y1={256} x2={671} y2={256} stroke="#888" strokeWidth={0.8} />
+        {/* Capacitor plates */}
+        <line x1={671} y1={249} x2={671} y2={263} stroke="#5cc4b0" strokeWidth={1} />
+        <line x1={675} y1={249} x2={675} y2={263} stroke="#5cc4b0" strokeWidth={1} />
+        {/* Wire from capacitor to AF amp */}
+        <line x1={675} y1={256} x2={681} y2={256} stroke="#888" strokeWidth={0.8} />
+
+        {/* AF amp */}
+        <polygon points="683,250 683,262 697,256" fill="none" stroke="#5cc4b0" strokeWidth={1.2} />
+        <text x={690} y={272} textAnchor="middle" fontSize={5.5} fill="#5cc4b0" opacity={0.6}>AF</text>
+
+        {/* Speaker */}
+        <line x1={697} y1={256} x2={707} y2={256} stroke="#888" strokeWidth={0.8} />
+        <polygon points="709,251 709,261 715,264 715,248" fill="none" stroke="#ccc" strokeWidth={0.8} opacity={0.5} />
+        <line x1={715} y1={248} x2={721} y2={244} stroke="#ccc" strokeWidth={0.6} opacity={0.3} />
+        <line x1={715} y1={264} x2={721} y2={268} stroke="#ccc" strokeWidth={0.6} opacity={0.3} />
+
+        <text
+          x={672} y={304}
+          textAnchor="middle" fontSize={14} fontWeight={700}
+          fill="#5cc4b0" letterSpacing={2}
+        >
+          RX
+        </text>
+
+        {/* Distance label */}
+        <text
+          x={410} y={330}
+          textAnchor="middle" fontSize={13}
+          fill="#e0e2e8" opacity={0.9} letterSpacing={1.5}
+        >
+          worldwide via multi-hop
+        </text>
+
+        {/* ════════════════════════════════════════════════
+            LEGEND
+            ════════════════════════════════════════════════ */}
+        <rect x={0} y={418} width={820} height={82} fill="#2a3044" opacity={0.95} />
+
+        {/* Row 1: Diagram elements */}
+        <g transform="translate(30,440)">
+          <line x1={0} y1={0} x2={22} y2={0} stroke="#daa030" strokeWidth={2.5} strokeLinecap="round" />
+          <text x={30} y={4} fontSize={10.5} fill="#bbb">Signal path</text>
+
+          <rect x={128} y={-5} width={26} height={10} rx={5} fill="#2d9c8a" opacity={0.45} />
+          <text x={162} y={4} fontSize={10.5} fill="#bbb">Ionosphere</text>
+
+          <g transform="translate(264,0)" stroke="#ccc" strokeWidth={1.3}>
+            <line x1={0} y1={7} x2={0} y2={-2} />
+            <line x1={0} y1={-2} x2={-7} y2={-10} />
+            <line x1={0} y1={-2} x2={7} y2={-10} />
           </g>
-        ))}
+          <text x={280} y={4} fontSize={10.5} fill="#bbb">Antenna</text>
 
-        {/* ── TX station (sits on curved ground) ─────────────────────── */}
-        {/* Building */}
-        <rect x={txX - 22} y={txGround - 24} width={44} height={24}
-          rx="2" fill="currentColor" opacity="0.35"
-          stroke="currentColor" strokeWidth="1" strokeOpacity="0.55" />
-        <rect x={txX - 9} y={txGround - 24} width={18} height={8}
-          fill="currentColor" opacity="0.25" />
-        {/* Antenna mast */}
-        <line x1={txX} y1={txGround - 24} x2={txX} y2={txTop}
-          stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
-        {/* Guy wires */}
-        <line x1={txX} y1={txTop + 10} x2={txX - 14} y2={txGround - 24}
-          stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-        <line x1={txX} y1={txTop + 10} x2={txX + 14} y2={txGround - 24}
-          stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-        {/* Antenna tip glow */}
-        <circle className="tx-dot" cx={txX} cy={txTop} r={4}
-          fill="hsl(38 92% 52%)" />
-        {/* Label */}
-        <text x={txX} y={txGround + 16} textAnchor="middle"
-          fontSize="14" fontWeight="700"
-          fill="hsl(0 0% 90%)" opacity="0.9" letterSpacing="2">TX</text>
+          {/* TX: mini schematic box with amber accent */}
+          <rect x={358} y={-8} width={30} height={16} rx={3} fill="#12161f" stroke="#daa030" strokeWidth={0.9} />
+          <polygon points="363,-2 363,4 369,1" fill="none" stroke="#daa030" strokeWidth={0.8} />
+          <circle cx={376} cy={1} r={3} fill="none" stroke="#daa030" strokeWidth={0.7} />
+          <line x1={374} y1={-1} x2={378} y2={3} stroke="#daa030" strokeWidth={0.5} />
+          <line x1={378} y1={-1} x2={374} y2={3} stroke="#daa030" strokeWidth={0.5} />
+          <text x={396} y={4} fontSize={10.5} fill="#bbb">TX (transmitter)</text>
 
-        {/* ── RX station (sits on curved ground) ─────────────────────── */}
-        <rect x={rxX - 22} y={rxGround - 24} width={44} height={24}
-          rx="2" fill="currentColor" opacity="0.35"
-          stroke="currentColor" strokeWidth="1" strokeOpacity="0.55" />
-        <rect x={rxX - 9} y={rxGround - 24} width={18} height={8}
-          fill="currentColor" opacity="0.25" />
-        <line x1={rxX} y1={rxGround - 24} x2={rxX} y2={rxTop}
-          stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
-        <line x1={rxX} y1={rxTop + 10} x2={rxX - 14} y2={rxGround - 24}
-          stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-        <line x1={rxX} y1={rxTop + 10} x2={rxX + 14} y2={rxGround - 24}
-          stroke="currentColor" strokeWidth="0.8" opacity="0.25" />
-        <circle className="rx-dot" cx={rxX} cy={rxTop} r={4}
-          fill="hsl(172 60% 48%)" />
-        <text x={rxX} y={rxGround + 16} textAnchor="middle"
-          fontSize="14" fontWeight="700"
-          fill="hsl(0 0% 90%)" opacity="0.9" letterSpacing="2">RX</text>
-
-        {/* ── Distance label ───────────────────────────────────────────── */}
-        <line x1={txX + 30} y1={earthY + 22} x2={rxX - 30} y2={earthY + 22}
-          stroke="hsl(0 0% 85%)" strokeWidth="0.8" strokeDasharray="5 5" opacity="0.4" />
-        <text x={W / 2} y={earthY + 38} textAnchor="middle"
-          fontSize="13" fill="hsl(0 0% 88%)" opacity="0.8"
-          letterSpacing="1.5">worldwide via multi-hop</text>
-
-        {/* ── "HF" frequency label in the sky ─────────────────────────── */}
-        <text x={W / 2} y={ionoY - 22} textAnchor="middle"
-          fontSize="14" fill="currentColor" opacity="0.5"
-          letterSpacing="3">HF skywave propagation</text>
-
-        {/* ── Component symbol strip ───────────────────────────────────── */}
-        <ComponentStrip cx={W / 2} y={earthY + 58} />
-
-        {/* ── Stars above ionosphere ───────────────────────────────────── */}
-        {[
-          [60,20],[160,12],[310,30],[440,8],[560,25],[700,14],[750,35],
-          [90,40],[220,22],[490,38],[630,18],
-        ].map(([sx,sy],i) => (
-          <circle key={`star-${i}`}
-            cx={sx} cy={sy} r={0.8}
-            fill="currentColor" opacity={0.1 + (i % 3) * 0.06} />
-        ))}
-      </SVGDiagram>
-    </div>
-  )
-}
-
-/* ── Component symbols strip ─────────────────────────────────────────────── */
-
-function ComponentStrip({ cx, y }: { cx: number; y: number }) {
-  // Symbols match the ARRL-standard circuit library (src/lib/circuit/symbols)
-  // scaled to ~0.7x for the decorative strip
-  const S = 1.5 // stroke width for strip symbols
-  const items: Array<{ symbol: () => ReactNode; label: string }> = [
-    {
-      label: 'Resistor',
-      // ARRL zigzag: 3.5 cycles, same proportions as passives.tsx
-      symbol: () => (
-        <g stroke="currentColor" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" opacity="0.75">
-          <line x1={-20} y1={0} x2={-11} y2={0} />
-          <polyline points="-11,0 -8.5,-6 -3,6 2.5,-6 8,6 11,0" fill="none" />
-          <line x1={11} y1={0} x2={20} y2={0} />
+          {/* RX: mini schematic box with teal accent */}
+          <rect x={528} y={-8} width={30} height={16} rx={3} fill="#12161f" stroke="#5cc4b0" strokeWidth={0.9} />
+          <polygon points="533,-2 533,4 539,1" fill="none" stroke="#5cc4b0" strokeWidth={0.8} />
+          <circle cx={546} cy={1} r={3} fill="none" stroke="#5cc4b0" strokeWidth={0.7} />
+          <line x1={544} y1={-1} x2={548} y2={3} stroke="#5cc4b0" strokeWidth={0.5} />
+          <line x1={548} y1={-1} x2={544} y2={3} stroke="#5cc4b0" strokeWidth={0.5} />
+          <text x={566} y={4} fontSize={10.5} fill="#bbb">RX (receiver)</text>
         </g>
-      ),
-    },
-    {
-      label: 'Capacitor',
-      // ARRL two parallel plates, same gap/plate proportions as passives.tsx
-      symbol: () => (
-        <g stroke="currentColor" strokeWidth={S} strokeLinecap="round" opacity="0.75">
-          <line x1={-16} y1={0} x2={-3} y2={0} />
-          <line x1={-3} y1={-8} x2={-3} y2={8} />
-          <line x1={3} y1={-8} x2={3} y2={8} />
-          <line x1={3} y1={0} x2={16} y2={0} />
-        </g>
-      ),
-    },
-    {
-      label: 'Inductor',
-      // ARRL air-core: 4 semicircular arcs, same geometry as passives.tsx
-      symbol: () => (
-        <g stroke="currentColor" strokeWidth={S} strokeLinecap="round" strokeLinejoin="round" opacity="0.75">
-          <line x1={-20} y1={0} x2={-13} y2={0} />
+
+        {/* Row 2: Circuit symbols */}
+        <g transform="translate(30,468)">
           <path
-            d="M -13 0 a 3.2 4.5 0 0 0 6.5 0 a 3.2 4.5 0 0 0 6.5 0 a 3.2 4.5 0 0 0 6.5 0 a 3.2 4.5 0 0 0 6.5 0"
-            fill="none" />
-          <line x1={13} y1={0} x2={20} y2={0} />
-        </g>
-      ),
-    },
-    {
-      label: 'Waveform',
-      symbol: () => (
-        <path
-          d="M -20,0 C -14,-10 -6,-10 0,0 C 6,10 14,10 20,0"
-          fill="none" stroke="hsl(38 92% 52%)" strokeWidth="1.8"
-          strokeLinecap="round" opacity="0.75" />
-      ),
-    },
-    {
-      label: 'Antenna',
-      // ARRL antenna: V-shape with straight arms, same as misc.tsx
-      symbol: () => (
-        <g stroke="currentColor" strokeWidth={S} strokeLinecap="round" opacity="0.75">
-          <line x1={0} y1={10} x2={0} y2={0} />
-          <line x1={0} y1={0} x2={-9} y2={-10} />
-          <line x1={0} y1={0} x2={9} y2={-10} />
-        </g>
-      ),
-    },
-  ]
+            d="M 0 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0"
+            fill="none" stroke="#5cc4b0" strokeWidth={1.3} strokeLinecap="round"
+          />
+          <text x={28} y={3} fontSize={10.5} fill="#bbb">Inductor</text>
 
-  const spacing = 130
-  const startX  = cx - ((items.length - 1) / 2) * spacing
-
-  return (
-    <g>
-      {/* Connecting line */}
-      <line
-        x1={startX - 28} y1={y}
-        x2={startX + (items.length - 1) * spacing + 28} y2={y}
-        stroke="currentColor" strokeWidth="0.8" opacity="0.12"
-        strokeDasharray="3 5" />
-
-      {items.map((item, i) => {
-        const x = startX + i * spacing
-        return (
-          <g key={item.label} transform={`translate(${x}, ${y})`}>
-            {item.symbol()}
-            <text y={22} textAnchor="middle"
-              fontSize="12.5" fontWeight="500" fill="hsl(0 0% 88%)" opacity="0.9">
-              {item.label}
-            </text>
+          <g transform="translate(112,0)">
+            <line x1={-2} y1={-6} x2={-2} y2={6} stroke="#5cc4b0" strokeWidth={1.1} />
+            <line x1={2} y1={-6} x2={2} y2={6} stroke="#5cc4b0" strokeWidth={1.1} />
           </g>
-        )
-      })}
+          <text x={122} y={3} fontSize={10.5} fill="#bbb">Capacitor</text>
 
-      {/* Arrows between symbols */}
-      {items.slice(0, -1).map((_, i) => {
-        const ax = startX + i * spacing + 26
-        return (
-          <path key={`arr-${i}`}
-            d={`M ${ax},${y} L ${ax + 18},${y} M ${ax + 14},${y - 4} L ${ax + 20},${y} L ${ax + 14},${y + 4}`}
-            fill="none" stroke="currentColor" strokeWidth="1"
-            strokeLinecap="round" strokeLinejoin="round" opacity="0.15" />
-        )
-      })}
-    </g>
+          <polyline
+            points="216,0 219,-5 225,5 231,-5 237,5 240,0"
+            fill="none" stroke="#daa030" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
+          />
+          <text x={248} y={3} fontSize={10.5} fill="#bbb">Resistor</text>
+
+          <polygon points="332,-5 332,5 344,0" fill="none" stroke="#daa030" strokeWidth={1.1} />
+          <text x={352} y={3} fontSize={10.5} fill="#bbb">Amplifier</text>
+
+          <circle cx={432} cy={0} r={6} fill="none" stroke="#daa030" strokeWidth={1.1} />
+          <line x1={428} y1={-4} x2={436} y2={4} stroke="#daa030" strokeWidth={0.9} />
+          <line x1={436} y1={-4} x2={428} y2={4} stroke="#daa030" strokeWidth={0.9} />
+          <text x={446} y={3} fontSize={10.5} fill="#bbb">Mixer</text>
+
+          <path
+            d="M 510,0 C 514,-7 520,-7 524,0 C 528,7 534,7 538,0"
+            fill="none" stroke="#b88a20" strokeWidth={1.4} strokeLinecap="round"
+          />
+          <text x={546} y={3} fontSize={10.5} fill="#bbb">Oscillator</text>
+        </g>
+      </SVGDiagram>
+
+      <div className="px-6 pt-4 pb-4 text-center text-sm leading-relaxed text-muted-foreground border-t border-border">
+        <p>
+          This is a <strong className="text-foreground font-medium">superheterodyne radio link</strong> — the same architecture used in most real transceivers.
+          Each symbol in the TX and RX boxes represents a real circuit stage: amplifiers, mixers, filters, and oscillators.
+        </p>
+        <p className="mt-2 italic opacity-80">
+          Keep learning — by the end of this guide, every part of this diagram will make complete sense!
+        </p>
+      </div>
+    </div>
   )
 }
