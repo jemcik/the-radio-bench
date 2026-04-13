@@ -29,15 +29,24 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
   const [pinned, setPinned] = useState(false)
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const isTouch = useRef(false)
+  const suppressTooltip = useRef(false)
 
   return (
     <TooltipProvider delayDuration={300} skipDelayDuration={100}>
-      <Popover open={pinned} onOpenChange={setPinned}>
+      <Popover open={pinned} onOpenChange={(open) => {
+        setPinned(open)
+        if (!open) {
+          // Suppress tooltip briefly after popover closes so it doesn't flash
+          setTooltipOpen(false)
+          suppressTooltip.current = true
+          setTimeout(() => { suppressTooltip.current = false }, 400)
+        }
+      }}>
         <Tooltip
           open={tooltipOpen && !pinned}
           onOpenChange={(open) => {
-            // Don't show tooltip on touch or when popover is open
-            if (!isTouch.current && !pinned) setTooltipOpen(open)
+            // Don't show tooltip on touch, when popover is open, or right after popover closes
+            if (!isTouch.current && !pinned && !suppressTooltip.current) setTooltipOpen(open)
           }}
         >
           <PopoverTrigger asChild>
@@ -89,7 +98,13 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
             </span>
             <button
               className="text-muted-foreground hover:text-foreground cursor-pointer text-base leading-none px-0.5"
-              onClick={(e) => { e.stopPropagation(); setPinned(false) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setPinned(false)
+                setTooltipOpen(false)
+                suppressTooltip.current = true
+                setTimeout(() => { suppressTooltip.current = false }, 400)
+              }}
               aria-label="Close"
             >
               ×
