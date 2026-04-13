@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useState, useCallback } from 'react'
-import { FlaskConical, HelpCircle, ChevronRight, Bookmark, X, Mail, Github, Home } from 'lucide-react'
+import { FlaskConical, HelpCircle, ChevronRight, Bookmark, X, Mail, Github, Home, Radio } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
@@ -294,6 +294,16 @@ export default function Sidebar({ onNavigation }: { onNavigation?: () => void })
         >
           <Github className="w-3.5 h-3.5" />
           <span className="hidden xl:inline">GitHub</span>
+        </a>
+        <a
+          href="https://www.qrz.com/db/UT3UVC"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="UT3UVC on QRZ.com"
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        >
+          <Radio className="w-3.5 h-3.5" />
+          <span className="hidden xl:inline">UT3UVC</span>
         </a>
       </div>
 
