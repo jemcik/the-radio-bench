@@ -4,6 +4,7 @@
  */
 import { useTranslation, Trans } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
+import DiagramFigure from './DiagramFigure'
 
 export default function OscilloscopeDiagram() {
   const { t } = useTranslation('ui')
@@ -40,13 +41,20 @@ export default function OscilloscopeDiagram() {
     return d
   }
 
+  const caption = (
+    <>
+      {t('ch0_2.scopeDiagramCaption1')}{' '}
+      {t('ch0_2.scopeDiagramCaption2')}<sub>pp</sub>.{' '}
+      <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong /> }} />
+    </>
+  )
+
   return (
-    <figure className="my-8 not-prose">
-      <div className="rounded-xl border border-border bg-muted/40 p-4 overflow-x-auto">
-        <SVGDiagram
-          width={W} height={H}
-          style={{ maxWidth: W, margin: '0 auto' }}
-          fontFamily="inherit"
+    <DiagramFigure caption={caption}>
+      <SVGDiagram
+        width={W} height={H}
+        style={{ maxWidth: W, margin: '0 auto' }}
+        fontFamily="inherit"
           aria-label={t('ch0_2.scopeDiagramAria')}
         >
           {/* Screen bezel */}
@@ -156,13 +164,7 @@ export default function OscilloscopeDiagram() {
             fontWeight="600">
             TIME/DIV 0.5ms
           </text>
-        </SVGDiagram>
-      </div>
-      <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        {t('ch0_2.scopeDiagramCaption1')}{' '}
-        {t('ch0_2.scopeDiagramCaption2')}<sub>pp</sub>.{' '}
-        <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong /> }} />
-      </figcaption>
-    </figure>
+      </SVGDiagram>
+    </DiagramFigure>
   )
 }

@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useFont } from '@/context/FontContext'
 import { getFontById } from '@/lib/fonts'
 import SVGDiagram from './SVGDiagram'
+import DiagramFigure from './DiagramFigure'
 
 /** Estimate text width using an off-screen canvas (accurate to ±2 px). */
 function measureText(text: string, font: string): number {
@@ -69,12 +70,11 @@ export default function ChapterFlowDiagram() {
   }
 
   return (
-    <figure className="my-8 not-prose">
-      <div className="rounded-xl border border-border bg-muted/40 p-4 overflow-x-auto">
-        <SVGDiagram
-          width={TOTAL_W} height={TOTAL_H}
-          style={{ maxWidth: TOTAL_W, margin: '0 auto' }}
-          aria-label={t('chapterFlow.ariaLabel')}
+    <DiagramFigure caption={t('chapterFlow.caption')}>
+      <SVGDiagram
+        width={TOTAL_W} height={TOTAL_H}
+        style={{ maxWidth: TOTAL_W, margin: '0 auto' }}
+        aria-label={t('chapterFlow.ariaLabel')}
         >
           {steps.map((step, i) => {
             const boxX = boxXs[i]
@@ -141,11 +141,7 @@ export default function ChapterFlowDiagram() {
               </g>
             )
           })}
-        </SVGDiagram>
-      </div>
-      <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        {t('chapterFlow.caption')}
-      </figcaption>
-    </figure>
+      </SVGDiagram>
+    </DiagramFigure>
   )
 }

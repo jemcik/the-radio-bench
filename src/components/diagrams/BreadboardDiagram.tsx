@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
+import DiagramFigure from './DiagramFigure'
 
 /**
  * Chapter 0.2 — Breadboard anatomy
@@ -49,14 +50,23 @@ export default function BreadboardDiagram() {
   const hlX       = holeStartX + hlCol * colStep
   const hlColNum  = hlCol + 1                      // human label
 
+  const caption = (
+    <>
+      {t('ch0_2.breadboardCaption1')}{' '}
+      <span style={{ color: 'hsl(0 70% 55%)' }}>{t('ch0_2.breadboardRed')}</span>/
+      <span style={{ color: 'hsl(221 80% 60%)' }}>{t('ch0_2.breadboardBlue')}</span> {t('ch0_2.breadboardCaptionRails')}{' '}
+      {t('ch0_2.breadboardCaption5holes')}{' '}
+      {t('ch0_2.breadboardCaptionNode')}
+    </>
+  )
+
   return (
-    <figure className="my-8 not-prose">
-      <div className="rounded-xl border border-border bg-muted/40 p-4 overflow-x-auto">
-        <SVGDiagram
-          width={W} height={H}
-          style={{ maxWidth: W, margin: '0 auto' }}
-          fontFamily="inherit"
-          aria-label={t('ch0_2.breadboardAria')}
+    <DiagramFigure caption={caption}>
+      <SVGDiagram
+        width={W} height={H}
+        style={{ maxWidth: W, margin: '0 auto' }}
+        fontFamily="inherit"
+        aria-label={t('ch0_2.breadboardAria')}
         >
           {/* ── Board body ──────────────────────────────────────────── */}
           <rect x={bx} y={by} width={bw} height={bh} rx="6"
@@ -203,15 +213,7 @@ export default function BreadboardDiagram() {
             fontSize="10" fill="hsl(38 92% 55%)" opacity="0.8">
             {t('ch0_2.breadboardNode')}
           </text>
-        </SVGDiagram>
-      </div>
-      <figcaption className="mt-2 text-center text-xs text-muted-foreground">
-        {t('ch0_2.breadboardCaption1')}{' '}
-        <span style={{ color: 'hsl(0 70% 55%)' }}>{t('ch0_2.breadboardRed')}</span>/
-        <span style={{ color: 'hsl(221 80% 60%)' }}>{t('ch0_2.breadboardBlue')}</span> {t('ch0_2.breadboardCaptionRails')}{' '}
-        {t('ch0_2.breadboardCaption5holes')}{' '}
-        {t('ch0_2.breadboardCaptionNode')}
-      </figcaption>
-    </figure>
+      </SVGDiagram>
+    </DiagramFigure>
   )
 }
