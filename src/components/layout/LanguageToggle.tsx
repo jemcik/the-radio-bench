@@ -6,6 +6,7 @@ import {
   PopoverContent,
 } from '@/components/ui/popover'
 import { useState } from 'react'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -42,7 +43,7 @@ export default function LanguageToggle() {
             key={lang.code}
             onClick={() => {
               i18n.changeLanguage(lang.code)
-              localStorage.setItem('trb-lang-chosen', '1')
+              localStorage.setItem(STORAGE_KEYS.languageChosen, '1')
               setOpen(false)
             }}
             className={cn(

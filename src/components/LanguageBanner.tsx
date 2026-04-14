@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'uk', label: 'Українська', flag: '🇺🇦' },
 ] as const
-
-export const LANG_CHOSEN_KEY = 'trb-lang-chosen'
 
 /**
  * Full-screen language picker shown once on first visit.
@@ -17,14 +16,14 @@ export const LANG_CHOSEN_KEY = 'trb-lang-chosen'
 export default function LanguageBanner() {
   const { i18n } = useTranslation()
   const [dismissed, setDismissed] = useState(
-    () => !!localStorage.getItem(LANG_CHOSEN_KEY),
+    () => !!localStorage.getItem(STORAGE_KEYS.languageChosen),
   )
 
   if (dismissed) return null
 
   const pick = (code: string) => {
     i18n.changeLanguage(code)
-    localStorage.setItem(LANG_CHOSEN_KEY, '1')
+    localStorage.setItem(STORAGE_KEYS.languageChosen, '1')
     setDismissed(true)
   }
 

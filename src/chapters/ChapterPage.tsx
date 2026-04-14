@@ -1,10 +1,13 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react'
 import { getChapterById, getAdjacentChapters } from '@/data/chapters'
 import { useTranslatedChapter } from '@/data/useTranslatedChapters'
 import { lazy, Suspense } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { BookmarkButton } from '@/components/ui/bookmark-button'
+import { BookmarkButton } from '@/features/bookmarks/bookmark-button'
+import { ChapterScope } from '@/components/ui/section-heading'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 
 // ─── Lazy-load each chapter module ───────────────────────────────────────────
 // Add a new entry here as you write each chapter.
@@ -20,22 +23,6 @@ const CHAPTER_COMPONENTS: Record<string, React.LazyExoticComponent<() => React.J
 const chapterNavLinkClass =
   'group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors'
 
-function ChevronLeftIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-      <path d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z" />
-    </svg>
-  )
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-      <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06L7.28 12.78a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z" />
-    </svg>
-  )
-}
-
 function ChapterNavLink({
   to,
   edge,
@@ -50,14 +37,14 @@ function ChapterNavLink({
 
   return (
     <Link to={to} className={chapterNavLinkClass}>
-      {edge === 'prev' && <ChevronLeftIcon />}
+      {edge === 'prev' && <ChevronLeft className="w-4 h-4" aria-hidden />}
       <div className={edge === 'prev' ? 'text-right' : ''}>
         <div className={edge === 'next' ? 'text-xs text-muted-foreground/70 text-right' : 'text-xs text-muted-foreground/70'}>
           {label}
         </div>
         <div className="group-hover:text-foreground transition-colors">{chapterTitle}</div>
       </div>
-      {edge === 'next' && <ChevronRightIcon />}
+      {edge === 'next' && <ChevronRight className="w-4 h-4" aria-hidden />}
     </Link>
   )
 }
@@ -158,19 +145,25 @@ export default function ChapterPage() {
   if (!ChapterContent) return <ComingSoon id={chapterId} />
 
   return (
+    <ChapterScope chapterId={chapterId}>
     <div className="max-w-5xl mx-auto px-6 py-10">
       <ChapterHeader id={chapterId} />
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      {/* ErrorBoundary catches both lazy-load failures and render-time
+          throws inside the chapter; resetKey wipes a stuck error when the
+          user navigates to a different chapter. */}
+      <ErrorBoundary resetKey={chapterId}>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-20">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <div className="prose-chapter">
+            <ChapterContent />
           </div>
-        }
-      >
-        <div className="prose-chapter">
-          <ChapterContent />
-        </div>
-      </Suspense>
+        </Suspense>
+      </ErrorBoundary>
       {/* Feedback link */}
       <div className="mt-12 pt-6 border-t border-border/50 flex items-center gap-4 text-[13px] text-muted-foreground/60">
         <span>{t('chapter.feedbackIntro')}</span>
@@ -181,12 +174,11 @@ export default function ChapterPage() {
           className="inline-flex items-center gap-1 text-primary/70 hover:text-primary transition-colors"
         >
           {t('chapter.openIssue')}
-          <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-            <path d="M3.75 2h3.5a.75.75 0 010 1.5H4.56l7.22 7.22a.75.75 0 11-1.06 1.06L3.5 4.56v2.69a.75.75 0 01-1.5 0v-3.5A1.75 1.75 0 013.75 2z" />
-          </svg>
+          <ArrowUpRight className="w-3 h-3" aria-hidden />
         </a>
       </div>
       <ChapterNav currentId={chapterId} />
     </div>
+    </ChapterScope>
   )
 }

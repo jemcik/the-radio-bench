@@ -88,7 +88,10 @@
     "backToHome": "← Back to home",
     "notTranslated": "This chapter is not yet available in your language. Showing the English version.",
     "feedbackIntro": "Found a mistake or have a suggestion?",
-    "openIssue": "Open an issue"
+    "openIssue": "Open an issue",
+    "loadFailedTitle": "This chapter failed to load",
+    "loadFailedBody": "Something went wrong rendering the page. Try going back to the home page or refreshing.",
+    "loadFailedRetry": "Try again"
   },
 
   "welcome": {

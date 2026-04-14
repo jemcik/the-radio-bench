@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { DEFAULT_THEME } from '@/lib/themes'
-
-const STORAGE_KEY = 'trb-theme'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { codec, readPersisted, usePersistedState } from '@/lib/hooks/usePersistedState'
 
 interface ThemeContextValue {
   theme: string
@@ -13,26 +13,18 @@ const ThemeContext = createContext<ThemeContextValue>({
   setTheme: () => {},
 })
 
-// Apply the initial theme immediately (before first render) to avoid flash
+// Apply the initial theme immediately (before first render) to avoid flash.
+// Uses the same codec as the hook so the storage format is single-sourced.
 if (typeof document !== 'undefined') {
-  const saved = localStorage.getItem('trb-theme') ?? DEFAULT_THEME
+  const saved = readPersisted(STORAGE_KEYS.theme, DEFAULT_THEME, codec.string)
   document.documentElement.setAttribute('data-theme', saved)
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<string>(() => {
-    if (typeof window === 'undefined') return DEFAULT_THEME
-    return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_THEME
-  })
-
-  const setTheme = (id: string) => {
-    setThemeState(id)
-    localStorage.setItem(STORAGE_KEY, id)
-  }
+  const [theme, setTheme] = usePersistedState(STORAGE_KEYS.theme, DEFAULT_THEME, codec.string)
 
   useEffect(() => {
-    const root = document.documentElement
-    root.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
   return (

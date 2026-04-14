@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { type ChapterMeta, type Part, getChapterById } from '@/data/chapters'
 import { useTranslatedParts } from '@/data/useTranslatedChapters'
-import { useBookmarks, type Bookmark as BookmarkType } from '@/context/BookmarkContext'
+import { useBookmarks, type Bookmark as BookmarkType } from '@/features/bookmarks/BookmarkContext'
 
 // ─── Chapter row ──────────────────────────────────────────────────────────────
 

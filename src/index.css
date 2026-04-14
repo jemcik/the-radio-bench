@@ -42,6 +42,19 @@
     --ring:              38 92% 45%;
     --term-accent:       38 80% 40%;
     --radius:            0.5rem;
+
+    /* Callout palette — semantic accent colors used by <Callout variant="...">.
+       Themes may override individual entries below to retune for their mood;
+       the icon/border/bg-tint utilities are wired in tailwind.config.ts. */
+    --callout-danger:     0 84% 60%;   /* red-400 */
+    --callout-key:        38 92% 50%;  /* amber-400 */
+    --callout-tip:        142 71% 45%; /* green-400 */
+    --callout-note:       217 91% 60%; /* blue-400 */
+    --callout-caution:    25 95% 53%;  /* orange-400 */
+    --callout-experiment: 173 80% 40%; /* teal-400 */
+    --callout-onair:      271 76% 53%; /* purple-400 */
+    --callout-math:       330 81% 60%; /* pink-400 */
+
     color-scheme: light;
   }
 
@@ -358,7 +371,9 @@
     background: hsl(var(--primary) / 0.12) !important;
   }
 
-  /* Floating toast notification for bookmarks */
+  /* Toast keyframes — referenced by tailwind.config.ts as `animate-toast-in` /
+     `animate-toast-out`. The toast element itself is rendered by
+     <ToastProvider> in src/components/ui/toast.tsx. */
   @keyframes toast-in {
     0%   { transform: translateX(-120%); opacity: 0; }
     100% { transform: translateX(0);     opacity: 1; }
@@ -367,35 +382,5 @@
   @keyframes toast-out {
     0%   { transform: translateX(0);     opacity: 1; }
     100% { transform: translateX(-120%); opacity: 0; }
-  }
-
-  .bookmark-toast {
-    position: fixed;
-    top: 4.5rem;
-    left: 1rem;
-    z-index: 9990;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem 0.6rem 0.75rem;
-    border-radius: 0.75rem;
-    border: 1.5px solid hsl(var(--primary) / 0.4);
-    background: hsl(var(--card));
-    color: hsl(var(--primary));
-    font-size: 0.8125rem;
-    font-weight: 600;
-    box-shadow:
-      0 4px 24px hsl(var(--primary) / 0.15),
-      0 0 0 1px hsl(var(--primary) / 0.05);
-    animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    pointer-events: none;
-  }
-
-  .bookmark-toast svg {
-    flex-shrink: 0;
-  }
-
-  .bookmark-toast-out {
-    animation: toast-out 0.35s ease-in forwards;
   }
 }

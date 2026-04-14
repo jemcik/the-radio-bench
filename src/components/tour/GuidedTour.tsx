@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback, createContext, useContext, useRef } f
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
-import { TOUR_STEPS, TOUR_STORAGE_KEY, TOUR_STEP_KEY } from './tourSteps'
+import { TOUR_STEPS } from './tourSteps'
 import TourOverlay from './TourOverlay'
 import WelcomeBuddy from '../WelcomeBuddy'
-import { LANG_CHOSEN_KEY } from '../LanguageBanner'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { tourPersistence } from './tourPersistence'
 
 /* ── Tour context (lets any component trigger the tour) ───────────────────── */
 
@@ -43,17 +44,16 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
   // Auto-trigger on first visit (welcome page only, after language is chosen)
   useEffect(() => {
     if (!isWelcome) return
-    const completed = localStorage.getItem(TOUR_STORAGE_KEY)
-    if (completed) return
+    if (tourPersistence.isCompleted()) return
 
     // Wait for the language banner to be dismissed first
-    const check = () => !!localStorage.getItem(LANG_CHOSEN_KEY)
+    const check = () => !!localStorage.getItem(STORAGE_KEYS.languageChosen)
     if (check()) {
       const t = setTimeout(() => setPhase('prompt'), 800)
       return () => clearTimeout(t)
     }
 
-    // Poll until language is chosen (banner writes LANG_CHOSEN_KEY on pick)
+    // Poll until language is chosen (banner writes STORAGE_KEYS.languageChosen on pick)
     const interval = setInterval(() => {
       if (check()) {
         clearInterval(interval)
@@ -87,7 +87,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
           if (step < steps.length - 1) {
             const next = step + 1
             setStep(next)
-            localStorage.setItem(TOUR_STEP_KEY, String(next))
+            tourPersistence.saveStep(next)
           } else {
             completeTour()
           }
@@ -122,8 +122,8 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
   const startTour = useCallback(() => {
     skipCount.current = 0
     // Resume from saved step if available
-    const saved = localStorage.getItem(TOUR_STEP_KEY)
-    const resumeStep = saved ? Math.min(parseInt(saved, 10), steps.length - 1) : 0
+    const saved = tourPersistence.getSavedStep()
+    const resumeStep = saved !== null ? Math.min(saved, steps.length - 1) : 0
     setStep(resumeStep)
     setPhase('active')
   }, [steps.length])
@@ -131,7 +131,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
   // Dismiss = remember where the user left off
   const dismissTour = useCallback(() => {
     steps[step]?.onExit?.()
-    localStorage.setItem(TOUR_STEP_KEY, String(step))
+    tourPersistence.saveStep(step)
     setPhase('done')
     window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
@@ -139,8 +139,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
   // Complete = finished all steps
   const completeTour = useCallback(() => {
     steps[step]?.onExit?.()
-    localStorage.setItem(TOUR_STORAGE_KEY, '1')
-    localStorage.removeItem(TOUR_STEP_KEY)
+    tourPersistence.markCompleted()
     setPhase('done')
     window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
@@ -152,8 +151,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     if (step < steps.length - 1) {
       const next = step + 1
       setStep(next)
-      // Save progress as we go
-      localStorage.setItem(TOUR_STEP_KEY, String(next))
+      tourPersistence.saveStep(next)
     } else {
       completeTour()
     }
@@ -161,12 +159,12 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
 
   const contextValue = useCallback(() => {
     // Clear stored flag and start fresh or resume
-    localStorage.removeItem(TOUR_STORAGE_KEY)
+    tourPersistence.reset()
     skipCount.current = 0
-    const saved = localStorage.getItem(TOUR_STEP_KEY)
-    if (saved) {
+    const saved = tourPersistence.getSavedStep()
+    if (saved !== null) {
       // Has a saved step — go straight to active (resume)
-      const resumeStep = Math.min(parseInt(saved, 10), steps.length - 1)
+      const resumeStep = Math.min(saved, steps.length - 1)
       setStep(resumeStep)
       setPhase('active')
     } else {

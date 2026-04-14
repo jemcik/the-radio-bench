@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useTranslation, Trans } from 'react-i18next'
+import { ChevronRight, Info } from 'lucide-react'
 import { PARTS } from '@/data/chapters'
 import { useTranslatedParts } from '@/data/useTranslatedChapters'
 import LogoIcon from '@/components/LogoIcon'
 import HeroIllustration from '@/components/HeroIllustration'
 import WelcomeBuddy from '@/components/WelcomeBuddy'
-import { G } from '@/components/ui/glossary-term'
-import { BookmarkButton } from '@/components/ui/bookmark-button'
+import { G } from '@/features/glossary/glossary-term'
+import { BookmarkButton } from '@/features/bookmarks/bookmark-button'
+import { Card } from '@/components/ui/card'
 import LanguageBanner from '@/components/LanguageBanner'
 
 const stats = {
@@ -61,9 +63,7 @@ export default function Welcome() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
             >
               {t('welcome.startBasics')}
-              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06L7.28 12.78a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
-              </svg>
+              <ChevronRight className="w-4 h-4" aria-hidden />
             </Link>
             <button
               onClick={() => document.getElementById('whats-covered')?.scrollIntoView({ behavior: 'smooth' })}
@@ -85,10 +85,10 @@ export default function Welcome() {
           { value: stats.chapters, label: t('welcome.statChapters') },
           { value: stats.labs, label: t('welcome.statLabs') },
         ].map(s => (
-          <div key={s.label} className="rounded-xl border border-border bg-card p-4 text-center">
+          <Card key={s.label} className="p-4 text-center">
             <div className="text-2xl font-bold text-primary font-mono">{s.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -124,13 +124,13 @@ export default function Welcome() {
             [t('welcome.oscilloscope'), t('welcome.oscilloscopeDesc')],
             [t('welcome.vna'), t('welcome.vnaDesc')],
           ] as const).map(([tool, desc]) => (
-            <div key={tool} className="flex gap-3 rounded-lg border border-border bg-card px-4 py-3">
+            <Card key={tool} radius="lg" className="flex gap-3 px-4 py-3">
               <span className="text-teal-500 mt-0.5 shrink-0">▸</span>
               <div>
                 <div className="text-sm font-medium text-card-foreground">{tool}</div>
                 <div className="text-xs text-muted-foreground">{desc}</div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
         <p className="text-muted-foreground text-sm leading-relaxed">
@@ -147,7 +147,7 @@ export default function Welcome() {
         <h2 className="text-lg font-semibold text-foreground">{t('welcome.whatsCovered')}</h2>
         <div className="space-y-3">
           {translatedParts.map(part => (
-            <div key={part.number} className="rounded-xl border border-border bg-card overflow-hidden">
+            <Card key={part.number} className="overflow-hidden">
               <div className="px-4 py-3 border-b border-border flex items-center gap-2">
                 <span className="text-xs font-mono font-bold text-primary">
                   {['0', 'I', 'II', 'III', 'IV'][part.number]}
@@ -173,17 +173,15 @@ export default function Welcome() {
                   )
                 })}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
 
       {/* ERC 32 note */}
-      <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+      <Card surface="accent" className="p-5">
         <div className="flex items-start gap-3">
-          <svg className="w-5 h-5 text-primary shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
-          </svg>
+          <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden />
           <div>
             <p className="text-sm font-semibold text-primary mb-1">{t('welcome.ercAligned')}</p>
             <p className="text-sm text-muted-foreground">
@@ -191,7 +189,7 @@ export default function Welcome() {
             </p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

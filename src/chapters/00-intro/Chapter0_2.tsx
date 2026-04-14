@@ -1,12 +1,12 @@
 // Chapter 0.2 — Lab Bench Setup
 import { useTranslation, Trans } from 'react-i18next'
-import LabActivity from '@/components/LabActivity/LabActivity'
+import LabActivity from '@/components/lab/LabActivity'
 import MultimeterDiagram from '@/components/diagrams/MultimeterDiagram'
 import OscilloscopeDiagram from '@/components/diagrams/OscilloscopeDiagram'
 import BreadboardDiagram from '@/components/diagrams/BreadboardDiagram'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
-import { G } from '@/components/ui/glossary-term'
+import { G } from '@/features/glossary/glossary-term'
 
 export default function Chapter0_2() {
   const { t } = useTranslation('ui')

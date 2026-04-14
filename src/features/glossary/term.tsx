@@ -2,7 +2,7 @@ import { useState, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-import type { GlossaryEntry } from '@/data/glossary'
+import type { GlossaryEntry } from './glossary'
 
 /**
  * Glossary term with two interaction modes:

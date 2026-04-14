@@ -9,8 +9,7 @@
  */
 import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-
-const STORAGE_KEY = 'rrb-last-path'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
 
 export default function LastLocationTracker() {
   const location = useLocation()
@@ -23,7 +22,7 @@ export default function LastLocationTracker() {
     if (restored.current) return
     restored.current = true
 
-    const saved = localStorage.getItem(STORAGE_KEY)
+    const saved = localStorage.getItem(STORAGE_KEYS.lastPath)
     // Only navigate away from root if we have a non-root saved path
     if (saved && saved !== '/' && location.pathname === '/') {
       navigate(saved, { replace: true })
@@ -32,7 +31,7 @@ export default function LastLocationTracker() {
 
   // Persist every path change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, location.pathname)
+    localStorage.setItem(STORAGE_KEYS.lastPath, location.pathname)
   }, [location.pathname])
 
   return null

@@ -8,7 +8,8 @@
  *   - GroundEarth: earth ground (single-terminal)
  */
 
-import { type SymbolProps, type SinglePinProps, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, type SinglePinProps, orientAngle, STROKE } from '../types'
+import { OrientedLabel, SymbolText } from '../SymbolLabel'
 
 // ─── Battery ──────────────────────────────────────────────────────────────────
 
@@ -26,7 +27,6 @@ export function Battery({
   value,
 }: SymbolProps) {
   const angle = orientAngle(orient)
-  const vert = isVertical(orient)
 
   // Polarity label positions — computed per orientation so they stay
   // upright and next to the correct plate regardless of rotation.
@@ -59,34 +59,10 @@ export function Battery({
       </g>
 
       {/* Polarity labels — outside rotation so they always read correctly */}
-      <text x={plus.x} y={plus.y} fontSize={9} textAnchor="middle"
-        fill="currentColor" opacity={0.45}>+</text>
-      <text x={minus.x} y={minus.y} fontSize={10} textAnchor="middle"
-        fill="currentColor" opacity={0.45}>−</text>
+      <SymbolText x={plus.x} y={plus.y} size={9} opacity={0.45}>+</SymbolText>
+      <SymbolText x={minus.x} y={minus.y} size={10} opacity={0.45}>−</SymbolText>
 
-      {/* Label and value outside rotation */}
-      {(label || value) && (
-        <>
-          {label && (
-            <text
-              x={vert ? x + 18 : x}
-              y={vert ? y : y - 14}
-              fontSize="12" fontWeight="bold"
-              textAnchor={vert ? 'start' : 'middle'}
-              fill="currentColor"
-            >{label}</text>
-          )}
-          {value && (
-            <text
-              x={vert ? x + 18 : x}
-              y={vert ? y + 16 : y + 4}
-              fontSize="11"
-              textAnchor={vert ? 'start' : 'middle'}
-              fill="currentColor" opacity={0.7}
-            >{value}</text>
-          )}
-        </>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
@@ -105,7 +81,6 @@ export function BatteryMulti({
   value,
 }: SymbolProps) {
   const angle = orientAngle(orient)
-  const vert = isVertical(orient)
 
   return (
     <g>
@@ -113,67 +88,22 @@ export function BatteryMulti({
       <g transform={`translate(${x},${y}) rotate(${angle})`}>
         {/* Cell 1 */}
         <line x1={-10} y1={-10} x2={-10} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line
-          x1={-6}
-          y1={-6}
-          x2={-6}
-          y2={6}
-          stroke="currentColor"
-          strokeWidth={STROKE + 0.8}
-        />
+        <line x1={-6} y1={-6} x2={-6} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
 
         {/* Cell 2 */}
         <line x1={-2} y1={-10} x2={-2} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line
-          x1={2}
-          y1={-6}
-          x2={2}
-          y2={6}
-          stroke="currentColor"
-          strokeWidth={STROKE + 0.8}
-        />
+        <line x1={2} y1={-6} x2={2} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
 
         {/* Cell 3 */}
         <line x1={6} y1={-10} x2={6} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line
-          x1={10}
-          y1={-6}
-          x2={10}
-          y2={6}
-          stroke="currentColor"
-          strokeWidth={STROKE + 0.8}
-        />
+        <line x1={10} y1={-6} x2={10} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
 
         {/* Leads */}
         <line x1={-30} y1={0} x2={-10} y2={0} stroke="currentColor" strokeWidth={STROKE} />
         <line x1={10} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label and value outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
-      {value && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y + 16 : y + 4}
-          fontSize="11"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-          opacity={0.7}
-        >
-          {value}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
@@ -191,13 +121,10 @@ export function Ground({
   orient = 'down',
   label,
 }: SinglePinProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   return (
     <g>
       {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Lead from top */}
         <line x1={0} y1={-15} x2={0} y2={0} stroke="currentColor" strokeWidth={STROKE} />
 
@@ -207,19 +134,7 @@ export function Ground({
         <line x1={-4} y1={10} x2={4} y2={10} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} />
     </g>
   )
 }
@@ -236,13 +151,10 @@ export function GroundEarth({
   orient = 'down',
   label,
 }: SinglePinProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   return (
     <g>
       {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Lead from top */}
         <line x1={0} y1={-15} x2={0} y2={0} stroke="currentColor" strokeWidth={STROKE} />
 
@@ -252,45 +164,12 @@ export function GroundEarth({
         <line x1={-4} y1={10} x2={4} y2={10} stroke="currentColor" strokeWidth={STROKE} />
 
         {/* Diagonal hatching below */}
-        <line
-          x1={-10}
-          y1={14}
-          x2={-4}
-          y2={20}
-          stroke="currentColor"
-          strokeWidth={STROKE}
-        />
-        <line
-          x1={-4}
-          y1={14}
-          x2={2}
-          y2={20}
-          stroke="currentColor"
-          strokeWidth={STROKE}
-        />
-        <line
-          x1={2}
-          y1={14}
-          x2={8}
-          y2={20}
-          stroke="currentColor"
-          strokeWidth={STROKE}
-        />
+        <line x1={-10} y1={14} x2={-4} y2={20} stroke="currentColor" strokeWidth={STROKE} />
+        <line x1={-4} y1={14} x2={2} y2={20} stroke="currentColor" strokeWidth={STROKE} />
+        <line x1={2} y1={14} x2={8} y2={20} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} />
     </g>
   )
 }

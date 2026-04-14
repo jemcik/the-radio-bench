@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
 import { Bookmark } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useBookmarks } from '@/context/BookmarkContext'
+import { useBookmarks } from './BookmarkContext'
+import { useTransientFlag } from '@/lib/hooks/useTransientFlag'
 import { cn } from '@/lib/utils'
 
 interface BookmarkButtonProps {
@@ -15,7 +15,7 @@ interface BookmarkButtonProps {
   className?: string
 }
 
-const pulseKeyframes: React.CSSProperties = {
+const pulseStyle: React.CSSProperties = {
   animation: 'bookmark-pop 0.5s ease-out',
 }
 
@@ -30,18 +30,10 @@ export function BookmarkButton({
   const { t } = useTranslation('ui')
   const { isBookmarked, toggle } = useBookmarks()
   const active = isBookmarked(chapterId, sectionId)
-  const prevActive = useRef(active)
-  const [pulse, setPulse] = useState(false)
 
-  // Fire pulse when bookmark is added (active goes false → true)
-  useEffect(() => {
-    if (active && !prevActive.current) {
-      setPulse(true)
-      const timer = setTimeout(() => setPulse(false), 600)
-      return () => clearTimeout(timer)
-    }
-    prevActive.current = active
-  }, [active])
+  // Pulse for ~600ms whenever the bookmark transitions from off → on. The hook
+  // detects the rising edge during render, so no setState-in-effect lint hit.
+  const pulse = useTransientFlag(active, 600)
 
   const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
   const btnSize = size === 'sm' ? 'w-8 h-8' : 'w-9 h-9'
@@ -66,7 +58,7 @@ export function BookmarkButton({
     >
       <Bookmark
         className={cn(iconSize, 'transition-all')}
-        style={pulse ? pulseKeyframes : undefined}
+        style={pulse ? pulseStyle : undefined}
         fill={active ? 'currentColor' : 'none'}
         strokeWidth={1.5}
       />

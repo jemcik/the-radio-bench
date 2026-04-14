@@ -2,9 +2,15 @@
  * Chapter 0.1 — How a chapter is structured
  * Shows the Concept → Formula → Widget → Lab → Quiz flow.
  * Box widths are computed dynamically from translated text.
+ *
+ * Measurement uses the *active* user font (read from FontContext) — generic
+ * `sans-serif` would underestimate width for wider faces like Plex Sans
+ * or Lora, leading to cramped boxes after the user changes typeface.
  */
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useFont } from '@/context/FontContext'
+import { getFontById } from '@/lib/fonts'
 import SVGDiagram from './SVGDiagram'
 
 /** Estimate text width using an off-screen canvas (accurate to ±2 px). */
@@ -19,6 +25,11 @@ function measureText(text: string, font: string): number {
 
 export default function ChapterFlowDiagram() {
   const { t } = useTranslation('ui')
+  const { font: fontId } = useFont()
+  // The SVG <text> uses font-family: inherit, which resolves to --font-sans
+  // (set by FontContext). Mirror that here so the canvas measures glyphs
+  // in the same face that will be painted.
+  const sans = getFontById(fontId).sans
 
   const stepDefs = useMemo(() => [
     { label: t('chapterFlow.analogy'), sub: t('chapterFlow.analogySub'), color: 'hsl(38 92% 50%)' },
@@ -32,16 +43,18 @@ export default function ChapterFlowDiagram() {
   const GAP = 32
   const PAD_X = 20
   const PAD_Y = 20
-  const H_PAD = 24 // horizontal padding inside each box
+  // Total horizontal padding inside each box. Generous so wider fonts
+  // (Plex Sans, Lora) and longer translations (Ukrainian) still breathe.
+  const H_PAD = 36
   const MIN_W = 80
 
-  // Compute dynamic widths
+  // Compute dynamic widths — re-runs when the user changes font.
   const steps = useMemo(() => stepDefs.map(s => {
-    const labelW = measureText(s.label, '600 15px sans-serif')
-    const subW = measureText(s.sub, '400 12px sans-serif')
+    const labelW = measureText(s.label, `600 15px ${sans}`)
+    const subW = measureText(s.sub, `400 12px ${sans}`)
     const w = Math.max(MIN_W, Math.max(labelW, subW) + H_PAD)
     return { ...s, w }
-  }), [stepDefs])
+  }), [stepDefs, sans])
 
   const TOTAL_W = PAD_X * 2 + steps.reduce((s, st) => s + st.w, 0) + (steps.length - 1) * GAP
   const TOTAL_H = BOX_H + PAD_Y * 2

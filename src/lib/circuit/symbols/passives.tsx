@@ -1,4 +1,38 @@
-import { type SymbolProps, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, orientAngle, STROKE } from '../types'
+import { SymbolText, getLabelPosition } from '../SymbolLabel'
+
+/**
+ * Passive components share an "above-the-body" label style: both the
+ * designator (R1) and the value (1 kΩ) sit just above the symbol, with
+ * subtle opacity. Vertical orientations slide the texts to the right
+ * instead. The `getLabelPosition` helper handles the orient maths.
+ *
+ * For the bolder split-above/below style used by sources, switches, meters,
+ * etc., see `OrientedLabel` in `../SymbolLabel`.
+ */
+function PassiveLabel({
+  x,
+  y,
+  orient,
+  label,
+  value,
+}: SymbolProps & { orient: NonNullable<SymbolProps['orient']> }) {
+  const { lx, ly, anchor } = getLabelPosition(x, y, orient)
+  return (
+    <>
+      {label && (
+        <SymbolText x={lx} y={ly} size={12} anchor={anchor} opacity={0.85}>
+          {label}
+        </SymbolText>
+      )}
+      {value && (
+        <SymbolText x={lx} y={ly + 12} size={11} anchor={anchor} opacity={0.6}>
+          {value}
+        </SymbolText>
+      )}
+    </>
+  )
+}
 
 /**
  * Resistor — ARRL zigzag style
@@ -10,24 +44,10 @@ import { type SymbolProps, orientAngle, isVertical, STROKE } from '../types'
  *
  * The zigzag creates 3.5 cycles matching ARRL standard.
  */
-export function Resistor({
-  x,
-  y,
-  orient = 'right',
-  label,
-  value,
-}: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
-  // Label positioning
-  const lx = vert ? x + 18 : x
-  const ly = vert ? y : y - 14
-  const anchor = vert ? 'start' : 'middle'
-
+export function Resistor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left lead */}
         <line x1="-30" y1="0" x2="-16" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
@@ -42,35 +62,7 @@ export function Resistor({
         />
       </g>
 
-      {/* Label (un-rotated, placed outside transform group) */}
-      {label && (
-        <text
-          x={lx}
-          y={ly}
-          fontSize="12"
-          fill="currentColor"
-          opacity={0.85}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {label}
-        </text>
-      )}
-
-      {/* Value (un-rotated, placed below/beside label) */}
-      {value && (
-        <text
-          x={lx}
-          y={ly + 12}
-          fontSize="11"
-          fill="currentColor"
-          opacity={0.6}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {value}
-        </text>
-      )}
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
@@ -84,23 +76,10 @@ export function Resistor({
  *   Plate 2: vertical line (4,-10) to (4,10)
  *   Lead from (4,0) to (30,0)
  */
-export function Capacitor({
-  x,
-  y,
-  orient = 'right',
-  label,
-  value,
-}: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
-  const lx = vert ? x + 18 : x
-  const ly = vert ? y : y - 14
-  const anchor = vert ? 'start' : 'middle'
-
+export function Capacitor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left lead */}
         <line x1="-30" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
@@ -114,35 +93,7 @@ export function Capacitor({
         <line x1="4" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
       </g>
 
-      {/* Label (un-rotated, placed outside transform group) */}
-      {label && (
-        <text
-          x={lx}
-          y={ly}
-          fontSize="12"
-          fill="currentColor"
-          opacity={0.85}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {label}
-        </text>
-      )}
-
-      {/* Value (un-rotated, placed below/beside label) */}
-      {value && (
-        <text
-          x={lx}
-          y={ly + 12}
-          fontSize="11"
-          fill="currentColor"
-          opacity={0.6}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {value}
-        </text>
-      )}
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
@@ -150,30 +101,12 @@ export function Capacitor({
 /**
  * Capacitor (Electrolytic) — polarised
  *
- * SVG path (at origin, orient='right'):
- *   Lead from (-30,0) to (-4,0)
- *   Plate 1 (positive): vertical line (-4,-10) to (-4,10)
- *   Plate 2 (negative): curved using quadratic bezier
- *   Lead from (4,0) to (30,0)
- *   "+" text near the positive plate at about (-10, -8)
+ * Same as Capacitor but with one curved plate and a "+" mark.
  */
-export function CapacitorElectrolytic({
-  x,
-  y,
-  orient = 'right',
-  label,
-  value,
-}: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
-  const lx = vert ? x + 18 : x
-  const ly = vert ? y : y - 14
-  const anchor = vert ? 'start' : 'middle'
-
+export function CapacitorElectrolytic({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left lead */}
         <line x1="-30" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
@@ -193,77 +126,21 @@ export function CapacitorElectrolytic({
         <line x1="4" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
         {/* "+" mark near positive plate */}
-        <text
-          x="-10"
-          y="-8"
-          fontSize="9"
-          fill="currentColor"
-          opacity={0.5}
-          textAnchor="middle"
-          dominantBaseline="middle"
-        >
-          +
-        </text>
+        <SymbolText x={-10} y={-8} size={9} opacity={0.5}>+</SymbolText>
       </g>
 
-      {/* Label (un-rotated, placed outside transform group) */}
-      {label && (
-        <text
-          x={lx}
-          y={ly}
-          fontSize="12"
-          fill="currentColor"
-          opacity={0.85}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {label}
-        </text>
-      )}
-
-      {/* Value (un-rotated, placed below/beside label) */}
-      {value && (
-        <text
-          x={lx}
-          y={ly + 12}
-          fontSize="11"
-          fill="currentColor"
-          opacity={0.6}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {value}
-        </text>
-      )}
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
  * Inductor — air-core (4 semicircular bumps)
- *
- * SVG path (at origin, orient='right'):
- *   Lead from (-30,0) to (-18,0)
- *   4 arcs bulging upward (negative y): a4.5,6 0 0,0 9,0 (repeated 4 times)
- *   Lead to (30,0)
  */
-export function Inductor({
-  x,
-  y,
-  orient = 'right',
-  label,
-  value,
-}: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
-  const lx = vert ? x + 18 : x
-  const ly = vert ? y : y - 14
-  const anchor = vert ? 'start' : 'middle'
-
+export function Inductor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left lead */}
         <line x1="-30" y1="0" x2="-18" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
@@ -278,62 +155,18 @@ export function Inductor({
         />
       </g>
 
-      {/* Label (un-rotated, placed outside transform group) */}
-      {label && (
-        <text
-          x={lx}
-          y={ly}
-          fontSize="12"
-          fill="currentColor"
-          opacity={0.85}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {label}
-        </text>
-      )}
-
-      {/* Value (un-rotated, placed below/beside label) */}
-      {value && (
-        <text
-          x={lx}
-          y={ly + 12}
-          fontSize="11"
-          fill="currentColor"
-          opacity={0.6}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {value}
-        </text>
-      )}
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
  * Inductor (Magnetic Core) — air-core with iron core lines
- *
- * Same as Inductor but with two horizontal parallel lines below the bumps
- * at y=4 and y=7, spanning from x=-16 to x=16, representing the iron core.
  */
-export function InductorCore({
-  x,
-  y,
-  orient = 'right',
-  label,
-  value,
-}: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
-  const lx = vert ? x + 18 : x
-  const ly = vert ? y : y - 14
-  const anchor = vert ? 'start' : 'middle'
-
+export function InductorCore({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left lead */}
         <line x1="-30" y1="0" x2="-18" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
 
@@ -352,35 +185,7 @@ export function InductorCore({
         <line x1="-16" y1="7" x2="16" y2="7" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
       </g>
 
-      {/* Label (un-rotated, placed outside transform group) */}
-      {label && (
-        <text
-          x={lx}
-          y={ly}
-          fontSize="12"
-          fill="currentColor"
-          opacity={0.85}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {label}
-        </text>
-      )}
-
-      {/* Value (un-rotated, placed below/beside label) */}
-      {value && (
-        <text
-          x={lx}
-          y={ly + 12}
-          fontSize="11"
-          fill="currentColor"
-          opacity={0.6}
-          textAnchor={anchor}
-          dominantBaseline="middle"
-        >
-          {value}
-        </text>
-      )}
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }

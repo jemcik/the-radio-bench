@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { DEFAULT_FONT, getFontById } from '@/lib/fonts'
-
-const FONT_KEY = 'trb-font'
-const SIZE_KEY = 'trb-font-size'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { codec, readPersisted, usePersistedState } from '@/lib/hooks/usePersistedState'
 
 /** 5 font-size steps in px. Index 2 (16px) is the default. */
 export const FONT_SIZES = [14, 15, 16, 17, 18] as const
@@ -35,38 +34,26 @@ function applySize(index: number) {
   document.documentElement.style.fontSize = `${px}px`
 }
 
-// Apply immediately before first render to avoid flash
+// Apply immediately before first render to avoid flash.
 if (typeof document !== 'undefined') {
-  const savedFont = localStorage.getItem(FONT_KEY) ?? DEFAULT_FONT
-  applyFont(savedFont)
+  applyFont(readPersisted(STORAGE_KEYS.font, DEFAULT_FONT, codec.string))
+  applySize(readPersisted(STORAGE_KEYS.fontSize, DEFAULT_SIZE_INDEX, codec.number))
+}
 
-  const savedSize = localStorage.getItem(SIZE_KEY)
-  const sizeIdx = savedSize != null ? Number(savedSize) : DEFAULT_SIZE_INDEX
-  applySize(sizeIdx)
+function clampSizeIndex(i: number): number {
+  return Math.max(0, Math.min(i, FONT_SIZES.length - 1))
 }
 
 export function FontProvider({ children }: { children: React.ReactNode }) {
-  const [font, setFontState] = useState<string>(() => {
-    if (typeof window === 'undefined') return DEFAULT_FONT
-    return localStorage.getItem(FONT_KEY) ?? DEFAULT_FONT
-  })
+  const [font, setFont] = usePersistedState(STORAGE_KEYS.font, DEFAULT_FONT, codec.string)
+  const [sizeIndex, setSizeIndexRaw] = usePersistedState(
+    STORAGE_KEYS.fontSize,
+    DEFAULT_SIZE_INDEX,
+    codec.number,
+  )
 
-  const [sizeIndex, setSizeIndexState] = useState<number>(() => {
-    if (typeof window === 'undefined') return DEFAULT_SIZE_INDEX
-    const saved = localStorage.getItem(SIZE_KEY)
-    return saved != null ? Number(saved) : DEFAULT_SIZE_INDEX
-  })
-
-  const setFont = (id: string) => {
-    setFontState(id)
-    localStorage.setItem(FONT_KEY, id)
-  }
-
-  const setSizeIndex = (i: number) => {
-    const clamped = Math.max(0, Math.min(i, FONT_SIZES.length - 1))
-    setSizeIndexState(clamped)
-    localStorage.setItem(SIZE_KEY, String(clamped))
-  }
+  // Keep callers from setting an out-of-range index; the wrapped setter clamps.
+  const setSizeIndex = (i: number) => setSizeIndexRaw(clampSizeIndex(i))
 
   useEffect(() => { applyFont(font) }, [font])
   useEffect(() => { applySize(sizeIndex) }, [sizeIndex])

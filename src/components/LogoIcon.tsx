@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils'
+
 /**
  * The Radio Bench logo — Antenna Pulse.
  * A vertical mast with ground radials and radiating signal arcs.
@@ -15,11 +17,10 @@ interface LogoIconProps {
 }
 
 export default function LogoIcon({ size = 32, className = '' }: LogoIconProps) {
+  // The wrapper hugs its SVG child (which has explicit width/height SVG
+  // attributes), so no inline width/height style is needed on the box.
   return (
-    <div
-      className={`rounded-lg bg-primary/20 flex items-center justify-center shrink-0 ${className}`}
-      style={{ width: size, height: size }}
-    >
+    <div className={cn('inline-flex rounded-lg bg-primary/20 shrink-0', className)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={size}

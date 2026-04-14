@@ -8,7 +8,8 @@
  *   - Fuse: simple fuse symbol
  */
 
-import { type SymbolProps, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, orientAngle, STROKE } from '../types'
+import { OrientedLabel } from '../SymbolLabel'
 
 // ─── Meter ────────────────────────────────────────────────────────────────────
 
@@ -26,56 +27,22 @@ export function Meter({
   letter,
   accent = 'currentColor',
 }: SymbolProps & { letter: string; accent?: string }) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   return (
     <g>
       {/* Component body — circle + letter only, NO leads.
           Wires connect directly to the circle edge via pins2(…, 40).
           This avoids colour mismatches between wire and lead strokes. */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Circle */}
         <circle cx={0} cy={0} r={20} stroke={accent} strokeWidth={STROKE} fill="none" />
 
-        {/* Letter inside */}
-        <text
-          x={0}
-          y={7}
-          fontSize="16"
-          fontWeight="bold"
-          textAnchor="middle"
-          fill={accent}
-        >
+        {/* Letter inside — uses raw <text> for the custom accent fill */}
+        <text x={0} y={7} fontSize="16" fontWeight="bold" textAnchor="middle" fill={accent}>
           {letter}
         </text>
       </g>
 
-      {/* Label and value outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 28 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
-      {value && (
-        <text
-          x={vert ? x + 28 : x}
-          y={vert ? y + 16 : y + 4}
-          fontSize="11"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-          opacity={0.7}
-        >
-          {value}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} offset={28} label={label} value={value} />
     </g>
   )
 }
@@ -96,13 +63,10 @@ export function SwitchSPST({
   value,
   closed = false,
 }: SymbolProps & { closed?: boolean }) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   return (
     <g>
       {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Left contact dot */}
         <circle cx={-12} cy={0} r={2.5} fill="currentColor" />
 
@@ -121,31 +85,7 @@ export function SwitchSPST({
         <line x1={12} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label and value outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
-      {value && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y + 16 : y + 4}
-          fontSize="11"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-          opacity={0.7}
-        >
-          {value}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
@@ -166,15 +106,12 @@ export function SwitchSPDT({
   value,
   position = 'up',
 }: SymbolProps & { position?: 'up' | 'down' }) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   const targetY = position === 'up' ? -10 : 10
 
   return (
     <g>
       {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Common contact dot */}
         <circle cx={-12} cy={0} r={2.5} fill="currentColor" />
 
@@ -193,31 +130,7 @@ export function SwitchSPDT({
         <line x1={12} y1={10} x2={30} y2={10} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label and value outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
-      {value && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y + 16 : y + 4}
-          fontSize="11"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-          opacity={0.7}
-        >
-          {value}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
@@ -235,24 +148,12 @@ export function Fuse({
   label,
   value,
 }: SymbolProps) {
-  const angle = orientAngle(orient)
-  const vert = isVertical(orient)
-
   return (
     <g>
       {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Rectangle body */}
-        <rect
-          x={-9}
-          y={-4}
-          width={18}
-          height={8}
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          fill="none"
-          rx={1}
-        />
+        <rect x={-9} y={-4} width={18} height={8} stroke="currentColor" strokeWidth={STROKE} fill="none" rx={1} />
 
         {/* S-curve inside (simplified as a wavy line) */}
         <path
@@ -268,31 +169,8 @@ export function Fuse({
         <line x1={9} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Label and value outside rotation */}
-      {label && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y : y - 14}
-          fontSize="12"
-          fontWeight="bold"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-        >
-          {label}
-        </text>
-      )}
-      {value && (
-        <text
-          x={vert ? x + 18 : x}
-          y={vert ? y + 16 : y + 4}
-          fontSize="11"
-          textAnchor={vert ? 'start' : 'middle'}
-          fill="currentColor"
-          opacity={0.7}
-        >
-          {value}
-        </text>
-      )}
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
+

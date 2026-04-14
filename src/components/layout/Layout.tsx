@@ -8,113 +8,63 @@ import LogoIcon from '@/components/LogoIcon'
 import Sidebar from './Sidebar'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
-import SearchDialog, { SearchTrigger } from './SearchDialog'
-import { useTour } from '@/components/GuidedTour/GuidedTour'
-import { useBookmarks } from '@/context/BookmarkContext'
-
-// Tailwind's lg breakpoint
-const LG = 1024
-
-const SIDEBAR_KEY = 'radiopedia-sidebar-open'
+import SearchDialog, { SearchTrigger } from '@/features/search/SearchDialog'
+import { useTour } from '@/components/tour/GuidedTour'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { codec, usePersistedState } from '@/lib/hooks/usePersistedState'
+import { useEventListener } from '@/lib/hooks/useEventListener'
+import { useKeyboardShortcut } from '@/lib/hooks/useKeyboardShortcut'
+import { useBreakpoint } from '@/lib/hooks/useMediaQuery'
+import { useTransientFlag } from '@/lib/hooks/useTransientFlag'
+import { useToast } from '@/components/ui/toast'
 
 export default function Layout() {
   const { t } = useTranslation('ui')
   const navigate = useNavigate()
   const { startTour } = useTour()
-  const { bookmarks } = useBookmarks()
+  const toast = useToast()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  // Bumped each time a bookmark-added event fires; drives the pulse animation.
+  const [bookmarkAddedTick, setBookmarkAddedTick] = useState(0)
   const sidebarBtnRef = useRef<HTMLButtonElement>(null)
   const mainRef = useRef<HTMLElement>(null)
-  const prevBookmarkCount = useRef(bookmarks.length)
   const location = useLocation()
-  const [desktopOpen, setDesktopOpen] = useState(() => {
-    const saved = localStorage.getItem(SIDEBAR_KEY)
-    return saved === null ? true : saved === '1'
-  })
+  const isDesktop = useBreakpoint('lg')
+  const [desktopOpen, setDesktopOpen] = usePersistedState(
+    STORAGE_KEYS.sidebarOpen,
+    true,
+    codec.boolean,
+  )
+  // Pulse the sidebar button briefly after a bookmark is added.
+  const pulseSidebarBtn = useTransientFlag(bookmarkAddedTick, 2400)
 
   // Scroll main content to top on route change
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0)
   }, [location.pathname])
 
-  // Persist desktop sidebar preference
-  useEffect(() => {
-    localStorage.setItem(SIDEBAR_KEY, desktopOpen ? '1' : '0')
-  }, [desktopOpen])
+  // Tour can request the sidebar open / scroll content to top
+  useEventListener('radiopedia:open-sidebar', () => setDesktopOpen(true))
+  useEventListener('radiopedia:scroll-top', () => mainRef.current?.scrollTo(0, 0))
 
-  // Listen for tour requesting sidebar open
-  useEffect(() => {
-    const handler = () => setDesktopOpen(true)
-    window.addEventListener('radiopedia:open-sidebar', handler)
-    return () => window.removeEventListener('radiopedia:open-sidebar', handler)
-  }, [])
+  // When a bookmark is added while the sidebar is closed, show a toast and
+  // pulse the sidebar button so the user knows where it landed.
+  useEventListener('radiopedia:bookmark-added', () => {
+    if (desktopOpen) return
+    toast.show(t('bookmark.bookmarkSaved'))
+    setBookmarkAddedTick(n => n + 1)
+  })
 
-  // Scroll to top when tour ends
-  useEffect(() => {
-    const handler = () => mainRef.current?.scrollTo(0, 0)
-    window.addEventListener('radiopedia:scroll-top', handler)
-    return () => window.removeEventListener('radiopedia:scroll-top', handler)
-  }, [])
+  // Global Cmd/Ctrl+K toggles the search dialog.
+  useKeyboardShortcut('k', () => setSearchOpen(prev => !prev), { mod: true })
 
-  // Show a floating notification when a bookmark is added while sidebar is closed
-  // Uses direct DOM manipulation to avoid set-state-in-effect lint rule
-  useEffect(() => {
-    const count = bookmarks.length
-    if (count > prevBookmarkCount.current && !desktopOpen) {
-      // Pulse the button itself (capture ref for stable cleanup — exhaustive-deps)
-      const cls = 'sidebar-pulse'
-      const sidebarBtn = sidebarBtnRef.current
-      sidebarBtn?.classList.add(cls)
-
-      // Create a floating notification pill
-      const pill = document.createElement('div')
-      pill.className = 'bookmark-toast'
-      pill.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-          <path d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5Z"/>
-        </svg>
-        <span>Bookmark saved</span>
-      `
-      document.body.appendChild(pill)
-
-      const t = setTimeout(() => {
-        sidebarBtn?.classList.remove(cls)
-        pill.classList.add('bookmark-toast-out')
-        setTimeout(() => pill.remove(), 400)
-      }, 2500)
-
-      prevBookmarkCount.current = count
-      return () => {
-        clearTimeout(t)
-        sidebarBtn?.classList.remove(cls)
-        pill.remove()
-      }
-    }
-    prevBookmarkCount.current = count
-  }, [bookmarks.length, desktopOpen])
-
-  // Global Cmd+K / Ctrl+K
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        setSearchOpen(prev => !prev)
-      }
-    }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [])
-
-  // Auto-close when viewport crosses into desktop territory
-  useEffect(() => {
-    const mq = window.matchMedia(`(min-width: ${LG}px)`)
-    const onBreakpoint = (e: MediaQueryListEvent) => {
-      if (e.matches) setMobileOpen(false)
-    }
-    mq.addEventListener('change', onBreakpoint)
-    return () => mq.removeEventListener('change', onBreakpoint)
-  }, [])
+  // Auto-close the mobile drawer the moment the viewport crosses into
+  // desktop. Render-time guard (rather than useEffect) avoids the cascading
+  // render that the set-state-in-effect lint rule flags.
+  if (isDesktop && mobileOpen) {
+    setMobileOpen(false)
+  }
 
   // Lock body scroll while mobile sidebar is open
   useEffect(() => {
@@ -138,13 +88,16 @@ export default function Layout() {
             aria-label={desktopOpen ? t('sidebar.closeSidebar') : t('sidebar.openSidebar')}
             onClick={() => {
               // On mobile, open the slide-in drawer; on desktop, toggle the panel
-              if (window.innerWidth < LG) {
+              if (!isDesktop) {
                 setMobileOpen(o => !o)
               } else {
                 setDesktopOpen(o => !o)
               }
             }}
-            className="w-9 h-9 rounded-lg text-foreground/70 hover:text-foreground hover:bg-accent"
+            className={cn(
+              'w-9 h-9 rounded-lg text-foreground/70 hover:text-foreground hover:bg-accent',
+              pulseSidebarBtn && 'sidebar-pulse',
+            )}
           >
             <Menu className={cn('w-5 h-5 transition-transform duration-300', desktopOpen && 'lg:rotate-90')} />
           </Button>

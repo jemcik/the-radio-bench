@@ -1,5 +1,5 @@
 import i18n from '@/i18n'
-import { addBookmarkImperative, removeBookmarkImperative } from '@/context/BookmarkContext'
+import { addBookmarkImperative, removeBookmarkImperative } from '@/features/bookmarks/BookmarkContext'
 
 /**
  * Tour step definitions.
@@ -94,5 +94,4 @@ export const TOUR_STEPS: TourStepDef[] = [
   },
 ]
 
-export const TOUR_STORAGE_KEY = 'radiopedia-tour-completed'
-export const TOUR_STEP_KEY = 'radiopedia-tour-step'
+// Storage keys for tour state live in src/lib/storage-keys.ts.

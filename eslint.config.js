@@ -22,4 +22,22 @@ export default tseslint.config(
     files: ['**/*.{jsx,tsx}'],
     ...reactHooks.configs.flat.recommended,
   },
+  {
+    // Vitest globals (configured via `globals: true` in vite.config.ts)
+    files: ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+        vi: 'readonly',
+      },
+    },
+  },
 );

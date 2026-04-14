@@ -3,10 +3,13 @@
   "ignoreFiles": ["dist/**", "**/vite.config.ts.timestamp-*.mjs"],
   "ignoreIssues": {
     "src/components/diagrams/SVGDiagram.tsx": ["exports", "types"],
-    "src/components/LabActivity/**": ["exports", "types"],
+    "src/components/lab/**": ["exports", "types"],
     "src/components/ui/**": ["exports", "types"],
     "src/data/chapters.ts": ["types"],
-    "src/lib/circuit/**": ["exports", "types"],
-    "src/lib/themes.ts": ["types"]
+    "src/features/bookmarks/**": ["exports", "types"],
+    "src/features/glossary/**": ["exports", "types"],
+    "src/lib/themes.ts": ["types"],
+    "src/lib/circuit/index.ts": ["exports", "types"],
+    "src/lib/circuit/symbols/**": ["exports", "types"]
   }
 }

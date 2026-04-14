@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Term } from './term'
-import { glossary, type GlossaryEntry } from '@/data/glossary'
+import { glossary, type GlossaryEntry } from './glossary'
 
 /**
  * A <Term> that auto-looks up its definition from the central glossary,

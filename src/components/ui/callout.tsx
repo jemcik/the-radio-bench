@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import { type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 import {
   IconDanger,
   IconKeyConcept,
@@ -9,9 +11,14 @@ import {
   IconExperiment,
   IconOnAir,
   IconMath,
-} from './callout-icons';
+} from './callout-icons'
 
-/* ── Variant config ────────────────────────────────────────────────── */
+/**
+ * Color comes from the per-theme `--callout-*` CSS variables (defined in
+ * src/index.css; wired into Tailwind utilities in tailwind.config.ts as
+ * `text-callout-*`, `border-l-callout-*`, `bg-callout-*`). Each theme may
+ * retune individual entries without touching this component.
+ */
 
 export type CalloutVariant =
   | 'danger'
@@ -21,108 +28,86 @@ export type CalloutVariant =
   | 'caution'
   | 'experiment'
   | 'onair'
-  | 'math';
+  | 'math'
 
-interface VariantConfig {
-  label: string;
-  Icon: typeof IconDanger;
-  /** Tailwind text color for the icon + label */
-  text: string;
-  /** Tailwind border-l color */
-  border: string;
-  /** Tailwind bg tint */
-  bg: string;
+const ICONS: Record<CalloutVariant, typeof IconDanger> = {
+  danger:     IconDanger,
+  key:        IconKeyConcept,
+  tip:        IconProTip,
+  note:       IconNote,
+  caution:    IconCaution,
+  experiment: IconExperiment,
+  onair:      IconOnAir,
+  math:       IconMath,
 }
 
-const variants: Record<CalloutVariant, VariantConfig> = {
-  danger: {
-    label: 'Danger',
-    Icon: IconDanger,
-    text: 'text-red-400',
-    border: 'border-l-red-400',
-    bg: 'bg-red-500/[0.06]',
-  },
-  key: {
-    label: 'Key Concept',
-    Icon: IconKeyConcept,
-    text: 'text-amber-400',
-    border: 'border-l-amber-400',
-    bg: 'bg-amber-500/[0.06]',
-  },
-  tip: {
-    label: 'Pro Tip',
-    Icon: IconProTip,
-    text: 'text-green-400',
-    border: 'border-l-green-400',
-    bg: 'bg-green-500/[0.06]',
-  },
-  note: {
-    label: 'Note',
-    Icon: IconNote,
-    text: 'text-blue-400',
-    border: 'border-l-blue-400',
-    bg: 'bg-blue-500/[0.06]',
-  },
-  caution: {
-    label: 'Caution',
-    Icon: IconCaution,
-    text: 'text-orange-400',
-    border: 'border-l-orange-400',
-    bg: 'bg-orange-500/[0.06]',
-  },
-  experiment: {
-    label: 'Experiment',
-    Icon: IconExperiment,
-    text: 'text-teal-400',
-    border: 'border-l-teal-400',
-    bg: 'bg-teal-500/[0.06]',
-  },
-  onair: {
-    label: 'On Air',
-    Icon: IconOnAir,
-    text: 'text-purple-400',
-    border: 'border-l-purple-400',
-    bg: 'bg-purple-500/[0.06]',
-  },
-  math: {
-    label: 'Math',
-    Icon: IconMath,
-    text: 'text-pink-400',
-    border: 'border-l-pink-400',
-    bg: 'bg-pink-500/[0.06]',
-  },
-};
+/** Default English label per variant — used as i18n fallback. */
+const DEFAULT_LABELS: Record<CalloutVariant, string> = {
+  danger:     'Danger',
+  key:        'Key Concept',
+  tip:        'Pro Tip',
+  note:       'Note',
+  caution:    'Caution',
+  experiment: 'Experiment',
+  onair:      'On Air',
+  math:       'Math',
+}
 
-/* ── Component ─────────────────────────────────────────────────────── */
+const calloutVariants = cva(
+  'flex gap-3 items-start rounded-lg border-l-[3px] px-4 py-3 my-4',
+  {
+    variants: {
+      variant: {
+        danger:     'border-l-callout-danger     bg-callout-danger/[0.06]',
+        key:        'border-l-callout-key        bg-callout-key/[0.06]',
+        tip:        'border-l-callout-tip        bg-callout-tip/[0.06]',
+        note:       'border-l-callout-note       bg-callout-note/[0.06]',
+        caution:    'border-l-callout-caution    bg-callout-caution/[0.06]',
+        experiment: 'border-l-callout-experiment bg-callout-experiment/[0.06]',
+        onair:      'border-l-callout-onair      bg-callout-onair/[0.06]',
+        math:       'border-l-callout-math       bg-callout-math/[0.06]',
+      },
+    },
+    defaultVariants: { variant: 'note' },
+  },
+)
 
-interface CalloutProps {
-  variant: CalloutVariant;
+/** Text-color utility (icon + label) per variant — kept separate so callers
+ *  reading the JSX can see which colour applies where. */
+const TEXT_BY_VARIANT: Record<CalloutVariant, string> = {
+  danger:     'text-callout-danger',
+  key:        'text-callout-key',
+  tip:        'text-callout-tip',
+  note:       'text-callout-note',
+  caution:    'text-callout-caution',
+  experiment: 'text-callout-experiment',
+  onair:      'text-callout-onair',
+  math:       'text-callout-math',
+}
+
+interface CalloutProps extends VariantProps<typeof calloutVariants> {
+  variant: CalloutVariant
   /** Override the default label text */
-  title?: string;
-  children: ReactNode;
-  className?: string;
+  title?: string
+  children: ReactNode
+  className?: string
 }
 
-export function Callout({ variant, title, children, className = '' }: CalloutProps) {
-  const v = variants[variant];
-  const { t } = useTranslation('ui');
-  const translatedLabel = t(`calloutLabels.${variant}`, { defaultValue: v.label });
+export function Callout({ variant, title, children, className }: CalloutProps) {
+  const Icon = ICONS[variant]
+  const text = TEXT_BY_VARIANT[variant]
+  const { t } = useTranslation('ui')
+  const translatedLabel = t(`calloutLabels.${variant}`, { defaultValue: DEFAULT_LABELS[variant] })
 
   return (
-    <div
-      className={`flex gap-3 items-start rounded-lg border-l-[3px] px-4 py-3 my-4 ${v.border} ${v.bg} ${className}`}
-    >
-      <v.Icon size={36} className={`${v.text} shrink-0 mt-0.5`} />
+    <div className={cn(calloutVariants({ variant }), className)}>
+      <Icon size={36} className={cn(text, 'shrink-0 mt-0.5')} />
       <div className="min-w-0 flex-1">
-        <p
-          className={`text-[10px] font-bold uppercase tracking-[0.15em] mb-1 ${v.text}`}
-        >
+        <p className={cn('text-[10px] font-bold uppercase tracking-[0.15em] mb-1', text)}>
           {title ?? translatedLabel}
         </p>
-        <div className="text-sm leading-relaxed text-foreground/90">
-          {children}
-        </div>
+        <div className="text-sm leading-relaxed text-foreground/90">{children}</div>
       </div>
     </div>
-  );
+  )
 }

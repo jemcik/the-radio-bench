@@ -3,7 +3,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import ChapterFlowDiagram from '@/components/diagrams/ChapterFlowDiagram'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
-import { G } from '@/components/ui/glossary-term'
+import { G } from '@/features/glossary/glossary-term'
 
 export default function Chapter0_1() {
   const { t } = useTranslation('ui')

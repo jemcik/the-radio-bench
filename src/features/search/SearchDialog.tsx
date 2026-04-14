@@ -1,114 +1,11 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { TFunction } from 'i18next'
 import { Search, FileText, BookOpen, ArrowRight, ChevronDown } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { cn } from '@/lib/utils'
-import { getAllChapters } from '@/data/chapters'
-import { glossary, type GlossaryEntry } from '@/data/glossary'
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface SearchResult {
-  type: 'chapter' | 'glossary'
-  id: string
-  title: string
-  subtitle: string
-  /** Where to navigate (null for glossary terms without a page) */
-  href: string | null
-  /** Full glossary entry for inline preview */
-  entry?: GlossaryEntry
-  /** Original glossary key (for matching and “See also” labels) */
-  glossaryKey?: string
-}
-
-// ─── Build search index ──────────────────────────────────────────────────────
-
-function mergeGlossaryEntry(key: string, base: GlossaryEntry, t: TFunction<'ui'>): GlossaryEntry {
-  const translatedTip = t(`glossary.${key}.tip`, { defaultValue: '' })
-  const translatedDetail = t(`glossary.${key}.detail`, { defaultValue: '' })
-  return {
-    ...base,
-    tip: translatedTip || base.tip,
-    detail: translatedDetail || base.detail,
-  }
-}
-
-function glossaryDisplayTitle(key: string, t: TFunction<'ui'>): string {
-  const fallback = key.charAt(0).toUpperCase() + key.slice(1)
-  return t(`glossary._names.${key}`, { defaultValue: fallback })
-}
-
-function buildResults(t: TFunction<'ui'>): SearchResult[] {
-  const chapters: SearchResult[] = getAllChapters().map(ch => {
-    const title = t(`chapterTitles.${ch.id}`, { defaultValue: ch.title })
-    const subtitle = t(`chapterSubtitles.${ch.id}`, { defaultValue: ch.subtitle })
-    return {
-      type: 'chapter',
-      id: ch.id,
-      title: `${ch.number} — ${title}`,
-      subtitle,
-      href: ch.status !== 'coming-soon' ? `/chapter/${ch.id}` : null,
-    }
-  })
-
-  const terms: SearchResult[] = Object.entries(glossary).map(([key, entry]) => {
-    const merged = mergeGlossaryEntry(key, entry, t)
-    return {
-      type: 'glossary' as const,
-      id: `g-${key}`,
-      title: glossaryDisplayTitle(key, t),
-      subtitle: merged.tip,
-      href: null,
-      entry: merged,
-      glossaryKey: key,
-    }
-  })
-
-  return [...chapters, ...terms]
-}
-
-// ─── Fuzzy match ─────────────────────────────────────────────────────────────
-
-function matchScore(query: string, text: string): number {
-  const q = query.toLowerCase()
-  const t = text.toLowerCase()
-  // Exact substring — best match
-  if (t.includes(q)) return 100 - t.indexOf(q)
-  // All query words present
-  const words = q.split(/\s+/).filter(Boolean)
-  const allPresent = words.every(w => t.includes(w))
-  if (allPresent) return 50
-  // At least some words
-  const matchCount = words.filter(w => t.includes(w)).length
-  if (matchCount > 0) return matchCount * 10
-  return 0
-}
-
-function searchFn(query: string, all: SearchResult[]): SearchResult[] {
-  if (!query.trim()) return []
-  return all
-    .map(r => {
-      const keyScore =
-        r.type === 'glossary' && r.glossaryKey
-          ? matchScore(query, r.glossaryKey) * 0.85
-          : 0
-      return {
-        result: r,
-        score: Math.max(
-          matchScore(query, r.title),
-          matchScore(query, r.subtitle) * 0.7,
-          keyScore,
-        ),
-      }
-    })
-    .filter(r => r.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 12)
-    .map(r => r.result)
-}
+import { buildIndex, searchIndex, type SearchResult } from './buildIndex'
 
 // ─── Components ──────────────────────────────────────────────────────────────
 
@@ -154,15 +51,18 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
 }
 
 function SearchDialogBody({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation('ui')
+  const { t, i18n } = useTranslation('ui')
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [expanded, setExpanded] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
-  const allResults = useMemo(() => buildResults(t), [t])
-  const results = useMemo(() => searchFn(query, allResults), [query, allResults])
+  // Memoize on the active language, not on `t` — `t` gets a new identity on
+  // every render, which would rebuild the 200+ entry index unnecessarily.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const allResults = useMemo(() => buildIndex(t), [i18n.language])
+  const results = useMemo(() => searchIndex(query, allResults), [query, allResults])
 
   const maxIdx = Math.max(results.length - 1, 0)
   const safeActive = Math.min(active, maxIdx)

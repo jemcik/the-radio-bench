@@ -6,6 +6,7 @@
  */
 
 import { type SymbolProps, type TransistorProps, type OpAmpProps, orientAngle, STROKE } from '../types'
+import { CenteredLabel, SymbolText } from '../SymbolLabel'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // DIODES
@@ -15,9 +16,7 @@ import { type SymbolProps, type TransistorProps, type OpAmpProps, orientAngle, S
  * Diode — standard rectifier diode (ARRL).
  * Triangle (cathode-facing right) with vertical bar at cathode.
  */
-export function Diode(props: SymbolProps) {
-  const { x, y, orient = 'right', label, value } = props
-
+export function Diode({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
@@ -32,17 +31,7 @@ export function Diode(props: SymbolProps) {
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Labels (outside rotation) */}
-      {label && (
-        <text x={x} y={y - 20} fontSize="11" fontWeight="600" textAnchor="middle" fill="currentColor">
-          {label}
-        </text>
-      )}
-      {value && (
-        <text x={x} y={y + 20} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
-          {value}
-        </text>
-      )}
+      <CenteredLabel x={x} y={y} label={label} value={value} />
     </>
   )
 }
@@ -51,9 +40,7 @@ export function Diode(props: SymbolProps) {
  * LED — light-emitting diode.
  * Diode with two small arrows pointing away to indicate light emission.
  */
-export function LED(props: SymbolProps) {
-  const { x, y, orient = 'right', label, value } = props
-
+export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
@@ -68,26 +55,14 @@ export function LED(props: SymbolProps) {
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
         {/* Light arrows (upper and lower, pointing up-right) */}
-        {/* Upper arrow from ~(2, -12) pointing up-right */}
         <line x1="2" y1="-12" x2="8" y2="-18" stroke="currentColor" strokeWidth={STROKE} />
         <polygon points="8,-18 6,-14 10,-15" fill="currentColor" />
 
-        {/* Lower arrow from ~(6, -14) pointing up-right */}
         <line x1="6" y1="-8" x2="12" y2="-14" stroke="currentColor" strokeWidth={STROKE} />
         <polygon points="12,-14 10,-10 14,-11" fill="currentColor" />
       </g>
 
-      {/* Labels (outside rotation) */}
-      {label && (
-        <text x={x} y={y - 20} fontSize="11" fontWeight="600" textAnchor="middle" fill="currentColor">
-          {label}
-        </text>
-      )}
-      {value && (
-        <text x={x} y={y + 20} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
-          {value}
-        </text>
-      )}
+      <CenteredLabel x={x} y={y} label={label} value={value} />
     </>
   )
 }
@@ -95,9 +70,7 @@ export function LED(props: SymbolProps) {
 /**
  * Zener Diode — voltage regulation diode with bent cathode bar.
  */
-export function DiodeZener(props: SymbolProps) {
-  const { x, y, orient = 'right', label, value } = props
-
+export function DiodeZener({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
@@ -116,17 +89,7 @@ export function DiodeZener(props: SymbolProps) {
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Labels */}
-      {label && (
-        <text x={x} y={y - 20} fontSize="11" fontWeight="600" textAnchor="middle" fill="currentColor">
-          {label}
-        </text>
-      )}
-      {value && (
-        <text x={x} y={y + 20} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
-          {value}
-        </text>
-      )}
+      <CenteredLabel x={x} y={y} label={label} value={value} />
     </>
   )
 }
@@ -140,9 +103,7 @@ export function DiodeZener(props: SymbolProps) {
  * Standard symbol: vertical base bar with angled collector and emitter leads,
  * small arrow on emitter pointing away from base.
  */
-export function TransistorNPN(props: TransistorProps) {
-  const { x, y, orient = 'right', circle = true, label, value } = props
-
+export function TransistorNPN({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
@@ -155,32 +116,19 @@ export function TransistorNPN(props: TransistorProps) {
         {/* Base lead */}
         <line x1="-30" y1="0" x2="-5" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Collector: line from base upward-right */}
+        {/* Collector */}
         <line x1="-5" y1="-7" x2="12" y2="-25" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Collector output pad */}
         <line x1="12" y1="-25" x2="12" y2="-28" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Emitter: line from base downward-right */}
+        {/* Emitter */}
         <line x1="-5" y1="7" x2="12" y2="25" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Emitter output pad */}
         <line x1="12" y1="25" x2="12" y2="28" stroke="currentColor" strokeWidth={STROKE} />
 
         {/* Emitter arrow pointing away from base (outward) */}
-        {/* Arrow tip at ~(12, 25), arrow base perpendicular to emitter line */}
         <polygon points="12,25 8,18 14,20" fill="currentColor" />
       </g>
 
-      {/* Labels (outside rotation) */}
-      {label && (
-        <text x={x} y={y - 25} fontSize="11" fontWeight="600" textAnchor="middle" fill="currentColor">
-          {label}
-        </text>
-      )}
-      {value && (
-        <text x={x} y={y + 25} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
-          {value}
-        </text>
-      )}
+      <CenteredLabel x={x} y={y} label={label} value={value} gap={25} />
     </>
   )
 }
@@ -189,9 +137,7 @@ export function TransistorNPN(props: TransistorProps) {
  * PNP Bipolar Junction Transistor.
  * Same as NPN but emitter arrow points inward (toward base).
  */
-export function TransistorPNP(props: TransistorProps) {
-  const { x, y, orient = 'right', circle = true, label, value } = props
-
+export function TransistorPNP({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
@@ -204,32 +150,19 @@ export function TransistorPNP(props: TransistorProps) {
         {/* Base lead */}
         <line x1="-30" y1="0" x2="-5" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Collector: line from base upward-right */}
+        {/* Collector */}
         <line x1="-5" y1="-7" x2="12" y2="-25" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Collector output pad */}
         <line x1="12" y1="-25" x2="12" y2="-28" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Emitter: line from base downward-right */}
+        {/* Emitter */}
         <line x1="-5" y1="7" x2="12" y2="25" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Emitter output pad */}
         <line x1="12" y1="25" x2="12" y2="28" stroke="currentColor" strokeWidth={STROKE} />
 
         {/* Emitter arrow pointing inward (toward base junction) */}
-        {/* Arrow tip points back toward (-5, 7) */}
         <polygon points="2,18 8,20 6,14" fill="currentColor" />
       </g>
 
-      {/* Labels (outside rotation) */}
-      {label && (
-        <text x={x} y={y - 25} fontSize="11" fontWeight="600" textAnchor="middle" fill="currentColor">
-          {label}
-        </text>
-      )}
-      {value && (
-        <text x={x} y={y + 25} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
-          {value}
-        </text>
-      )}
+      <CenteredLabel x={x} y={y} label={label} value={value} gap={25} />
     </>
   )
 }
@@ -243,24 +176,16 @@ export function TransistorPNP(props: TransistorProps) {
  * Triangle pointing right with − (inverting) and + (non-inverting) inputs,
  * and output on the right.
  */
-export function OpAmp(props: OpAmpProps) {
-  const { x, y, orient = 'right', label, value } = props
-
+export function OpAmp({ x, y, orient = 'right', label, value }: OpAmpProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
         {/* Triangle: (-20,-22) to (24,0) to (-20,22) */}
         <path d="M-20,-22 L24,0 L-20,22 Z" fill="none" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Inverting input (−) label */}
-        <text x="-12" y="-8" fontSize="12" textAnchor="middle" dominantBaseline="middle" fill="currentColor">
-          −
-        </text>
-
-        {/* Non-inverting input (+) label */}
-        <text x="-12" y="10" fontSize="12" textAnchor="middle" dominantBaseline="middle" fill="currentColor">
-          +
-        </text>
+        {/* Input markers — drawn inside the rotated group so they follow orientation */}
+        <SymbolText x={-12} y={-8} size={12}>−</SymbolText>
+        <SymbolText x={-12} y={10} size={12}>+</SymbolText>
 
         {/* Inverting input lead (upper-left) */}
         <line x1="-30" y1="-12" x2="-20" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
@@ -274,15 +199,15 @@ export function OpAmp(props: OpAmpProps) {
 
       {/* Component label (right of symbol) */}
       {label && (
-        <text x={x + 32} y={y} fontSize="11" fontWeight="600" textAnchor="start" dominantBaseline="middle" fill="currentColor">
+        <SymbolText x={x + 32} y={y} size={11} weight={600} anchor="start">
           {label}
-        </text>
+        </SymbolText>
       )}
       {/* Value label (below) */}
       {value && (
-        <text x={x} y={y + 25} fontSize="10" textAnchor="middle" fill="currentColor" opacity="0.7">
+        <SymbolText x={x} y={y + 25} size={10} opacity={0.7}>
           {value}
-        </text>
+        </SymbolText>
       )}
     </>
   )

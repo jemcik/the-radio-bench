@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useCallback, useEffect, type ReactNode } from 'react'
+import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { codec, readPersisted, usePersistedState } from '@/lib/hooks/usePersistedState'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,21 +25,20 @@ interface BookmarkContextValue {
   clear: () => void
 }
 
-// ─── Storage ─────────────────────────────────────────────────────────────────
+// ─── Storage helpers (used by the imperative API below) ──────────────────────
 
-const STORAGE_KEY = 'radiopedia-bookmarks'
+const bookmarkCodec = codec.json<Bookmark[]>()
 
-function load(): Bookmark[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
+function loadBookmarks(): Bookmark[] {
+  return readPersisted<Bookmark[]>(STORAGE_KEYS.bookmarks, [], bookmarkCodec)
 }
 
-function save(bookmarks: Bookmark[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks))
+function writeBookmarks(bookmarks: Bookmark[]) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.bookmarks, bookmarkCodec.serialize(bookmarks))
+  } catch {
+    /* localStorage unavailable / quota exceeded — silently drop */
+  }
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -45,17 +46,18 @@ function save(bookmarks: Bookmark[]) {
 const BookmarkContext = createContext<BookmarkContextValue | null>(null)
 
 export function BookmarkProvider({ children }: { children: ReactNode }) {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>(load)
+  const [bookmarks, setBookmarks] = usePersistedState<Bookmark[]>(
+    STORAGE_KEYS.bookmarks,
+    [],
+    bookmarkCodec,
+  )
 
-  // Persist on every change
-  useEffect(() => { save(bookmarks) }, [bookmarks])
-
-  // Sync from localStorage when imperative helpers write directly
+  // Sync from localStorage when imperative helpers (used by the tour) write directly.
   useEffect(() => {
-    const handler = () => setBookmarks(load())
+    const handler = () => setBookmarks(loadBookmarks())
     window.addEventListener('radiopedia:bookmark-sync', handler)
     return () => window.removeEventListener('radiopedia:bookmark-sync', handler)
-  }, [])
+  }, [setBookmarks])
 
   const isBookmarked = useCallback(
     (chapterId: string, sectionId?: string | null) =>
@@ -75,7 +77,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
         return [...prev, { chapterId, sectionId, label, ...(labelKey && { labelKey }), ts: Date.now() }]
       })
     },
-    []
+    [setBookmarks]
   )
 
   const remove = useCallback(
@@ -85,10 +87,10 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
       )
       window.dispatchEvent(new CustomEvent('radiopedia:bookmark-removed'))
     },
-    []
+    [setBookmarks]
   )
 
-  const clear = useCallback(() => setBookmarks([]), [])
+  const clear = useCallback(() => setBookmarks([]), [setBookmarks])
 
   return (
     <BookmarkContext.Provider value={{ bookmarks, isBookmarked, toggle, remove, clear }}>
@@ -107,19 +109,19 @@ export function useBookmarks() {
 
 /** Add a bookmark directly via localStorage + dispatch a sync event */
 export function addBookmarkImperative(chapterId: string, sectionId: string | null, label: string, labelKey?: string) {
-  const bookmarks = load()
+  const bookmarks = loadBookmarks()
   const exists = bookmarks.some(b => b.chapterId === chapterId && b.sectionId === sectionId)
   if (!exists) {
     bookmarks.push({ chapterId, sectionId, label, ...(labelKey && { labelKey }), ts: Date.now() })
-    save(bookmarks)
+    writeBookmarks(bookmarks)
     window.dispatchEvent(new CustomEvent('radiopedia:bookmark-sync'))
   }
 }
 
 /** Remove a bookmark directly via localStorage + dispatch a sync event */
 export function removeBookmarkImperative(chapterId: string, sectionId: string | null) {
-  const bookmarks = load()
+  const bookmarks = loadBookmarks()
   const filtered = bookmarks.filter(b => !(b.chapterId === chapterId && b.sectionId === sectionId))
-  save(filtered)
+  writeBookmarks(filtered)
   window.dispatchEvent(new CustomEvent('radiopedia:bookmark-sync'))
 }

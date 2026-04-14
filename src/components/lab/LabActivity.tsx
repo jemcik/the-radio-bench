@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { FlaskConical, ChevronDown, Zap, Wrench, ListOrdered, Eye, Link2, AlertTriangle } from 'lucide-react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
@@ -45,7 +46,7 @@ export default function LabActivity({
   expectedResult, connectionToTheory, troubleshooting,
 }: LabActivityProps) {
   const { t } = useTranslation('ui')
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const title = label ? `${t('lab.title')} ${label}` : t('lab.title')
 
   return (
@@ -131,17 +132,17 @@ export default function LabActivity({
 
             {/* Expected result + Connection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-lg border border-border bg-card/60 p-4">
+              <Card surface="muted" radius="lg" className="p-4">
                 <Section icon={Eye} title={t('lab.expectedResult')}>
                   <p className="text-sm text-card-foreground">{expectedResult}</p>
                 </Section>
-              </div>
+              </Card>
 
-              <div className="rounded-lg border border-teal-500/25 bg-teal-500/8 p-4">
+              <Card surface="teal" radius="lg" className="p-4">
                 <Section icon={Link2} title={t('lab.connectionToTheory')}>
                   <p className="text-sm text-teal-700 dark:text-teal-300">{connectionToTheory}</p>
                 </Section>
-              </div>
+              </Card>
             </div>
 
             {/* Troubleshooting */}
