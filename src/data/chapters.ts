@@ -364,6 +364,7 @@ export function getAdjacentChapters(id: string): {
 } {
   const all = getAllChapters()
   const idx = all.findIndex(c => c.id === id)
+  if (idx === -1) return { prev: undefined, next: undefined }
   return {
     prev: idx > 0 ? all[idx - 1] : undefined,
     next: idx < all.length - 1 ? all[idx + 1] : undefined,
