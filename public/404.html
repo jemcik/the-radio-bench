@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The Radio Bench</title>
+    <script>
+      // GitHub Pages SPA redirect — sends all 404s back to index.html
+      // so the HashRouter can handle client-side routing.
+      var pathSegmentsToKeep = 1; // /the-radio-bench/
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/' +
+        (l.hash ? l.hash : '#/')
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
