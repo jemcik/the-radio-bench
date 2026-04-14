@@ -22,6 +22,8 @@ The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](ht
 ## Features
 
 - **Interactive glossary** — hover any highlighted term for a quick tooltip, or click it to pin a full reference card with units, formulas, and related terms (100+ entries)
+- **Interactive widgets** — custom calculators and explorers woven into the prose (SI prefix converter, scientific-notation explorer, formula transposer, with more to come)
+- **End-of-chapter quizzes** — multiple-choice with immediate feedback, per-question explanations, and progress that survives a refresh
 - **Hands-on labs** — optional bench activities with a multimeter, breadboard, Arduino, oscilloscope, or VNA
 - **6 themes** — three light (Paper, Stone, Nordic) and three dark (Dusk, Moonlight, Graphite)
 - **Typography** — choose a reading font and text size from the theme popover (preferences persist)
@@ -29,11 +31,12 @@ The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](ht
 - **Bookmarks** — save any section heading and get back to it from the sidebar
 - **Guided tour** — a pip-boy mascot walks first-time visitors through the interface
 - **Circuit diagrams** — a custom SVG symbol library for inline schematics
+- **Bilingual** — full English and Ukrainian translations, switchable at any time
 - **Resumes where you left off** — your last location is remembered between visits
 
 ## Curriculum
 
-The course is organized into five parts spanning 21 chapters. Two chapters are published so far and more are on the way.
+The course is organized into five parts spanning 21 chapters. Three chapters are published so far and more are on the way.
 
 | Part | Title | Chapters |
 |------|-------|----------|
@@ -62,22 +65,27 @@ The dev server starts at `http://localhost:5173` with hot module replacement.
 | `npm run build` | Type-check with `tsc` then build for production |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run ESLint |
+| `npm test` | Run the vitest test suite once |
 | `npm run knip` | Find unused dependencies, exports, and files |
+| `npm run check:i18n` | Fail CI if any English i18n key is missing in Ukrainian |
 | `npm run check:gitignore` | Fail CI if tracked files match `.gitignore` patterns |
 
 ## Tech stack
 
-React 19 with TypeScript, built with Vite and styled using Tailwind CSS. UI primitives come from Radix UI (via shadcn/ui conventions) and icons from Lucide. Routing uses React Router with hash-based navigation for GitHub Pages compatibility. The site is deployed to GitHub Pages with a custom domain.
+React 19 with TypeScript, built with Vite and styled using Tailwind CSS. UI primitives come from Radix UI (via shadcn/ui conventions) and icons from Lucide. Routing uses React Router with hash-based navigation for GitHub Pages compatibility. Math is typeset with KaTeX. i18n is powered by i18next / react-i18next. Tests run on Vitest with Testing Library. The site is deployed to GitHub Pages with a custom domain.
 
 ## Project structure
 
 ```
 src/
   chapters/       Chapter content (TSX components)
-  components/     Layout, sidebar, search, tour, diagrams, UI primitives
-  context/        Theme, typography, and bookmark providers
-  data/           Chapter registry and glossary definitions
-  lib/            Circuit diagram system, theme config, utilities
+  components/     Layout, tour, diagrams, widgets, quiz, UI primitives
+  context/        Theme and typography providers
+  data/           Chapter registry
+  features/       Bookmarks, glossary, search, SI prefixes
+  i18n/           English + Ukrainian locale JSON
+  lib/            Circuit diagram system, theme config, hooks, utilities
+  test/           Shared test harness (providers, render helpers)
 ```
 
 ## Contributing
