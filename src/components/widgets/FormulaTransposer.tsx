@@ -195,11 +195,17 @@ export default function FormulaTransposer() {
           </div>
         ))}
 
-        <ResultBox tone="success" label={t('ch0_3.formulaTransposerResult')}>
-          <p className="font-mono text-lg font-bold text-foreground">
-            {steps[steps.length - 1]?.result}
-          </p>
-        </ResultBox>
+        {/* The "Rearranged" highlight only adds value when there is real
+            work above it. For the already-isolated case (one step whose
+            result equals the formula itself), the lone step IS the answer
+            and the success box would just repeat it. */}
+        {steps.length > 1 && (
+          <ResultBox tone="success" label={t('ch0_3.formulaTransposerResult')}>
+            <p className="font-mono text-lg font-bold text-foreground">
+              {steps[steps.length - 1]?.result}
+            </p>
+          </ResultBox>
+        )}
       </div>
     </Widget>
   )

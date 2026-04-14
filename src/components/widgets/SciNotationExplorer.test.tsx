@@ -10,7 +10,7 @@ function setup() {
 describe('SciNotationExplorer', () => {
   it('renders the input but no result panel when empty', () => {
     setup()
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton')).toBeInTheDocument()
     // The Standard/Engineering toggle buttons only appear once the result
     // panel renders — use their absence as a proxy for "no result".
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
@@ -19,7 +19,7 @@ describe('SciNotationExplorer', () => {
 
   it('breaks 2_400_000_000 into mantissa 2.4 and exponent 9 (standard)', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '2400000000' } })
 
     // Mantissa "2.4" is rendered in multiple places (the big display, the
@@ -30,7 +30,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode keeps 2.4 × 10⁹ for 2_400_000_000 (multiple of 3)', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '2400000000' } })
     fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
 
@@ -41,7 +41,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode normalises 1500 to 1.5 × 10³', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '1500' } })
 
     // Standard notation for 1500 is itself 1.5 × 10³ (already engineering-compatible).
@@ -51,7 +51,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode downshifts 0.00047 to 470 × 10⁻⁶', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '0.00047' } })
     fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
 
@@ -63,7 +63,7 @@ describe('SciNotationExplorer', () => {
 
   it('treats 0 as valid (exponent 0, no crash from log10(0))', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '0' } })
 
     // The result panel shows the toggle buttons when ok. Presence of the
@@ -72,20 +72,22 @@ describe('SciNotationExplorer', () => {
     expect(screen.getByRole('button', { name: /engineering/i })).toBeInTheDocument()
   })
 
-  it('shows the invalid hint for non-numeric input', () => {
+  it('rejects non-numeric input at the input layer', () => {
+    // <input type="number"> blocks non-numeric keypresses in real browsers,
+    // and jsdom mirrors this — setting value to "abc" resolves to empty.
+    // The widget therefore stays in the empty state rather than "invalid".
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton') as HTMLInputElement
     fireEvent.change(input, { target: { value: 'abc' } })
 
-    // Invalid message is the eyebrow-less body of the error ResultBox.
-    expect(screen.getByText(/please enter a valid number/i)).toBeInTheDocument()
-    // The Standard/Engineering toggle stays hidden while the input is invalid.
+    expect(input.value).toBe('')
+    // No result panel (empty state), no crash, no error message.
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
   })
 
   it('switches notation mode via the Standard/Engineering buttons', () => {
     setup()
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '12345' } })
 
     const std = screen.getByRole('button', { name: /standard/i })
@@ -101,7 +103,7 @@ describe('SciNotationExplorer', () => {
 
   it('exposes aria-pressed on the Standard/Engineering toggle', () => {
     setup()
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: '42' } })
+    fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '42' } })
 
     const std = screen.getByRole('button', { name: /standard/i })
     const eng = screen.getByRole('button', { name: /engineering/i })
