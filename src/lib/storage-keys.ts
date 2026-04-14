@@ -32,5 +32,8 @@ export const STORAGE_KEYS = {
 
   // Last-location resume
   lastPath: 'rrb-last-path',
+
+  // Quiz progress — one entry per chapter
+  quizProgress: (chapterId: string) => `trb-quiz-${chapterId}`,
 } as const
 

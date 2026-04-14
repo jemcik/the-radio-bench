@@ -150,13 +150,33 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 0.3 — Math Toolkit for Radio
 *ERC 32 requirement: adding, subtracting, multiplying, dividing; fractions; squaring; square roots; transposing formulae.*
-- Fractions and ratios (the language of comparison)
-- Powers of 10 and scientific notation (why 2,400,000,000 Hz = 2.4 GHz)
-- SI prefixes: pico, nano, micro, milli, kilo, mega, giga
-- Squaring and square roots (why they appear in power formulas)
-- Transposing formulas: if you know two things, you can find the third
-- **Widget:** SI prefix converter — type a number, pick a prefix, see the result
-- **Quiz:** 10 questions on unit conversion and basic arithmetic
+
+**Sections:**
+- **Fractions and ratios** — the language of comparison; voltage divider as the motivating example; "half the voltage" = ½ = 0.5 = 50%
+- **Powers of 10 and scientific notation** — why 2,400,000,000 Hz = 2.4 × 10⁹ Hz = 2.4 GHz; how to read and enter scientific notation on a calculator (the EXP/EE button demystified)
+- **SI prefixes: pico → tera** — the full ladder from pico to tera with real radio examples at each level (pF capacitors, µA current, kHz shortwave, GHz microwaves)
+- **Squaring and square roots** — why they appear in power formulas (P = I²R, P = V²/R); visual: area of a square as an analogy for squaring
+- **Transposing formulas** — the "cover the unknown" trick; if you know two things, you can find the third; step-by-step rearrangement walkthrough
+
+**Diagrams:**
+- **Prefix Ladder diagram** — logarithmic scale SVG from pico to giga, with real radio examples annotated at each order of magnitude (e.g., pF capacitor, mA LED current, kHz AM broadcast, MHz FM band, GHz Wi-Fi)
+- **Formula Triangle diagram** — visual triangle showing how covering one variable reveals the formula (Ohm's law triangle as a preview of Ch 1.2)
+
+**Interactive widgets:**
+- **SI Prefix Converter** — type a number, pick source and target prefix, see the conversion with the "move the decimal point" step visualised
+- **Scientific Notation Explorer** — enter a number, see it broken into mantissa × 10ⁿ; toggle between engineering notation (exponents divisible by 3) and standard scientific notation
+- **Formula Transposer** — pick a formula (V=IR, P=IV, P=I²R, f=1/T), select which variable to solve for, see the step-by-step algebraic rearrangement animated
+
+**Practical sidebar:**
+- "Your calculator's secret button" — how to use EXP/EE on a scientific calculator or phone app; common mistake: typing "2.4 × 10 EXP 9" instead of "2.4 EXP 9"
+
+**🔬 Lab Activity — Measure and Convert:**
+- Goal: practice expressing the same measurement in different units and prefixes
+- Equipment: multimeter, a few resistors (470Ω, 4.7kΩ, 1MΩ)
+- Procedure: measure each resistor; write the reading in Ω, kΩ, MΩ, and scientific notation; verify your conversions with the SI Prefix Converter widget
+- Connection to theory: builds muscle memory for prefix conversion — the skill used in every chapter that follows
+
+**Quiz:** 10–15 questions covering unit conversion, scientific notation, prefix arithmetic, and formula transposition
 
 #### Chapter 0.4 — The Decibel (dB, dBm, dBd, dBi)
 *Not in ERC 32 explicitly but used constantly in every other chapter.*

@@ -30,6 +30,18 @@ export const glossary: Record<string, GlossaryEntry> = {
       'DC (Direct Current) flows steadily from positive to negative. Batteries produce DC. Most electronic circuits run on DC power internally, even if they plug into an AC wall outlet (a power supply converts AC to DC). When you measure a battery with a multimeter, you use the DC voltage mode.',
     see: ['ac', 'voltage'],
   },
+  fm: {
+    tip: 'Frequency Modulation — a method of encoding audio onto a radio wave by varying its frequency.',
+    detail:
+      'FM (Frequency Modulation) carries information by slightly shifting the frequency of the carrier wave up and down. It produces higher-fidelity audio and better noise rejection than AM, which is why FM is used for music broadcasting (the FM band runs from 88 to 108 MHz in most countries). In amateur radio, FM is the standard mode on VHF/UHF repeaters.',
+    see: ['frequency', 'ac'],
+  },
+  am: {
+    tip: 'Amplitude Modulation — a method of encoding audio onto a radio wave by varying its strength.',
+    detail:
+      'AM (Amplitude Modulation) carries information by varying the strength (amplitude) of the carrier wave while keeping the frequency constant. It was the first voice modulation technique used in radio. The AM broadcast band runs from about 530 to 1700 kHz. AM is simpler but more susceptible to noise than FM.',
+    see: ['frequency', 'ac'],
+  },
   led: {
     tip: 'Light-Emitting Diode — a diode that gives off light when current flows through it.',
     detail:
@@ -40,6 +52,19 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Universal Serial Bus — standard connector for data transfer and power.',
     detail:
       'USB (Universal Serial Bus) is the most common way to connect peripherals to a computer. In electronics prototyping, USB provides both a data connection (for programming microcontrollers like Arduino) and a 5V power supply. USB-A is the rectangular plug; USB-B and USB-C are other shapes you\'ll see on development boards.',
+  },
+  si: {
+    tip: 'Système International — the modern metric system used worldwide for scientific measurements.',
+    detail:
+      'SI (Système International d\'Unités) is the international standard for units of measurement. In electronics and radio, SI gives us the volt (V), ampere (A), ohm (Ω), farad (F), henry (H), hertz (Hz), and watt (W). SI prefixes like kilo (k), mega (M), and giga (G) let us express very large or very small values without writing long strings of zeros.',
+    see: ['frequency', 'capacitance', 'resistance'],
+  },
+  farad: {
+    tip: 'The SI unit of capacitance — how much charge a capacitor can store per volt.',
+    detail:
+      'One farad (F) means the capacitor stores one coulomb of charge when one volt is applied. A farad is an enormous amount of capacitance — most real capacitors are measured in microfarads (µF = 10⁻⁶ F), nanofarads (nF = 10⁻⁹ F), or picofarads (pF = 10⁻¹² F). Electrolytics used in power supplies are typically 10–1000 µF; ceramic capacitors for RF work are often 10–100 pF.',
+    unit: 'Farad (F)',
+    see: ['capacitance', 'si'],
   },
   gnd: {
     tip: 'Ground — the zero-volt reference point in a circuit.',
@@ -108,6 +133,19 @@ export const glossary: Record<string, GlossaryEntry> = {
     unit: 'Ohm (Ω)',
     formula: 'Z = R + jX',
     see: ['resistance', 'swr'],
+  },
+  'voltage divider': {
+    tip: 'Two resistors in series that split an input voltage into a smaller output voltage.',
+    detail:
+      'A voltage divider is one of the most common circuits in electronics. Two resistors (R₁ and R₂) are connected in series across a voltage source. The output is taken from the junction between them. The output voltage is Vout = Vin × R₂ / (R₁ + R₂). Voltage dividers are used for biasing transistors, reading sensors, and setting reference voltages. They only work correctly when the load impedance is much higher than the divider resistance.',
+    formula: 'Vout = Vin × R₂ / (R₁ + R₂)',
+    see: ['voltage', 'resistance'],
+  },
+  'scientific notation': {
+    tip: 'A way of writing very large or very small numbers as a mantissa times a power of 10.',
+    detail:
+      'Scientific notation expresses any number in the form a × 10ⁿ, where a (the mantissa) is between 1 and 10, and n (the exponent) is an integer. For example, 2,400,000,000 Hz = 2.4 × 10⁹ Hz. Engineering notation is a variant where the exponent is always a multiple of 3, aligning with SI prefixes (kilo, mega, giga). Scientific notation makes arithmetic with very large or very small numbers much easier — you add exponents when multiplying and subtract when dividing.',
+    see: ['frequency'],
   },
   capacitance: {
     tip: 'The ability to store energy in an electric field between two plates.',

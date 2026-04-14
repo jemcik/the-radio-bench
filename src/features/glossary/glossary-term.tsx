@@ -34,14 +34,20 @@ export function G({ k, color, children }: GProps) {
     return <span className={color ?? 'text-[hsl(var(--term-accent))]'}>{label}</span>
   }
 
-  // Merge translated tip/detail (fall back to English base if no translation)
-  const translatedTip = t(`glossary.${key}.tip`, { defaultValue: '' })
-  const translatedDetail = t(`glossary.${key}.detail`, { defaultValue: '' })
+  // Merge translated fields (fall back to English base if no translation).
+  // unit/formula are strings displayed verbatim on the pinned card; their
+  // annotated variants (e.g. "V = I × R (Ohm's Law)") need locale overrides.
+  const translatedTip     = t(`glossary.${key}.tip`,     { defaultValue: '' })
+  const translatedDetail  = t(`glossary.${key}.detail`,  { defaultValue: '' })
+  const translatedUnit    = t(`glossary.${key}.unit`,    { defaultValue: '' })
+  const translatedFormula = t(`glossary.${key}.formula`, { defaultValue: '' })
 
   const def: GlossaryEntry = {
     ...baseDef,
-    tip: translatedTip || baseDef.tip,
-    detail: translatedDetail || baseDef.detail,
+    tip:     translatedTip     || baseDef.tip,
+    detail:  translatedDetail  || baseDef.detail,
+    unit:    translatedUnit    || baseDef.unit,
+    formula: translatedFormula || baseDef.formula,
   }
 
   return (

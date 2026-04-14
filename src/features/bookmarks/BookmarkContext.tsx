@@ -67,17 +67,24 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
 
   const toggle = useCallback(
     (chapterId: string, sectionId: string | null, label: string, labelKey?: string) => {
+      // Decide up-front so the setBookmarks updater stays pure. An impure
+      // updater is double-invoked by React.StrictMode in dev and would fire
+      // the toast event twice — which manifested as a duplicate "Bookmark
+      // saved" toast on every add.
+      const willRemove = bookmarks.some(
+        b => b.chapterId === chapterId && b.sectionId === sectionId,
+      )
       setBookmarks(prev => {
-        const exists = prev.some(b => b.chapterId === chapterId && b.sectionId === sectionId)
-        if (exists) {
-          window.dispatchEvent(new CustomEvent('radiopedia:bookmark-removed'))
+        if (willRemove) {
           return prev.filter(b => !(b.chapterId === chapterId && b.sectionId === sectionId))
         }
-        window.dispatchEvent(new CustomEvent('radiopedia:bookmark-added'))
         return [...prev, { chapterId, sectionId, label, ...(labelKey && { labelKey }), ts: Date.now() }]
       })
+      window.dispatchEvent(new CustomEvent(
+        willRemove ? 'radiopedia:bookmark-removed' : 'radiopedia:bookmark-added',
+      ))
     },
-    [setBookmarks]
+    [bookmarks, setBookmarks],
   )
 
   const remove = useCallback(

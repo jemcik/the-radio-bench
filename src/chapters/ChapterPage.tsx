@@ -16,6 +16,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 const CHAPTER_COMPONENTS: Record<string, React.LazyExoticComponent<() => React.JSX.Element>> = {
   '0-1': lazy(() => import('./00-intro/Chapter0_1')),
   '0-2': lazy(() => import('./00-intro/Chapter0_2')),
+  '0-3': lazy(() => import('./00-intro/Chapter0_3')),
 }
 
 // ─── Adjacent chapter nav ─────────────────────────────────────────────────────

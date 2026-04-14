@@ -1,6 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreFiles": ["dist/**", "**/vite.config.ts.timestamp-*.mjs"],
   "ignoreIssues": {
     "src/components/diagrams/SVGDiagram.tsx": ["exports", "types"],
     "src/components/lab/**": ["exports", "types"],
