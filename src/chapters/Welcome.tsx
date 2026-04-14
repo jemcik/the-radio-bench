@@ -7,6 +7,7 @@ import HeroIllustration from '@/components/HeroIllustration'
 import WelcomeBuddy from '@/components/WelcomeBuddy'
 import { G } from '@/components/ui/glossary-term'
 import { BookmarkButton } from '@/components/ui/bookmark-button'
+import LanguageBanner from '@/components/LanguageBanner'
 
 const stats = {
   chapters: PARTS.flatMap(p => p.chapters).length,
@@ -21,6 +22,8 @@ export default function Welcome() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <LanguageBanner />
+
       {/* Hero */}
       <div className="relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.04] via-transparent to-primary/[0.06] p-6 sm:p-8 overflow-hidden">
         {/* Subtle decorative glow */}

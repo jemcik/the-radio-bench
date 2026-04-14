@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'
 import { TOUR_STEPS, TOUR_STORAGE_KEY, TOUR_STEP_KEY } from './tourSteps'
 import TourOverlay from './TourOverlay'
 import WelcomeBuddy from '../WelcomeBuddy'
+import { LANG_CHOSEN_KEY } from '../LanguageBanner'
 
 /* ── Tour context (lets any component trigger the tour) ───────────────────── */
 
@@ -39,14 +40,27 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
   // Track skip attempts to avoid infinite loops
   const skipCount = useRef(0)
 
-  // Auto-trigger on first visit (welcome page only)
+  // Auto-trigger on first visit (welcome page only, after language is chosen)
   useEffect(() => {
     if (!isWelcome) return
     const completed = localStorage.getItem(TOUR_STORAGE_KEY)
     if (completed) return
 
-    const t = setTimeout(() => setPhase('prompt'), 800)
-    return () => clearTimeout(t)
+    // Wait for the language banner to be dismissed first
+    const check = () => !!localStorage.getItem(LANG_CHOSEN_KEY)
+    if (check()) {
+      const t = setTimeout(() => setPhase('prompt'), 800)
+      return () => clearTimeout(t)
+    }
+
+    // Poll until language is chosen (banner writes LANG_CHOSEN_KEY on pick)
+    const interval = setInterval(() => {
+      if (check()) {
+        clearInterval(interval)
+        setTimeout(() => setPhase('prompt'), 600)
+      }
+    }, 200)
+    return () => clearInterval(interval)
   }, [isWelcome])
 
   /**

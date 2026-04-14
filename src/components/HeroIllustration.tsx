@@ -491,36 +491,33 @@ export default function HeroIllustration() {
             ════════════════════════════════════════════════ */}
         <rect x={0} y={418} width={820} height={82} fill={c.legendBg} opacity={0.95} />
 
-        {/* Row 1: Diagram elements — 5 items, evenly spaced across 760px */}
+        {/* Row 1: Diagram elements — 4 items, evenly spaced across 760px */}
         <g transform="translate(30,440)">
           <line x1={0} y1={0} x2={22} y2={0} stroke={tx} strokeWidth={2.5} strokeLinecap="round" />
           <text x={30} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.signalPath')}</text>
 
-          <rect x={152} y={-5} width={26} height={10} rx={5} fill={ionoBand} opacity={0.45} />
-          <text x={186} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.ionosphere')}</text>
-
-          <g transform="translate(304,0)" stroke={c.legendAntenna} strokeWidth={1.3}>
+          <g transform="translate(253,0)" stroke={c.legendAntenna} strokeWidth={1.3}>
             <line x1={0} y1={7} x2={0} y2={-2} />
             <line x1={0} y1={-2} x2={-7} y2={-10} />
             <line x1={0} y1={-2} x2={7} y2={-10} />
           </g>
-          <text x={320} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.antenna')}</text>
+          <text x={269} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.antenna')}</text>
 
           {/* TX: mini schematic box with amber accent */}
-          <rect x={456} y={-8} width={30} height={16} rx={3} fill={c.boxFill} stroke={tx} strokeWidth={0.9} />
-          <polygon points="461,-2 461,4 467,1" fill="none" stroke={tx} strokeWidth={0.8} />
-          <circle cx={474} cy={1} r={3} fill="none" stroke={tx} strokeWidth={0.7} />
-          <line x1={472} y1={-1} x2={476} y2={3} stroke={tx} strokeWidth={0.5} />
-          <line x1={476} y1={-1} x2={472} y2={3} stroke={tx} strokeWidth={0.5} />
-          <text x={494} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.txTransmitter')}</text>
+          <rect x={506} y={-8} width={30} height={16} rx={3} fill={c.boxFill} stroke={tx} strokeWidth={0.9} />
+          <polygon points="511,-2 511,4 517,1" fill="none" stroke={tx} strokeWidth={0.8} />
+          <circle cx={524} cy={1} r={3} fill="none" stroke={tx} strokeWidth={0.7} />
+          <line x1={522} y1={-1} x2={526} y2={3} stroke={tx} strokeWidth={0.5} />
+          <line x1={526} y1={-1} x2={522} y2={3} stroke={tx} strokeWidth={0.5} />
+          <text x={544} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.txTransmitter')}</text>
 
           {/* RX: mini schematic box with teal accent */}
-          <rect x={608} y={-8} width={30} height={16} rx={3} fill={c.boxFill} stroke={rx} strokeWidth={0.9} />
-          <polygon points="613,-2 613,4 619,1" fill="none" stroke={rx} strokeWidth={0.8} />
-          <circle cx={626} cy={1} r={3} fill="none" stroke={rx} strokeWidth={0.7} />
-          <line x1={624} y1={-1} x2={628} y2={3} stroke={rx} strokeWidth={0.5} />
-          <line x1={628} y1={-1} x2={624} y2={3} stroke={rx} strokeWidth={0.5} />
-          <text x={646} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.rxReceiver')}</text>
+          <rect x={658} y={-8} width={30} height={16} rx={3} fill={c.boxFill} stroke={rx} strokeWidth={0.9} />
+          <polygon points="663,-2 663,4 669,1" fill="none" stroke={rx} strokeWidth={0.8} />
+          <circle cx={676} cy={1} r={3} fill="none" stroke={rx} strokeWidth={0.7} />
+          <line x1={674} y1={-1} x2={678} y2={3} stroke={rx} strokeWidth={0.5} />
+          <line x1={678} y1={-1} x2={674} y2={3} stroke={rx} strokeWidth={0.5} />
+          <text x={696} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.rxReceiver')}</text>
         </g>
 
         {/* Row 2: Circuit symbols — 6 items, evenly spaced across 760px */}
