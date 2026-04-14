@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import { Bookmark } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useBookmarks } from '@/context/BookmarkContext'
@@ -14,6 +15,10 @@ interface BookmarkButtonProps {
   className?: string
 }
 
+const pulseKeyframes: React.CSSProperties = {
+  animation: 'bookmark-pop 0.5s ease-out',
+}
+
 export function BookmarkButton({
   chapterId,
   sectionId = null,
@@ -25,6 +30,18 @@ export function BookmarkButton({
   const { t } = useTranslation('ui')
   const { isBookmarked, toggle } = useBookmarks()
   const active = isBookmarked(chapterId, sectionId)
+  const prevActive = useRef(active)
+  const [pulse, setPulse] = useState(false)
+
+  // Fire pulse when bookmark is added (active goes false → true)
+  useEffect(() => {
+    if (active && !prevActive.current) {
+      setPulse(true)
+      const timer = setTimeout(() => setPulse(false), 600)
+      return () => clearTimeout(timer)
+    }
+    prevActive.current = active
+  }, [active])
 
   const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
   const btnSize = size === 'sm' ? 'w-8 h-8' : 'w-9 h-9'
@@ -49,6 +66,7 @@ export function BookmarkButton({
     >
       <Bookmark
         className={cn(iconSize, 'transition-all')}
+        style={pulse ? pulseKeyframes : undefined}
         fill={active ? 'currentColor' : 'none'}
         strokeWidth={1.5}
       />

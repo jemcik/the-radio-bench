@@ -36,12 +36,13 @@ export default function LanguageToggle() {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-44 p-1.5">
+      <PopoverContent align="end" className="w-44 p-1.5 space-y-1">
         {LANGUAGES.map(lang => (
           <button
             key={lang.code}
             onClick={() => {
               i18n.changeLanguage(lang.code)
+              localStorage.setItem('trb-lang-chosen', '1')
               setOpen(false)
             }}
             className={cn(

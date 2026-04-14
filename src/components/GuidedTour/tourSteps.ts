@@ -26,7 +26,7 @@ export interface TourStepDef {
 }
 
 /** Demo bookmark used during the guided tour */
-const TOUR_BOOKMARK = { chapterId: '0-1', sectionId: 'what-youll-need' } as const
+const TOUR_BOOKMARK = { chapterId: 'welcome', sectionId: 'what-youll-need' } as const
 
 function tourBookmarkLabel() {
   return i18n.t('tour.bookmarkDemoLabel', { ns: 'ui' })
