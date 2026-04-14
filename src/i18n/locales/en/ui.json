@@ -298,7 +298,7 @@
 
     "sectionSIPrefixes": "SI Prefixes",
     "prefixesIntro": "<si>SI</si> prefixes are shorthand for powers of 10. Instead of writing 0.000001 <farad>farads</farad>, we write 1 µF (one microfarad). Instead of 2,400,000,000 Hz, we write 2.4 GHz.",
-    "prefixesRule": "To convert between prefixes, count how many steps you are moving on the ladder and shift the decimal point that many places. Moving <strong>up</strong> (to a bigger prefix) means the number gets <strong>smaller</strong>. Moving <strong>down</strong> (to a smaller prefix) means the number gets <strong>bigger</strong>.",
+    "prefixesRule": "To convert between prefixes, count how many steps you are moving on the ladder and shift the decimal point that many places. Moving <strong>right</strong> on the ladder (to a bigger prefix) means the number gets <strong>smaller</strong> — 1 000 mA becomes 1 A. Moving <strong>left</strong> (to a smaller prefix) means the number gets <strong>bigger</strong> — 2.4 GHz becomes 2 400 MHz.",
     "prefixesDiagramCaption": "The SI prefix ladder. Each step is a factor of 1000 (10³). Real radio examples are shown at each level.",
 
     "sectionSquaring": "Squaring and Square Roots",

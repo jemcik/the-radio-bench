@@ -69,6 +69,18 @@ describe('FormulaTransposer', () => {
     expect(screen.getByText(/rearranged/i)).toBeInTheDocument()
   })
 
+  it('hides the "Rearranged" box for the already-isolated case (no duplication)', () => {
+    setup()
+    // Default state: Ohm's law with V selected — V is already isolated, so
+    // there's only one step and the "Rearranged" highlight would just
+    // repeat it. The box must not render.
+    expect(screen.queryByText(/rearranged/i)).toBeNull()
+
+    // Switching to a non-isolated variable brings the box back.
+    fireEvent.click(screen.getByRole('button', { name: 'I' }))
+    expect(screen.getByText(/rearranged/i)).toBeInTheDocument()
+  })
+
   it('exposes aria-pressed on formula and variable toggles', () => {
     setup()
     // The active formula's aria-pressed should be "true", others "false".

@@ -83,7 +83,7 @@ export default function SciNotationExplorer() {
             {t('ch0_3.sciNotationEnter')}
           </label>
           <Input
-            type="text"
+            type="number"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={t('ch0_3.sciNotationPlaceholder')}
