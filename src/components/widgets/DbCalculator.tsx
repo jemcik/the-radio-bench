@@ -148,9 +148,15 @@ export default function DbCalculator() {
         naturalValue: natural,
         naturalFormatted: formatNatural(natural, mode, tUnit, locale),
         dbValue: roundTo(db, 4),
-        // Locale-aware — feeds the <input type="text"> directly so the
-        // user sees "20.00" in EN and "20,00" in UK regardless of OS.
-        dbFormatted: formatDecimal(db, 2, locale),
+        // One decimal place — matches the chapter's teaching landmarks
+        // (+3 dB = ×2, +10 dB = ×10). Showing "3.01" for ratio 2 is
+        // mathematically exact but clashes with the "+3 dB = ×2" rule
+        // the reader has just been told to memorise. One decimal still
+        // shows non-landmark ratios truthfully (ratio 3 → 4.8 dB) while
+        // letting landmark values ("3.0", "6.0", "20.0") line up with
+        // prose. Locale-aware — feeds the text input directly so the
+        // user sees "3.0" in EN and "3,0" in UK regardless of OS.
+        dbFormatted: formatDecimal(db, 1, locale),
       }
     }
     // Working from dB → natural
@@ -162,7 +168,7 @@ export default function DbCalculator() {
       naturalValue: natural,
       naturalFormatted: formatNatural(natural, mode, tUnit, locale),
       dbValue: roundTo(db, 4),
-      dbFormatted: formatDecimal(db, 2, locale),
+      dbFormatted: formatDecimal(db, 1, locale),
     }
   }, [editing, naturalText, dbText, mode, tUnit, locale])
 
@@ -282,7 +288,7 @@ export default function DbCalculator() {
               </span>
               <span className="text-muted-foreground mx-3 text-xl">↔</span>
               <span className="bg-callout-onair/20 border border-callout-onair/40 px-2 py-0.5 rounded">
-                {fmt(result.dbValue, 2)}
+                {fmt(result.dbValue, 1)}
                 {' '}
                 <span className="text-base font-semibold">
                   {mode === 'dbm' ? tUnit('dbm') : tUnit('db')}
@@ -300,6 +306,15 @@ export default function DbCalculator() {
               <p className="text-xs text-foreground">{t('ch0_4.dbCalculatorTrap')}</p>
             </ResultBox>
           )}
+
+          {/* Technical footnote — acknowledges that the displayed dB is
+              rounded, and shows the exact values for readers who want
+              to reconcile with textbook references that quote 3.01 dB
+              and 6.02 dB. Kept deliberately small and muted so it reads
+              as fine print rather than an instruction. */}
+          <p className="text-[11px] leading-relaxed text-muted-foreground px-1">
+            {t('ch0_4.dbCalculatorPrecisionNote')}
+          </p>
         </div>
       ) : (
         <ResultBox tone="muted" className="text-center">
