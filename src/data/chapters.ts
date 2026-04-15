@@ -78,6 +78,16 @@ export const PARTS: Part[] = [
         hasLab: true,
         hasQuiz: true,
       },
+      {
+        id: '0-5',
+        number: '0.5',
+        part: 0,
+        title: 'How to Read a Schematic',
+        subtitle: 'Wires, junctions, components — the visual grammar of every circuit diagram',
+        status: 'published',
+        hasLab: true,
+        hasQuiz: true,
+      },
     ],
   },
   {

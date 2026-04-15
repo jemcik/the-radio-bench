@@ -18,6 +18,20 @@ import { STORAGE_KEYS } from '@/lib/storage-keys'
 const CHAPTER_ID = '0-3'
 const QUIZ_QUESTION_COUNT = 12
 
+// Quantities shown in the "Units at a glance" cheat-sheet. Each entry
+// identifies a family of i18n keys — `unitsQuantity_{id}`,
+// `unitsUnit_{id}`, `unitsPrefixes_{id}` — so the whole table is
+// driven by a single array + three parallel template lookups.
+const UNIT_QUANTITIES = [
+  'voltage',
+  'current',
+  'resistance',
+  'power',
+  'frequency',
+  'capacitance',
+  'inductance',
+] as const
+
 export default function Chapter0_3() {
   const { t } = useTranslation('ui')
   const quizQuestions = useMemo(
@@ -130,6 +144,46 @@ export default function Chapter0_3() {
       <p>{t('ch0_3.transposingSteps')}</p>
 
       <FormulaTransposer />
+
+      {/* ── Units at a glance (cheat sheet) ───────────────────── */}
+      <Section id="units-at-a-glance" labelKey="ch0_3.sectionUnits" />
+
+      <p>{t('ch0_3.unitsIntro')}</p>
+
+      {/* `not-prose` so chapter prose typography doesn't fight the
+          compact table padding. Mirrors the Ch0.4 dBm-table pattern. */}
+      <div className="not-prose my-4 flex justify-center">
+        <table className="text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-border">
+              <th className="text-left py-2 px-4 font-semibold text-foreground">
+                {t('ch0_3.unitsHeaderQuantity')}
+              </th>
+              <th className="text-left py-2 px-4 font-semibold text-foreground">
+                {t('ch0_3.unitsHeaderUnit')}
+              </th>
+              <th className="text-left py-2 px-4 font-semibold text-foreground">
+                {t('ch0_3.unitsHeaderPrefixes')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {UNIT_QUANTITIES.map(q => (
+              <tr key={q} className="border-b border-border/40">
+                <td className="py-1.5 px-4 font-semibold text-foreground">
+                  {t(`ch0_3.unitsQuantity_${q}`)}
+                </td>
+                <td className="py-1.5 px-4 text-foreground">
+                  {t(`ch0_3.unitsUnit_${q}`)}
+                </td>
+                <td className="py-1.5 px-4 font-mono text-foreground">
+                  {t(`ch0_3.unitsPrefixes_${q}`)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* ── Lab Activity ────────────────────────────────────── */}
       <LabActivity
