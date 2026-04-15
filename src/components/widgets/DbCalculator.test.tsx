@@ -13,8 +13,9 @@ describe('DbCalculator', () => {
     // The default natural value is 100 (×100) and dB is 20.
     const inputs = screen.getAllByRole('textbox') as HTMLInputElement[]
     expect(inputs[0].value).toBe('100')
-    // The dB field mirrors the formatted result (one decimal precision via toFixed(2)).
-    expect(inputs[1].value).toBe('20.00')
+    // The dB field mirrors the formatted result — rounded to 1 decimal
+    // so landmark values (+3, +10, +20) line up with the chapter prose.
+    expect(inputs[1].value).toBe('20.0')
     // Result panel renders the formatted natural value with × prefix.
     expect(screen.getAllByText(/×100/).length).toBeGreaterThan(0)
   })
@@ -23,8 +24,9 @@ describe('DbCalculator', () => {
     setup()
     const [naturalInput] = screen.getAllByRole('textbox') as HTMLInputElement[]
     fireEvent.change(naturalInput, { target: { value: '2' } })
-    // Power doubling = +3 dB.
-    expect(screen.getAllByText(/3\.01/).length).toBeGreaterThan(0)
+    // Power doubling = +3 dB (the chapter's +3 dB = ×2 landmark — at one
+    // decimal place, 10·log(2) ≈ 3.0103 rounds to "3.0").
+    expect(screen.getAllByText(/3\.0/).length).toBeGreaterThan(0)
   })
 
   it('updates the natural ratio when dB is edited (power mode)', () => {
@@ -39,14 +41,15 @@ describe('DbCalculator', () => {
     setup()
     const modeSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement
     fireEvent.change(modeSelect, { target: { value: 'voltage' } })
-    // The mode switch resets the pair to (2, 6.02 dB) — natural is the
-    // typed seed; the dB field reflects the computed result.
+    // The mode switch resets the pair to (2, 6.0 dB) — natural is the
+    // typed seed; the dB field reflects the computed result, rounded to
+    // one decimal (the "6 dB = ×2 voltage" landmark from the chapter).
     const inputs = screen.getAllByRole('textbox') as HTMLInputElement[]
     expect(inputs[0].value).toBe('2')
-    expect(inputs[1].value).toBe('6.02')
-    // Re-typing the same ratio still shows the formatted ≈6.02 dB result.
+    expect(inputs[1].value).toBe('6.0')
+    // Re-typing the same ratio still shows the formatted ≈6.0 dB result.
     fireEvent.change(inputs[0], { target: { value: '2' } })
-    expect(screen.getAllByText(/6\.02/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/6\.0/).length).toBeGreaterThan(0)
   })
 
   it('switches to dBm mode and shows 1 W = +30 dBm', () => {
@@ -55,7 +58,7 @@ describe('DbCalculator', () => {
     fireEvent.change(modeSelect, { target: { value: 'dbm' } })
     const inputs = screen.getAllByRole('textbox') as HTMLInputElement[]
     expect(inputs[0].value).toBe('1')      // 1 W
-    expect(inputs[1].value).toBe('30.00')  // = +30 dBm (toFixed(2))
+    expect(inputs[1].value).toBe('30.0')   // = +30 dBm at 1-decimal precision
     // dBm label appears in the result panel.
     expect(screen.getAllByText('dBm').length).toBeGreaterThan(0)
   })
@@ -71,23 +74,23 @@ describe('DbCalculator', () => {
   })
 
   it('localizes the dB readout to the uk locale (comma decimal)', () => {
-    // Regression: the result box used to render "20.00" with a period even
-    // when the page was Ukrainian. The widget's internal toFixed(2) feeds
-    // the input (which must stay machine-format), but the ResultBox should
-    // display the number with the locale separator.
+    // Regression: the result box used to render "20.0" with a period even
+    // when the page was Ukrainian because Chrome ignores the lang attr on
+    // number inputs. Switched to type="text" with locale-aware formatting
+    // — now EN sees "20.0" and UK sees "20,0" regardless of OS locale.
     renderWithProviders(<DbCalculator />, { language: 'uk' })
     // дБ label should appear (units namespace), not "dB".
     expect(screen.getAllByText('дБ').length).toBeGreaterThan(0)
     // The +20 dB result for a ×100 power ratio renders with a comma.
-    expect(screen.getAllByText('20,00').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('20,0').length).toBeGreaterThan(0)
   })
 
-  it('localizes the dBm result to uk (1 W → "30,00 дБм")', () => {
+  it('localizes the dBm result to uk (1 W → "30,0 дБм")', () => {
     renderWithProviders(<DbCalculator />, { language: 'uk' })
     const modeSelect = screen.getAllByRole('combobox')[0] as HTMLSelectElement
     fireEvent.change(modeSelect, { target: { value: 'dbm' } })
-    // The dBm unit label and the comma-formatted 30,00 value both appear.
+    // The dBm unit label and the comma-formatted 30,0 value both appear.
     expect(screen.getAllByText('дБм').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('30,00').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('30,0').length).toBeGreaterThan(0)
   })
 })

@@ -11,13 +11,34 @@ import LogAxisToggle from '@/components/widgets/LogAxisToggle'
 import LogVsLinearDiagram from '@/components/diagrams/LogVsLinearDiagram'
 import DbRulerDiagram from '@/components/diagrams/DbRulerDiagram'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
+import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
+
+// Memorable dBm landmarks — a power decade every 10 dBm. The 0 dBm row
+// is the anchor (reference point 1 mW). Values extend from TX levels
+// (+60 dBm = 1 kW) down to receive-side noise-floor territory.
+// Strings like "+60 dBm" are culture-invariant; only the unit suffix
+// needs locale awareness (kw/w/mw/uw/nw/pw/fw live in units.* i18n).
+// Explicitly typed (rather than `as const`) so `anchor?` is optional
+// on every row — otherwise the destructure in .map() would complain
+// that rows without `anchor: true` don't have the property.
+interface DbmRow { dbm: string; unit: string; anchor?: boolean }
+const DBM_TABLE: readonly DbmRow[] = [
+  { dbm: '+60',  unit: 'kw' },
+  { dbm: '+30',  unit: 'w'  },
+  { dbm: '0',    unit: 'mw', anchor: true },
+  { dbm: '−30',  unit: 'uw' },
+  { dbm: '−60',  unit: 'nw' },
+  { dbm: '−90',  unit: 'pw' },
+  { dbm: '−120', unit: 'fw' },
+]
 
 const CHAPTER_ID = '0-4'
 const QUIZ_QUESTION_COUNT = 10
 
 export default function Chapter0_4() {
   const { t } = useTranslation('ui')
+  const tUnit = useUnitFormatter()
   const quizQuestions = useMemo(
     () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT),
     [t],
@@ -161,6 +182,40 @@ export default function Chapter0_4() {
 
       <p>{t('ch0_4.dbmTableTitle')}</p>
 
+      {/* The dBm ↔ power mental table. `not-prose` opts out of the chapter's
+          prose typography so default table padding doesn't fight our
+          compact design. Uses font-mono for column alignment; the 0 dBm
+          anchor row is bolded to highlight the reference point. */}
+      <div className="not-prose my-4 flex justify-center">
+        <table className="font-mono text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-border">
+              <th className="text-right py-2 px-4 font-semibold text-foreground">
+                {t('ch0_4.dbmTableHeaderDbm')}
+              </th>
+              <th className="text-left py-2 px-4 font-semibold text-foreground">
+                {t('ch0_4.dbmTableHeaderPower')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {DBM_TABLE.map(({ dbm, unit, anchor }) => (
+              <tr key={dbm}
+                  className={anchor
+                    ? 'bg-callout-experiment/10 font-bold'
+                    : 'border-b border-border/40'}>
+                <td className="text-right py-1.5 px-4 text-foreground">
+                  {dbm} {tUnit('dbm')}
+                </td>
+                <td className="text-left py-1.5 px-4 text-foreground">
+                  1 {tUnit(unit)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <p>
         <Trans i18nKey="ch0_4.dbmNegative" ns="ui"
           components={{ strong: <strong /> }}
@@ -208,7 +263,7 @@ export default function Chapter0_4() {
         </li>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact2" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ strong: <strong />, i: <i /> }}
           />
         </li>
       </ul>
@@ -245,7 +300,11 @@ export default function Chapter0_4() {
           />
         </li>
         <li>{t('ch0_4.recognise4')}</li>
-        <li>{t('ch0_4.recognise5')}</li>
+        <li>
+          <Trans i18nKey="ch0_4.recognise5" ns="ui"
+            components={{ rf: <G k="rf" /> }}
+          />
+        </li>
         <li>{t('ch0_4.recognise6')}</li>
         <li>
           <Trans i18nKey="ch0_4.recognise7" ns="ui"

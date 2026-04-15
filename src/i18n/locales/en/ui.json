@@ -68,7 +68,6 @@
   "lab": {
     "title": "Lab Activity",
     "optional": "Optional",
-    "goal": "Goal",
     "equipment": "Equipment",
     "components": "Components",
     "procedure": "Procedure",
@@ -534,14 +533,14 @@
     "ratioWhyPowerUnit": "But wait — voltage and power are not the same thing. Why treat them with the same unit? Because the decibel is, fundamentally, a <strong>power unit</strong>. Even when we compute it from voltages, we are really quoting the <strong>power ratio</strong> that voltage change implies. A +6 dB reading at a multimeter probe and a +6 dB reading at a wattmeter describe the same physical event — the decibel speaks one language at every point in a signal chain, whether you happened to measure voltage or power there.",
     "ratioWhyPowerUnitDetail": "If you genuinely wanted “the log of a voltage ratio for its own sake”, you would drop the squaring and write 10 · log(V₁ / V₂). Nobody does. In radio, audio, and every signal-chain discipline, what ultimately matters is the <strong>power</strong> delivered to a load — voltage is just what a probe can reach. The 20-log convention bakes in a quiet conversion: <i>measure voltage, but quote the power-dB it would produce</i>. That is why adding and subtracting dB across a chain works — every number refers to the same physical quantity.",
     "ratioWhy": "So the <strong>20</strong> for voltage is really the 10 for power, seen through the P = V² / R relationship. Substitute V² for P inside the logarithm and the identity log(x²) = 2 · log(x) pulls the 2 out in front; the 10 becomes 20:",
-    "ratioLandmarks": "These six landmarks cover almost every dB value you will meet on the air:",
+    "ratioLandmarks": "Almost every dB value you meet on the air sits on a small set of reference points — and the next section shows how to reach all of them from just two. First, the one trap that catches nearly everyone:",
     "ratioTrap": "A 2:1 voltage ratio is 6 dB. A 2:1 power ratio is 3 dB. Same physical doubling, different dB number, because power depends on voltage squared. This is the single most common dB mistake — guard against it now.",
     "ratioTableHeaderDb": "dB",
     "ratioTableHeaderPower": "Power ratio",
     "ratioTableHeaderVoltage": "Voltage ratio",
 
     "sectionShortcut": "The 3 / 10 Shortcut",
-    "shortcutIntro": "Memorise only two landmarks and every other dB value falls out by composition:",
+    "shortcutIntro": "Memorise just two reference values and every other dB number falls out by composition:",
     "shortcutPlus3": "+3 dB = ×2 in power",
     "shortcutPlus10": "+10 dB = ×10 in power",
     "shortcutChainTitle": "Then chain them:",
@@ -569,7 +568,7 @@
     "sectionLogAxis": "Reading Log-Scale Plots",
     "logAxisIntro": "When you reach Chapter 1.8 (Filters) you will see plots labelled <strong>−3 dB at the cutoff</strong> and <strong>−20 dB per decade</strong>. Both axes on those plots are logarithmic. Two facts are enough to read them:",
     "logAxisFact1": "On a <strong>log frequency axis</strong>, equal screen distance means equal <i>ratios</i>, not equal differences. The space from 10 Hz to 100 Hz is the same as from 100 Hz to 1000 Hz. Each ×10 step is one <strong>decade</strong>.",
-    "logAxisFact2": "<strong>−20 dB per decade</strong> means every time the frequency multiplies by 10, the signal drops by a factor of 10 in voltage (or 100 in power). That is the slope of a textbook RC low-pass filter above its cutoff.",
+    "logAxisFact2": "<strong>−20 dB per decade</strong> describes a <i>slope</i>: each decade (a ×10 step in frequency) brings the signal down by 20 dB. To turn that 20 dB into a physical drop, apply the 10·log / 20·log split from earlier — for <strong>voltage</strong> it is a ÷10 drop, for <strong>power</strong> a ÷100 drop. Same slope on the plot, two different physical ratios depending on what the y-axis is showing. This is exactly the slope of a first-order RC low-pass filter above its cutoff — a curve that looks hopelessly bent on linear paper straightens out on log-log axes, which is why filter datasheets use those axes by default.",
     "logAxisWhy": "A linear axis would squash the interesting low-frequency behaviour into the leftmost pixel. The log axis spreads it out so the curve becomes a near-straight line — much easier to read and reason about.",
 
     "sectionRecognise": "Real Radio Numbers to Recognise",
@@ -578,7 +577,7 @@
     "recognise2": "<qrp>QRP</qrp> (low-power) operation: 5 W = +37 dBm",
     "recognise3": "Handheld <vhf>VHF</vhf> on high power: 5 W = +37 dBm",
     "recognise4": "Handheld VHF on low power: 1 W = +30 dBm",
-    "recognise5": "Arduino RF experiments: ~1 mW = 0 dBm",
+    "recognise5": "Arduino <rf>RF</rf> experiments: ~1 mW = 0 dBm",
     "recognise6": "Receiver sensitivity threshold: roughly −120 dBm",
     "recognise7": "<coax>Coax</coax> cable loss: typically quoted in dB per 100 m",
     "recognise8": "6 dBi <yagi>Yagi</yagi> antenna ≈ 4× the power towards the front compared to isotropic",
@@ -613,6 +612,7 @@
     "dbCalculatorResult": "Result",
     "dbCalculatorFormula": "Formula",
     "dbCalculatorTrap": "Heads up: the same physical doubling is +6 dB on this voltage scale and +3 dB on the power scale.",
+    "dbCalculatorPrecisionNote": "Values are shown rounded to 0.1 dB. The exact conversions for a 2× ratio are 10·log₁₀(2) ≈ 3.0103 (power) and 20·log₁₀(2) ≈ 6.0206 (voltage) — you will often see these quoted as 3.01 dB and 6.02 dB in engineering references.",
     "dbCalculatorReference": "Quick reference — power ratios",
     "dbCalculatorRefMinus20": "−20 dB = ÷100",
     "dbCalculatorRefMinus10": "−10 dB = ÷10",
@@ -635,7 +635,7 @@
     "logAxisToggleAboutFilterTitle": "RC low-pass filter",
     "logAxisToggleAboutFilterBody": "The simplest filter you can build — one resistor (R) and one capacitor (C). Low frequencies pass through almost untouched; high frequencies are progressively weakened. Used everywhere from radio receivers to audio crossovers to noise-cleanup on power supplies.",
     "logAxisToggleAboutCutoffTitle": "Cutoff frequency",
-    "logAxisToggleAboutCutoffBody": "the dividing line. By convention it's the frequency where the filter has lost exactly half its output power, which lands at −3 dB on the chart. Below it the signal passes through nearly unchanged; above it the output drops by a factor of 10 for every 10× rise in frequency.",
+    "logAxisToggleAboutCutoffBody": "the dividing line. By convention it's the frequency where the filter has lost exactly half its output power, which lands at −3 dB on the chart. At lower frequencies (left of the line) the signal passes through nearly unchanged; at higher frequencies (right of the line) the output drops by a factor of 10 for every 10× rise in frequency.",
     "logAxisToggleAboutReadingTitle": "How to read the chart",
     "logAxisToggleAboutReadingBody": "The X axis is frequency. The Y axis is how much of the signal makes it through, in decibels — 0 dB means it passes unchanged, −20 dB means it's 10× weaker, −40 dB means 100× weaker. Drag the slider to retune the cutoff; toggle the axis to see why log is the textbook default.",
     "logAxisToggleHint": "On the linear axis the entire interesting curve is squashed near zero. On the log axis it spreads out into a near-straight \"−20 dB per decade\" slope — exactly how filter datasheets present it.",
@@ -799,9 +799,7 @@
   },
 
   "language": {
-    "label": "Language",
-    "en": "English",
-    "uk": "Українська"
+    "label": "Language"
   },
 
   "parts": {
@@ -925,6 +923,7 @@
       "breadboard": "breadboard",
       "power rails": "power rails",
       "dip chip": "DIP chip",
+      "rf": "RF",
       "hf": "HF",
       "ionosphere": "ionosphere",
       "ground wave": "ground wave",

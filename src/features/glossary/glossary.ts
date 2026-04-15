@@ -330,6 +330,12 @@ export const glossary: Record<string, GlossaryEntry> = {
   },
 
   // ── Radio / propagation ──────────────────────────────────────────
+  rf: {
+    tip: 'Radio frequency — the AC signal range where radios actually transmit and receive.',
+    detail:
+      'RF (radio frequency) spans roughly 3 kHz to 300 GHz — the range of AC frequencies at which signals radiate efficiently as electromagnetic waves from practical-size antennas. Amateur radio splits this into HF (3–30 MHz, long-distance via ionosphere), VHF (30–300 MHz, mostly line-of-sight, 2 m band), and UHF (300 MHz – 3 GHz, 70 cm band, microwave edge). Below RF you cannot radiate efficiently without impractically large antennas; far above it you are in microwave and optical territory. In conversation "RF" often means "the signal that goes to the antenna" — as opposed to AF (audio frequency), which is what a microphone produces before it gets modulated onto the RF carrier.',
+    see: ['hf', 'vhf'],
+  },
   hf: {
     tip: 'High Frequency — the 3–30 MHz range used for long-distance radio.',
     detail:
