@@ -53,8 +53,14 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
         >
           <PopoverTrigger asChild>
             <TooltipTrigger asChild>
+              {/* `inline` (not inline-block) so the browser's line-break
+                  algorithm can keep a following punctuation mark (",", ".",
+                  ":") attached to the term — inline-block is treated as an
+                  atomic unit, which leaves stranded commas at the start of
+                  the next wrapped line. `position: relative` still works on
+                  inline elements; the dashed underline renders identically. */}
               <span
-                className={`relative inline-block border-b border-dashed border-current/40 ${pinned ? 'cursor-default' : 'cursor-help'} ${className}`}
+                className={`relative inline border-b border-dashed border-current/40 ${pinned ? 'cursor-default' : 'cursor-help'} ${className}`}
                 style={{ lineHeight: 'inherit' }}
                 onTouchStart={() => { isTouch.current = true }}
                 onClick={(e) => {

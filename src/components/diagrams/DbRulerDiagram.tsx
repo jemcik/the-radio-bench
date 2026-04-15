@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
+import { svgTokens } from './svgTokens'
 
 /**
  * Chapter 0.4 — A single horizontal ruler that aligns four ways of
@@ -58,11 +59,7 @@ export default function DbRulerDiagram() {
   const xFor = (i: number) =>
     PAD_L + (i / (N_TICKS - 1)) * trackW
 
-  const fg = 'hsl(var(--foreground))'
-  const muted = 'hsl(var(--muted-foreground))'
-  const border = 'hsl(var(--border))'
-  const accent = 'hsl(var(--primary))'
-  const zeroAccent = 'hsl(var(--callout-experiment))'
+  const { fg, mutedFg: muted, border, primary: accent, experiment: zeroAccent } = svgTokens
 
   // Row layout (Y coords). Two rows above the axis line, two below.
   // Spacing tuned so each row's main label (fontSize 14) and sub label

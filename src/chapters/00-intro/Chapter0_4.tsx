@@ -37,10 +37,8 @@ export default function Chapter0_4() {
 
       <DbRulerDiagram />
 
-      {/* ── Logarithms in One Page ────────────────────────────── */}
-      <Section id="logarithms" labelKey="ch0_4.sectionLogs">
-        {t('ch0_4.sectionLogs')}
-      </Section>
+      {/* ── Logarithms in Three Examples ───────────────────────── */}
+      <Section id="logarithms" labelKey="ch0_4.sectionLogs" />
 
       <p>
         <Trans i18nKey="ch0_4.logsIntro" ns="ui"
@@ -65,9 +63,7 @@ export default function Chapter0_4() {
       <Callout variant="key">{t('ch0_4.logsKey')}</Callout>
 
       {/* ── dB as a Pure Ratio ─────────────────────────────────── */}
-      <Section id="ratio" labelKey="ch0_4.sectionRatio">
-        {t('ch0_4.sectionRatio')}
-      </Section>
+      <Section id="ratio" labelKey="ch0_4.sectionRatio" />
 
       <p>
         <Trans i18nKey="ch0_4.ratioIntro" ns="ui"
@@ -84,19 +80,51 @@ export default function Chapter0_4() {
       <MBlock tex="\text{dB} = 20 \cdot \log_{10}\!\left(\frac{V_1}{V_2}\right)" />
 
       <p>
+        <Trans i18nKey="ch0_4.ratioWhyTen" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_4.ratioWhyTenMultiply" ns="ui"
+          components={{ strong: <strong />, i: <i /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_4.ratioWhyPowerUnit" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_4.ratioWhyPowerUnitDetail" ns="ui"
+          components={{ strong: <strong />, i: <i /> }}
+        />
+      </p>
+
+      <p>
         <Trans i18nKey="ch0_4.ratioWhy" ns="ui"
           components={{ strong: <strong /> }}
         />
       </p>
+
+      {/* Four-step derivation — substitute P = V²/R into the power
+          formula and let the log identity do the rest. Makes the
+          "10 becomes 20" transition concrete instead of hand-wavy. */}
+      <MBlock tex="\begin{aligned}
+        \text{dB} &= 10 \cdot \log_{10}\!\left(\tfrac{P_1}{P_2}\right) \\
+                  &= 10 \cdot \log_{10}\!\left(\tfrac{V_1^{\,2}}{V_2^{\,2}}\right) \\
+                  &= 10 \cdot 2 \cdot \log_{10}\!\left(\tfrac{V_1}{V_2}\right) \\
+                  &= 20 \cdot \log_{10}\!\left(\tfrac{V_1}{V_2}\right)
+      \end{aligned}" />
 
       <p>{t('ch0_4.ratioLandmarks')}</p>
 
       <Callout variant="caution">{t('ch0_4.ratioTrap')}</Callout>
 
       {/* ── The 3 / 10 Shortcut ───────────────────────────────── */}
-      <Section id="shortcut" labelKey="ch0_4.sectionShortcut">
-        {t('ch0_4.sectionShortcut')}
-      </Section>
+      <Section id="shortcut" labelKey="ch0_4.sectionShortcut" />
 
       <p>{t('ch0_4.shortcutIntro')}</p>
 
@@ -123,9 +151,7 @@ export default function Chapter0_4() {
       <DbCalculator />
 
       {/* ── dBm — Power Relative to 1 mW ──────────────────────── */}
-      <Section id="dbm" labelKey="ch0_4.sectionDbm">
-        {t('ch0_4.sectionDbm')}
-      </Section>
+      <Section id="dbm" labelKey="ch0_4.sectionDbm" />
 
       <p>
         <Trans i18nKey="ch0_4.dbmIntro" ns="ui"
@@ -142,9 +168,7 @@ export default function Chapter0_4() {
       </p>
 
       {/* ── dBd and dBi — Two Antenna References ──────────────── */}
-      <Section id="antenna" labelKey="ch0_4.sectionAntenna">
-        {t('ch0_4.sectionAntenna')}
-      </Section>
+      <Section id="antenna" labelKey="ch0_4.sectionAntenna" />
 
       <p>{t('ch0_4.antennaIntro')}</p>
 
@@ -168,9 +192,7 @@ export default function Chapter0_4() {
       <p>{t('ch0_4.antennaPreview')}</p>
 
       {/* ── Reading Log-Scale Plots ───────────────────────────── */}
-      <Section id="log-axis" labelKey="ch0_4.sectionLogAxis">
-        {t('ch0_4.sectionLogAxis')}
-      </Section>
+      <Section id="log-axis" labelKey="ch0_4.sectionLogAxis" />
 
       <p>
         <Trans i18nKey="ch0_4.logAxisIntro" ns="ui"
@@ -198,9 +220,7 @@ export default function Chapter0_4() {
       <LogAxisToggle />
 
       {/* ── Real Radio Numbers to Recognise ───────────────────── */}
-      <Section id="recognise" labelKey="ch0_4.sectionRecognise">
-        {t('ch0_4.sectionRecognise')}
-      </Section>
+      <Section id="recognise" labelKey="ch0_4.sectionRecognise" />
 
       <p>
         <Trans i18nKey="ch0_4.recogniseIntro" ns="ui"

@@ -39,6 +39,13 @@ describe('LogAxisToggle', () => {
     expect(slider).toBeInTheDocument()
   })
 
+  it('localizes the cutoff readout to the uk locale (comma separator + кГц)', () => {
+    // Default cutoff is 1 kHz → "1,0 кГц" in Ukrainian.
+    const { container } = renderWithProviders(<LogAxisToggle />, { language: 'uk' })
+    const readout = container.querySelector('span.font-mono.text-sm')
+    expect(readout?.textContent ?? '').toMatch(/1,0 кГц/)
+  })
+
   it('updates the cutoff readout when the slider value changes', () => {
     const { container } = setup()
     // The readout lives in the font-mono span next to the slider label —

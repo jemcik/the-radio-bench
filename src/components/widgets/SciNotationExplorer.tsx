@@ -4,6 +4,8 @@ import Widget from '@/components/ui/widget'
 import { Input } from '@/components/ui/input'
 import { ResultBox } from '@/components/ui/result-box'
 import { cn } from '@/lib/utils'
+import { formatNumber, roundTo } from '@/lib/format'
+import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { SI_PREFIXES, type SIPrefix } from '@/features/si/prefixes'
 
 type NotationResult =
@@ -17,9 +19,6 @@ type NotationResult =
       siPrefix?: SIPrefix
     }
 
-// Round to 6 decimals to swallow floating-point drift.
-const round6 = (v: number) => Math.round(v * 1_000_000) / 1_000_000
-
 /** Render a signed integer exponent using Unicode superscript glyphs. */
 function toSuperscript(n: number): string {
   const MAP: Record<string, string> = {
@@ -31,11 +30,15 @@ function toSuperscript(n: number): string {
 
 export default function SciNotationExplorer() {
   const { t } = useTranslation('ui')
+  const { locale } = useLocaleFormatter()
   const [inputValue, setInputValue] = useState('')
   const [isEngineering, setIsEngineering] = useState(false)
 
   const result = useMemo<NotationResult>(() => {
-    const trimmed = inputValue.trim()
+    // Normalise: accept both "." and "," as decimal separators so
+    // Ukrainian-style "1,5" parses. Input is `type="text"` so the raw
+    // string arrives untouched by the browser.
+    const trimmed = inputValue.trim().replace(',', '.')
     if (!trimmed) return { ok: false }
 
     const num = parseFloat(trimmed)
@@ -61,16 +64,18 @@ export default function SciNotationExplorer() {
 
     return {
       ok: true,
-      mantissa: round6(mantissa),
+      mantissa: roundTo(mantissa, 6),
       exponent,
-      engineeringMantissa: round6(engineeringMantissa),
+      engineeringMantissa: roundTo(engineeringMantissa, 6),
       engineeringExponent,
       siPrefix: SI_PREFIXES.find(p => p.exponent === engineeringExponent),
     }
   }, [inputValue])
 
   const currentExponent = result.ok ? (isEngineering ? result.engineeringExponent : result.exponent) : 0
-  const currentMantissa = result.ok ? (isEngineering ? result.engineeringMantissa : result.mantissa) : 0
+  const currentMantissaRaw = result.ok ? (isEngineering ? result.engineeringMantissa : result.mantissa) : 0
+  // Localize the decimal separator so a uk reader sees "2,4 × 10⁹".
+  const currentMantissa = formatNumber(currentMantissaRaw, locale)
 
   return (
     <Widget
@@ -83,9 +88,13 @@ export default function SciNotationExplorer() {
             {t('ch0_3.sciNotationEnter')}
           </label>
           <Input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            // Strip non-numeric chars (letters, symbols) at the input
+            // layer so the field behaves like `type="number"` visually,
+            // while we keep display-format control.
+            onChange={(e) => setInputValue(e.target.value.replace(/[^0-9.,-]/g, ''))}
             placeholder={t('ch0_3.sciNotationPlaceholder')}
           />
         </div>
@@ -192,7 +201,7 @@ export default function SciNotationExplorer() {
             <ResultBox tone="info" label={t('ch0_3.sciNotationAlsoWritten')}>
               <p className="text-lg font-mono font-bold text-foreground">
                 <span className="bg-callout-key/20 border border-callout-key/40 px-2 py-0.5 rounded">
-                  {result.engineeringMantissa}
+                  {formatNumber(result.engineeringMantissa, locale)}
                 </span>
                 <span className="text-muted-foreground mx-2">×</span>
                 <span>10</span>

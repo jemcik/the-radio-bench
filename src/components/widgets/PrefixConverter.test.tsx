@@ -16,7 +16,7 @@ describe('PrefixConverter', () => {
 
   it('converts 1 kΩ to 1000 Ω (happy path)', () => {
     setup('Ω')
-    const input = screen.getByRole('spinbutton') as HTMLInputElement
+    const input = screen.getByRole('textbox') as HTMLInputElement
     const [fromSelect, toSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[]
 
     // Source = kilo, target = none — indices come from SI_PREFIXES order
@@ -30,7 +30,7 @@ describe('PrefixConverter', () => {
 
   it('handles decimal-moving conversions (500 mA → 0.5 A)', () => {
     setup('A')
-    const input = screen.getByRole('spinbutton') as HTMLInputElement
+    const input = screen.getByRole('textbox') as HTMLInputElement
     const [fromSelect, toSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[]
 
     fireEvent.change(fromSelect, { target: { value: '3' } })  // milli
@@ -48,9 +48,23 @@ describe('PrefixConverter', () => {
     expect(screen.getByText(/enter a number/i)).toBeInTheDocument()
   })
 
+  it('localizes the converted decimal to the uk locale (500 mA → "0,5")', () => {
+    renderWithProviders(<PrefixConverter baseUnit="A" />, { language: 'uk' })
+    const input = screen.getByRole('textbox') as HTMLInputElement
+    const [fromSelect, toSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[]
+    fireEvent.change(fromSelect, { target: { value: '3' } })  // milli
+    fireEvent.change(toSelect,   { target: { value: '4' } })  // none
+    fireEvent.change(input, { target: { value: '500' } })
+
+    // "0,5" with comma — not the English "0.5".
+    expect(
+      screen.getAllByText((_, el) => /0,5/.test(el?.textContent ?? '')).length,
+    ).toBeGreaterThan(0)
+  })
+
   it('shows the invalid-state hint when input is not a number', () => {
     setup()
-    const input = screen.getByRole('spinbutton') as HTMLInputElement
+    const input = screen.getByRole('textbox') as HTMLInputElement
     // <input type="number"> in jsdom only accepts numeric strings via change events;
     // use fireEvent to simulate a user typing text. jsdom still populates the
     // internal value to '' because "abc" isn't a valid number — the widget's

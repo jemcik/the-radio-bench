@@ -24,7 +24,7 @@
  */
 
 // Layout wrapper
-export { default as Circuit } from './Circuit'
+export { default as Circuit, type LegendItem } from './Circuit'
 
 // Wiring
 export { Wire, Junction } from './Wire'

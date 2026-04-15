@@ -29,7 +29,7 @@
  *   //  • textAnchor="middle" at x=X means right edge = X + textWidth/2
  */
 
-import type { ReactNode, SVGProps } from 'react'
+import type { CSSProperties, ReactNode, SVGProps } from 'react'
 
 // Uncomment to re-enable the dev overlay: const isDev = import.meta.env.DEV
 
@@ -66,16 +66,23 @@ interface SVGDiagramProps extends Omit<SVGProps<SVGSVGElement>, 'viewBox' | 'wid
 
 let _nextId = 0
 
-export default function SVGDiagram({ width, height, children, ...rest }: SVGDiagramProps) {
+export default function SVGDiagram({ width, height, children, style, ...rest }: SVGDiagramProps) {
   // Each instance gets a stable clip-path ID to avoid collisions when
   // multiple diagrams appear on the same page.
   const clipId = `svg-diagram-clip-${width}x${height}-${(_nextId++).toString(36)}`
+
+  // `display: block` is required for `margin: 0 auto` to center the SVG
+  // inside its card. Inline SVGs (the browser default) can't be centred
+  // that way. We destructure `style` out of `rest` first, then merge with
+  // our baseline — so callers can still pass `maxWidth` / `margin` etc.
+  // without clobbering `display: block`.
+  const mergedStyle: CSSProperties = { display: 'block', ...(style ?? {}) }
 
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
       width="100%"
-      style={{ display: 'block' }}
+      style={mergedStyle}
       {...rest}
     >
       <defs>

@@ -43,3 +43,56 @@ export function formatNumber(n: number, locale: string): string {
   const s = String(n)
   return locale.startsWith('uk') ? s.replace('.', ',') : s
 }
+
+/**
+ * Round to a fixed number of decimal places, returning a number (not a
+ * string). Use to swallow floating-point drift before display:
+ *
+ *   roundTo(0.1 + 0.2, 4)  → 0.3
+ *   roundTo(1.23456, 2)    → 1.23
+ *
+ * Use `formatDecimal` when you want a string with locale separator.
+ */
+export function roundTo(n: number, decimals: number): number {
+  const f = 10 ** decimals
+  return Math.round(n * f) / f
+}
+
+/**
+ * Format a number in scientific notation with the given number of
+ * significant figures, trimming trailing zeros from the mantissa, and
+ * localizing the decimal separator.
+ *
+ *   formatScientific(1.23e-9,  6, 'en')  → "1.23e-9"
+ *   formatScientific(1.230e-9, 6, 'uk')  → "1,23e-9"
+ *   formatScientific(0,        6, 'en')  → "0"
+ */
+export function formatScientific(n: number, sigFigs: number, locale: string): string {
+  if (n === 0) return '0'
+  // .toExponential(d) gives mantissa with d fractional digits → d+1 sig figs.
+  const raw = n.toExponential(Math.max(0, sigFigs - 1))
+  // Trim trailing zeros in the mantissa, e.g. "1.230e-9" → "1.23e-9", "1.000e0" → "1e0".
+  const trimmed = raw.replace(/\.?0+e/, 'e')
+  return locale.startsWith('uk') ? trimmed.replace('.', ',') : trimmed
+}
+
+/**
+ * Format a frequency in Hz with the appropriate SI prefix (Hz / kHz / MHz),
+ * pulling localized unit symbols from the i18n `units.*` namespace.
+ *
+ *   formatHz(440,       tUnit, 'en')  → "440 Hz"
+ *   formatHz(1_500,     tUnit, 'uk')  → "1,5 кГц"
+ *   formatHz(2_400_000, tUnit, 'en')  → "2.40 MHz"
+ *
+ * `tUnit` is typically `useUnitFormatter()`. Decimals shrink as the value
+ * grows so the readout stays compact.
+ */
+export function formatHz(
+  hz: number,
+  tUnit: (key: string) => string,
+  locale: string,
+): string {
+  if (hz >= 1_000_000) return `${formatDecimal(hz / 1_000_000, hz >= 10_000_000 ? 0 : 2, locale)} ${tUnit('mhz')}`
+  if (hz >= 1_000)     return `${formatDecimal(hz / 1_000,     hz >= 10_000     ? 0 : 1, locale)} ${tUnit('khz')}`
+  return `${formatDecimal(hz, 0, locale)} ${tUnit('hz')}`
+}

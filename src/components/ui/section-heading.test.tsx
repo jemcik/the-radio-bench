@@ -57,6 +57,21 @@ describe('Section', () => {
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
 
+  it('renders t(labelKey) as the heading text when no children are provided', () => {
+    // Avoids the previous duplication footgun:
+    //   <Section id="x" labelKey="ch0_1.sectionStructure">{t('ch0_1.sectionStructure')}</Section>
+    // becomes:
+    //   <Section id="x" labelKey="ch0_1.sectionStructure" />
+    render(withProviders(<Section id="structure" labelKey="ch0_1.sectionStructure" />))
+    // The English string for ch0_1.sectionStructure is "How a chapter is structured".
+    expect(screen.getByRole('heading', { level: 2, name: /How a chapter is structured/i })).toBeInTheDocument()
+  })
+
+  it('prefers explicit children over labelKey when both are provided', () => {
+    render(withProviders(<Section id="x" labelKey="ch0_1.sectionStructure">Override text</Section>))
+    expect(screen.getByRole('heading', { level: 2, name: 'Override text' })).toBeInTheDocument()
+  })
+
   it('falls back to a derived label when children is not a string', () => {
     render(
       withProviders(

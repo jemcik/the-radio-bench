@@ -3,6 +3,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@/test/render'
 import SciNotationExplorer from './SciNotationExplorer'
 
+// SciNotationExplorer is locale-aware (the mantissa decimal separator
+// localizes via roundTo + formatNumber). Most tests pin English; the
+// uk-locale test below covers the regression class.
+
+
 function setup() {
   return renderWithProviders(<SciNotationExplorer />)
 }
@@ -10,7 +15,7 @@ function setup() {
 describe('SciNotationExplorer', () => {
   it('renders the input but no result panel when empty', () => {
     setup()
-    expect(screen.getByRole('spinbutton')).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
     // The Standard/Engineering toggle buttons only appear once the result
     // panel renders — use their absence as a proxy for "no result".
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
@@ -19,7 +24,7 @@ describe('SciNotationExplorer', () => {
 
   it('breaks 2_400_000_000 into mantissa 2.4 and exponent 9 (standard)', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '2400000000' } })
 
     // Mantissa "2.4" is rendered in multiple places (the big display, the
@@ -30,7 +35,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode keeps 2.4 × 10⁹ for 2_400_000_000 (multiple of 3)', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '2400000000' } })
     fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
 
@@ -41,7 +46,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode normalises 1500 to 1.5 × 10³', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '1500' } })
 
     // Standard notation for 1500 is itself 1.5 × 10³ (already engineering-compatible).
@@ -51,7 +56,7 @@ describe('SciNotationExplorer', () => {
 
   it('engineering mode downshifts 0.00047 to 470 × 10⁻⁶', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '0.00047' } })
     fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
 
@@ -63,7 +68,7 @@ describe('SciNotationExplorer', () => {
 
   it('treats 0 as valid (exponent 0, no crash from log10(0))', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '0' } })
 
     // The result panel shows the toggle buttons when ok. Presence of the
@@ -72,22 +77,21 @@ describe('SciNotationExplorer', () => {
     expect(screen.getByRole('button', { name: /engineering/i })).toBeInTheDocument()
   })
 
-  it('rejects non-numeric input at the input layer', () => {
-    // <input type="number"> blocks non-numeric keypresses in real browsers,
-    // and jsdom mirrors this — setting value to "abc" resolves to empty.
-    // The widget therefore stays in the empty state rather than "invalid".
+  it('strips non-numeric characters at the input layer', () => {
+    // The input is `type="text"` with inputMode="decimal" and an onChange
+    // that filters `[^0-9.,\-]`. Typing letters therefore never lands in
+    // state — the field stays empty and the result panel doesn't render.
     setup()
-    const input = screen.getByRole('spinbutton') as HTMLInputElement
+    const input = screen.getByRole('textbox') as HTMLInputElement
     fireEvent.change(input, { target: { value: 'abc' } })
 
     expect(input.value).toBe('')
-    // No result panel (empty state), no crash, no error message.
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
   })
 
   it('switches notation mode via the Standard/Engineering buttons', () => {
     setup()
-    const input = screen.getByRole('spinbutton')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '12345' } })
 
     const std = screen.getByRole('button', { name: /standard/i })
@@ -101,9 +105,32 @@ describe('SciNotationExplorer', () => {
     expect(eng.className).toMatch(/border-callout-experiment\/50/)
   })
 
+  it('handles negative inputs with a leading minus sign', () => {
+    // Math.abs() in the widget covers log10(); the rendered mantissa must
+    // still carry the sign so the reader sees "−2.4 × 10⁹", not "2.4 × 10⁹".
+    setup()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '-2400000000' } })
+    // Some readout text contains the negative mantissa.
+    expect(
+      screen.getAllByText((_, el) => /-2\.4/.test(el?.textContent ?? '')).length,
+    ).toBeGreaterThan(0)
+  })
+
+  it('localizes the mantissa decimal in the uk locale', () => {
+    renderWithProviders(<SciNotationExplorer />, { language: 'uk' })
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '2400000000' } })
+    // The mantissa "2,4" (comma) should appear somewhere in the result panel.
+    // Use a node-text matcher because the value sits inside a styled span.
+    expect(
+      screen.getAllByText((_, el) => /2,4/.test(el?.textContent ?? '')).length,
+    ).toBeGreaterThan(0)
+  })
+
   it('exposes aria-pressed on the Standard/Engineering toggle', () => {
     setup()
-    fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '42' } })
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '42' } })
 
     const std = screen.getByRole('button', { name: /standard/i })
     const eng = screen.getByRole('button', { name: /engineering/i })

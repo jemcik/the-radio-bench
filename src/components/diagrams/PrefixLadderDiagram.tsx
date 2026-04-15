@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
+import { svgTokens } from './svgTokens'
 import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
 
 /**
@@ -43,6 +44,12 @@ export default function PrefixLadderDiagram() {
   const positions = prefixes.map((_, i) => axisStartX + step * i)
 
   // 8 colours — one per segment between the 9 ticks.
+  // DECORATIVE EXCEPTION (per CLAUDE.md): this is the prefix-segment
+  // rainbow — a deliberate visual identity that lets the reader see
+  // each magnitude band (kilo / mega / giga …) as a distinct hue.
+  // It is intentionally NOT theme-driven; the rainbow stays the same
+  // across every theme so the chapter prose can refer to "the blue
+  // band" without worrying about light/dark mode.
   const segmentColors = [
     'hsl(210 60% 55%)', 'hsl(250 50% 58%)', 'hsl(280 45% 55%)',
     'hsl(320 50% 55%)', 'hsl(38 70% 50%)',  'hsl(25 70% 50%)',
@@ -50,9 +57,9 @@ export default function PrefixLadderDiagram() {
   ]
 
   const arrowY = axisY - 24
-  const arrowC = 'hsl(var(--muted-foreground))'
-  const axisC = 'hsl(var(--border))'
-  const labelC = 'hsl(var(--muted-foreground))'
+  const arrowC = svgTokens.mutedFg
+  const axisC = svgTokens.border
+  const labelC = svgTokens.mutedFg
 
   // Draw a small chevron at (x, y) pointing left or right
   const chevron = (x: number, dir: 'left' | 'right') => {

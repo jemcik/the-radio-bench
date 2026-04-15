@@ -141,6 +141,7 @@
   },
 
   "ch0_1": {
+    "heroAriaLabel": "Pen-and-ink sketch of an open book with a magnifying glass hovering over a small schematic on the right-hand page",
     "intro1": "This site is built around one idea: understanding radio means understanding the physics underneath it. Not memorising facts, but building a mental model solid enough that you can reason about things you've never seen before.",
     "intro2": "Every chapter is designed to be read in order — each one lays a foundation for the next. But if you already know a topic well, feel free to skip ahead. The sidebar shows you exactly where you are.",
     "sectionStructure": "How a chapter is structured",
@@ -152,9 +153,9 @@
     "labActivities": "Lab activities",
     "labActivitiesDetail": "(optional, marked with a flask icon in the sidebar). If you have a multimeter, oscilloscope, VNA, or Arduino, the lab activities let you verify the theory on a real bench. They're completely optional — the chapter stands without them — but doing them rewires the knowledge from \"understood\" to \"experienced.\"",
     "quiz": "Quiz",
-    "quizDetail": "(coming soon, marked with a question-mark icon in the sidebar). Chapters will include a short quiz at the end to help you check what stuck. The act of trying to recall something is itself part of learning.",
+    "quizDetail": "(marked with a question-mark icon in the sidebar). Chapters include a short quiz at the end to help you check what stuck. The act of trying to recall something is itself part of learning.",
     "sectionIcons": "The icons in the sidebar",
-    "iconsDetail": "Next to each chapter title in the sidebar you'll see small icons. A <flask>flask</flask> means the chapter has a lab activity. A <qmark>question mark</qmark> means a quiz is planned for that chapter. Chapters marked \"soon\" are planned but not yet written.",
+    "iconsDetail": "Next to each chapter title in the sidebar you'll see small icons. A <flask>flask</flask> means the chapter has a lab activity. A <qmark>question mark</qmark> means the chapter has a quiz. Chapters marked \"soon\" are planned but not yet written.",
     "sectionCallouts": "Callout boxes",
     "calloutsIntro": "Throughout the chapters you'll see coloured callout boxes. Each one has a different purpose — here's what they mean:",
     "calloutDanger": "<strong>Safety-critical information.</strong> High voltage, RF exposure, or equipment-damage risks. Never skip these.",
@@ -177,6 +178,7 @@
   },
 
   "ch0_2": {
+    "heroAriaLabel": "Pen-and-ink sketch of a workbench holding a multimeter, an oscilloscope with a sine-wave trace, and a breadboard with a jumper wire arching above it",
     "intro": "Before we touch a single resistor or frequency formula, let's get comfortable with the instruments. A bench without working, understood tools is just a flat surface with expensive decorations on it.",
     "coversInstruments": "This chapter covers the four instruments you'll use throughout the course: <multimeter>multimeter</multimeter>, <oscilloscope>oscilloscope</oscilloscope>, <vna>VNA (Vector Network Analyser)</vna>, and the <strong>Arduino</strong> in its role as a signal generator.",
 
@@ -240,11 +242,18 @@
 
     "voltmeterCaption": "Voltmeter in parallel — probes tap across the component, never break the circuit",
     "ammeterCaption": "Ammeter in series — break the circuit and insert the meter in the gap",
+    "legendMainLoop": "main circuit",
+    "legendBattery": "battery (1.5 V)",
+    "legendResistor": "resistor (R₁)",
+    "legendVoltmeterProbes": "voltmeter probes (parallel)",
+    "legendAmmeterInline": "ammeter (in series)",
+    "legendJunction": "electrical connection",
 
     "scopeDiagramAria": "Oscilloscope screen showing a 1 kHz square wave at 5V peak-to-peak",
     "scopeDiagramCaption1": "Oscilloscope screen showing the 1 kHz square wave from the lab activity.",
     "scopeDiagramCaption2": "Amplitude = 2.5 div × 2 V/div = 5 V",
-    "scopeDiagramCaption3": "Period = 4 div × 0.5 ms/div = 2 ms → <strong>1 kHz</strong>.",
+    "scopeDiagramCaption3": "Period T = 2 div × 0.5 ms/div = 1 ms. Frequency is the reciprocal of period: f = 1 ÷ T = 1 ÷ 0.001 s = 1000 Hz = <strong>1 kHz</strong>.",
+    "scopeDiagramPeriodInline": "T = 2 × 0.5 ms = 1 ms → 1 kHz",
 
     "breadboardAria": "Breadboard anatomy: power rails run horizontally, tie-point columns connect 5 holes vertically",
     "breadboardDipGap": "← DIP gap — separates the two sides →",
@@ -259,6 +268,7 @@
   },
 
   "ch0_3": {
+    "heroAriaLabel": "Pen-and-ink sketch of an open notebook with hand-written equations, a slide rule, and a sharpened pencil resting on a desk",
     "intro": "Every chapter in this course uses numbers — <freq>frequencies</freq> in megahertz, <cap>capacitance</cap> in picofarads, <res>resistance</res> in kilohms. This chapter gives you the handful of mathematical tools you need to be comfortable with all of them. No calculus, no trigonometry — just arithmetic with a few tricks.",
 
     "sectionFractions": "Fractions and Ratios",
@@ -501,11 +511,12 @@
   },
 
   "ch0_4": {
+    "heroAriaLabel": "Pen-and-ink sketch of a vintage VU meter with its needle deflected slightly above zero, beside a flourished \"dB\" inscription",
     "intro": "A radio receiver picks up signals as faint as 0.000000000001 watts. The transmitter across the room puts out 100 watts. That is a ratio of one hundred trillion to one. Nobody wants to write that. <decibel>Decibels</decibel> are the trick radio operators use to write ratios like that as small, friendly numbers — and to add gains and losses with simple arithmetic instead of multiplying long strings of zeros.",
     "introNote": "A decibel is not a unit like the volt or the ohm. It is a way of writing ratios.",
     "introPreview": "By the end of this chapter you will be able to read \"−120 dBm\" and immediately know: that is a weak receive signal, about a millionth of a billionth of a watt.",
 
-    "sectionLogs": "Logarithms in One Page",
+    "sectionLogs": "Logarithms in Three Examples",
     "logsIntro": "You already know that 10³ = 1000. A <logarithm>logarithm</logarithm> just asks the reverse question: <i>what power do I need to raise 10 to, to get 1000?</i> Answer: 3. So log₁₀(1000) = 3.",
     "logsThree": "Three values to remember, nothing else:",
     "logsBullet1": "log₁₀(1) = 0",
@@ -518,7 +529,11 @@
     "ratioIntro": "There are two formulas, and they differ by a single factor of 2. Which one you use depends on whether you are comparing <strong>powers</strong> or <strong>voltages and currents</strong>.",
     "ratioPower": "For power ratios:",
     "ratioVoltage": "For voltage or current ratios:",
-    "ratioWhy": "Why the factor of 2? Because power scales with the <strong>square</strong> of voltage (P = V² / R, from Chapter 0.3). And log(V²) = 2 · log(V), so the 10 in front becomes 20.",
+    "ratioWhyTen": "Where do those numbers come from? Start with the <strong>10</strong>. A decibel is, literally, one tenth of a <strong>bel</strong> — a unit originally defined as just log₁₀(P₁ / P₂), with no multiplier at all. Bell Labs engineers found the bel too coarse for everyday work (a thousand-fold power increase is only 3 bels — the numbers barely move), so they split each bel into ten <strong>deci</strong>bels. The × 10 in the formula is nothing more than that bel-to-decibel conversion.",
+    "ratioWhyTenMultiply": "<i>Multiply by 10 — why not divide?</i> Because decibels are the <strong>smaller</strong> unit, and a smaller unit means <strong>more</strong> of them fit into the same quantity. Same arithmetic as metres to centimetres: 2 m = 200 cm, not 0.02 cm. A log ratio of 3 bels is the same physical change as 30 dB — the × 10 is just counting the larger number of smaller units.",
+    "ratioWhyPowerUnit": "But wait — voltage and power are not the same thing. Why treat them with the same unit? Because the decibel is, fundamentally, a <strong>power unit</strong>. Even when we compute it from voltages, we are really quoting the <strong>power ratio</strong> that voltage change implies. A +6 dB reading at a multimeter probe and a +6 dB reading at a wattmeter describe the same physical event — the decibel speaks one language at every point in a signal chain, whether you happened to measure voltage or power there.",
+    "ratioWhyPowerUnitDetail": "If you genuinely wanted “the log of a voltage ratio for its own sake”, you would drop the squaring and write 10 · log(V₁ / V₂). Nobody does. In radio, audio, and every signal-chain discipline, what ultimately matters is the <strong>power</strong> delivered to a load — voltage is just what a probe can reach. The 20-log convention bakes in a quiet conversion: <i>measure voltage, but quote the power-dB it would produce</i>. That is why adding and subtracting dB across a chain works — every number refers to the same physical quantity.",
+    "ratioWhy": "So the <strong>20</strong> for voltage is really the 10 for power, seen through the P = V² / R relationship. Substitute V² for P inside the logarithm and the identity log(x²) = 2 · log(x) pulls the 2 out in front; the 10 becomes 20:",
     "ratioLandmarks": "These six landmarks cover almost every dB value you will meet on the air:",
     "ratioTrap": "A 2:1 voltage ratio is 6 dB. A 2:1 power ratio is 3 dB. Same physical doubling, different dB number, because power depends on voltage squared. This is the single most common dB mistake — guard against it now.",
     "ratioTableHeaderDb": "dB",

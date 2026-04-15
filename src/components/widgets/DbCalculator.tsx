@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { ResultBox } from '@/components/ui/result-box'
 import { cn } from '@/lib/utils'
-import { formatDecimal, formatNumber } from '@/lib/format'
+import { formatDecimal, formatNumber, roundTo } from '@/lib/format'
+import { dbToNatural, naturalToDb, type DbMode } from '@/lib/decibel'
+import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 
 /**
  * Chapter 0.4 — interactive dB calculator with three modes:
@@ -17,7 +19,7 @@ import { formatDecimal, formatNumber } from '@/lib/format'
  * input simply hides the result panel rather than throwing.
  */
 
-type Mode = 'power' | 'voltage' | 'dbm'
+type Mode = DbMode
 
 type Result =
   | { ok: false }
@@ -33,11 +35,6 @@ type Result =
       dbFormatted: string
     }
 
-/** Round to 4 decimals — enough for engineering, swallows fp drift. */
-function round4(n: number): number {
-  return Math.round(n * 10_000) / 10_000
-}
-
 /**
  * Format a "natural" value (ratio or watts) compactly.
  *
@@ -51,7 +48,7 @@ function formatNatural(
   tUnit: (k: string) => string,
   locale: string,
 ): string {
-  const num = (x: number) => formatNumber(round4(x), locale)
+  const num = (x: number) => formatNumber(roundTo(x, 4), locale)
   if (mode === 'dbm') {
     // Pick a sensible SI prefix from W down to fW.
     const abs = Math.abs(n)
@@ -71,9 +68,31 @@ function formatNatural(
   return `×${num(n)}`
 }
 
+/**
+ * Normalise a number string: trim whitespace, convert a comma decimal
+ * separator to a period so `parseFloat` can read Ukrainian-style input
+ * like "20,5". We use `type="text"` inputs (not `type="number"`) because
+ * Chrome ignores the `lang` attribute on number inputs and always uses
+ * the OS locale — which gave UK users' commas to EN-page readers.
+ */
+function normaliseDecimalString(raw: string): string {
+  return raw.trim().replace(',', '.')
+}
+
+/**
+ * Strip anything that isn't a digit, decimal separator (. or ,), or a
+ * leading minus sign. Applied in onChange so that typing letters or
+ * symbols is silently ignored at the input layer — same end-user feel as
+ * `type="number"` but under our own control (so locale formatting stays
+ * consistent). The parser still validates semantic correctness.
+ */
+function stripNonNumeric(raw: string): string {
+  return raw.replace(/[^0-9.,-]/g, '')
+}
+
 /** Parse a string to a positive finite number, returning NaN otherwise. */
 function parsePositive(raw: string): number {
-  const trimmed = raw.trim()
+  const trimmed = normaliseDecimalString(raw)
   if (!trimmed) return NaN
   const n = parseFloat(trimmed)
   if (!isFinite(n) || n <= 0) return NaN
@@ -82,20 +101,16 @@ function parsePositive(raw: string): number {
 
 /** Parse a string to a finite number (any sign). */
 function parseNumber(raw: string): number {
-  const trimmed = raw.trim()
+  const trimmed = normaliseDecimalString(raw)
   if (!trimmed) return NaN
   const n = parseFloat(trimmed)
   return isFinite(n) ? n : NaN
 }
 
 export default function DbCalculator() {
-  const { t, i18n } = useTranslation('ui')
-  const locale = i18n.language
-  // Helper to fetch a unit symbol from the shared `units` namespace.
-  // Wrapped in useCallback so the identity is stable across renders —
-  // otherwise the result useMemo below would have to take it as a dep
-  // and recompute on every render (defeating the memo).
-  const tUnit = useCallback((k: string) => t(`units.${k}`), [t])
+  const { t } = useTranslation('ui')
+  const { locale, fmt } = useLocaleFormatter()
+  const tUnit = useUnitFormatter()
   const [mode, setMode] = useState<Mode>('power')
 
   // We track which field the user last edited, then derive the other.
@@ -127,33 +142,27 @@ export default function DbCalculator() {
     if (naturalIsActive) {
       const natural = parsePositive(naturalText)
       if (isNaN(natural)) return { ok: false }
-      let db: number
-      if (mode === 'voltage') db = 20 * Math.log10(natural)
-      else if (mode === 'power') db = 10 * Math.log10(natural)
-      else db = 10 * Math.log10(natural / 0.001)  // watts → dBm
+      const db = naturalToDb(natural, mode)
       return {
         ok: true,
         naturalValue: natural,
         naturalFormatted: formatNatural(natural, mode, tUnit, locale),
-        dbValue: round4(db),
-        // Machine-format (period) — feeds the <input type="number"> value.
-        // Localized separator is applied at display time in the ResultBox.
-        dbFormatted: db.toFixed(2),
+        dbValue: roundTo(db, 4),
+        // Locale-aware — feeds the <input type="text"> directly so the
+        // user sees "20.00" in EN and "20,00" in UK regardless of OS.
+        dbFormatted: formatDecimal(db, 2, locale),
       }
     }
     // Working from dB → natural
     const db = parseNumber(dbText)
     if (isNaN(db)) return { ok: false }
-    let natural: number
-    if (mode === 'voltage') natural = Math.pow(10, db / 20)
-    else if (mode === 'power') natural = Math.pow(10, db / 10)
-    else natural = 0.001 * Math.pow(10, db / 10)  // dBm → watts
+    const natural = dbToNatural(db, mode)
     return {
       ok: true,
       naturalValue: natural,
       naturalFormatted: formatNatural(natural, mode, tUnit, locale),
-      dbValue: round4(db),
-      dbFormatted: db.toFixed(2),
+      dbValue: roundTo(db, 4),
+      dbFormatted: formatDecimal(db, 2, locale),
     }
   }, [editing, naturalText, dbText, mode, tUnit, locale])
 
@@ -180,7 +189,7 @@ export default function DbCalculator() {
   // mirror the result back so the input shows the converted figure.
   const naturalDisplay = editing === 'natural'
     ? naturalText
-    : (result.ok ? round4(result.naturalValue).toString() : '')
+    : (result.ok ? formatNumber(roundTo(result.naturalValue, 4), locale) : '')
   const dbDisplay = editing === 'db'
     ? dbText
     : (result.ok ? result.dbFormatted : '')
@@ -230,11 +239,12 @@ export default function DbCalculator() {
           </label>
           <Input
             id="dbcalc-natural"
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={naturalDisplay}
             onChange={(e) => {
               setEditing('natural')
-              setNaturalText(e.target.value)
+              setNaturalText(stripNonNumeric(e.target.value))
             }}
             placeholder={t('ch0_4.dbCalculatorPlaceholder')}
           />
@@ -250,11 +260,12 @@ export default function DbCalculator() {
           </label>
           <Input
             id="dbcalc-db"
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={dbDisplay}
             onChange={(e) => {
               setEditing('db')
-              setDbText(e.target.value)
+              setDbText(stripNonNumeric(e.target.value))
             }}
             placeholder={t('ch0_4.dbCalculatorPlaceholder')}
           />
@@ -271,7 +282,7 @@ export default function DbCalculator() {
               </span>
               <span className="text-muted-foreground mx-3 text-xl">↔</span>
               <span className="bg-callout-onair/20 border border-callout-onair/40 px-2 py-0.5 rounded">
-                {formatDecimal(result.dbValue, 2, locale)}
+                {fmt(result.dbValue, 2)}
                 {' '}
                 <span className="text-base font-semibold">
                   {mode === 'dbm' ? tUnit('dbm') : tUnit('db')}

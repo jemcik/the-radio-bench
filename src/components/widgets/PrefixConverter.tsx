@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { ResultBox } from '@/components/ui/result-box'
 import { cn } from '@/lib/utils'
+import { formatNumber, formatScientific } from '@/lib/format'
+import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
 
 // Converter offers the full pico → tera range used in radio
@@ -30,6 +32,7 @@ type Result =
 
 export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProps) {
   const { t } = useTranslation('ui')
+  const { locale } = useLocaleFormatter()
   const [inputValue, setInputValue] = useState('')
   const [sourceIndex, setSourceIndex] = useState(DEFAULT_SOURCE)
   const [targetIndex, setTargetIndex] = useState(DEFAULT_TARGET)
@@ -38,7 +41,10 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
   const target = PREFIXES[targetIndex]
 
   const result = useMemo<Result>(() => {
-    const trimmed = inputValue.trim()
+    // Normalise: comma decimal separators (Ukrainian-style "1,5") are
+    // accepted in addition to period. The input is `type="text"` so the
+    // raw string arrives exactly as typed, without browser re-formatting.
+    const trimmed = inputValue.trim().replace(',', '.')
     if (!trimmed) return { ok: false }
 
     const num = parseFloat(trimmed)
@@ -52,16 +58,17 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
     let formatted: string
     if (Math.abs(converted) < 0.00001 && converted !== 0) {
       // Use scientific notation for very small numbers
-      formatted = converted.toExponential(6).replace(/\.?0+e/, 'e')
+      formatted = formatScientific(converted, 7, locale)
     } else if (converted % 1 === 0) {
-      formatted = converted.toString()
+      formatted = formatNumber(converted, locale)
     } else {
-      // Max 8 significant figures, trim trailing zeros
-      formatted = converted.toPrecision(8).replace(/\.?0+$/, '')
+      // Max 8 significant figures, trim trailing zeros, then localize separator.
+      const trimmed = converted.toPrecision(8).replace(/\.?0+$/, '')
+      formatted = locale.startsWith('uk') ? trimmed.replace('.', ',') : trimmed
     }
 
     return { ok: true, value: converted, formatted, decimalMovement }
-  }, [inputValue, source.exponent, target.exponent])
+  }, [inputValue, source.exponent, target.exponent, locale])
 
   return (
     <Widget
@@ -75,9 +82,14 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
             {t('ch0_3.prefixConverterEnter')}
           </label>
           <Input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            // Strip anything that isn't a digit, decimal separator, or
+            // minus sign — silently ignore letters/symbols the way a
+            // `type="number"` input would, while we keep display-format
+            // control (Chrome ignores `lang` on number inputs).
+            onChange={(e) => setInputValue(e.target.value.replace(/[^0-9.,-]/g, ''))}
             placeholder={t('ch0_3.prefixConverterPlaceholder')}
           />
         </div>

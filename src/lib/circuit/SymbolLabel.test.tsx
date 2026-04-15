@@ -93,7 +93,7 @@ describe('OrientedLabel', () => {
   it('horizontal: label above (y-14), value below (y+4), centered', () => {
     const { container } = render(
       <Svg>
-        <OrientedLabel x={100} y={50} orient="right" label="B1" value="9V" />
+        <OrientedLabel x={100} y={50} orient="right" label="B1" value="1.5V" />
       </Svg>,
     )
     const [labelEl, valueEl] = Array.from(container.querySelectorAll('text'))
@@ -107,7 +107,7 @@ describe('OrientedLabel', () => {
   it('vertical: shifts both texts to the right of the body', () => {
     const { container } = render(
       <Svg>
-        <OrientedLabel x={100} y={50} orient="down" label="B1" value="9V" />
+        <OrientedLabel x={100} y={50} orient="down" label="B1" value="1.5V" />
       </Svg>,
     )
     const texts = Array.from(container.querySelectorAll('text'))

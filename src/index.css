@@ -28,7 +28,7 @@
     --sidebar-border:    240 6% 90%;
     --popover:           0 0% 100%;
     --popover-foreground:240 10% 10%;
-    --primary:           40 90% 54%;
+    --primary:           22 65% 40%;
     --primary-foreground:0 0% 100%;
     --secondary:         240 5% 94%;
     --secondary-foreground: 240 8% 25%;
@@ -40,7 +40,14 @@
     --destructive-foreground: 0 0% 98%;
     --border:            240 6% 88%;
     --ring:              38 92% 45%;
-    --term-accent:       38 80% 40%;
+    --term-accent:       22 70% 36%;
+    /* Softer ink stroke for sketched illustrations — chapter-hero SVGs
+       and circuit schematics use it via `text-[hsl(var(--sketch-stroke))]`.
+       Lighter than --foreground in light themes so line art reads as
+       "pencil sketch" rather than a stark silhouette. Dark themes leave
+       it at foreground lightness — light strokes on dark bg already
+       read softly. */
+    --sketch-stroke:       240 8% 38%;
     --radius:            0.5rem;
 
     /* Callout palette — semantic accent colors used by <Callout variant="...">.
@@ -69,7 +76,7 @@
     --sidebar-border:    240 6% 90%;
     --popover:           0 0% 100%;
     --popover-foreground:240 10% 10%;
-    --primary:           40 90% 54%;   /* saffron */
+    --primary:           22 65% 40%;   /* copper */
     --primary-foreground:0 0% 100%;
     --secondary:         240 5% 94%;
     --secondary-foreground: 240 8% 25%;
@@ -81,7 +88,8 @@
     --destructive-foreground: 0 0% 98%;
     --border:            240 6% 88%;
     --ring:              38 92% 45%;
-    --term-accent:       38 80% 40%;
+    --term-accent:       22 70% 36%;
+    --sketch-stroke:       240 8% 38%;
     --radius:            0.5rem;
     color-scheme: light;
   }
@@ -97,7 +105,7 @@
     --sidebar-border:    35 10% 86%;
     --popover:           40 15% 96%;
     --popover-foreground:30 10% 12%;
-    --primary:           40 90% 50%;
+    --primary:           22 65% 38%;   /* copper */
     --primary-foreground:0 0% 100%;
     --secondary:         35 12% 90%;
     --secondary-foreground: 30 8% 25%;
@@ -109,7 +117,8 @@
     --destructive-foreground: 0 0% 98%;
     --border:            35 10% 84%;
     --ring:              38 92% 42%;
-    --term-accent:       38 80% 38%;
+    --term-accent:       22 70% 34%;
+    --sketch-stroke:       30 8% 34%;
     --radius:            0.5rem;
     color-scheme: light;
   }
@@ -138,6 +147,7 @@
     --border:            215 15% 86%;
     --ring:              221 83% 53%;
     --term-accent:       38 80% 40%;
+    --sketch-stroke:       215 12% 36%;
     --radius:            0.5rem;
     color-scheme: light;
   }
@@ -166,6 +176,7 @@
     --border:            28 8% 22%;
     --ring:              38 85% 55%;
     --term-accent:       38 85% 60%;
+    --sketch-stroke:       35 18% 82%;
     --radius:            0.5rem;
     color-scheme: dark;
   }
@@ -194,6 +205,7 @@
     --border:            222 12% 24%;
     --ring:              250 60% 68%;
     --term-accent:       38 85% 62%;
+    --sketch-stroke:       220 14% 84%;
     --radius:            0.5rem;
     color-scheme: dark;
   }
@@ -222,6 +234,7 @@
     --border:            212 10% 23%;
     --ring:              38 80% 58%;
     --term-accent:       38 80% 62%;
+    --sketch-stroke:       210 11% 82%;
     --radius:            0.5rem;
     color-scheme: dark;
   }
