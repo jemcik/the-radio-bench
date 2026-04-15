@@ -179,21 +179,36 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 **Quiz:** 10–15 questions covering unit conversion, scientific notation, prefix arithmetic, and formula transposition
 
 #### Chapter 0.4 — The Decibel (dB, dBm, dBd, dBi)
-*Not in ERC 32 explicitly but used constantly in every other chapter.*
-- Why we use logarithms for ratios (doubling power vs. adding 3 dB)
-- dB as a pure ratio (no units): gain, loss, attenuation
-- dBm: power relative to 1 milliwatt — the radio operator's favourite unit
-- dBd and dBi: antenna gain reference points
-- Converting between watts and dBm (the key table to memorise)
-- Real examples: typical TX power in dBm, path loss, receiver sensitivity
-- **Widget:** Interactive dB calculator — enter watts, get dBm and vice versa
-- **Widget:** "What does +3 dB feel like?" — slider shows signal doubling
-- **Quiz:** 10 questions on dB conversions
-- **🔬 Lab Activity — Measuring dB with a Multimeter**
+*Not in ERC 32 explicitly but used constantly in every other chapter — this is the logarithmic counterpart to 0.3's scientific notation and SI prefixes.*
+
+**Sections:**
+- **Logarithms in one page** — `log₁₀(x)` as "the exponent you'd raise 10 to, to get x"; `log₁₀(1000) = 3`, `log₁₀(1) = 0`. Introduced here because 0.1–0.3 never needed logs, and every concept below depends on them.
+- **Why we use logarithms for ratios** — doubling power vs. adding 3 dB; why addition is easier than multiplication when values span many orders of magnitude.
+- **dB as a pure ratio (no units)** — gain, loss, attenuation; the `10·log₁₀(P₁/P₂)` power formula and the `20·log₁₀(V₁/V₂)` voltage/current formula; why the factor is different (and why 2:1 voltage = 6 dB but 2:1 power = 3 dB — the classic beginner trap).
+- **dBm: power relative to 1 milliwatt** — the radio operator's favourite unit; the key mental table (0 dBm = 1 mW, 30 dBm = 1 W, 60 dBm = 1 kW).
+- **dBd and dBi: antenna gain reference points** — two different references, one number; dBi ≈ dBd + 2.15.
+- **Reading log-scale plots** — why filter response, SWR sweeps, and Bode plots use a log frequency axis; how to read "−20 dB per decade" off a plot; this quietly pre-pays for Ch 1.8 (Filters) and Ch 3.3 (Antennas).
+- **Real examples** — typical TX power in dBm, path loss, receiver sensitivity (–120 dBm is a weak-but-readable signal).
+
+**Diagrams:**
+- **Log scale vs. linear scale** — side-by-side plot of the same data, showing why a log axis makes decade-spanning behaviour readable.
+- **dB ruler** — horizontal number line mapping dB ↔ ratio ↔ dBm ↔ watts at the same markings, so the reader sees all four vocabularies aligned.
+
+**Interactive widgets:**
+- **dB Calculator** — enter watts / milliwatts, get dBm; enter dBm, get watts. Handles voltage-ratio mode too (20·log variant).
+- **"What does +3 dB feel like?"** — slider from −10 dB to +30 dB; shows both the multiplicative ratio and a visual bar-height comparison against the reference.
+- **Log-axis toggle** — same dataset (e.g., a simple filter response), toggle linear vs. log frequency axis; the reader sees why log is the right default for RF.
+
+**Practical sidebar:**
+- "The 3 / 10 shortcut" — memorise only two landmarks (+3 dB = ×2, +10 dB = ×10) and you can estimate any dB value by composition (+13 dB = ×20, +20 dB = ×100, +23 dB = ×200).
+
+**🔬 Lab Activity — Measuring dB with a Multimeter**
   - Goal: feel what a 3 dB, 6 dB, and 20 dB difference looks like as a voltage ratio
   - Equipment: multimeter, two resistors as a voltage divider (e.g., 1kΩ + 1kΩ, then 1kΩ + 3kΩ), 9V battery
-  - Procedure: measure output of each divider; calculate voltage ratio; convert to dB; compare to theoretical
-  - Connection: a 2:1 voltage ratio = 6 dB voltage difference = 6 dB signal difference (not the same as power dB — a great insight)
+  - Procedure: measure output of each divider; calculate voltage ratio; convert to dB using the 20·log formula; compare to theoretical
+  - Connection: a 2:1 voltage ratio = 6 dB voltage difference, but only 3 dB power difference — the factor-of-two that trips up every beginner, now cleared up before it bites in Ch 1.8.
+
+**Quiz:** 10 questions on dB conversions, dBm↔watts, voltage vs. power dB, and reading a log-scale plot
 
 ---
 

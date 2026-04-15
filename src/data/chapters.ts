@@ -74,7 +74,7 @@ export const PARTS: Part[] = [
         part: 0,
         title: 'The Decibel',
         subtitle: 'dB, dBm, dBd, dBi — the language of radio levels',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
       },

@@ -52,7 +52,7 @@ export default function LabActivity({
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="my-8">
       <div className={cn(
-        'rounded-xl border transition-colors overflow-hidden',
+        'not-prose rounded-xl border transition-colors overflow-hidden',
         open
           ? 'border-teal-500/40 bg-teal-500/5'
           : 'border-border bg-card hover:border-teal-500/30 hover:bg-teal-500/3'
@@ -85,9 +85,9 @@ export default function LabActivity({
               <Section icon={Wrench} title={t('lab.equipment')}>
                 <ul className="space-y-1.5">
                   {equipment.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-card-foreground">
-                      <span className="text-teal-500 shrink-0 mt-0.5">›</span>
-                      <span>{item}</span>
+                    <li key={i} className="flex items-start gap-2 text-sm leading-6 text-card-foreground">
+                      <span className="text-teal-500 shrink-0">›</span>
+                      <span className="flex-1 min-w-0">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -97,9 +97,9 @@ export default function LabActivity({
                 <Section icon={Zap} title={t('lab.components')}>
                   <ul className="space-y-1.5">
                     {components.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-card-foreground">
-                        <span className="text-teal-500 shrink-0 mt-0.5">›</span>
-                        <span>{item}</span>
+                      <li key={i} className="flex items-start gap-2 text-sm leading-6 text-card-foreground">
+                        <span className="text-teal-500 shrink-0">›</span>
+                        <span className="flex-1 min-w-0">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -113,11 +113,11 @@ export default function LabActivity({
             <Section icon={ListOrdered} title={t('lab.procedure')}>
               <ol className="space-y-3">
                 {procedure.map((step, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <span className="font-mono text-teal-500 font-bold shrink-0 w-5 text-right mt-0.5">
+                  <li key={i} className="flex gap-3 text-sm leading-6">
+                    <span className="font-mono text-teal-500 font-bold shrink-0 w-5 text-right">
                       {i + 1}.
                     </span>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <span className="text-card-foreground">{step.text}</span>
                       {step.note && (
                         <p className="text-muted-foreground italic text-xs mt-1">{step.note}</p>
@@ -140,7 +140,7 @@ export default function LabActivity({
 
               <Card surface="teal" radius="lg" className="p-4">
                 <Section icon={Link2} title={t('lab.connectionToTheory')}>
-                  <p className="text-sm text-teal-700 dark:text-teal-300">{connectionToTheory}</p>
+                  <p className="text-sm text-foreground">{connectionToTheory}</p>
                 </Section>
               </Card>
             </div>
@@ -150,9 +150,9 @@ export default function LabActivity({
               <Section icon={AlertTriangle} title={t('lab.troubleshooting')}>
                 <ul className="space-y-1.5">
                   {troubleshooting.map((tip, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-primary shrink-0 mt-0.5">•</span>
-                      <span>{tip}</span>
+                    <li key={i} className="flex items-start gap-2 text-sm leading-6 text-muted-foreground">
+                      <span className="text-primary shrink-0">•</span>
+                      <span className="flex-1 min-w-0">{tip}</span>
                     </li>
                   ))}
                 </ul>
