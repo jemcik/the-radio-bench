@@ -28,6 +28,22 @@ beforeEach(() => {
     })
   }
 
+  // jsdom does not implement ResizeObserver. Several Radix primitives
+  // (Slider, Tooltip, Popover) probe their own size via this API and crash
+  // without a stub. The minimal "no-op" implementation is enough for the
+  // unit tests we run — none of them assert on observed sizes.
+  if (!('ResizeObserver' in window)) {
+    Object.defineProperty(window, 'ResizeObserver', {
+      writable: true,
+      configurable: true,
+      value: class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    })
+  }
+
   // Reset localStorage between tests so persisted state does not leak across them.
   window.localStorage.clear()
 })

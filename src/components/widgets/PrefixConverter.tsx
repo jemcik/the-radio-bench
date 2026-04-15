@@ -8,10 +8,9 @@ import { ResultBox } from '@/components/ui/result-box'
 import { cn } from '@/lib/utils'
 import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
 
-// Ladder-style converter covers pico…giga (skip the tera entry).
-const PREFIXES = SI_PREFIXES.slice(0, 8)
-// SI_PREFIXES and PREFIXES share the same leading indices, so UNITY_PREFIX_INDEX
-// still points at the '10⁰' row inside PREFIXES.
+// Converter offers the full pico → tera range used in radio
+// (terahertz appears in the prefix ladder; keep the converter in step).
+const PREFIXES = SI_PREFIXES
 const DEFAULT_SOURCE = UNITY_PREFIX_INDEX
 const DEFAULT_TARGET = UNITY_PREFIX_INDEX + 1  // 'kilo'
 
@@ -196,28 +195,33 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
           {t('ch0_3.prefixConverterReference')}
         </p>
+        {/* Reference grid intentionally omits the unity (10⁰) row — it has
+            no symbol to decode, so a card explaining "no prefix means no
+            prefix" adds noise. Unity is still selectable in the dropdowns
+            and remains the default source. */}
         <div className="grid grid-cols-4 gap-2 text-xs">
-          {PREFIXES.map((prefix, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                'px-2 py-1.5 rounded border text-center transition-colors',
-                sourceIndex === idx
-                  ? 'bg-callout-note/10 border-callout-note/30 font-semibold'
-                  : targetIndex === idx
-                    ? 'bg-callout-experiment/10 border-callout-experiment/30 font-semibold'
-                    : 'bg-muted border-border',
-              )}
-            >
-              <div className="font-mono text-foreground">
-                {prefix.symbol || '—'}
+          {PREFIXES.map((prefix, idx) => {
+            if (prefix.exponent === 0) return null
+            return (
+              <div
+                key={idx}
+                className={cn(
+                  'px-2 py-1.5 rounded border text-center transition-colors',
+                  sourceIndex === idx
+                    ? 'bg-callout-note/10 border-callout-note/30 font-semibold'
+                    : targetIndex === idx
+                      ? 'bg-callout-experiment/10 border-callout-experiment/30 font-semibold'
+                      : 'bg-muted border-border',
+                )}
+              >
+                <div className="font-mono text-foreground">{prefix.symbol}</div>
+                <div className="text-muted-foreground text-[10px] leading-tight mt-0.5">
+                  {t(`ch0_3.prefixName_${prefix.name}`)}
+                </div>
+                <div className="text-muted-foreground">10^{prefix.exponent}</div>
               </div>
-              <div className="text-muted-foreground text-[10px] leading-tight mt-0.5">
-                {t(`ch0_3.prefixName_${prefix.name}`)}
-              </div>
-              <div className="text-muted-foreground">10^{prefix.exponent}</div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </Widget>

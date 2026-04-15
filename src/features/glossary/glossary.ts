@@ -354,4 +354,105 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Skywave (also called skip propagation) occurs when HF signals travel upward at an angle, refract off the ionosphere, and return to earth hundreds or thousands of kilometres away. The signal can then bounce off the ground and repeat the process (multi-hop), reaching the other side of the planet. The skip zone is the area between the end of ground wave coverage and where the first skywave hop lands.',
     see: ['ionosphere', 'hf', 'ground wave'],
   },
+
+  // ── Decibels (Chapter 0.4) ───────────────────────────────────────
+  decibel: {
+    tip: 'A logarithmic way of expressing a ratio between two values — usually power, voltage, or current.',
+    detail:
+      'A decibel (dB) is one tenth of a bel and represents a ratio, not an absolute value. For powers, dB = 10 · log₁₀(P₁ / P₂); for voltages or currents, dB = 20 · log₁₀(V₁ / V₂). The factor of 2 difference is because power scales with the square of voltage. Two landmark values cover most situations: +3 dB ≈ doubling power, +10 dB = tenfold increase. Adding decibels is the same as multiplying ratios — that is why every gain and loss in a radio chain can be tallied with simple addition.',
+    formula: 'dB = 10·log₁₀(P₁/P₂)  •  dB = 20·log₁₀(V₁/V₂)',
+    see: ['dbm', 'logarithm'],
+  },
+  dbm: {
+    tip: 'Power expressed in dB referenced to one milliwatt — the standard absolute power unit in radio.',
+    detail:
+      'dBm is decibels relative to 1 mW: dBm = 10 · log₁₀(P / 1 mW). Unlike plain dB (a pure ratio), dBm is an absolute power level. Key landmarks: 0 dBm = 1 mW, +30 dBm = 1 W, +60 dBm = 1 kW; on the receive side, −60 dBm = 1 µW and roughly −120 dBm is the noise floor of a sensitive HF receiver. Because dBm uses logs, a chain of gains and losses through cables, amplifiers, and antennas can be added together as +/− dB values instead of multiplied.',
+    unit: 'dBm',
+    formula: 'P(dBm) = 10·log₁₀(P / 1 mW)',
+    see: ['decibel', 'logarithm'],
+  },
+  dbd: {
+    tip: 'Antenna gain measured against a half-wave dipole as the reference.',
+    detail:
+      'dBd expresses an antenna\'s gain relative to a half-wave dipole — the simplest practical antenna. A dipole itself is 0 dBd. A 3-element Yagi might be 5 dBd, meaning it concentrates roughly three times more power in its preferred direction than a dipole would. dBd is the more honest quote for amateur antennas because it compares to something real and easy to build.',
+    unit: 'dBd',
+    see: ['dbi', 'antenna'],
+  },
+  dbi: {
+    tip: 'Antenna gain measured against an isotropic radiator as the reference.',
+    detail:
+      'dBi is gain compared to an isotropic radiator — an imaginary point source that radiates equally in every direction. Because a real dipole already has about 2.15 dB of gain over isotropic, dBi numbers are always 2.15 dB larger than dBd numbers for the same antenna (dBi ≈ dBd + 2.15). Manufacturers prefer dBi because the larger number sells better; the underlying antenna is the same.',
+    unit: 'dBi',
+    formula: 'dBi ≈ dBd + 2.15',
+    see: ['dbd', 'antenna'],
+  },
+  logarithm: {
+    tip: 'The exponent you would have to raise 10 to in order to get a given number.',
+    detail:
+      'A logarithm answers the question: "what power do I need to raise the base to in order to get this number?" The base most often used in engineering is 10, written log₁₀. Three values worth memorising: log₁₀(1) = 0, log₁₀(10) = 1, log₁₀(1000) = 3. The killer feature of logs is that they turn multiplication into addition: log(a × b) = log(a) + log(b). That is exactly why decibels are useful — multiplying gain stages becomes adding decibel values.',
+    formula: 'log₁₀(10ⁿ) = n  •  log(a×b) = log(a) + log(b)',
+    see: ['decibel', 'scientific notation'],
+  },
+  decade: {
+    tip: 'A factor-of-10 step in frequency — the natural unit on a logarithmic axis.',
+    detail:
+      'A decade is a 10:1 frequency ratio. On a log-scale plot the screen distance from 100 Hz to 1 kHz is the same as from 1 kHz to 10 kHz — both are one decade. Filter rolloff is commonly quoted "per decade" for the same reason: a textbook RC low-pass filter loses 20 dB of gain for every decade above its cutoff frequency, no matter where on the spectrum you measure it.',
+    see: ['logarithm', 'frequency'],
+  },
+
+  // ── Antennas, radio practice (Chapter 0.4 vocabulary) ────────────
+  isotropic: {
+    tip: 'An imaginary antenna that radiates equally in every direction — used as the zero-gain reference for dBi.',
+    detail:
+      'An isotropic radiator is a theoretical point source that broadcasts the same power in every direction in 3D space (a perfect sphere of radiation). No real antenna can do this — even a simple dipole concentrates its energy into a doughnut shape. The isotropic radiator exists only on paper, as the convenient zero-gain reference for dBi: a real antenna\'s dBi figure tells you how many decibels stronger it is in its best direction than this imaginary point would be.',
+    see: ['dbi', 'antenna', 'dipole'],
+  },
+  dipole: {
+    tip: 'The simplest practical antenna — a straight wire cut to about half a wavelength and fed in the middle.',
+    detail:
+      'A dipole is two pieces of conductor, each a quarter-wavelength long, fed by a feedline at the join in the middle. For the 20-metre amateur band (14 MHz) that\'s about 5 m of total wire. Despite being trivially simple, it works well: about 2.15 dBi of gain broadside to the wire, and it resonates naturally at the design frequency. The dipole is the reference antenna behind dBd, and the starting point for almost every other amateur antenna (Yagis, log-periodics, end-feds — all are elaborations of it).',
+    see: ['dbd', 'antenna', 'yagi'],
+  },
+  'ham radio': {
+    tip: 'A ham is a licensed amateur radio operator — someone with a government licence to transmit on amateur radio bands as a hobby.',
+    detail:
+      'A "ham" is a licensed amateur radio operator. To become one you pass a written exam (covering basic electronics, regulations, and operating practice) and receive a unique callsign from your national authority — FCC in the US, Ofcom in the UK, UCRF (Ukrainian State Centre of Radio Frequencies) in Ukraine. Once licensed, you can transmit on the amateur radio bands: talking to other hams locally, around the world, bouncing signals off the moon, even contacting astronauts on the ISS. The hobby covers everything from casual chats on a handheld to homebuilt antennas, software-defined radios, satellite work, and emergency communications when normal networks fail. The word "ham" started as a 1900s nickname (originally a put-down for sloppy telegraph operators) and is now worn proudly.',
+    see: ['arrl', 'cept'],
+  },
+  transceiver: {
+    tip: 'A radio that combines transmitter and receiver in one box, sharing one antenna and frequency control.',
+    detail:
+      'Most modern amateur radios are transceivers — single units that can both send and receive, rather than separate boxes. The internals share one frequency knob, one antenna jack, and switch between transmit and receive modes when you press PTT (push-to-talk). The word itself is a portmanteau of TRANSmitter + reCEIVER. A typical HF transceiver outputs 100 W (+50 dBm); a handheld VHF/UHF transceiver typically outputs 5 W (+37 dBm).',
+    see: ['hf', 'vhf', 'dbm'],
+  },
+  qrp: {
+    tip: 'Low-power operating, usually 5 W or less — a self-imposed challenge that rewards good antennas and clever operating.',
+    detail:
+      'QRP is the practice of transmitting with very low power — by convention 5 W or less on CW (Morse) and 10 W on SSB voice. It\'s a self-imposed challenge: getting a contact across thousands of kilometres with the same power as a small bicycle lamp takes good antennas, good propagation, and skilled operating. "QRP" is one of the old Q-codes from the telegraphy era; the original meaning was the question "shall I reduce my transmitter power?", but today it\'s a noun describing the activity itself ("I\'m running QRP tonight").',
+    see: ['transceiver', 'dbm'],
+  },
+  vhf: {
+    tip: 'Very High Frequency — the 30–300 MHz range, home of the 2-metre amateur band, FM broadcast, and most handheld radios.',
+    detail:
+      'VHF (Very High Frequency) covers 30–300 MHz. In amateur radio the headline VHF band is 2 metres (144–148 MHz in most countries), where handheld and mobile FM rigs operate through local repeaters. VHF signals travel mostly line-of-sight — they don\'t bounce off the ionosphere the way HF does — so typical range is 30–60 km on flat terrain, much further from a hilltop or with a directional antenna. Commercial FM broadcast radio (88–108 MHz) and old analogue TV channels also live in VHF.',
+    see: ['hf', 'fm'],
+  },
+  yagi: {
+    tip: 'Directional antenna with one driven element and several parasitic rods — focuses radiated power in one direction.',
+    detail:
+      'A Yagi-Uda antenna (usually just "Yagi") has a single driven dipole element, a slightly longer "reflector" element behind it, and one or more shorter "director" elements in front. The reflector and directors aren\'t electrically connected — they shape the radiation pattern by parasitic coupling. The result is a beam: 5–15 dBi of gain concentrated forward, with much weaker reception from the sides and rear. Rooftop TV antennas are usually Yagis, as are most serious amateur antennas for VHF/UHF and HF DX work.',
+    see: ['antenna', 'dipole', 'dbi', 'dbd'],
+  },
+  coax: {
+    tip: 'Coaxial cable — central conductor inside a tubular shield, used to feed RF between radios and antennas.',
+    detail:
+      'Coaxial cable (coax) carries RF signals between a radio and its antenna with controlled impedance — 50 Ω is the amateur-radio standard, 75 Ω is used for TV and video. The two conductors are concentric: a centre wire surrounded by a foil or braid shield, separated by an insulator. The geometry keeps the signal contained inside the cable and rejects external interference. Coax has loss that grows with frequency: thin RG-58 might drop 5 dB per 30 m at 144 MHz; thicker LMR-400 cuts that to about 1.5 dB. Cable loss is something you\'ll routinely express in dB.',
+    see: ['antenna', 'impedance', 'decibel'],
+  },
+  qso: {
+    tip: 'A two-way radio contact between two amateur stations — the basic unit of activity on the bands.',
+    detail:
+      'QSO is one of the old Q-codes from the telegraphy era; the literal meaning was the question "can you communicate with X?", but today it is used as a noun for the contact itself ("I had a nice QSO with a station in Japan last night"). A typical QSO exchanges callsigns, signal reports, location, name, and equipment, then closes with 73 (best regards). QSOs can last seconds (a quick contest exchange) or hours (a relaxed ragchew). Hams log every QSO they make — date, time, frequency, mode, signal report — both for personal records and for awards that require proof of contact with specific places.',
+    see: ['ham radio', 'transceiver'],
+  },
 }
