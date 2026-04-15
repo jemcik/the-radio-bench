@@ -53,6 +53,18 @@ describe('G (glossary term) i18n for unit/formula', () => {
     expect(screen.getByText(/Ohm's Law/)).toBeInTheDocument()
   })
 
+  it('renders unknown keys as plain styled text without crashing', () => {
+    // A typo in chapter prose (`<G k="totally-not-a-real-term">`) used to be
+    // a silent footgun — the term tooltip would never appear and the reader
+    // would not know the link was broken. Confirm the fallback path just
+    // renders the label as a plain accent-coloured span (no role="button").
+    renderWithProviders(<G k="totally-not-a-real-term">made-up label</G>)
+    expect(screen.getByText('made-up label')).toBeInTheDocument()
+    // No clickable trigger means the popover wiring is bypassed for unknown
+    // keys (rather than rendering an empty popover).
+    expect(screen.queryByRole('button', { name: /made-up label/i })).toBeNull()
+  })
+
   it('uses en glossary._names for related terms (not the raw capitalized key)', () => {
     // Prior to the _names backfill, "See also: rms" rendered as "Rms" in the
     // en locale. After adding glossary._names to en/ui.json, it should read

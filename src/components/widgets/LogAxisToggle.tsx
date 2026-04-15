@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { Slider } from '@/components/ui/slider'
@@ -6,7 +6,9 @@ import { ResultBox } from '@/components/ui/result-box'
 import SVGDiagram from '@/components/diagrams/SVGDiagram'
 import { M } from '@/components/ui/math'
 import { cn } from '@/lib/utils'
-import { formatDecimal } from '@/lib/format'
+import { formatHz } from '@/lib/format'
+import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useClipPathId } from '@/lib/hooks/useClipPathId'
 
 /**
  * Chapter 0.4 — Log axis vs Linear axis demo
@@ -40,22 +42,10 @@ function gainDb(f: number, fc: number): number {
   return -10 * Math.log10(1 + (f / fc) ** 2)
 }
 
-/**
- * Format a frequency with a sensible SI suffix.
- * Unit symbols come from i18n so a Ukrainian reader sees Гц / кГц / МГц
- * instead of Hz / kHz / MHz. `locale` controls the decimal separator —
- * Ukrainian uses a comma ("1,0 кГц"), English a period ("1.0 kHz").
- */
-function formatHz(f: number, tUnit: (k: string) => string, locale: string): string {
-  if (f >= 1_000_000) return `${formatDecimal(f / 1_000_000, f >= 10_000_000 ? 0 : 2, locale)} ${tUnit('mhz')}`
-  if (f >= 1_000)     return `${formatDecimal(f / 1_000,     f >= 10_000    ? 0 : 1, locale)} ${tUnit('khz')}`
-  return `${formatDecimal(f, 0, locale)} ${tUnit('hz')}`
-}
-
 export default function LogAxisToggle() {
-  const { t, i18n } = useTranslation('ui')
-  const locale = i18n.language
-  const tUnit = (k: string) => t(`units.${k}`)
+  const { t } = useTranslation('ui')
+  const { locale } = useLocaleFormatter()
+  const tUnit = useUnitFormatter()
   const [axis, setAxis] = useState<Axis>('log')
   // Slider value is log10(fc). Default 1 kHz → 3.0
   const [fcLog, setFcLog] = useState<number>(3)
@@ -63,8 +53,7 @@ export default function LogAxisToggle() {
 
   // Unique id per widget instance so the <clipPath> doesn't collide if
   // the page mounts multiple LogAxisToggle widgets.
-  const uid = useId().replace(/:/g, '')
-  const clipId = `logaxis-plot-${uid}`
+  const clipId = useClipPathId('logaxis-plot')
 
   // ── Plot geometry ──────────────────────────────────────────────────
   // PAD_R must clear the half-width of the rightmost tick label, which

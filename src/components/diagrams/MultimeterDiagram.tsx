@@ -6,7 +6,7 @@
  * ARRL-standard symbols and explicit waypoint wiring.
  */
 import { useTranslation } from 'react-i18next'
-import { Circuit, Wire, Junction, Resistor, Battery, Meter, pins2 } from '@/lib/circuit'
+import { Circuit, Wire, Junction, Resistor, Battery, Meter, pins2, type LegendItem } from '@/lib/circuit'
 
 const W = 360
 const H = 220
@@ -29,44 +29,54 @@ const AMP_ACCENT  = 'hsl(142 55% 42%)'
 
 /* ── Voltmeter in parallel ─────────────────────────────────────────────── *
  *
- *  A ─────────[R₁]────────── B        y = 40
+ *  ┌─────────[R₁]─────────┐        y = TOP (40)
+ *  │         • │ • │         │          • = T-junction (probes tap at R₁'s pins)
+ *  │         │   │           │
+ *  │         └─(V)─┘         │        y = MID (100)
  *  │                         │
- *  ├── ──────(V)──────── ───┤         y = 100  (parallel branch)
+ *  ┤ [Bat]                   │          y ≈ 142
  *  │                         │
- *  ┤ [Bat]                   │         y ≈ 142
- *  │                         │
- *  └─────────────────────────┘         y = 195
+ *  └─────────────────────────┘          y = BOT (195)
+ *
+ * The probes tap the circuit AT the resistor's pins — that mirrors how
+ * you physically place a voltmeter's probes on a component's leads.
+ * Junction dots only at true T-junctions (3+ wires meeting); plain 90°
+ * bends in a single wire are NOT junctions.
  */
-const L = 75, R = 285, TOP = 40, MID = 100, BOT = 195
+const L = 75, R = 285, TOP = 40, BOT = 195
+// Y-level of the voltmeter branch; the Meter's pins sit 20 px left/right
+// of its centre (span = 40), so short horizontal stubs connect the
+// vertical probe drops to the meter's pins.
+const VMID = 100
 
-function VoltmeterParallel({ caption }: { caption: string }) {
+function VoltmeterParallel({
+  caption,
+  legend,
+}: {
+  caption: string
+  legend: LegendItem[]
+}) {
   return (
-    <Circuit width={W} height={H}
-      caption={caption}>
+    <Circuit width={W} height={H} caption={caption} legend={legend}>
 
-      {/* ── main loop wires ── */}
+      {/* ── main loop wires (no accent colour) ── */}
       <Wire points={[vBat.p1, { x: L, y: TOP }, vR1.p1]} />
-      <Wire points={[vR1.p2, { x: R, y: TOP }]} />
-      <Wire points={[{ x: R, y: TOP }, { x: R, y: BOT }]} />
-      <Wire points={[{ x: R, y: BOT }, { x: L, y: BOT }]} />
-      <Wire points={[{ x: L, y: BOT }, vBat.p2]} />
+      <Wire points={[vR1.p2, { x: R, y: TOP }, { x: R, y: BOT }, { x: L, y: BOT }, vBat.p2]} />
 
-      {/* ── voltmeter parallel branch (accent colour) ── */}
-      <Wire points={[{ x: L, y: MID }, vMtr.p1]} color={VOLT_ACCENT} />
-      <Wire points={[vMtr.p2, { x: R, y: MID }]} color={VOLT_ACCENT} />
+      {/* ── voltmeter probes: drop from R₁'s pins down to the meter ── */}
+      <Wire points={[vR1.p1, { x: vR1.p1.x, y: VMID }, vMtr.p1]} color={VOLT_ACCENT} />
+      <Wire points={[vMtr.p2, { x: vR1.p2.x, y: VMID }, vR1.p2]} color={VOLT_ACCENT} />
 
       {/* ── components ── */}
       <Battery x={75} y={142} orient="down" value="1.5 V" />
       <Resistor x={180} y={40} label="R₁" />
       <Meter x={180} y={100} letter="V" accent={VOLT_ACCENT} />
 
-      {/* ── junction dots ── */}
-      <Junction x={L} y={TOP} />
-      <Junction x={R} y={TOP} />
-      <Junction x={L} y={BOT} />
-      <Junction x={R} y={BOT} />
-      <Junction x={L} y={MID} />
-      <Junction x={R} y={MID} />
+      {/* ── junction dots — only at the two T-junctions where probes
+            tap the main loop at R₁'s pins. Corners (L,TOP) etc. are
+            single-wire bends, not electrical connections. ── */}
+      <Junction x={vR1.p1.x} y={vR1.p1.y} />
+      <Junction x={vR1.p2.x} y={vR1.p2.y} />
     </Circuit>
   )
 }
@@ -81,10 +91,15 @@ function VoltmeterParallel({ caption }: { caption: string }) {
  */
 const AL = 65, AR = 295, ATOP = 48, ABOT = 190
 
-function AmmeterSeries({ caption }: { caption: string }) {
+function AmmeterSeries({
+  caption,
+  legend,
+}: {
+  caption: string
+  legend: LegendItem[]
+}) {
   return (
-    <Circuit width={W} height={H}
-      caption={caption}>
+    <Circuit width={W} height={H} caption={caption} legend={legend}>
 
       {/* ── wires ── */}
       <Wire points={[aBat.p1, { x: AL, y: ATOP }, aAm.p1]} />
@@ -99,11 +114,11 @@ function AmmeterSeries({ caption }: { caption: string }) {
       <Meter x={148} y={48} letter="A" accent={AMP_ACCENT} />
       <Resistor x={238} y={48} label="R₁" />
 
-      {/* ── corner dots ── */}
-      <Junction x={AL} y={ATOP} />
-      <Junction x={AR} y={ATOP} />
-      <Junction x={AL} y={ABOT} />
-      <Junction x={AR} y={ABOT} />
+      {/* ── junction dots — only at the ammeter's pin connections, where
+            the meter is inserted "into" the wire. Corners (AL,ATOP) etc.
+            are single-wire bends, not electrical connections. ── */}
+      <Junction x={aAm.p1.x} y={aAm.p1.y} />
+      <Junction x={aAm.p2.x} y={aAm.p2.y} />
     </Circuit>
   )
 }
@@ -112,10 +127,27 @@ function AmmeterSeries({ caption }: { caption: string }) {
 
 export default function MultimeterDiagram() {
   const { t } = useTranslation('ui')
+
+  const voltmeterLegend: LegendItem[] = [
+    { kind: 'line',     label: t('ch0_2.legendMainLoop') },
+    { kind: 'battery',  label: t('ch0_2.legendBattery') },
+    { kind: 'resistor', label: t('ch0_2.legendResistor') },
+    { kind: 'line',     color: VOLT_ACCENT, label: t('ch0_2.legendVoltmeterProbes') },
+    { kind: 'dot',      label: t('ch0_2.legendJunction') },
+  ]
+
+  const ammeterLegend: LegendItem[] = [
+    { kind: 'line',     label: t('ch0_2.legendMainLoop') },
+    { kind: 'battery',  label: t('ch0_2.legendBattery') },
+    { kind: 'resistor', label: t('ch0_2.legendResistor') },
+    { kind: 'circle',   color: AMP_ACCENT, label: t('ch0_2.legendAmmeterInline') },
+    { kind: 'dot',      label: t('ch0_2.legendJunction') },
+  ]
+
   return (
     <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
-      <VoltmeterParallel caption={t('ch0_2.voltmeterCaption')} />
-      <AmmeterSeries caption={t('ch0_2.ammeterCaption')} />
+      <VoltmeterParallel caption={t('ch0_2.voltmeterCaption')} legend={voltmeterLegend} />
+      <AmmeterSeries caption={t('ch0_2.ammeterCaption')} legend={ammeterLegend} />
     </div>
   )
 }

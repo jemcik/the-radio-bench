@@ -7,6 +7,8 @@ import { lazy, Suspense } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { BookmarkButton } from '@/features/bookmarks/bookmark-button'
 import { ChapterScope } from '@/components/ui/section-heading'
+import { ChapterHero } from '@/components/ui/chapter-hero'
+import { CHAPTER_HEROES } from '@/components/chapter-heroes'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 
 // ─── Lazy-load each chapter module ───────────────────────────────────────────
@@ -100,6 +102,11 @@ function ChapterHeader({ id }: { id: string }) {
   const meta = useTranslatedChapter(rawMeta)
   if (!meta) return null
 
+  // Optional vintage pen-and-ink sketch under the title.
+  // Chapters without a registered hero simply render the header as before.
+  const HeroComponent = CHAPTER_HEROES[id]
+  const heroAriaLabel = t(`ch${id.replace('-', '_')}.heroAriaLabel`, { defaultValue: '' })
+
   return (
     <div className="mb-10 pb-8 border-b border-border">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -124,6 +131,11 @@ function ChapterHeader({ id }: { id: string }) {
         />
       </div>
       <p className="text-muted-foreground mt-2">{meta.subtitle}</p>
+      {HeroComponent && (
+        <ChapterHero ariaLabel={heroAriaLabel}>
+          <HeroComponent />
+        </ChapterHero>
+      )}
     </div>
   )
 }

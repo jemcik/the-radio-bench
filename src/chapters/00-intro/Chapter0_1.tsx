@@ -13,7 +13,7 @@ export default function Chapter0_1() {
       <p>{t('ch0_1.intro1')}</p>
       <p>{t('ch0_1.intro2')}</p>
 
-      <Section id="chapter-structure" labelKey="ch0_1.sectionStructure">{t('ch0_1.sectionStructure')}</Section>
+      <Section id="chapter-structure" labelKey="ch0_1.sectionStructure" />
 
       <p>{t('ch0_1.eachChapterFollows')}</p>
 
@@ -38,7 +38,7 @@ export default function Chapter0_1() {
         </li>
       </ul>
 
-      <Section id="sidebar-icons" labelKey="ch0_1.sectionIcons">{t('ch0_1.sectionIcons')}</Section>
+      <Section id="sidebar-icons" labelKey="ch0_1.sectionIcons" />
 
       <p>
         <Trans
@@ -51,7 +51,7 @@ export default function Chapter0_1() {
         />
       </p>
 
-      <Section id="callout-boxes" labelKey="ch0_1.sectionCallouts">{t('ch0_1.sectionCallouts')}</Section>
+      <Section id="callout-boxes" labelKey="ch0_1.sectionCallouts" />
 
       <p>{t('ch0_1.calloutsIntro')}</p>
 
@@ -87,7 +87,7 @@ export default function Chapter0_1() {
         {t('ch0_1.calloutMath')}
       </Callout>
 
-      <Section id="recommended-path" labelKey="ch0_1.sectionPath">{t('ch0_1.sectionPath')}</Section>
+      <Section id="recommended-path" labelKey="ch0_1.sectionPath" />
 
       <p>
         <Trans i18nKey="ch0_1.path1" ns="ui" components={{ strong: <strong /> }} />
@@ -95,12 +95,12 @@ export default function Chapter0_1() {
 
       <p>{t('ch0_1.path2')}</p>
 
-      <Section id="note-on-maths" labelKey="ch0_1.sectionMaths">{t('ch0_1.sectionMaths')}</Section>
+      <Section id="note-on-maths" labelKey="ch0_1.sectionMaths" />
 
       <p>{t('ch0_1.maths1')}</p>
       <p>{t('ch0_1.maths2')}</p>
 
-      <Section id="one-more-thing" labelKey="ch0_1.sectionOneMore">{t('ch0_1.sectionOneMore')}</Section>
+      <Section id="one-more-thing" labelKey="ch0_1.sectionOneMore" />
 
       <p>
         <Trans

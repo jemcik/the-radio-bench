@@ -26,7 +26,7 @@ export default function Chapter0_2() {
         />
       </p>
 
-      <Section id="multimeter" labelKey="ch0_2.sectionMultimeter">{t('ch0_2.sectionMultimeter')}</Section>
+      <Section id="multimeter" labelKey="ch0_2.sectionMultimeter" />
 
       <p>
         <Trans i18nKey="ch0_2.multimeterIntro" ns="ui"
@@ -57,7 +57,7 @@ export default function Chapter0_2() {
         </li>
       </ul>
 
-      <Section id="oscilloscope" labelKey="ch0_2.sectionOscilloscope">{t('ch0_2.sectionOscilloscope')}</Section>
+      <Section id="oscilloscope" labelKey="ch0_2.sectionOscilloscope" />
 
       <p>{t('ch0_2.scopeIntro')}</p>
 
@@ -78,7 +78,7 @@ export default function Chapter0_2() {
         />
       </Callout>
 
-      <Section id="vna" labelKey="ch0_2.sectionVna">{t('ch0_2.sectionVna')}</Section>
+      <Section id="vna" labelKey="ch0_2.sectionVna" />
 
       <p>
         <Trans i18nKey="ch0_2.vnaIntro" ns="ui"
@@ -98,7 +98,7 @@ export default function Chapter0_2() {
 
       <p>{t('ch0_2.vnaNote')}</p>
 
-      <Section id="arduino" labelKey="ch0_2.sectionArduino">{t('ch0_2.sectionArduino')}</Section>
+      <Section id="arduino" labelKey="ch0_2.sectionArduino" />
 
       <p>
         <Trans i18nKey="ch0_2.arduinoIntro" ns="ui"
@@ -119,7 +119,7 @@ export default function Chapter0_2() {
 
       <Callout variant="note">{t('ch0_2.arduinoNote')}</Callout>
 
-      <Section id="breadboard" labelKey="ch0_2.sectionBreadboard">{t('ch0_2.sectionBreadboard')}</Section>
+      <Section id="breadboard" labelKey="ch0_2.sectionBreadboard" />
 
       <p>
         <Trans i18nKey="ch0_2.breadboardIntro" ns="ui"
@@ -139,7 +139,7 @@ export default function Chapter0_2() {
         </li>
       </ul>
 
-      <Section id="voltage-safety" labelKey="ch0_2.sectionSafety">{t('ch0_2.sectionSafety')}</Section>
+      <Section id="voltage-safety" labelKey="ch0_2.sectionSafety" />
 
       <p>
         <Trans i18nKey="ch0_2.safetyIntro" ns="ui"

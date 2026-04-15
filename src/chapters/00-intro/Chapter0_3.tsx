@@ -34,9 +34,7 @@ export default function Chapter0_3() {
       </p>
 
       {/* ── Fractions and Ratios ─────────────────────────────── */}
-      <Section id="fractions" labelKey="ch0_3.sectionFractions">
-        {t('ch0_3.sectionFractions')}
-      </Section>
+      <Section id="fractions" labelKey="ch0_3.sectionFractions" />
 
       <p>
         <Trans i18nKey="ch0_3.fractionsIntro" ns="ui"
@@ -53,9 +51,7 @@ export default function Chapter0_3() {
       <Callout variant="key">{t('ch0_3.fractionsKey')}</Callout>
 
       {/* ── Powers of 10 and Scientific Notation ────────────── */}
-      <Section id="powers-of-10" labelKey="ch0_3.sectionPowersOf10">
-        {t('ch0_3.sectionPowersOf10')}
-      </Section>
+      <Section id="powers-of-10" labelKey="ch0_3.sectionPowersOf10" />
 
       <p>
         <Trans i18nKey="ch0_3.powersIntro" ns="ui"
@@ -75,9 +71,7 @@ export default function Chapter0_3() {
       </Callout>
 
       {/* ── SI Prefixes ─────────────────────────────────────── */}
-      <Section id="si-prefixes" labelKey="ch0_3.sectionSIPrefixes">
-        {t('ch0_3.sectionSIPrefixes')}
-      </Section>
+      <Section id="si-prefixes" labelKey="ch0_3.sectionSIPrefixes" />
 
       <p>
         <Trans i18nKey="ch0_3.prefixesIntro" ns="ui"
@@ -96,9 +90,7 @@ export default function Chapter0_3() {
       <PrefixConverter />
 
       {/* ── Squaring and Square Roots ───────────────────────── */}
-      <Section id="squaring" labelKey="ch0_3.sectionSquaring">
-        {t('ch0_3.sectionSquaring')}
-      </Section>
+      <Section id="squaring" labelKey="ch0_3.sectionSquaring" />
 
       <p>
         <Trans i18nKey="ch0_3.squaringIntro" ns="ui"
@@ -123,9 +115,7 @@ export default function Chapter0_3() {
       </Callout>
 
       {/* ── Transposing Formulas ─────────────────────────────── */}
-      <Section id="transposing" labelKey="ch0_3.sectionTransposing">
-        {t('ch0_3.sectionTransposing')}
-      </Section>
+      <Section id="transposing" labelKey="ch0_3.sectionTransposing" />
 
       <p>{t('ch0_3.transposingIntro')}</p>
 

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
+import { svgTokens } from './svgTokens'
 
 /**
  * Chapter 0.3 — Ohm's Law Triangle
@@ -41,10 +42,7 @@ export default function FormulaTriangleDiagram() {
   const baseY = topY + triH
   const dividerY = topY + triH * 0.52  // horizontal line at ~52% — gives V more room
 
-  const primary = 'hsl(var(--primary))'
-  const fg = 'hsl(var(--foreground))'
-  const border = 'hsl(var(--border))'
-  const muted = 'hsl(var(--muted-foreground))'
+  const { primary, fg, border, mutedFg: muted } = svgTokens
 
   // For a given triangle at center cx, compute the left/right x at a given y
   const edgeX = (cx: number, y: number) => {

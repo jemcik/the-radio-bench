@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
+import { svgTokens } from './svgTokens'
 
 /**
  * Chapter 0.4 — Linear vs Logarithmic frequency axis, side by side.
@@ -53,11 +54,8 @@ export default function LogVsLinearDiagram() {
   const logX = (f: number) =>
     PAD + (Math.log10(f) / Math.log10(F_MAX)) * trackW
 
-  const fg = 'hsl(var(--foreground))'
-  const muted = 'hsl(var(--muted-foreground))'
-  const border = 'hsl(var(--border))'
   // Pull a mild accent from the theme so the two scales read as related.
-  const accent = 'hsl(var(--primary))'
+  const { fg, mutedFg: muted, border, primary: accent } = svgTokens
 
   const fmtTick = (f: number) =>
     f >= 1000 ? `${f / 1000} ${tUnit('khz')}` : `${f} ${tUnit('hz')}`
