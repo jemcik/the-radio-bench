@@ -13,6 +13,9 @@ import {
   Diode, LED, TransistorNPN,
   Meter,
   pins2,
+  SCHEMATIC_PAD_TOP,
+  schematicHeight,
+  type LegendItem,
 } from '@/lib/circuit'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
@@ -50,39 +53,38 @@ function SymbolCell({
   )
 }
 
-// ─── Walkthrough schematic: 3 V battery → R₁ → LED → back ───────────────────
+// ─── Walkthrough schematic: 3 V battery → R → LED → back ───────────────────
 // Used both as an in-prose example and as the schematic the reader builds
 // in the lab. Pinned topology:
-//   B₁ (battery, vertical on left rail) → top wire → R₁ → wire → D₁ (LED)
-//   → right rail down → bottom wire → back to B₁
+//   B (battery, vertical on left rail) → top wire → R → wire → D (LED)
+//   → right rail down → bottom wire → back to B
 //
-// Canvas-sizing budget:
-//   TOP_Y=60 (not 30) — horizontal passives put their label at y-14; LED's
-//   CenteredLabel puts "D₁" at y-20 on top of emission arrows that already
-//   extend to y-18. Giving 60 px of headroom above lets the label clear the
-//   arrow tips and sit comfortably above the zigzag.
-//   maxWidth={480} — without it, SVGDiagram's width="100%" scales the 340 px
-//   schematic to the full chapter column (~900 px) and it reads as huge.
-//   Resistor intentionally carries NO value prop: PassiveLabel's value
-//   placement sits right on top of the zigzag (y-2, i.e. inside the ±8 body
-//   band). The value is stated in the caption and in step 2 below.
+// Vertical layout is derived from the shared SCHEMATIC_PAD_TOP /
+// schematicHeight() helpers in @/lib/circuit/layout so every schematic in
+// the project has the same top/bottom padding — see that file for the
+// reasoning behind the specific numbers. The author only picks the
+// rail-to-rail span; top/bottom padding and total height follow.
+// Resistor intentionally carries NO value prop: PassiveLabel's value
+// placement sits right on top of the zigzag (y−2, i.e. inside the ±8
+// body band). The value is stated in the caption and in step 2 below.
 const SCHEMATIC_W = 340
-const SCHEMATIC_H = 200
+const RAIL_SPAN = 130
+const TOP_Y = SCHEMATIC_PAD_TOP
+const BOT_Y = TOP_Y + RAIL_SPAN
+const SCHEMATIC_H = schematicHeight(RAIL_SPAN)
 const LEFT_X = 60
 const RIGHT_X = 280
-const TOP_Y = 60
-const BOT_Y = 170
-const BAT_Y = 115
+const BAT_Y = (TOP_Y + BOT_Y) / 2 // battery centred on the left rail
 const bat = pins2(LEFT_X, BAT_Y, 'down')
 const r1  = pins2(150, TOP_Y)
 const led = pins2(230, TOP_Y)
 
-function LedCircuit({ caption }: { caption: string }) {
+function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[] }) {
   return (
-    <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} maxWidth={480}>
-      {/* Left rail + top wire to R₁ */}
+    <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} legend={legend}>
+      {/* Left rail + top wire to R */}
       <Wire points={[bat.p1, { x: LEFT_X, y: TOP_Y }, r1.p1]} />
-      {/* R₁ to LED */}
+      {/* R to LED */}
       <Wire points={[r1.p2, led.p1]} />
       {/* LED right → down right rail → across bottom → back to battery */}
       <Wire points={[
@@ -264,7 +266,14 @@ export default function Chapter0_5() {
         <Trans i18nKey="ch0_5.exampleIntro" ns="ui" />
       </p>
 
-      <LedCircuit caption={t('ch0_5.exampleCaption')} />
+      <LedCircuit
+        caption={t('ch0_5.exampleCaption')}
+        legend={[
+          { kind: 'battery',  label: t('ch0_5.legendBattery') },
+          { kind: 'resistor', label: t('ch0_5.legendResistor') },
+          { kind: 'led',      label: t('ch0_5.legendLed') },
+        ]}
+      />
 
       <ol>
         <li>

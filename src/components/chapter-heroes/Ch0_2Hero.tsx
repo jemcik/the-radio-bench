@@ -26,13 +26,19 @@ export default function Ch0_2Hero() {
         <line x1="350" y1="118" x2="380" y2="132" />
       </g>
 
-      {/* Multimeter (left) */}
+      {/* Multimeter (left)
+          Display → dial → probe sockets, laid out top-to-bottom.
+          Dial sits clearly below the display (previous version had r=12
+          at cy=82 which crashed into the display's bottom edge at y=74). */}
       <rect x="50" y="58" width="90" height="52" rx="4" />
-      <circle cx="95" cy="82" r="12" strokeWidth={1} />
-      <line x1="95" y1="82" x2="104" y2="74" strokeWidth={0.9} />
-      <rect x="62" y="66" width="66" height="8" rx="1" strokeWidth={0.9} />
-      <circle cx="72"  cy="102" r="2.5" strokeWidth={0.9} />
-      <circle cx="118" cy="102" r="2.5" strokeWidth={0.9} />
+      {/* Display strip */}
+      <rect x="62" y="64" width="66" height="10" rx="1" strokeWidth={0.9} />
+      {/* Selector dial — centred horizontally, below the display */}
+      <circle cx="95" cy="90" r="10" strokeWidth={1} />
+      <line x1="95" y1="90" x2="102" y2="83" strokeWidth={0.9} />
+      {/* Probe sockets */}
+      <circle cx="72"  cy="104" r="2.5" strokeWidth={0.9} />
+      <circle cx="118" cy="104" r="2.5" strokeWidth={0.9} />
 
       {/* Oscilloscope (centre) */}
       <rect x="160" y="42" width="130" height="68" rx="4" />
