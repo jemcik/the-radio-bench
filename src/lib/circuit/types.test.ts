@@ -74,16 +74,16 @@ describe('pins2', () => {
 describe('pinsBJT', () => {
   it('right: base on left, collector upper-right, emitter lower-right', () => {
     const { base, collector, emitter } = pinsBJT(0, 0, 'right')
-    expect(base).toEqual({ x: -30, y: 0 })
-    expect(collector).toEqual({ x: 12, y: -28 })
-    expect(emitter).toEqual({ x: 12, y: 28 })
+    expect(base).toEqual({ x: -26, y: 0 })
+    expect(collector).toEqual({ x: 12, y: -19 })
+    expect(emitter).toEqual({ x: 12, y: 19 })
   })
 
   it('down rotates the layout 90° clockwise', () => {
     const { base, collector, emitter } = pinsBJT(0, 0, 'down')
-    expect(base).toEqual({ x: 0, y: -30 })
-    expect(collector).toEqual({ x: 28, y: 12 })
-    expect(emitter).toEqual({ x: -28, y: 12 })
+    expect(base).toEqual({ x: 0, y: -26 })
+    expect(collector).toEqual({ x: 19, y: 12 })
+    expect(emitter).toEqual({ x: -19, y: 12 })
   })
 })
 

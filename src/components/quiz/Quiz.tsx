@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import Widget from '@/components/ui/widget'
@@ -33,9 +32,33 @@ interface QuizProps {
 interface QuizProgress {
   currentIndex: number
   currentScore: number
+  /** Has the current question been submitted? Persisted so reloads don't let
+   *  the user answer the same question again and double-count the score. */
+  answered: boolean
+  /** Which option the user selected for the current question (null = none). */
+  selectedOptionIndex: number | null
+  /** True once the final question was submitted — show the score screen. */
+  quizComplete: boolean
 }
 
-const INITIAL_PROGRESS: QuizProgress = { currentIndex: 0, currentScore: 0 }
+const INITIAL_PROGRESS: QuizProgress = {
+  currentIndex: 0,
+  currentScore: 0,
+  answered: false,
+  selectedOptionIndex: null,
+  quizComplete: false,
+}
+
+/** Backfill missing fields for users with old-shape stored progress. */
+function normalizeProgress(p: Partial<QuizProgress>): QuizProgress {
+  return {
+    currentIndex: p.currentIndex ?? 0,
+    currentScore: p.currentScore ?? 0,
+    answered: p.answered ?? false,
+    selectedOptionIndex: p.selectedOptionIndex ?? null,
+    quizComplete: p.quizComplete ?? false,
+  }
+}
 
 /**
  * Build a `QuizQuestion[]` from i18n keys shaped like
@@ -77,21 +100,22 @@ export default function Quiz({ title, questions, storageKey }: QuizProps) {
 
   // Progress is only persisted when a storageKey is supplied. We always call
   // the hook (it tolerates an unused key) and pass a safe no-op key otherwise.
-  const [progress, setProgress] = usePersistedState<QuizProgress>(
+  // `answered`, `selectedOptionIndex`, and `quizComplete` are part of the
+  // persisted state (not separate React useState) so a page reload mid-quiz
+  // restores the exact screen the user was on — in particular, the user
+  // can't re-submit an already-answered question and double-count the score.
+  const [rawProgress, setProgress] = usePersistedState<QuizProgress>(
     storageKey ?? '__quiz-ephemeral__',
     INITIAL_PROGRESS,
     codec.json<QuizProgress>(),
   )
-
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null)
-  const [answered, setAnswered] = useState(false)
-  const [quizComplete, setQuizComplete] = useState(false)
+  const progress = normalizeProgress(rawProgress)
 
   // Bail out if the persisted index is out of range (questions may shrink
   // between visits).
   const currentQuestionIndex =
     progress.currentIndex < questions.length ? progress.currentIndex : 0
-  const score = progress.currentScore
+  const { currentScore: score, answered, selectedOptionIndex, quizComplete } = progress
 
   if (questions.length === 0) {
     return (
@@ -106,33 +130,36 @@ export default function Quiz({ title, questions, storageKey }: QuizProps) {
 
   const handleSelectOption = (optionIndex: number) => {
     if (answered) return  // Prevent changing answer after submission
-    setSelectedOptionIndex(optionIndex)
+    setProgress({ ...progress, selectedOptionIndex: optionIndex })
   }
 
   const handleSubmitAnswer = () => {
     if (selectedOptionIndex === null) return
+    if (answered) return  // Guard: never let a reload + resubmit double-count
 
-    setAnswered(true)
-    if (selectedOptionIndex === currentQuestion.correctIndex) {
-      setProgress({ ...progress, currentScore: score + 1 })
-    }
+    const isCorrect = selectedOptionIndex === currentQuestion.correctIndex
+    setProgress({
+      ...progress,
+      answered: true,
+      currentScore: isCorrect ? score + 1 : score,
+    })
   }
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      setProgress({ ...progress, currentIndex: currentQuestionIndex + 1 })
-      setSelectedOptionIndex(null)
-      setAnswered(false)
+      setProgress({
+        ...progress,
+        currentIndex: currentQuestionIndex + 1,
+        answered: false,
+        selectedOptionIndex: null,
+      })
     } else {
-      setQuizComplete(true)
+      setProgress({ ...progress, quizComplete: true })
     }
   }
 
   const handleTryAgain = () => {
     setProgress(INITIAL_PROGRESS)
-    setSelectedOptionIndex(null)
-    setAnswered(false)
-    setQuizComplete(false)
   }
 
   // Score screen

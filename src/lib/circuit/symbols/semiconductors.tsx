@@ -54,15 +54,24 @@ export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
         <line x1="-30" y1="0" x2="-8" y2="0" stroke="currentColor" strokeWidth={STROKE} />
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Light arrows (upper and lower, pointing up-right) */}
-        <line x1="2" y1="-12" x2="8" y2="-18" stroke="currentColor" strokeWidth={STROKE} />
-        <polygon points="8,-18 6,-14 10,-15" fill="currentColor" />
+        {/* Light emission arrows — two parallel 45° shafts with open chevron
+            arrowheads (per KiCad / ARRL convention). For a (1,−1) shaft
+            direction the chevron splits into one horizontal barb (backward)
+            and one vertical barb (downward), each 3 units long.
+            Stroke is lighter than the body so arrows read as annotation. */}
+        <g strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="2" y1="-11" x2="9" y2="-18" stroke="currentColor" />
+          <polyline points="6,-18 9,-18 9,-15" fill="none" stroke="currentColor" />
 
-        <line x1="6" y1="-8" x2="12" y2="-14" stroke="currentColor" strokeWidth={STROKE} />
-        <polygon points="12,-14 10,-10 14,-11" fill="currentColor" />
+          <line x1="6" y1="-9" x2="13" y2="-16" stroke="currentColor" />
+          <polyline points="10,-16 13,-16 13,-13" fill="none" stroke="currentColor" />
+        </g>
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} />
+      {/* Label sits BELOW the LED body — the emission arrows occupy the
+          space above, so placing the label there would force an awkwardly
+          large gap. Below the body it sits at the standard distance. */}
+      <CenteredLabel x={x} y={y} label={label} value={value} labelSide="below" />
     </>
   )
 }
@@ -99,70 +108,73 @@ export function DiodeZener({ x, y, orient = 'right', label, value }: SymbolProps
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * NPN Bipolar Junction Transistor.
- * Standard symbol: vertical base bar with angled collector and emitter leads,
- * small arrow on emitter pointing away from base.
+ * NPN Bipolar Junction Transistor — ARRL Handbook standard.
+ *
+ * Geometry (orient='right', at origin):
+ *   Circle:     r=15
+ *   Base bar:   x=−4, y=−11 to +11
+ *   Base lead:  (−26, 0) → (−4, 0)
+ *   Collector:  diagonal (−4, −6) → pin (12, −19)  (~39° from horizontal)
+ *   Emitter:    diagonal (−4, 6) → pin (12, 19) with filled arrowhead.
+ *
+ * Pins extended 2 units along the lead direction (from (10, ±17) to
+ * (12, ±19)) so future wire connections have a longer stub to attach to.
+ * Stub outside the circle is ≈ 8 units, up from ≈ 5.
+ *
+ * Emitter direction d=(16, 13), |d|=√425. Arrowhead:
+ *   tip   (4, 12.5)    — t≈0.5, inside circle (|·|≈13.1)
+ *   wing  (−1.9, 11.6) — t≈0.25 + 3 perp
+ *   wing  (1.9, 6.9)   — t≈0.25 − 3 perp
+ * Both wings at distance ≈ √36 ≈ 6 from tip.
  */
 export function TransistorNPN({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Optional enclosing circle */}
-        {circle && <circle cx="0" cy="0" r="18" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
+        {circle && <circle cx="0" cy="0" r="15" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
 
-        {/* Base-junction bar (vertical) */}
-        <line x1="-5" y1="-11" x2="-5" y2="11" stroke="currentColor" strokeWidth={STROKE} />
+        {/* Base bar + lead */}
+        <line x1="-4" y1="-11" x2="-4" y2="11" stroke="currentColor" strokeWidth={STROKE} />
+        <line x1="-26" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Base lead */}
-        <line x1="-30" y1="0" x2="-5" y2="0" stroke="currentColor" strokeWidth={STROKE} />
+        {/* Collector — diagonal from bar to pin */}
+        <line x1="-4" y1="-6" x2="12" y2="-19" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Collector */}
-        <line x1="-5" y1="-7" x2="12" y2="-25" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="12" y1="-25" x2="12" y2="-28" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter */}
-        <line x1="-5" y1="7" x2="12" y2="25" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="12" y1="25" x2="12" y2="28" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter arrow pointing away from base (outward) */}
-        <polygon points="12,25 8,18 14,20" fill="currentColor" />
+        {/* Emitter — diagonal with filled arrowhead pointing outward */}
+        <line x1="-4" y1="6" x2="12" y2="19" stroke="currentColor" strokeWidth={STROKE} />
+        <polygon points="4,12.5 -1.9,11.6 1.9,6.9" fill="currentColor" />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} gap={25} />
+      <CenteredLabel x={x} y={y} label={label} value={value} gap={22} />
     </>
   )
 }
 
 /**
- * PNP Bipolar Junction Transistor.
- * Same as NPN but emitter arrow points inward (toward base).
+ * PNP Bipolar Junction Transistor — ARRL Handbook standard.
+ * Same as NPN but emitter arrow points inward (toward base junction).
+ * Tip at bar junction (−4, 6), wings at (−0.8, 11.8) and (2.4, 8) —
+ * both inside r=15. Wings at distance ≈ √44 ≈ 6.6 from tip.
  */
 export function TransistorPNP({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Optional enclosing circle */}
-        {circle && <circle cx="0" cy="0" r="18" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
+        {circle && <circle cx="0" cy="0" r="15" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
 
-        {/* Base-junction bar (vertical) */}
-        <line x1="-5" y1="-11" x2="-5" y2="11" stroke="currentColor" strokeWidth={STROKE} />
+        {/* Base bar + lead */}
+        <line x1="-4" y1="-11" x2="-4" y2="11" stroke="currentColor" strokeWidth={STROKE} />
+        <line x1="-26" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Base lead */}
-        <line x1="-30" y1="0" x2="-5" y2="0" stroke="currentColor" strokeWidth={STROKE} />
+        {/* Collector — diagonal from bar to pin */}
+        <line x1="-4" y1="-6" x2="12" y2="-19" stroke="currentColor" strokeWidth={STROKE} />
 
-        {/* Collector */}
-        <line x1="-5" y1="-7" x2="12" y2="-25" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="12" y1="-25" x2="12" y2="-28" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter */}
-        <line x1="-5" y1="7" x2="12" y2="25" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="12" y1="25" x2="12" y2="28" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter arrow pointing inward (toward base junction) */}
-        <polygon points="2,18 8,20 6,14" fill="currentColor" />
+        {/* Emitter — diagonal with filled arrowhead pointing inward */}
+        <line x1="-4" y1="6" x2="12" y2="19" stroke="currentColor" strokeWidth={STROKE} />
+        <polygon points="-4,6 -0.8,11.8 2.4,8" fill="currentColor" />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} gap={25} />
+      <CenteredLabel x={x} y={y} label={label} value={value} gap={22} />
     </>
   )
 }

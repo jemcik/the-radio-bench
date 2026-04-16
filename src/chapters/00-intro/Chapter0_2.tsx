@@ -57,6 +57,18 @@ export default function Chapter0_2() {
         </li>
       </ul>
 
+      <p>
+        <Trans i18nKey="ch0_2.multimeterBuying" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_2.multimeterTrueRms" ns="ui"
+          components={{ strong: <strong />, ac: <G k="ac" />, pwm: <G k="pwm" /> }}
+        />
+      </p>
+
       <Section id="oscilloscope" labelKey="ch0_2.sectionOscilloscope" />
 
       <p>{t('ch0_2.scopeIntro')}</p>
@@ -78,6 +90,30 @@ export default function Chapter0_2() {
         />
       </Callout>
 
+      <p>
+        <Trans i18nKey="ch0_2.scopeSpecs" ns="ui"
+          components={{ strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_2.scopeRecommendation" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_2.scopeProbes" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_2.scopeTriggering" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
       <Section id="vna" labelKey="ch0_2.sectionVna" />
 
       <p>
@@ -97,6 +133,18 @@ export default function Chapter0_2() {
       </Callout>
 
       <p>{t('ch0_2.vnaNote')}</p>
+
+      <p>
+        <Trans i18nKey="ch0_2.vnaHobby" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans i18nKey="ch0_2.vnaSparams" ns="ui"
+          components={{ strong: <strong />, swr: <G k="swr" /> }}
+        />
+      </p>
 
       <Section id="arduino" labelKey="ch0_2.sectionArduino" />
 
@@ -139,6 +187,52 @@ export default function Chapter0_2() {
         </li>
       </ul>
 
+      <p>
+        <Trans i18nKey="ch0_2.breadboardSizes" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>{t('ch0_2.breadboardQuality')}</p>
+
+      <p>
+        <Trans i18nKey="ch0_2.breadboardJumpers" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <Section id="accessories" labelKey="ch0_2.sectionAccessories" />
+
+      <p>{t('ch0_2.accessoriesIntro')}</p>
+
+      <ul>
+        <li>
+          <Trans i18nKey="ch0_2.accessoriesClips" ns="ui"
+            components={{ strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.accessoriesStrippers" ns="ui"
+            components={{ strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.accessoriesMagnifier" ns="ui"
+            components={{ strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.accessoriesEsd" ns="ui"
+            components={{ strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.accessoriesPsu" ns="ui"
+            components={{ strong: <strong /> }}
+          />
+        </li>
+      </ul>
+
       <Section id="voltage-safety" labelKey="ch0_2.sectionSafety" />
 
       <p>
@@ -149,6 +243,12 @@ export default function Chapter0_2() {
           }}
         />
       </p>
+
+      <Callout variant="danger">
+        <Trans i18nKey="ch0_2.safetyDanger" ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </Callout>
 
       <Callout variant="tip">{t('ch0_2.safetyTip')}</Callout>
 

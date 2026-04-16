@@ -461,4 +461,9 @@ export const glossary: Record<string, GlossaryEntry> = {
       'QSO is one of the old Q-codes from the telegraphy era; the literal meaning was the question "can you communicate with X?", but today it is used as a noun for the contact itself ("I had a nice QSO with a station in Japan last night"). A typical QSO exchanges callsigns, signal reports, location, name, and equipment, then closes with 73 (best regards). QSOs can last seconds (a quick contest exchange) or hours (a relaxed ragchew). Hams log every QSO they make — date, time, frequency, mode, signal report — both for personal records and for awards that require proof of contact with specific places.',
     see: ['ham radio', 'transceiver'],
   },
+  topology: {
+    tip: 'The pattern of connections in a circuit — what is joined to what — independent of how the drawing is laid out on the page.',
+    detail:
+      'A schematic encodes topology, not geometry. Two drawings that look completely different on paper can describe the same circuit if every component is connected to the same neighbours in both. A neat rectangle and a tangled zig-zag with identical connections are the same circuit. In design practice "topology" also names specific connection patterns — voltage divider, bridge rectifier, common-emitter amplifier — each with a characteristic electrical behaviour that holds no matter how it is drawn.',
+  },
 }

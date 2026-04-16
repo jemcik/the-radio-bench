@@ -15,8 +15,8 @@
  *   const b1 = pins2(60, 120, 'down')
  *
  *   <Circuit width={360} height={220} caption="Simple circuit">
- *     <Resistor x={180} y={40} label="R1" value="1 kΩ" />
- *     <Battery x={60} y={120} orient="down" label="B1" value="1.5 V" />
+ *     <Resistor x={180} y={40} label="R1" value="1kΩ" />
+ *     <Battery x={60} y={120} orient="down" label="B1" value="1.5V" />
  *     <Wire points={[b1.p1, {x:60, y:40}, r1.p1]} />
  *     <Wire points={[r1.p2, {x:300, y:40}, {x:300, y:200}, {x:60, y:200}, b1.p2]} />
  *     <Junction x={60} y={40} />
@@ -25,6 +25,9 @@
 
 // Layout wrapper
 export { default as Circuit, type LegendItem } from './Circuit'
+
+// Shared vertical-padding budget so all schematics land at the same size
+export { SCHEMATIC_PAD_TOP, SCHEMATIC_PAD_BOT, schematicHeight } from './layout'
 
 // Wiring
 export { Wire, Junction } from './Wire'

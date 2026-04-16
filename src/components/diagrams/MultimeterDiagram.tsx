@@ -6,22 +6,50 @@
  * ARRL-standard symbols and explicit waypoint wiring.
  */
 import { useTranslation } from 'react-i18next'
-import { Circuit, Wire, Junction, Resistor, Battery, Meter, pins2, type LegendItem } from '@/lib/circuit'
+import {
+  Circuit, Wire, Junction, Resistor, Battery, Meter, pins2,
+  SCHEMATIC_PAD_TOP, schematicHeight,
+  type LegendItem,
+} from '@/lib/circuit'
 
+/* ── shared vertical layout ────────────────────────────────────────────── *
+ * Top rail lives at SCHEMATIC_PAD_TOP, total height comes from the shared
+ * `schematicHeight(railSpan)` helper — every schematic in the project uses
+ * the same padding rule so the cards line up visually. */
 const W = 360
-const H = 220
+const V_RAIL_SPAN = 140
+const A_RAIL_SPAN = 135
+const H = schematicHeight(Math.max(V_RAIL_SPAN, A_RAIL_SPAN))
+const V_TOP = SCHEMATIC_PAD_TOP
+const V_BOT = V_TOP + V_RAIL_SPAN
+const A_TOP = SCHEMATIC_PAD_TOP
+const A_BOT = A_TOP + A_RAIL_SPAN
 
-/* ── pin positions ─────────────────────────────────────────────────────── */
+/* ── component centres ─────────────────────────────────────────────────── *
+ * Single source of truth for every symbol's (x, y). The pin-helper bindings
+ * below derive from these, and the JSX <Component {...CENTRE} ...> render
+ * MUST use the same object — otherwise pins and symbol body drift apart
+ * (wires disconnect from the drawn symbol).  See
+ * `feedback_schematic_pin_symbol_drift.md` in project memory. */
 
 // Voltmeter circuit
-const vR1  = pins2(180, 40)               // R₁ horizontal on top wire
-const vBat = pins2(75, 142, 'down')       // battery vertical on left rail
-const vMtr = pins2(180, 100, 'right', 40) // voltmeter — span=40 matches circle r=20
+const V_R1  = { x: 180, y: V_TOP }                  // R₁ on top wire
+const V_MTR = { x: 180, y: (V_TOP + V_BOT) / 2 }    // voltmeter centred
+const V_BAT = { x: 75,  y: (V_TOP + V_BOT) / 2 + 25 } // battery below-centre
 
 // Ammeter circuit
-const aAm  = pins2(148, 48, 'right', 40) // ammeter — span=40 matches circle r=20
-const aR1  = pins2(238, 48)              // R₁ on top wire (series with ammeter)
-const aBat = pins2(65, 130, 'down')      // battery on left rail
+const A_AM  = { x: 148, y: A_TOP }                 // ammeter on top wire
+const A_R1  = { x: 238, y: A_TOP }                 // R₁ on top wire (series)
+const A_BAT = { x: 65,  y: (A_TOP + A_BOT) / 2 + 13 } // battery below-centre
+
+/* ── pin bindings (derived from centres) ───────────────────────────────── */
+const vR1  = pins2(V_R1.x,  V_R1.y)
+const vBat = pins2(V_BAT.x, V_BAT.y, 'down')
+const vMtr = pins2(V_MTR.x, V_MTR.y, 'right', 40) // span=40 matches circle r=20
+
+const aAm  = pins2(A_AM.x,  A_AM.y,  'right', 40) // span=40 matches circle r=20
+const aR1  = pins2(A_R1.x,  A_R1.y)
+const aBat = pins2(A_BAT.x, A_BAT.y, 'down')
 
 /* ── accent colours for meter highlights ───────────────────────────────── */
 const VOLT_ACCENT = 'hsl(210 70% 55%)'
@@ -29,25 +57,21 @@ const AMP_ACCENT  = 'hsl(142 55% 42%)'
 
 /* ── Voltmeter in parallel ─────────────────────────────────────────────── *
  *
- *  ┌─────────[R₁]─────────┐        y = TOP (40)
- *  │         • │ • │         │          • = T-junction (probes tap at R₁'s pins)
+ *  ┌─────────[R₁]─────────┐        y = V_TOP
+ *  │         • │ • │         │      • = T-junction (probes tap at R₁'s pins)
  *  │         │   │           │
- *  │         └─(V)─┘         │        y = MID (100)
+ *  │         └─(V)─┘         │        y = V_MTR.y (voltmeter branch)
  *  │                         │
- *  ┤ [Bat]                   │          y ≈ 142
+ *  ┤ [Bat]                   │        y = V_BAT.y
  *  │                         │
- *  └─────────────────────────┘          y = BOT (195)
+ *  └─────────────────────────┘        y = V_BOT
  *
  * The probes tap the circuit AT the resistor's pins — that mirrors how
  * you physically place a voltmeter's probes on a component's leads.
  * Junction dots only at true T-junctions (3+ wires meeting); plain 90°
  * bends in a single wire are NOT junctions.
  */
-const L = 75, R = 285, TOP = 40, BOT = 195
-// Y-level of the voltmeter branch; the Meter's pins sit 20 px left/right
-// of its centre (span = 40), so short horizontal stubs connect the
-// vertical probe drops to the meter's pins.
-const VMID = 100
+const L = 75, R = 285
 
 function VoltmeterParallel({
   caption,
@@ -60,20 +84,20 @@ function VoltmeterParallel({
     <Circuit width={W} height={H} caption={caption} legend={legend}>
 
       {/* ── main loop wires (no accent colour) ── */}
-      <Wire points={[vBat.p1, { x: L, y: TOP }, vR1.p1]} />
-      <Wire points={[vR1.p2, { x: R, y: TOP }, { x: R, y: BOT }, { x: L, y: BOT }, vBat.p2]} />
+      <Wire points={[vBat.p1, { x: L, y: V_TOP }, vR1.p1]} />
+      <Wire points={[vR1.p2, { x: R, y: V_TOP }, { x: R, y: V_BOT }, { x: L, y: V_BOT }, vBat.p2]} />
 
       {/* ── voltmeter probes: drop from R₁'s pins down to the meter ── */}
-      <Wire points={[vR1.p1, { x: vR1.p1.x, y: VMID }, vMtr.p1]} color={VOLT_ACCENT} />
-      <Wire points={[vMtr.p2, { x: vR1.p2.x, y: VMID }, vR1.p2]} color={VOLT_ACCENT} />
+      <Wire points={[vR1.p1, { x: vR1.p1.x, y: V_MTR.y }, vMtr.p1]} color={VOLT_ACCENT} />
+      <Wire points={[vMtr.p2, { x: vR1.p2.x, y: V_MTR.y }, vR1.p2]} color={VOLT_ACCENT} />
 
-      {/* ── components ── */}
-      <Battery x={75} y={142} orient="down" value="1.5 V" />
-      <Resistor x={180} y={40} label="R₁" />
-      <Meter x={180} y={100} letter="V" accent={VOLT_ACCENT} />
+      {/* ── components (positions derived from the shared centres) ── */}
+      <Battery {...V_BAT} orient="down" value="1.5V" />
+      <Resistor {...V_R1} label="R₁" />
+      <Meter {...V_MTR} letter="V" accent={VOLT_ACCENT} />
 
       {/* ── junction dots — only at the two T-junctions where probes
-            tap the main loop at R₁'s pins. Corners (L,TOP) etc. are
+            tap the main loop at R₁'s pins. Corners (L, V_TOP) etc. are
             single-wire bends, not electrical connections. ── */}
       <Junction x={vR1.p1.x} y={vR1.p1.y} />
       <Junction x={vR1.p2.x} y={vR1.p2.y} />
@@ -83,13 +107,13 @@ function VoltmeterParallel({
 
 /* ── Ammeter in series ─────────────────────────────────────────────────── *
  *
- *  ┌────(A)────[R₁]────┐              y = 48
+ *  ┌────(A)────[R₁]────┐              y = A_TOP
  *  │                    │
- *  ┤ [Bat]              │              y ≈ 130
+ *  ┤ [Bat]              │              y = A_BAT.y
  *  │                    │
- *  └────────────────────┘              y = 190
+ *  └────────────────────┘              y = A_BOT
  */
-const AL = 65, AR = 295, ATOP = 48, ABOT = 190
+const AL = 65, AR = 295
 
 function AmmeterSeries({
   caption,
@@ -102,20 +126,20 @@ function AmmeterSeries({
     <Circuit width={W} height={H} caption={caption} legend={legend}>
 
       {/* ── wires ── */}
-      <Wire points={[aBat.p1, { x: AL, y: ATOP }, aAm.p1]} />
+      <Wire points={[aBat.p1, { x: AL, y: A_TOP }, aAm.p1]} />
       <Wire points={[aAm.p2, aR1.p1]} />
-      <Wire points={[aR1.p2, { x: AR, y: ATOP }]} />
-      <Wire points={[{ x: AR, y: ATOP }, { x: AR, y: ABOT }]} />
-      <Wire points={[{ x: AR, y: ABOT }, { x: AL, y: ABOT }]} />
-      <Wire points={[{ x: AL, y: ABOT }, aBat.p2]} />
+      <Wire points={[aR1.p2, { x: AR, y: A_TOP }]} />
+      <Wire points={[{ x: AR, y: A_TOP }, { x: AR, y: A_BOT }]} />
+      <Wire points={[{ x: AR, y: A_BOT }, { x: AL, y: A_BOT }]} />
+      <Wire points={[{ x: AL, y: A_BOT }, aBat.p2]} />
 
-      {/* ── components ── */}
-      <Battery x={65} y={130} orient="down" value="1.5 V" />
-      <Meter x={148} y={48} letter="A" accent={AMP_ACCENT} />
-      <Resistor x={238} y={48} label="R₁" />
+      {/* ── components (positions derived from the shared centres) ── */}
+      <Battery {...A_BAT} orient="down" value="1.5V" />
+      <Meter {...A_AM} letter="A" accent={AMP_ACCENT} />
+      <Resistor {...A_R1} label="R₁" />
 
       {/* ── junction dots — only at the ammeter's pin connections, where
-            the meter is inserted "into" the wire. Corners (AL,ATOP) etc.
+            the meter is inserted "into" the wire. Corners (AL,A_TOP) etc.
             are single-wire bends, not electrical connections. ── */}
       <Junction x={aAm.p1.x} y={aAm.p1.y} />
       <Junction x={aAm.p2.x} y={aAm.p2.y} />
@@ -145,7 +169,7 @@ export default function MultimeterDiagram() {
   ]
 
   return (
-    <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
+    <div className="my-8 flex flex-col gap-6 not-prose">
       <VoltmeterParallel caption={t('ch0_2.voltmeterCaption')} legend={voltmeterLegend} />
       <AmmeterSeries caption={t('ch0_2.ammeterCaption')} legend={ammeterLegend} />
     </div>

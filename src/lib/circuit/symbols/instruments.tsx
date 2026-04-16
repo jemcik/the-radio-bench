@@ -36,8 +36,16 @@ export function Meter({
         {/* Circle */}
         <circle cx={0} cy={0} r={20} stroke={accent} strokeWidth={STROKE} fill="none" />
 
-        {/* Letter inside — uses raw <text> for the custom accent fill */}
-        <text x={0} y={7} fontSize="16" fontWeight="bold" textAnchor="middle" fill={accent}>
+        {/* Letter inside — dominantBaseline="central" centers on the em-box
+            middle, which is the correct geometric centre for uppercase
+            letters in a circle. The old `y={7}` hack relied on font-specific
+            baseline metrics and drifted off-centre. */}
+        <text
+          x={0} y={0}
+          fontSize="16" fontWeight="bold"
+          textAnchor="middle" dominantBaseline="central"
+          fill={accent}
+        >
           {letter}
         </text>
       </g>
