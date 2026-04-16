@@ -86,10 +86,13 @@ export function pinsBJT(
   cy: number,
   orient: Orientation = 'right',
 ): { base: Point; collector: Point; emitter: Point } {
-  // Offsets relative to centre, in 'right' orientation
-  const bx = -30, by = 0
-  const cUpX = 12, cUpY = -28
-  const eDownX = 12, eDownY = 28
+  // Offsets relative to centre, in 'right' orientation.
+  // Collector/emitter follow the same ~41° diagonal used inside the symbol,
+  // extending just past the circle (r=18) so leads are short stubs — not
+  // long lines crossing half the schematic.
+  const bx = -26, by = 0
+  const cUpX = 12, cUpY = -19
+  const eDownX = 12, eDownY = 19
 
   const rot = (ox: number, oy: number): Point => {
     switch (orient) {
@@ -163,7 +166,11 @@ export interface SymbolProps {
   orient?: Orientation
   /** Component designator label, e.g. "R1", "C3". */
   label?: string
-  /** Value label, e.g. "1 kΩ", "100 nF". */
+  /**
+   * Value label rendered next to the symbol. Schematic convention — no
+   * space between number and unit (e.g. "1kΩ", "100nF", "1.5V"); use the
+   * spaced form ("1 kΩ") only in prose, never in a value prop.
+   */
   value?: string
 }
 

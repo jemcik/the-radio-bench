@@ -21,9 +21,10 @@ const CHAPTER_ID = '0-5'
 const QUIZ_QUESTION_COUNT = 6
 
 // ─── Symbol tour helper ──────────────────────────────────────────────────────
-// Renders a single symbol inside a tiny framed SVG card with its name and
-// one-line description underneath. The grid below then tiles these into a
-// responsive 2/3/4-column layout.
+// One row per symbol: framed SVG on the left, name + description on the
+// right. The parent list lays these out as a simple vertical stack, which
+// reads left-to-right like a glossary and avoids the cramped 2/3/4-column
+// grid that the section used to have.
 interface SymbolCellProps {
   name: string
   description: ReactNode
@@ -35,13 +36,13 @@ function SymbolCell({
   name, description, svgWidth = 110, svgHeight = 56, children,
 }: SymbolCellProps) {
   return (
-    <div className="flex flex-col items-center text-center gap-2">
-      <div className="w-full rounded border border-border bg-card/60 p-2 flex items-center justify-center text-[hsl(var(--sketch-stroke))]">
+    <div className="flex items-center gap-4 py-1">
+      <div className="shrink-0 w-40 sm:w-48 rounded border border-border bg-card/60 p-2 flex items-center justify-center text-[hsl(var(--sketch-stroke))]">
         <SVGDiagram width={svgWidth} height={svgHeight}>
           {children}
         </SVGDiagram>
       </div>
-      <div className="space-y-1 px-1">
+      <div className="flex-1 min-w-0 space-y-1">
         <p className="text-sm font-semibold text-foreground">{name}</p>
         <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
       </div>
@@ -54,19 +55,31 @@ function SymbolCell({
 // in the lab. Pinned topology:
 //   B₁ (battery, vertical on left rail) → top wire → R₁ → wire → D₁ (LED)
 //   → right rail down → bottom wire → back to B₁
-const SCHEMATIC_W = 300
-const SCHEMATIC_H = 160
-const LEFT_X = 50
-const RIGHT_X = 250
-const TOP_Y = 30
-const BOT_Y = 130
-const bat = pins2(LEFT_X, 80, 'down')
-const r1  = pins2(130, TOP_Y)
-const led = pins2(210, TOP_Y)
+//
+// Canvas-sizing budget:
+//   TOP_Y=60 (not 30) — horizontal passives put their label at y-14; LED's
+//   CenteredLabel puts "D₁" at y-20 on top of emission arrows that already
+//   extend to y-18. Giving 60 px of headroom above lets the label clear the
+//   arrow tips and sit comfortably above the zigzag.
+//   maxWidth={480} — without it, SVGDiagram's width="100%" scales the 340 px
+//   schematic to the full chapter column (~900 px) and it reads as huge.
+//   Resistor intentionally carries NO value prop: PassiveLabel's value
+//   placement sits right on top of the zigzag (y-2, i.e. inside the ±8 body
+//   band). The value is stated in the caption and in step 2 below.
+const SCHEMATIC_W = 340
+const SCHEMATIC_H = 200
+const LEFT_X = 60
+const RIGHT_X = 280
+const TOP_Y = 60
+const BOT_Y = 170
+const BAT_Y = 115
+const bat = pins2(LEFT_X, BAT_Y, 'down')
+const r1  = pins2(150, TOP_Y)
+const led = pins2(230, TOP_Y)
 
 function LedCircuit({ caption }: { caption: string }) {
   return (
-    <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption}>
+    <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} maxWidth={480}>
       {/* Left rail + top wire to R₁ */}
       <Wire points={[bat.p1, { x: LEFT_X, y: TOP_Y }, r1.p1]} />
       {/* R₁ to LED */}
@@ -79,9 +92,12 @@ function LedCircuit({ caption }: { caption: string }) {
         { x: LEFT_X,  y: BOT_Y },
         bat.p2,
       ]} />
-      <Battery x={LEFT_X} y={80} orient="down" label="B₁" value="3 V" />
-      <Resistor x={130} y={TOP_Y} label="R₁" value="220 Ω" />
-      <LED x={210} y={TOP_Y} label="D₁" />
+      {/* Designator subscripts omitted — only one of each component in this
+          schematic, so numbering adds no information. The symbols-tour
+          section above still teaches the R₁/C₁/Q₁ convention. */}
+      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="B" value="3V" />
+      <Resistor x={150} y={TOP_Y} label="R" />
+      <LED x={230} y={TOP_Y} label="D" />
       {/* No <Junction>s — this is a single loop with only bends, no
           T-joins. Serves as a live example of the chapter's wire rule:
           every corner is a bend, not a junction. */}
@@ -100,7 +116,7 @@ export default function Chapter0_5() {
     <>
       <p>
         <Trans i18nKey="ch0_5.intro" ns="ui"
-          components={{ strong: <strong />, i: <i /> }}
+          components={{ strong: <strong />, i: <i />, topology: <G k="topology" /> }}
         />
       </p>
 
@@ -148,49 +164,60 @@ export default function Chapter0_5() {
         />
       </p>
 
-      <div className="not-prose my-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {/* Designators (R₁, C₁, …) are intentionally omitted here — each cell
+          already captions the symbol with its name. The horizontal-passive
+          label offset (`y - 14` in getLabelPosition) places subscripts right
+          on top of the resistor zigzag / capacitor plates / LED emission
+          arrows in this tight 110×56 preview canvas. The full worked-example
+          schematic below keeps them, where there's room to breathe. */}
+      <div className="not-prose my-6 flex flex-col divide-y divide-border">
         <SymbolCell
           name={t('ch0_5.symbolResistorName')}
           description={t('ch0_5.symbolResistorDesc')}
         >
-          <Resistor x={55} y={28} label="R₁" />
+          <Resistor x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolCapacitorName')}
           description={t('ch0_5.symbolCapacitorDesc')}
         >
-          <Capacitor x={55} y={28} label="C₁" />
+          <Capacitor x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolInductorName')}
           description={t('ch0_5.symbolInductorDesc')}
         >
-          <Inductor x={55} y={28} label="L₁" />
+          <Inductor x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolBatteryName')}
           description={t('ch0_5.symbolBatteryDesc')}
-          svgHeight={70}
         >
-          <Battery x={55} y={35} orient="down" label="B₁" value="3 V" />
+          {/* svgHeight inherits the default 56 — leads extend to ±30 and
+              get clipped by ~2 px at each end of the viewport, which is
+              the look we want here (the gallery cell doesn't need full
+              pin-length leads the way a wired schematic does). */}
+          <Battery x={55} y={28} orient="down" />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolGroundName')}
           description={t('ch0_5.symbolGroundDesc')}
-          svgHeight={56}
         >
-          <Ground x={55} y={20} />
+          {/* Ground extends y−15 (lead top) to y+10 (shortest line), centre
+              offset ≈ −2.5 from component y. y=30 puts the visual centre at
+              27.5, matching the viewport centre (28). */}
+          <Ground x={55} y={30} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolDiodeName')}
           description={t('ch0_5.symbolDiodeDesc')}
         >
-          <Diode x={55} y={28} label="D₁" />
+          <Diode x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
@@ -199,15 +226,14 @@ export default function Chapter0_5() {
             <Trans i18nKey="ch0_5.symbolLedDesc" ns="ui" />
           }
         >
-          <LED x={55} y={28} label="D₂" />
+          <LED x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolTransistorName')}
           description={t('ch0_5.symbolTransistorDesc')}
-          svgHeight={72}
         >
-          <TransistorNPN x={55} y={36} label="Q₁" />
+          <TransistorNPN x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell

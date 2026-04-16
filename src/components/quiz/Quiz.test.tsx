@@ -162,4 +162,47 @@ describe('Quiz component', () => {
     // noQuestions key renders English text in the test provider.
     expect(screen.getByText(/no questions available/i)).toBeInTheDocument()
   })
+
+  it('does not double-count the score when the user remounts after submitting (bug: 7/6 score)', () => {
+    // Seed storage as if the user answered q1 correctly and reloaded BEFORE
+    // clicking Next — {answered: true, selectedOptionIndex: 1, currentScore: 1}.
+    localStorage.setItem(
+      'trb-quiz-test',
+      JSON.stringify({
+        currentIndex: 0,
+        currentScore: 1,
+        answered: true,
+        selectedOptionIndex: 1,
+        quizComplete: false,
+      }),
+    )
+    setup({ storageKey: 'trb-quiz-test' })
+    // Explanation should be showing (the answered-state is preserved).
+    expect(screen.getByText('Basic arithmetic.')).toBeInTheDocument()
+    // Submit button is gone — Next takes its place.
+    expect(screen.queryByRole('button', { name: /submit/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
+    // Advance to q2, answer it, finish. Score should be 2/3, NOT 3/3.
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }))
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Volt' })) // wrong
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }))
+    fireEvent.click(screen.getByRole('button', { name: /score/i }))
+    expect(screen.getByText('2 / 3')).toBeInTheDocument()
+  })
+
+  it('backfills missing fields when resuming from old-shape stored progress', () => {
+    // Pre-fix storage only had {currentIndex, currentScore}. After the fix,
+    // loading that shape must not crash and must behave like a fresh question.
+    localStorage.setItem(
+      'trb-quiz-test',
+      JSON.stringify({ currentIndex: 1, currentScore: 1 }),
+    )
+    setup({ storageKey: 'trb-quiz-test' })
+    // Land on q2, with no selection, Submit disabled.
+    expect(screen.getByText('Capital of France?')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /submit/i })).toBeDisabled()
+  })
 })

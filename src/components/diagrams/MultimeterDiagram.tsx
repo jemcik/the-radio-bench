@@ -68,7 +68,7 @@ function VoltmeterParallel({
       <Wire points={[vMtr.p2, { x: vR1.p2.x, y: VMID }, vR1.p2]} color={VOLT_ACCENT} />
 
       {/* ── components ── */}
-      <Battery x={75} y={142} orient="down" value="1.5 V" />
+      <Battery x={75} y={142} orient="down" value="1.5V" />
       <Resistor x={180} y={40} label="R₁" />
       <Meter x={180} y={100} letter="V" accent={VOLT_ACCENT} />
 
@@ -110,7 +110,7 @@ function AmmeterSeries({
       <Wire points={[{ x: AL, y: ABOT }, aBat.p2]} />
 
       {/* ── components ── */}
-      <Battery x={65} y={130} orient="down" value="1.5 V" />
+      <Battery x={65} y={130} orient="down" value="1.5V" />
       <Meter x={148} y={48} letter="A" accent={AMP_ACCENT} />
       <Resistor x={238} y={48} label="R₁" />
 

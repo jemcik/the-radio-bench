@@ -8,7 +8,7 @@
  *
  * USAGE
  *   <Circuit width={360} height={220} caption="Simple RC filter">
- *     <Resistor x={100} y={40} label="R1" value="1 kΩ" />
+ *     <Resistor x={100} y={40} label="R1" value="1kΩ" />
  *     <Capacitor x={200} y={100} orient="down" label="C1" />
  *     <Wire points={[r1.p2, {x:200, y:40}, c1.p1]} />
  *   </Circuit>
@@ -25,6 +25,14 @@ interface CircuitProps {
   /** Optional caption rendered below the diagram. */
   caption?: string
   /**
+   * Optional max-width (CSS value) for the surrounding card. Without this,
+   * `SVGDiagram` sets `width="100%"` so a small schematic scales up to fill
+   * the entire chapter column, rendering as if at 2–3× its design size.
+   * Pass e.g. `480` (treated as px) or `"32rem"` to keep the diagram at a
+   * comfortable reading size.
+   */
+  maxWidth?: number | string
+  /**
    * Optional colour legend shown as a compact row beneath the SVG (inside
    * the card). Each entry gets a small swatch + label. Useful when the
    * diagram uses accent wires (e.g. voltmeter probes) whose meaning the
@@ -35,9 +43,13 @@ interface CircuitProps {
   children: ReactNode
 }
 
-export default function Circuit({ width, height, caption, legend, children }: CircuitProps) {
+export default function Circuit({ width, height, caption, maxWidth, legend, children }: CircuitProps) {
+  const mw = typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth
   return (
-    <figure className="not-prose">
+    <figure
+      className="not-prose"
+      style={mw ? { maxWidth: mw, marginInline: 'auto' } : undefined}
+    >
       {/* text-[hsl(var(--sketch-stroke))] softens the default stroke (wires,
           component outlines, junction dots) so the schematic reads as an
           inked drawing rather than hard-black lines. Accent-coloured wires

@@ -115,19 +115,28 @@ interface CenteredLabelProps {
   value?: string
   /** Distance from centre to each text. Default 20. */
   gap?: number
+  /**
+   * Which side the designator label sits on. Default 'above'. Use 'below'
+   * for symbols that have decorations above the body (e.g. LED emission
+   * arrows) where putting the label above would force an awkwardly large
+   * gap. With 'below', the value (if any) flips above.
+   */
+  labelSide?: 'above' | 'below'
 }
 
-export function CenteredLabel({ x, y, label, value, gap = 20 }: CenteredLabelProps) {
+export function CenteredLabel({ x, y, label, value, gap = 20, labelSide = 'above' }: CenteredLabelProps) {
   if (!label && !value) return null
+  const labelY = labelSide === 'above' ? y - gap : y + gap
+  const valueY = labelSide === 'above' ? y + gap : y - gap
   return (
     <>
       {label && (
-        <SymbolText x={x} y={y - gap} size={11} weight={600}>
+        <SymbolText x={x} y={labelY} size={11} weight={600}>
           {label}
         </SymbolText>
       )}
       {value && (
-        <SymbolText x={x} y={y + gap} size={10} opacity={0.7}>
+        <SymbolText x={x} y={valueY} size={10} opacity={0.7}>
           {value}
         </SymbolText>
       )}
