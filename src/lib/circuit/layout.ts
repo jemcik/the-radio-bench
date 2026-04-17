@@ -37,7 +37,7 @@ export const SCHEMATIC_PAD_TOP = 35
  * with PAD_TOP after you account for the larger content above the top
  * rail (labels, meter circles).
  */
-export const SCHEMATIC_PAD_BOT = 20
+const SCHEMATIC_PAD_BOT = 20
 
 /**
  * Compute the SVG viewBox height for a schematic with the given

@@ -39,4 +39,3 @@ export const svgTokens = {
   onair: 'hsl(var(--callout-onair))',
 } as const
 
-export type SvgToken = keyof typeof svgTokens

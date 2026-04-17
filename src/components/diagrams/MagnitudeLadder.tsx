@@ -48,7 +48,7 @@ import { RoughPaths, roughLine, roughLinearPath, roughRect } from '@/lib/rough'
  * italic → ~12 px. All well above the 11 px floor.
  */
 
-export interface LadderItem {
+interface LadderItem {
   value: number
   label: string
   description: string
@@ -56,7 +56,7 @@ export interface LadderItem {
   ratioBelowLabel?: string
 }
 
-export type LadderTone = 'primary' | 'note' | 'caution'
+type LadderTone = 'primary' | 'note' | 'caution'
 
 interface MagnitudeLadderProps {
   title: string

@@ -26,8 +26,9 @@
 // Layout wrapper
 export { default as Circuit, type LegendItem, type LegendHeading, type LegendEntry } from './Circuit'
 
-// Shared vertical-padding budget so all schematics land at the same size
-export { SCHEMATIC_PAD_TOP, SCHEMATIC_PAD_BOT, schematicHeight } from './layout'
+// Shared vertical-padding budget so all schematics land at the same size.
+// SCHEMATIC_PAD_BOT stays internal to ./layout — only used by schematicHeight.
+export { SCHEMATIC_PAD_TOP, schematicHeight } from './layout'
 
 // Wiring
 export { Wire, Junction } from './Wire'
