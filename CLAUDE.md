@@ -3,6 +3,112 @@
 Short-form guidance to keep future work consistent. If you change a
 convention here, update this file in the same commit.
 
+## Workflow — read before starting work
+
+### Pre-PR quality gate — non-negotiable
+
+Before opening a PR for a new chapter, a batch of significant changes,
+or any work the user hints is "done" / "ready", run the **full** gate.
+Don't curate scripts from memory — list every quality-check script in
+`package.json` and run them all:
+
+```bash
+jq -r '.scripts | keys[]' package.json | grep -E '^(check|lint|test|build|knip)'
+# Then run each. Currently:
+npm run lint
+npx tsc --noEmit
+npm run knip              # dead-code / unused-export sweep — DON'T SKIP
+npm run check:i18n
+npm run check:i18n-usage
+npm run check:uk
+npm run check:gitignore
+npm test
+npm run build
+```
+
+All must be green. If any fails, stop and fix before continuing.
+Past failure: a gate run missed `knip` (not in Claude's memory set)
+and shipped a PR with 5 unused exports + 1 unused file.
+
+**After every `git push`**, verify CI actually passes:
+
+```bash
+gh pr checks <PR_NUMBER>
+gh run view <run-id> --log-failed   # if red
+```
+
+Local `npm run build` ≠ CI green. Two common CI-only failure modes on
+this repo:
+
+1. **`npm ci` peer-dep strictness** — CI uses `npm ci`, which rejects
+   mismatched `peerDependencies`. Worked around via `.npmrc` with
+   `legacy-peer-deps=true`.
+2. **Node-version drift** — CI pins one Node version (see
+   `.github/workflows/*.yml`); local Node may be newer.
+
+Wait for CI to complete before telling the user "ready for review".
+
+For new chapters / large refactors, also delegate an agent review
+covering: UK translation quality, EN↔UK consistency, i18n completeness
+(see "New chapter checklist" below), test coverage, prose promises
+paid off, schematic conventions. Report findings first — don't
+silently apply every suggestion.
+
+### Don't start a local dev server
+
+The user runs `npm run dev` locally. Both servers fight for port 5173
+and any screenshot I take reflects my instance, not theirs. If visual
+verification is needed, ask the user to screenshot or describe.
+Never invoke `preview_start` for this repo.
+
+### Never use git worktrees
+
+Don't pass `isolation: "worktree"` to the Agent tool; don't suggest
+`git worktree add`. A stray worktree once made the user's dev server
+serve a stale snapshot missing Ch 1.1 + uncommitted edits. Work
+directly in the main checkout.
+
+### Commit cadence
+
+Batch related changes into one commit. Don't commit after every
+single fix — the user has flagged this. A commit is a unit of
+reviewable work, not a save point.
+
+## New chapter checklist
+
+A chapter is done when ALL of these are true, not just "prose is
+written":
+
+1. **Hero illustration renders.** Never hand the user a prose-only
+   preview with a TODO placeholder for the hero or primary widget.
+   The user has caught this twice — no more incomplete previews.
+2. **Visual density throughout.** Every section has something to look
+   at — widget, illustration, magnitude scale. A chapter that's 2/3
+   prose before the first visual fails review. Plan visuals at
+   outline time, not after prose is written.
+3. **Five i18n touchpoints**, each in BOTH `en/ui.json` AND
+   `uk/ui.json`:
+   - `chapterTitles.{id}`
+   - `chapterSubtitles.{id}`
+   - `ch{id}.*` translation block
+   - New glossary terms in `glossary.*`
+   - New unit symbols in `units.*`
+
+   `chapterTitles` / `chapterSubtitles` are separate namespaces that
+   silently fall back to English via `defaultValue` when missing —
+   parity scripts can't catch that. Cross-check manually.
+4. **Test pairs.** Every interactive widget has a `*.test.tsx`
+   sibling using `renderWithProviders` from `src/test/render`.
+   Numeric outputs asserted on the exact `.toFixed(2)` format
+   (`"20.00"`, not `"20"`).
+5. **Prose promises paid off.** Read top-to-bottom for phrasings like
+   `"The … table:"` / `"The … diagram:"` — every such promise has
+   the referenced artefact actually rendered. Run
+   `node scripts/check-i18n-usage.mjs` to catch orphan keys too.
+6. **Status flip last.** `'coming-soon'` → `'published'` in
+   `src/data/chapters.ts` only after 1–5 and the full gate above
+   are green.
+
 ## SVG diagrams (`src/components/diagrams/*`)
 
 These render at fixed `viewBox` dimensions and scale responsively
@@ -19,14 +125,33 @@ Diagrams are viewed inline with body copy. Small SVG text reads as
 |---|---|---|
 | Primary tick / row label | **13–14** | Mono for numbers, sans for words |
 | Axis / row title | **14**, weight 600 | The thing the reader scans for |
-| Secondary tick label (units, examples) | **12–13** | Mono ok |
-| Sub-label / hint under a title | **11** | `--muted-foreground` |
-| Footnote / caveat inside the SVG | **11** italic | Not smaller |
+| Secondary tick label (units, examples) | **13** | Mono ok |
+| Sub-label / hint under a title | **13** | `--muted-foreground` |
+| Footnote / caveat inside the SVG | **13** italic | Not smaller |
 | Symbol / hero glyph (e.g. prefix `µ`) | **17**, weight 700 | Anchor point |
 
-**Never** drop below 11 px inside a diagram. If text doesn't fit at
-11 px, the layout is wrong (rotate, stagger, wrap, or shrink the
-content set — don't shrink the type).
+**Never** drop below **13 px** for any standalone text label inside a
+diagram. If a label doesn't fit at 13 px, the layout is wrong (rotate,
+stagger, wrap, or shrink the content set — don't shrink the type).
+
+**HTML-rendered text around diagrams follows the same floor.** Both
+`DiagramFigure` (figcaption) and `Circuit` (figcaption + legend list)
+use `text-[13px]` for caption and legend-label text. Never use
+Tailwind's `text-xs` (= 12 px) or `text-[11px]` for diagram-adjacent
+copy — these read as "tiny footnote" beside 16 px body prose. Apply
+the 13 px floor uniformly so the SVG interior and the surrounding
+HTML are typographically flush.
+
+The old "11 px floor" rule from earlier chapters is deprecated — the
+user has repeatedly flagged 11–12 px text as too small next to body
+copy. Exception: glyph decorations INSIDE a shape (e.g. the `+` inside
+a 5 px-radius ion circle) are typographic artwork, not readable text,
+and may use smaller fontSizes to fit their container.
+
+(Font sizes are **on-screen** values. Do not use CSS `maxWidth`/
+`maxHeight` to scale a diagram — match the viewBox to the display size
+so the fontSize number in source equals the fontSize the reader sees.
+See `feedback_svg_font_minimum_on_screen.md`.)
 
 ### Padding — symmetric and tight
 
@@ -115,6 +240,33 @@ i18n strings should hold the **prose only** ("Cutoff frequency"); the
 math symbol is composed in JSX. The same plain-text key can serve as
 the `aria-label` (screen readers don't need the symbol).
 
+**In i18n prose — including schematic reference designators** — wrap
+single-letter variables in `<var>X</var>` and map `var: <MathVar />` in
+the `<Trans>` call:
+
+```json
+// ui.json
+"symbolResistorDesc": "… Labelled <var>R</var>. Value in ohms."
+```
+
+```tsx
+// chapter.tsx
+<Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui"
+  components={{ var: <MathVar /> }} />
+```
+
+`MathVar` is exported from `@/components/ui/math`. This covers math
+variables (`I`, `V`, `R`, `f`, `Q`) AND schematic reference designators
+(`R` for resistor, `C` for capacitor, `L` for inductor, `D` for diode,
+`Q` for transistor). Plain `R` in sans-serif reads as an English letter
+intrusion in Cyrillic prose; KaTeX serif marks it as "symbol / label"
+unambiguously. The `<var>` tag must appear in **both** `en/ui.json` and
+`uk/ui.json` — Trans component mapping requires matching tags per locale.
+
+If a chapter's description field (e.g. `SymbolCell`) currently renders
+plain `t(...)`, convert to `<Trans>` before introducing `<var>` in the
+i18n string, or the tag renders literally as text.
+
 ### Plot curves must be clipped to the plot rectangle
 
 When a plotted function can leave the plot area (e.g. an RC roll-off
@@ -192,6 +344,22 @@ node scripts/check-i18n.mjs   # if you touched locale files
 
 Then sanity-check visually in `npm run dev`. The dev server is the only
 place font metrics match production — jsdom can't catch label overlap.
+
+## Ukrainian translation — use the `ua-translate` skill
+
+**Before translating any EN → UK content** (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never translate inline key-by-key.
+
+The skill runs six stages:
+1. Load glossary + landmines + style refs
+2. Primary translation via briefed agent
+3. **Parallel critique** — 5 specialist agents in one spawn (fluency / technical / consistency / calques / grammar)
+4. Consolidate findings + apply high-confidence auto-fixes
+5. Automated lint: `npm run check:uk` (fails on mechanical errors — English leftovers, decimal periods, Latin units, forbidden words, capitalised `Ви`, `<i>I</i>` for math vars)
+6. Present only non-obvious decisions to the user
+
+Every time the user pushes back on a specific Ukrainian phrasing, extend `.claude/skills/ua-translate/references/landmines.md` (and, where detectable, the linter). The skill gets smarter per chapter instead of repeating the same 30-issue round-trip.
+
+**Linter CLI**: `npm run check:uk` scans the whole `uk/ui.json`. Scope to one chapter: `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch1_1`.
 
 ## i18n discipline — translate WHOLE widgets, never piecemeal
 
@@ -300,9 +468,13 @@ least one related term so the tooltip's "see also" chain works.
 
 - **Amateur radio callsigns** in Ukraine are issued by **УДЦР**
   (Український державний центр радіочастот / Ukrainian State Centre
-  of Radio Frequencies, a.k.a. UCRF), not by НКРЗІ. НКРЗІ is the
-  regulator; УДЦР is the licensing body. Any glossary entry, lab
-  callout, or prose mentioning the licensing process must use УДЦР.
+  of Radio Frequencies, a.k.a. UCRF). УДЦР is the licensing body;
+  the regulator ABOVE УДЦР is **НКЕК** (Національна комісія, що
+  здійснює державне регулювання у сферах електронних комунікацій,
+  радіочастотного спектра та надання послуг поштового зв'язку) —
+  НКЕК replaced НКРЗІ in 2022. If you need to mention the regulator,
+  use НКЕК (not НКРЗІ). Any glossary entry, lab callout, or prose
+  about the licensing process must use УДЦР for the issuing body.
 - **Decimal separator** in Ukrainian is a **comma**, not a period:
   `1,55 В`, not `1.55 В`. Every numeric value in `uk/ui.json` should
   follow this — including dB values (`−2,5 дБ`), ratios (`0,1`),
@@ -348,5 +520,25 @@ least one related term so the tooltip's "see also" chain works.
 - **Glossary terms**: wrap first occurrence of each technical term in
   `<G k="termKey">` so the tooltip works. Don't sprinkle `<G>` on every
   occurrence — once per chapter section is enough.
+- **Glossary tag span**: keep the `<G>` wrapper tight around the
+  abbreviation or canonical term only — never wrap a long parenthetical
+  expansion too. `<vna>VNA (Vector Network Analyser)</vna>` makes the
+  Radix popper measure the wrapped union of the whole phrase and
+  position the tooltip off-screen; `<vna>VNA</vna> (Vector Network
+  Analyser)` anchors to the abbreviation alone.
+- **Schematic coordinates — one source of truth**: every component's
+  `(x, y)` lives in a single `const NAME = { x, y }` object.
+  `pins2(NAME.x, NAME.y, …)` and `<Component {...NAME} />` both derive
+  from it. Never duplicate literal coordinates between pin helpers and
+  JSX render — editing only one side causes silent drift (wires end at
+  the new pin, symbol body drawn at the old position, and no test
+  catches it).
 - **Chapter status**: flip `'coming-soon'` → `'published'` in
-  `src/data/chapters.ts` only after tsc/eslint/i18n/vitest all pass.
+  `src/data/chapters.ts` only after the full pre-PR gate (see top)
+  is green.
+- **No HTML entities in i18n JSON**: `&quot;`, `&amp;`, `&nbsp;`
+  render verbatim through react-i18next. Use real characters — curly
+  quotes `"…"` / `«…»`, a real non-breaking space, etc.
+- **Schematic junction dots**: only at real T-junctions (three or
+  more wires meeting). Never at a corner bend, never at a phantom
+  two-wire crossing.

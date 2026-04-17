@@ -33,12 +33,14 @@ interface CircuitProps {
    */
   maxWidth?: number | string
   /**
-   * Optional colour legend shown as a compact row beneath the SVG (inside
-   * the card). Each entry gets a small swatch + label. Useful when the
-   * diagram uses accent wires (e.g. voltmeter probes) whose meaning the
-   * reader needs help parsing.
+   * Optional colour legend shown as a compact stack beside / beneath the
+   * SVG (inside the card). Each entry is either a swatch + label pair
+   * (`LegendItem`) or a section heading (`{ heading: … }`) that spans
+   * both columns and groups the items below it. Useful when the diagram
+   * mixes two conceptually different categories (e.g. quantities vs
+   * components) that the reader should parse as separate groups.
    */
-  legend?: LegendItem[]
+  legend?: LegendEntry[]
   /** SVG children — symbols, wires, labels, etc. */
   children: ReactNode
 }
@@ -75,15 +77,31 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
                 labels aligned on the right. The `contents` class on <li>
                 removes the list item from layout so dt/dd act as direct grid
                 children and all swatches + labels line up cleanly. */}
-            <dl className="shrink-0 grid grid-cols-[1.5rem_1fr] gap-x-3 gap-y-2 text-[11px] text-muted-foreground">
-              {legend.map((item, i) => (
-                <div key={i} className="contents">
-                  <dt className="flex items-center justify-center">
-                    <LegendSwatch kind={item.kind ?? 'line'} color={item.color} />
-                  </dt>
-                  <dd className="flex items-center">{item.label}</dd>
-                </div>
-              ))}
+            <dl className="shrink-0 grid grid-cols-[1.5rem_1fr] gap-x-3 gap-y-2 text-[13px] text-muted-foreground">
+              {legend.map((entry, i) => {
+                if ('heading' in entry) {
+                  return (
+                    <div
+                      key={i}
+                      className="col-span-2 mt-2 first:mt-0 font-semibold text-foreground/75"
+                    >
+                      {entry.heading}
+                    </div>
+                  )
+                }
+                return (
+                  <div key={i} className="contents">
+                    <dt className="flex items-center justify-center">
+                      {entry.swatch
+                        ? entry.swatch
+                        : entry.kind
+                          ? <LegendSwatch kind={entry.kind} color={entry.color} />
+                          : null}
+                    </dt>
+                    <dd className="flex items-center">{entry.label}</dd>
+                  </div>
+                )
+              })}
             </dl>
           </div>
         ) : (
@@ -93,7 +111,7 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
         )}
       </div>
       {caption && (
-        <figcaption className="mt-2 text-center text-xs text-muted-foreground">
+        <figcaption className="mt-2 text-center text-[13px] text-muted-foreground">
           {caption}
         </figcaption>
       )}
@@ -106,13 +124,36 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
 export type LegendSwatchKind = 'line' | 'dot' | 'circle' | 'resistor' | 'battery' | 'led'
 
 export interface LegendItem {
-  /** Visual shape of the swatch. Defaults to 'line' (short horizontal stroke). */
+  /**
+   * Predefined visual swatch (battery, resistor, LED, line, dot…).
+   * Ignored when `swatch` is also set. Omit both to render an item
+   * with no swatch at all.
+   */
   kind?: LegendSwatchKind
-  /** Stroke/fill colour. Defaults to `currentColor` (the sketch-stroke token). */
+  /**
+   * Custom swatch — any ReactNode that goes in the swatch column.
+   * Used e.g. for quantity letters (`<MathVar>V</MathVar>`) so each
+   * letter lines up in its own column and the em-dash / description
+   * that follow in the label column align across rows.
+   */
+  swatch?: ReactNode
+  /** Stroke/fill colour for predefined swatches. Ignored by `swatch`. */
   color?: string
-  /** Human-readable description (already i18n-resolved). */
-  label: string
+  /**
+   * Human-readable description. Accepts a plain string or a React node —
+   * pass a `<Trans>` element when the i18n string contains placeholders
+   * like `<var>V</var>` that need to render through KaTeX / MathVar.
+   */
+  label: ReactNode
 }
+
+/** A section heading — spans both legend columns, groups items beneath. */
+export interface LegendHeading {
+  heading: ReactNode
+}
+
+/** Either a swatch-and-label item or a section heading. */
+export type LegendEntry = LegendItem | LegendHeading
 
 function LegendSwatch({ kind, color }: { kind: LegendSwatchKind; color?: string }) {
   const c = color ?? 'currentColor'

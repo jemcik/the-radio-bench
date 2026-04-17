@@ -13,7 +13,7 @@
  * render and trip the `react-hooks/static-components` rule.
  * ──────────────────────────────────────────────────────────────────────────── */
 
-export interface StationProps {
+interface StationProps {
   c: {
     antenna: string; boxFill: string; mic: string; micText: string
     wire: string; speaker: string

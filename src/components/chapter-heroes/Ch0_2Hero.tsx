@@ -1,72 +1,104 @@
 /**
  * Chapter 0.2 hero — a workbench holding a multimeter, an oscilloscope
  * (with sine-wave trace), and a breadboard with a jumper wire arching over.
+ *
+ * Drawn with Rough.js for the hand-sketched aesthetic. Every stroke path
+ * renders with `stroke="currentColor"` so the sketch inherits the page's
+ * `--sketch-stroke` token and adapts to every theme.
  */
+import { useMemo } from 'react'
+import {
+  RoughPaths,
+  roughCircle,
+  roughLine,
+  roughPath,
+  roughRect,
+} from '@/lib/rough'
+
 export default function Ch0_2Hero() {
+  const s = useMemo(() => ({
+    bench: roughLine(20, 110, 400, 110, { seed: 1, strokeWidth: 1.1 }),
+    benchShadow: roughLine(40, 116, 380, 116, { seed: 2, strokeWidth: 0.8, roughness: 0.4 }),
+    hatches: [[30, 60], [70, 100], [110, 140], [150, 180], [190, 220],
+              [230, 260], [270, 300], [310, 340], [350, 380]]
+      .map(([x1, x2], i) =>
+        roughLine(x1, 118, x2, 132, { seed: 10 + i, strokeWidth: 0.6, roughness: 0.5 })),
+
+    // Multimeter
+    mmBody: roughRect(50, 58, 90, 52, { seed: 20 }),
+    mmDisplay: roughRect(62, 64, 66, 10, { seed: 21, strokeWidth: 0.9 }),
+    mmDial: roughCircle(95, 90, 20, { seed: 22, strokeWidth: 1 }),
+    mmDialPointer: roughLine(95, 90, 102, 83, { seed: 23, strokeWidth: 0.9 }),
+    mmProbeL: roughCircle(72, 104, 5, { seed: 24, strokeWidth: 0.9 }),
+    mmProbeR: roughCircle(118, 104, 5, { seed: 25, strokeWidth: 0.9 }),
+
+    // Oscilloscope
+    oscBody: roughRect(160, 42, 130, 68, { seed: 30 }),
+    oscScreen: roughRect(168, 52, 86, 48, { seed: 31, strokeWidth: 0.9 }),
+    oscTrace: roughPath(
+      'M 172 76 Q 183 58, 193 76 T 213 76 T 233 76 T 253 76',
+      { seed: 32, strokeWidth: 1 },
+    ),
+    oscGraticule: [
+      roughLine(189, 56, 189, 96, { seed: 33, strokeWidth: 0.5, roughness: 0.3 }),
+      roughLine(211, 56, 211, 96, { seed: 34, strokeWidth: 0.5, roughness: 0.3 }),
+      roughLine(233, 56, 233, 96, { seed: 35, strokeWidth: 0.5, roughness: 0.3 }),
+      roughLine(168, 76, 254, 76, { seed: 36, strokeWidth: 0.5, roughness: 0.3 }),
+    ],
+    oscKnobs: [
+      roughCircle(267, 62, 8, { seed: 40, strokeWidth: 0.9 }),
+      roughCircle(279, 62, 8, { seed: 41, strokeWidth: 0.9 }),
+      roughCircle(267, 78, 8, { seed: 42, strokeWidth: 0.9 }),
+      roughCircle(279, 78, 8, { seed: 43, strokeWidth: 0.9 }),
+    ],
+
+    // Breadboard
+    bbBody: roughRect(305, 78, 80, 32, { seed: 50 }),
+    bbRows: [86, 92, 98, 104].map((y, i) =>
+      roughLine(310, y, 380, y, {
+        seed: 51 + i, strokeWidth: 0.5, roughness: 0.3,
+      })),
+    bbJumper: roughPath(
+      'M 318 78 C 330 50, 360 50, 372 78',
+      { seed: 60, strokeWidth: 1 },
+    ),
+  }), [])
+
   return (
     <svg
-      width="420" height="140" viewBox="0 0 420 140"
-      fill="none" stroke="currentColor" strokeWidth={1.3}
-      strokeLinecap="round" strokeLinejoin="round"
+      width="540" height="180" viewBox="0 0 420 140"
+      fill="none"
       aria-hidden
     >
-      {/* Bench surface */}
-      <line x1="20" y1="110" x2="400" y2="110" />
-      <line x1="40" y1="116" x2="380" y2="116" strokeWidth={0.8} opacity={0.6} />
-      {/* Shadow cross-hatch */}
-      <g strokeWidth={0.6} opacity={0.45}>
-        <line x1="30"  y1="118" x2="60"  y2="132" />
-        <line x1="70"  y1="118" x2="100" y2="132" />
-        <line x1="110" y1="118" x2="140" y2="132" />
-        <line x1="150" y1="118" x2="180" y2="132" />
-        <line x1="190" y1="118" x2="220" y2="132" />
-        <line x1="230" y1="118" x2="260" y2="132" />
-        <line x1="270" y1="118" x2="300" y2="132" />
-        <line x1="310" y1="118" x2="340" y2="132" />
-        <line x1="350" y1="118" x2="380" y2="132" />
+      <RoughPaths paths={s.bench} />
+      <RoughPaths paths={s.benchShadow} opacity={0.6} />
+      <g opacity={0.45}>
+        {s.hatches.map((h, i) => <RoughPaths key={i} paths={h} />)}
       </g>
 
-      {/* Multimeter (left)
-          Display → dial → probe sockets, laid out top-to-bottom.
-          Dial sits clearly below the display (previous version had r=12
-          at cy=82 which crashed into the display's bottom edge at y=74). */}
-      <rect x="50" y="58" width="90" height="52" rx="4" />
-      {/* Display strip */}
-      <rect x="62" y="64" width="66" height="10" rx="1" strokeWidth={0.9} />
-      {/* Selector dial — centred horizontally, below the display */}
-      <circle cx="95" cy="90" r="10" strokeWidth={1} />
-      <line x1="95" y1="90" x2="102" y2="83" strokeWidth={0.9} />
-      {/* Probe sockets */}
-      <circle cx="72"  cy="104" r="2.5" strokeWidth={0.9} />
-      <circle cx="118" cy="104" r="2.5" strokeWidth={0.9} />
+      {/* Multimeter */}
+      <RoughPaths paths={s.mmBody} />
+      <RoughPaths paths={s.mmDisplay} />
+      <RoughPaths paths={s.mmDial} />
+      <RoughPaths paths={s.mmDialPointer} />
+      <RoughPaths paths={s.mmProbeL} />
+      <RoughPaths paths={s.mmProbeR} />
 
-      {/* Oscilloscope (centre) */}
-      <rect x="160" y="42" width="130" height="68" rx="4" />
-      <rect x="168" y="52" width="86" height="48" rx="2" strokeWidth={0.9} />
-      <path d="M 172 76 Q 183 58, 193 76 T 213 76 T 233 76 T 253 76" strokeWidth={1} />
-      {/* Graticule */}
-      <g strokeWidth={0.5} opacity={0.5}>
-        <line x1="189" y1="56" x2="189" y2="96" />
-        <line x1="211" y1="56" x2="211" y2="96" />
-        <line x1="233" y1="56" x2="233" y2="96" />
-        <line x1="168" y1="76" x2="254" y2="76" />
+      {/* Oscilloscope */}
+      <RoughPaths paths={s.oscBody} />
+      <RoughPaths paths={s.oscScreen} />
+      <RoughPaths paths={s.oscTrace} />
+      <g opacity={0.5}>
+        {s.oscGraticule.map((g, i) => <RoughPaths key={i} paths={g} />)}
       </g>
-      {/* Knobs */}
-      <circle cx="267" cy="62" r="4" strokeWidth={0.9} />
-      <circle cx="279" cy="62" r="4" strokeWidth={0.9} />
-      <circle cx="267" cy="78" r="4" strokeWidth={0.9} />
-      <circle cx="279" cy="78" r="4" strokeWidth={0.9} />
+      {s.oscKnobs.map((k, i) => <RoughPaths key={i} paths={k} />)}
 
-      {/* Breadboard (right) */}
-      <rect x="305" y="78" width="80" height="32" rx="3" />
-      <g strokeWidth={0.4} opacity={0.55}>
-        <line x1="310" y1="86"  x2="380" y2="86" />
-        <line x1="310" y1="92"  x2="380" y2="92" />
-        <line x1="310" y1="98"  x2="380" y2="98" />
-        <line x1="310" y1="104" x2="380" y2="104" />
+      {/* Breadboard */}
+      <RoughPaths paths={s.bbBody} />
+      <g opacity={0.55}>
+        {s.bbRows.map((r, i) => <RoughPaths key={i} paths={r} />)}
       </g>
-      {/* Jumper wire arcing above */}
-      <path d="M 318 78 C 330 50, 360 50, 372 78" strokeWidth={0.9} />
+      <RoughPaths paths={s.bbJumper} />
     </svg>
   )
 }

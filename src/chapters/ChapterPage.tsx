@@ -21,6 +21,7 @@ const CHAPTER_COMPONENTS: Record<string, React.LazyExoticComponent<() => React.J
   '0-3': lazy(() => import('./00-intro/Chapter0_3')),
   '0-4': lazy(() => import('./00-intro/Chapter0_4')),
   '0-5': lazy(() => import('./00-intro/Chapter0_5')),
+  '1-1': lazy(() => import('./01-electricity/Chapter1_1')),
 }
 
 // ─── Adjacent chapter nav ─────────────────────────────────────────────────────
@@ -109,7 +110,7 @@ function ChapterHeader({ id }: { id: string }) {
   const heroAriaLabel = t(`ch${id.replace('-', '_')}.heroAriaLabel`, { defaultValue: '' })
 
   return (
-    <div className="mb-10 pb-8 border-b border-border">
+    <div className="mb-10 pb-6 border-b border-border">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span className="text-xs font-mono text-muted-foreground">{t('chapter.chapter')} {meta.number}</span>
         {meta.hasLab && (
@@ -117,9 +118,6 @@ function ChapterHeader({ id }: { id: string }) {
         )}
         {meta.hasQuiz && (
           <Badge variant="warning">{t('chapter.quiz')}</Badge>
-        )}
-        {meta.erc32 && meta.erc32.length > 0 && (
-          <Badge variant="muted">{t('chapter.erc32')} {meta.erc32.join(', ')}</Badge>
         )}
       </div>
       <div className="flex items-center gap-1">

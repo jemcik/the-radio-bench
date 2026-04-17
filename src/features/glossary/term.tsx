@@ -1,7 +1,7 @@
 import { useState, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import type { GlossaryEntry } from './glossary'
 
 /**
@@ -51,7 +51,18 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
             if (!isTouch.current && !pinned && !suppressTooltip.current) setTooltipOpen(open)
           }}
         >
-          <PopoverTrigger asChild>
+          {/* Both PopoverAnchor and TooltipTrigger anchor to the same span,
+              but only TooltipTrigger owns event handling / ref for its
+              popper. PopoverAnchor is a positioning-only primitive — it
+              tells the popover where to appear without claiming event
+              listeners. Using PopoverTrigger AND TooltipTrigger both as
+              asChild on the same span caused Radix ref collisions: one
+              trigger's measurement of the bounding rect won out and the
+              other's popper floated to the wrong x-position (sometimes
+              hundreds of px away from the actual term). Click-to-pin is
+              now handled by the span's own onClick instead of
+              PopoverTrigger. */}
+          <PopoverAnchor asChild>
             <TooltipTrigger asChild>
               {/* `inline` (not inline-block) so the browser's line-break
                   algorithm can keep a following punctuation mark (",", ".",
@@ -82,7 +93,7 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
                 {children}
               </span>
             </TooltipTrigger>
-          </PopoverTrigger>
+          </PopoverAnchor>
 
           {/* ── Hover tooltip (lightweight, tip only) ──── */}
           <TooltipContent

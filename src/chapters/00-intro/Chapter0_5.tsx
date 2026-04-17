@@ -5,6 +5,7 @@ import LabActivity from '@/components/lab/LabActivity'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
 import { G } from '@/features/glossary/glossary-term'
+import { MathVar } from '@/components/ui/math'
 import SVGDiagram from '@/components/diagrams/SVGDiagram'
 import {
   Circuit, Wire,
@@ -175,21 +176,27 @@ export default function Chapter0_5() {
       <div className="not-prose my-6 flex flex-col divide-y divide-border">
         <SymbolCell
           name={t('ch0_5.symbolResistorName')}
-          description={t('ch0_5.symbolResistorDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui" components={{ var: <MathVar /> }} />
+          }
         >
           <Resistor x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolCapacitorName')}
-          description={t('ch0_5.symbolCapacitorDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolCapacitorDesc" ns="ui" components={{ var: <MathVar /> }} />
+          }
         >
           <Capacitor x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolInductorName')}
-          description={t('ch0_5.symbolInductorDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolInductorDesc" ns="ui" components={{ var: <MathVar /> }} />
+          }
         >
           <Inductor x={55} y={28} />
         </SymbolCell>
@@ -217,7 +224,9 @@ export default function Chapter0_5() {
 
         <SymbolCell
           name={t('ch0_5.symbolDiodeName')}
-          description={t('ch0_5.symbolDiodeDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolDiodeDesc" ns="ui" components={{ var: <MathVar /> }} />
+          }
         >
           <Diode x={55} y={28} />
         </SymbolCell>
@@ -233,7 +242,9 @@ export default function Chapter0_5() {
 
         <SymbolCell
           name={t('ch0_5.symbolTransistorName')}
-          description={t('ch0_5.symbolTransistorDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolTransistorDesc" ns="ui" components={{ var: <MathVar /> }} />
+          }
         >
           <TransistorNPN x={55} y={28} />
         </SymbolCell>

@@ -87,7 +87,7 @@ export default function Welcome() {
         ].map(s => (
           <Card key={s.label} className="p-4 text-center">
             <div className="text-2xl font-bold text-primary font-mono">{s.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+            <div className="text-[13px] text-muted-foreground mt-1">{s.label}</div>
           </Card>
         ))}
       </div>
@@ -95,7 +95,7 @@ export default function Welcome() {
       {/* What you'll need */}
       <div className="space-y-4">
         <div className="flex items-center gap-1">
-          <h2 id="what-youll-need" className="text-lg font-semibold text-foreground scroll-mt-20">{t('welcome.whatYouNeed')}</h2>
+          <h2 id="what-youll-need" className="text-xl font-semibold text-foreground scroll-mt-20">{t('welcome.whatYouNeed')}</h2>
           <span data-tour="bookmark-demo">
             <BookmarkButton
               chapterId="welcome"
@@ -106,14 +106,14 @@ export default function Welcome() {
             />
           </span>
         </div>
-        <p className="text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground leading-relaxed">
           <Trans
             i18nKey="welcome.justBrowserDetail"
             ns="ui"
             components={{ strong: <strong className="text-foreground" /> }}
           />
         </p>
-        <p className="text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground leading-relaxed">
           {t('welcome.handsOnLabsDetail')}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -127,13 +127,13 @@ export default function Welcome() {
             <Card key={tool} radius="lg" className="flex gap-3 px-4 py-3">
               <span className="text-teal-500 mt-0.5 shrink-0">▸</span>
               <div>
-                <div className="text-sm font-medium text-card-foreground">{tool}</div>
-                <div className="text-xs text-muted-foreground">{desc}</div>
+                <div className="text-base font-medium text-card-foreground">{tool}</div>
+                <div className="text-[13px] text-muted-foreground">{desc}</div>
               </div>
             </Card>
           ))}
         </div>
-        <p className="text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground leading-relaxed">
           <Trans
             i18nKey="welcome.termsHighlighted"
             ns="ui"
@@ -144,16 +144,16 @@ export default function Welcome() {
 
       {/* Chapter overview */}
       <div id="whats-covered" className="space-y-4 scroll-mt-20">
-        <h2 className="text-lg font-semibold text-foreground">{t('welcome.whatsCovered')}</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t('welcome.whatsCovered')}</h2>
         <div className="space-y-3">
           {translatedParts.map(part => (
             <Card key={part.number} className="overflow-hidden">
               <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-primary">
+                <span className="text-[13px] font-mono font-bold text-primary">
                   {['0', 'I', 'II', 'III', 'IV'][part.number]}
                 </span>
-                <span className="text-sm font-semibold text-card-foreground">{part.title}</span>
-                <span className="ml-auto text-xs text-muted-foreground">{part.chapters.length} {t('welcome.chapters')}</span>
+                <span className="text-base font-semibold text-card-foreground">{part.title}</span>
+                <span className="ml-auto text-[13px] text-muted-foreground">{part.chapters.length} {t('welcome.chapters')}</span>
               </div>
               <div className="px-4 py-2 flex flex-wrap gap-1.5">
                 {part.chapters.map(ch => {
@@ -162,12 +162,12 @@ export default function Welcome() {
                     <Link
                       key={ch.id}
                       to={`/chapter/${ch.id}`}
-                      className="text-xs bg-muted rounded px-2 py-1 text-primary hover:bg-primary/10 transition-colors"
+                      className="text-[13px] bg-muted rounded px-2 py-1 text-primary hover:bg-primary/10 transition-colors"
                     >
                       {ch.number} {ch.title}
                     </Link>
                   ) : (
-                    <span key={ch.id} className="text-xs text-muted-foreground/60 bg-muted rounded px-2 py-1">
+                    <span key={ch.id} className="text-[13px] text-muted-foreground/60 bg-muted rounded px-2 py-1">
                       {ch.number} {ch.title}
                     </span>
                   )
@@ -183,8 +183,8 @@ export default function Welcome() {
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden />
           <div>
-            <p className="text-sm font-semibold text-primary mb-1">{t('welcome.ercAligned')}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base font-semibold text-primary mb-1">{t('welcome.ercAligned')}</p>
+            <p className="text-base text-muted-foreground">
               {t('welcome.ercDetail')}
             </p>
           </div>

@@ -466,4 +466,73 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'A schematic encodes topology, not geometry. Two drawings that look completely different on paper can describe the same circuit if every component is connected to the same neighbours in both. A neat rectangle and a tangled zig-zag with identical connections are the same circuit. In design practice "topology" also names specific connection patterns — voltage divider, bridge rectifier, common-emitter amplifier — each with a characteristic electrical behaviour that holds no matter how it is drawn.',
   },
+
+  // ── Ch 1.1 terms ─────────────────────────────────────────────────
+  charge: {
+    tip: 'A property of matter: positive, negative, or neutral. Unlike charges attract, like charges repel.',
+    detail:
+      'Electric charge is a fundamental property of matter, carried by protons (positive) and electrons (negative); neutrons have none. An atom with equal numbers of protons and electrons is electrically neutral. Imbalance one way or the other and you have an ion with a net charge. Charge is measured in coulombs. A single electron carries about −1.602 × 10⁻¹⁹ C, so one coulomb is an enormous pile of them (~6.25 × 10¹⁸). In circuits we rarely count individual electrons; we count the rate at which charge flows past a point, which is called current.',
+    unit: 'Coulomb (C)',
+    see: ['coulomb', 'current', 'voltage'],
+  },
+  coulomb: {
+    tip: 'The SI unit of electric charge — about 6.25 × 10¹⁸ electrons.',
+    detail:
+      'One coulomb (C) is the quantity of charge carried by approximately 6.25 × 10¹⁸ electrons, or equivalently, the charge delivered in one second by a current of one ampere (1 C = 1 A·s). Named after French physicist Charles-Augustin de Coulomb (1736–1806). The coulomb is a large unit in everyday electronics — a typical AA battery can deliver about 10 000 C of charge over its lifetime, but instantaneous currents of interest involve fractions of a coulomb per second.',
+    unit: 'Coulomb (C)',
+    see: ['charge', 'current', 'ampere'],
+  },
+  ampere: {
+    tip: 'The SI unit of current — one coulomb of charge flowing past a point per second.',
+    detail:
+      'One ampere (A) is a flow rate of one coulomb per second (1 A = 1 C/s). Typical magnitudes: an LED runs on about 10 mA; an Arduino output pin can source or sink up to about 20 mA; a phone charger delivers 1–3 A; a household lighting circuit is protected at around 15 A; a lightning bolt peaks in the tens of thousands of amperes. The ampere is named after André-Marie Ampère (1775–1836), who worked out the mathematical laws relating currents to the magnetic fields they produce.',
+    unit: 'Ampere (A)',
+    formula: '1 A = 1 C/s',
+    see: ['current', 'coulomb'],
+  },
+  ohm: {
+    tip: 'The SI unit of resistance — one volt across the component produces one ampere of current.',
+    detail:
+      'One ohm (Ω) is the resistance that permits one ampere of current when one volt is applied across it (1 Ω = 1 V/A). Copper wire has a few milliohms per metre; a typical current-limiting resistor in a hobby circuit is in the range 100 Ω to 10 kΩ; dry human skin can measure 100 kΩ or more. The ohm is named after Georg Simon Ohm (1787–1854), who discovered that current is proportional to voltage in most materials — a relationship now known as Ohm\'s Law.',
+    unit: 'Ohm (Ω)',
+    formula: '1 Ω = 1 V/A',
+    see: ['resistance', 'voltage', 'current'],
+  },
+  conductor: {
+    tip: 'A material in which charges move easily — metals, especially copper and silver.',
+    detail:
+      'Conductors have loosely-bound outer electrons that can drift through the material when a voltage is applied, carrying current. The best conductors at room temperature are silver, copper, and gold; copper wins in practice because it is cheap, abundant, and almost as good as silver. Aluminium is lighter and cheaper still but about 60 % more resistive than copper for the same cross-section. Conductors are not perfect — every real wire has some resistance, which shows up as heat when current flows.',
+    see: ['insulator', 'semiconductor', 'resistance'],
+  },
+  insulator: {
+    tip: 'A material that blocks current flow — rubber, glass, plastic, dry air.',
+    detail:
+      'Insulators have electrons tightly bound to individual atoms, so charges cannot drift freely when a voltage is applied. Typical resistivity is ten to twenty orders of magnitude higher than copper. In practice no insulator is perfect — given a high enough voltage, any material will eventually break down and conduct (lightning through air, a spark across a spark plug). The voltage at which breakdown occurs is called the dielectric strength. Common insulators: PVC and rubber on wires, ceramic on antenna stand-offs, glass on high-voltage feedthroughs, air between capacitor plates.',
+    see: ['conductor', 'semiconductor'],
+  },
+  semiconductor: {
+    tip: 'A material with conductivity between a conductor and an insulator — most often silicon.',
+    detail:
+      'Semiconductors are materials like silicon and germanium whose conductivity is much lower than a metal but much higher than an insulator, and — crucially — can be controlled by chemical doping, electric fields, light, heat, or other stimuli. Their behaviour is what makes diodes, transistors, LEDs, photodiodes, and integrated circuits possible. Almost every modern electronic device is built from doped-silicon junctions. A full treatment of semiconductor physics is the subject of Chapter 1.10.',
+    see: ['conductor', 'insulator', 'diode'],
+  },
+  'drift velocity': {
+    tip: 'The average speed at which charge carriers crawl through a conductor when a voltage is applied — typically under 1 mm/s.',
+    detail:
+      'When a voltage is applied to a wire, the free electrons inside do not zip along like water through a pipe. They collide constantly with the atoms of the metal, and the net effect of the applied field is only to nudge their random thermal motion slightly in one direction. The average forward speed — the drift velocity — is surprisingly slow: a fraction of a millimetre per second at everyday currents. The reason a light switch works instantly is that the electric field propagates through the wire near the speed of light, pushing every electron in the wire simultaneously; the same electron does not need to travel from switch to lamp. What you feel as "fast" is the field, not the carriers.',
+    see: ['current', 'conductor'],
+  },
+  'conventional current': {
+    tip: 'The universal convention that current flows from + to −, even though electrons actually flow the other way.',
+    detail:
+      'Benjamin Franklin guessed the direction of current flow in the 18th century, before anyone knew that electrons existed. He picked + to − — the wrong way around, it turned out, since electrons are negative and actually move from − to +. But his convention was already embedded in every schematic, equation, and arrow symbol in the field by the time electrons were discovered in 1897, and changing it would have broken every document in existence. So we keep Franklin\'s convention: arrows in schematics, the direction of current in every formula, and the transistor-emitter arrow all point the way positive charge would move. Electrons actually flow the opposite direction, but for circuit analysis the difference is cosmetic — the math works out the same either way.',
+    see: ['current'],
+  },
+  emf: {
+    tip: 'Electromotive force — an older name for voltage, still used in some contexts (especially for sources).',
+    detail:
+      'EMF (electromotive force) is the energy per unit charge that a source provides to push charges around a circuit. Historically the distinction between EMF and voltage was important: EMF described the source, voltage described the difference between any two points. In modern practice the terms are used interchangeably for most purposes, and the unit is the same (the volt). You will see EMF more often in physics textbooks and older engineering literature; schematics and datasheets almost always just say "voltage".',
+    unit: 'Volt (V)',
+    see: ['voltage'],
+  },
 }
