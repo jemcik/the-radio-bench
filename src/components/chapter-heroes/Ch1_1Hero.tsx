@@ -107,9 +107,6 @@ export default function Ch1_1Hero() {
       driftArrow: belowArrow(235, COPPER_TOP_Y + TUBE_HEIGHT + 16, 90),
       waterSheen: sheenStrokes(WATER_TOP_Y, 100),
       copperSheen: sheenStrokes(COPPER_TOP_Y, 130),
-      desk: roughLine(20, 195, 400, 195, { seed: 1, strokeWidth: 1.1 }),
-      hatches: [30, 70, 110, 150, 190, 230, 270, 310, 350].map((x, i) =>
-        roughLine(x, 199, x + 30, 212, { seed: 10 + i, strokeWidth: 0.6, roughness: 0.5 })),
     }
   }, [])
 
@@ -119,8 +116,8 @@ export default function Ch1_1Hero() {
   return (
     <svg
       width="540"
-      height="283"
-      viewBox="0 0 420 220"
+      height="212"
+      viewBox="0 0 420 165"
       fill="none"
       aria-hidden
     >
@@ -209,12 +206,6 @@ export default function Ch1_1Hero() {
       <text x="235" y="151" fontFamily="Georgia, serif" fontStyle="italic"
             fontSize="8" fill="currentColor" textAnchor="middle"
             opacity={0.65}>{t('ch1_1.heroDriftLabel')}</text>
-
-      {/* Desk with hatching */}
-      <RoughPaths paths={s.desk} />
-      <g opacity={0.4}>
-        {s.hatches.map((h, i) => <RoughPaths key={i} paths={h} />)}
-      </g>
     </svg>
   )
 }
