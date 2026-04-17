@@ -124,6 +124,7 @@ Why: `домовленість` = interpersonal agreement (two parties), which d
 | `напишіть формулу як трикутник` | `запишіть формулу у вигляді трикутника` | EN "write as [a shape]" needs UA `записати у вигляді N`. |
 | `справжні радіо-приклади` | `реальні приклади з радіо` | Hyphenated compound `радіо-приклади` isn't natural UA; also `справжній` too often = "genuine/authentic". |
 | `вільне володіння перетворенням означає, що ви можете` | `якщо ви робите такі перетворення впевнено, то зможете` | `вільне володіння N` in UA is reserved for languages; calqued "being fluent means you can" restructures awkwardly. |
+| `стати у пригоді` / `стануть у пригоді` / `знадобляться у пригоді` | `стати у нагоді` / `стануть у нагоді` | **Hard error** — not an alternate idiom, just a confusion between `пригода` (adventure/incident) and `нагода` (occasion/need/use). The canonical UA idiom for "come in handy / be useful" is `стати в нагоді`. A native reader parses `стати у пригоді` as "turn into an adventure" → nonsense. This slipped past 5 critics on Ch 0.2 because it sounds *almost* right; mechanical linter rule now enforces. |
 | `вода летить стрімко` | `вода тече стрімко` | Water flows, doesn't fly |
 | `електрони пролітають повз точку` | `електрони проходять повз точку` | At drift-velocity speeds, electrons don't fly |
 | `струмінь, що виливається` | `струмінь з труби` / `струмінь, що ллється` | `виливатися` = spill/leak (problem), not designed flow |

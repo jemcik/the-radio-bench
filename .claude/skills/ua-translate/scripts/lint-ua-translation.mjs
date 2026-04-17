@@ -174,6 +174,17 @@ const RULES = [
   },
 
   {
+    id: 'forbidden.prygoda-vs-nahoda',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // «стати/ставати/знадобитися в/у пригоді» is a confusion with the real
+    // idiom «стати в нагоді». `пригода` = adventure/incident; `нагода` =
+    // occasion/use. Sound-alike mistake that slips past fluency critics.
+    pattern: /(?<!\p{L})(стан[еуютьі]+|став[ае][тв]?\p{L}*|став[аеи]\p{L}*|стало|ставало|знадоб\p{L}*)\s+(?:в|у)\s+пригод[іеаую](?!\p{L})/giu,
+    hint: 'Wrong idiom: «стати у пригоді» is a confusion with «пригода» (adventure). The correct UA idiom is «стати в нагоді» («нагода» = occasion/need). «Ці поради стануть вам у нагоді».',
+  },
+
+  {
     id: 'style.missing-nbsp-volt',
     category: 'STYLE',
     severity: 'WARN',
