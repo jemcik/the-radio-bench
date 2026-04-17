@@ -36,6 +36,18 @@ Examples of the class of issues you're looking for (not exhaustive):
   - `шматочок опору` ("a piece of resistance") — English wordplay that's not a wordplay in UA
   - `іменні пам'ятки` for "namesakes" — `пам'ятка` = monument/memorial
 
+- **`X від Y` where Y is an abstract feeling/quality** (calque of EN attributive "X of/from Y")
+  - `вечір від розчарування` for EN "a frustrating evening" — UA `від + abstract` means caused-by or against, not "characterised by". Replace with an adjective (`зіпсований вечір`, `втомлений день`) or a subordinate clause (`коли щось піде не так`).
+  - `настрій від радості` for "a joyful mood" — same pattern.
+  - Rule of thumb: if the EN source has "an [adjective] X" or "an X of [abstract]", the UA version must NOT render it as "X від [abstract]".
+
+- **Dative benefactor where accusative patient is native** (calque of EN "save you an X" / "spare you a Y")
+  - `врятує вам вечір` — `рятувати` in UA takes accusative (person or thing being saved): `врятує ВАС від X` or `врятує ВАШ вечір`, not `врятує ВАМ вечір`.
+  - Same family: `заощадить вам X`, `зекономить вам X`. Usually better as `заощадить X (кому?)` or rephrase entirely.
+
+- **Sound-alike idiom confusion**
+  - `стати у пригоді` (adventure) vs the correct `стати в нагоді` (occasion/need). `пригода` and `нагода` are near-homophones; the wrong one sneaks through fluency scans because it almost-parses. When you see a "this will come in handy" idiom, verify it's `нагода`, not `пригода`.
+
 ## What NOT to flag
 
 - Correct physics terminology taken from the glossary — this is not your job to second-guess
