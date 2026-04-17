@@ -75,7 +75,7 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
                 labels aligned on the right. The `contents` class on <li>
                 removes the list item from layout so dt/dd act as direct grid
                 children and all swatches + labels line up cleanly. */}
-            <dl className="shrink-0 grid grid-cols-[1.5rem_1fr] gap-x-3 gap-y-2 text-[11px] text-muted-foreground">
+            <dl className="shrink-0 grid grid-cols-[1.5rem_1fr] gap-x-3 gap-y-2 text-[13px] text-muted-foreground">
               {legend.map((item, i) => (
                 <div key={i} className="contents">
                   <dt className="flex items-center justify-center">
@@ -93,7 +93,7 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
         )}
       </div>
       {caption && (
-        <figcaption className="mt-2 text-center text-xs text-muted-foreground">
+        <figcaption className="mt-2 text-center text-[13px] text-muted-foreground">
           {caption}
         </figcaption>
       )}
@@ -110,8 +110,12 @@ export interface LegendItem {
   kind?: LegendSwatchKind
   /** Stroke/fill colour. Defaults to `currentColor` (the sketch-stroke token). */
   color?: string
-  /** Human-readable description (already i18n-resolved). */
-  label: string
+  /**
+   * Human-readable description. Accepts a plain string or a React node —
+   * pass a `<Trans>` element when the i18n string contains placeholders
+   * like `<var>V</var>` that need to render through KaTeX / MathVar.
+   */
+  label: ReactNode
 }
 
 function LegendSwatch({ kind, color }: { kind: LegendSwatchKind; color?: string }) {

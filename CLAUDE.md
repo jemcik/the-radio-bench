@@ -28,6 +28,14 @@ Diagrams are viewed inline with body copy. Small SVG text reads as
 diagram. If a label doesn't fit at 13 px, the layout is wrong (rotate,
 stagger, wrap, or shrink the content set — don't shrink the type).
 
+**HTML-rendered text around diagrams follows the same floor.** Both
+`DiagramFigure` (figcaption) and `Circuit` (figcaption + legend list)
+use `text-[13px]` for caption and legend-label text. Never use
+Tailwind's `text-xs` (= 12 px) or `text-[11px]` for diagram-adjacent
+copy — these read as "tiny footnote" beside 16 px body prose. Apply
+the 13 px floor uniformly so the SVG interior and the surrounding
+HTML are typographically flush.
+
 The old "11 px floor" rule from earlier chapters is deprecated — the
 user has repeatedly flagged 11–12 px text as too small next to body
 copy. Exception: glyph decorations INSIDE a shape (e.g. the `+` inside

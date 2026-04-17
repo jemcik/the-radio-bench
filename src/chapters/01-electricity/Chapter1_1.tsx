@@ -275,9 +275,9 @@ export default function Chapter1_1() {
       <LedCircuit
         caption={t('ch1_1.circuitCaption')}
         legend={[
-          { kind: 'battery',  label: 'V — voltage source (battery, 3 V)' },
-          { kind: 'resistor', label: 'R — resistance' },
-          { kind: 'led',      label: 'I — current flowing through' },
+          { kind: 'battery',  label: <Trans i18nKey="ch1_1.circuitLegendBattery"  ns="ui" components={{ var: <MathVar /> }} /> },
+          { kind: 'resistor', label: <Trans i18nKey="ch1_1.circuitLegendResistor" ns="ui" components={{ var: <MathVar /> }} /> },
+          { kind: 'led',      label: <Trans i18nKey="ch1_1.circuitLegendLed"      ns="ui" components={{ var: <MathVar /> }} /> },
         ]}
       />
 

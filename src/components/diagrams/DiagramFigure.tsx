@@ -31,7 +31,7 @@ export default function DiagramFigure({ caption, className, children }: DiagramF
         {children}
       </div>
       {caption && (
-        <figcaption className="mt-2 text-center text-xs text-muted-foreground">
+        <figcaption className="mt-2 text-center text-[13px] text-muted-foreground">
           {caption}
         </figcaption>
       )}
