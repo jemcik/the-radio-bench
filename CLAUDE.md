@@ -3,6 +3,112 @@
 Short-form guidance to keep future work consistent. If you change a
 convention here, update this file in the same commit.
 
+## Workflow — read before starting work
+
+### Pre-PR quality gate — non-negotiable
+
+Before opening a PR for a new chapter, a batch of significant changes,
+or any work the user hints is "done" / "ready", run the **full** gate.
+Don't curate scripts from memory — list every quality-check script in
+`package.json` and run them all:
+
+```bash
+jq -r '.scripts | keys[]' package.json | grep -E '^(check|lint|test|build|knip)'
+# Then run each. Currently:
+npm run lint
+npx tsc --noEmit
+npm run knip              # dead-code / unused-export sweep — DON'T SKIP
+npm run check:i18n
+npm run check:i18n-usage
+npm run check:uk
+npm run check:gitignore
+npm test
+npm run build
+```
+
+All must be green. If any fails, stop and fix before continuing.
+Past failure: a gate run missed `knip` (not in Claude's memory set)
+and shipped a PR with 5 unused exports + 1 unused file.
+
+**After every `git push`**, verify CI actually passes:
+
+```bash
+gh pr checks <PR_NUMBER>
+gh run view <run-id> --log-failed   # if red
+```
+
+Local `npm run build` ≠ CI green. Two common CI-only failure modes on
+this repo:
+
+1. **`npm ci` peer-dep strictness** — CI uses `npm ci`, which rejects
+   mismatched `peerDependencies`. Worked around via `.npmrc` with
+   `legacy-peer-deps=true`.
+2. **Node-version drift** — CI pins one Node version (see
+   `.github/workflows/*.yml`); local Node may be newer.
+
+Wait for CI to complete before telling the user "ready for review".
+
+For new chapters / large refactors, also delegate an agent review
+covering: UK translation quality, EN↔UK consistency, i18n completeness
+(see "New chapter checklist" below), test coverage, prose promises
+paid off, schematic conventions. Report findings first — don't
+silently apply every suggestion.
+
+### Don't start a local dev server
+
+The user runs `npm run dev` locally. Both servers fight for port 5173
+and any screenshot I take reflects my instance, not theirs. If visual
+verification is needed, ask the user to screenshot or describe.
+Never invoke `preview_start` for this repo.
+
+### Never use git worktrees
+
+Don't pass `isolation: "worktree"` to the Agent tool; don't suggest
+`git worktree add`. A stray worktree once made the user's dev server
+serve a stale snapshot missing Ch 1.1 + uncommitted edits. Work
+directly in the main checkout.
+
+### Commit cadence
+
+Batch related changes into one commit. Don't commit after every
+single fix — the user has flagged this. A commit is a unit of
+reviewable work, not a save point.
+
+## New chapter checklist
+
+A chapter is done when ALL of these are true, not just "prose is
+written":
+
+1. **Hero illustration renders.** Never hand the user a prose-only
+   preview with a TODO placeholder for the hero or primary widget.
+   The user has caught this twice — no more incomplete previews.
+2. **Visual density throughout.** Every section has something to look
+   at — widget, illustration, magnitude scale. A chapter that's 2/3
+   prose before the first visual fails review. Plan visuals at
+   outline time, not after prose is written.
+3. **Five i18n touchpoints**, each in BOTH `en/ui.json` AND
+   `uk/ui.json`:
+   - `chapterTitles.{id}`
+   - `chapterSubtitles.{id}`
+   - `ch{id}.*` translation block
+   - New glossary terms in `glossary.*`
+   - New unit symbols in `units.*`
+
+   `chapterTitles` / `chapterSubtitles` are separate namespaces that
+   silently fall back to English via `defaultValue` when missing —
+   parity scripts can't catch that. Cross-check manually.
+4. **Test pairs.** Every interactive widget has a `*.test.tsx`
+   sibling using `renderWithProviders` from `src/test/render`.
+   Numeric outputs asserted on the exact `.toFixed(2)` format
+   (`"20.00"`, not `"20"`).
+5. **Prose promises paid off.** Read top-to-bottom for phrasings like
+   `"The … table:"` / `"The … diagram:"` — every such promise has
+   the referenced artefact actually rendered. Run
+   `node scripts/check-i18n-usage.mjs` to catch orphan keys too.
+6. **Status flip last.** `'coming-soon'` → `'published'` in
+   `src/data/chapters.ts` only after 1–5 and the full gate above
+   are green.
+
 ## SVG diagrams (`src/components/diagrams/*`)
 
 These render at fixed `viewBox` dimensions and scale responsively
@@ -414,5 +520,25 @@ least one related term so the tooltip's "see also" chain works.
 - **Glossary terms**: wrap first occurrence of each technical term in
   `<G k="termKey">` so the tooltip works. Don't sprinkle `<G>` on every
   occurrence — once per chapter section is enough.
+- **Glossary tag span**: keep the `<G>` wrapper tight around the
+  abbreviation or canonical term only — never wrap a long parenthetical
+  expansion too. `<vna>VNA (Vector Network Analyser)</vna>` makes the
+  Radix popper measure the wrapped union of the whole phrase and
+  position the tooltip off-screen; `<vna>VNA</vna> (Vector Network
+  Analyser)` anchors to the abbreviation alone.
+- **Schematic coordinates — one source of truth**: every component's
+  `(x, y)` lives in a single `const NAME = { x, y }` object.
+  `pins2(NAME.x, NAME.y, …)` and `<Component {...NAME} />` both derive
+  from it. Never duplicate literal coordinates between pin helpers and
+  JSX render — editing only one side causes silent drift (wires end at
+  the new pin, symbol body drawn at the old position, and no test
+  catches it).
 - **Chapter status**: flip `'coming-soon'` → `'published'` in
-  `src/data/chapters.ts` only after tsc/eslint/i18n/vitest all pass.
+  `src/data/chapters.ts` only after the full pre-PR gate (see top)
+  is green.
+- **No HTML entities in i18n JSON**: `&quot;`, `&amp;`, `&nbsp;`
+  render verbatim through react-i18next. Use real characters — curly
+  quotes `"…"` / `«…»`, a real non-breaking space, etc.
+- **Schematic junction dots**: only at real T-junctions (three or
+  more wires meeting). Never at a corner bend, never at a phantom
+  two-wire crossing.
