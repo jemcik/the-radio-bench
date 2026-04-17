@@ -95,6 +95,35 @@ Why: `домовленість` = interpersonal agreement (two parties), which d
 | `коло під напругою це вже готовий нещасний випадок, якому бракує лише нагоди` | `коло під напругою — це нещасний випадок, що вже чекає свого часу` | Missing em-dash + calqued "an accident waiting to happen" |
 | `Верстак` (abstract lab-bench setup) | `Стенд` | `верстак` is reserved for `Радіоверстак` brand pun + literal workbench illustration. Abstract "bench" = `стенд`. |
 | `працюючих інструментів` (Russianism participle) | `справних інструментів` / `робочих інструментів` | `-ючих` active participles are Russianism; UA uses `-льний`/`-чий` or relative clauses. Same rule as `підтягуючий` → `підтягувальний`. |
+| `кΩ` / `МΩ` / `мΩ` (Cyrillic prefix + Greek Ω) | `кОм` / `МОм` / `мОм` | Mixed-script compound in prose. Keep «Ω» only as a standalone parenthetical («(Ω)») referencing meter-faceplate labels, or in the glossary dual-notation form «Ом (Ω)». |
+| `наноfarads` (Latin stem in mid-word) | `нанофарад` | English leftover glued to UA prefix; case form needs adjustment (skilки + genitive plural). |
+| `пікo` (Latin `o` inside Cyrillic word) | `піко` | Mixed-script encoding typo. Any `-ико`, `-ано`, etc. ending that "looks right" but contains a Latin letter renders identically in Latin fonts but breaks search/screen readers. |
+| `обидві сторони (рівняння)` (math equation "sides") | `обидві частини (рівняння)` | `сторони` is a literal calque of EN "both sides". UA math textbooks prefer `обидві частини рівняння` as the formal idiom. Applies to `formulaDivideBothSides`, `formulaMultiplyBothSides`, `formulaTakeSquareRoot`, `formulaTakeReciprocal`, quiz explanations. |
+| `Невірне введення` (for "invalid input") | `Некоректне введення` / `Неправильне значення` | `невірний` strictly means "unfaithful" in UA. Use `некоректний` for "invalid/incorrect". |
+| `Струм` (as formal quantity-label row in units table) | `Сила струму` | Glossary rule: formal quantity labels use `сила струму`; running prose uses `струм`. |
+| `найбільш використовуваний навичка` | `найуживаніша навичка` | Gender mismatch (`навичка` is f, needs f adjective) + stylistic: UA prefers `найуживаніший` over analytic `найбільш + X`. |
+| `закрий невідому` (ти-imperative, f-accusative) | `закрийте невідоме` (ви-imperative, n-accusative) | Register break (familiar ти in a ви-chapter) + gender: "the unknown" as abstract = `невідоме` (n). |
+| `яку змінну вам потрібна` | `яка змінна вам потрібна` | Case agreement: after `вам потрібна` the subject is nom., not acc. |
+| `або еквівалентно поділену на 2` | `— тобто поділену на 2` | `еквівалентно` as floating adverb is calque of "or equivalently". UA uses a dash + `тобто`. |
+| `Як тільки ви побачите це як ділення` | `Щойно ви почнете сприймати їх як ділення` | `Як тільки` + perfective future is a calque of "once/as soon as". `Щойно` + `почнете` reads native. |
+| `нудно й схильно до помилок` | `нудно і легко помилитися` | `схильно до помилок` is a literal calque of "error-prone"; UA `схильність` needs a person/object subject, not an activity. |
+| `Число перед множенням` (for "the number in front") | `Число-множник перед степенем десяти` | Literal rendering opens the sentence unclearly — `множення` as a noun here reads opaque. |
+| `в десять разів більше!` | `вдесятеро більше, ніж потрібно!` | Calque of "ten times too big!" — UA has `вдесятеро` as the compact multiplier. |
+| `на скільки кроків ви рухаєтеся` | `скільки кроків ви робите` | `рухатися на N кроків` isn't idiomatic; you `робите` N steps. Also the preposition `на` is redundant here. |
+| `йде в іншу сторону` (for "the inverse operation") | `це зворотна дія` / `робить навпаки` | Spatial calque of "goes the other way" for an abstract inverse. |
+| `перетворюєте формулу для напруги чи струму` | `виражаєте з формули напругу чи струм` | EN "rearrange for" is an idiom; UA says `виразити з формули X`. |
+| `робить речі більшими швидко` | `швидко збільшує числа` | `речі` landmine + calqued word order. |
+| `приносять їх назад` (of inverse operations) | `повертає їх до попередніх величин` | `приносити назад` is physical carrying; abstract "bring them back down" needs `повертає`. |
+| `ви часто будете знати … й вам потрібно знайти` | `часто трапляється так, що ви знаєте … й маєте знайти` | Tense-mismatched calque of "you will know … and need to find". |
+| `Ми будемо практикуватися в цьому з кожною новою формулою` | `Ми відпрацьовуватимемо це на кожній новій формулі` | Triple calque: `практикуватися в N` + `з кожною N` + periphrastic future. |
+| `близькі до позначених значень` | `близькими до номінальних значень` | `позначених` is ambiguous (marked by whom?). EN "labelled values" = `номінальні`. |
+| `ви на неправильному діапазоні` | `обрано не той діапазон` | Literal calque of "you are on the wrong range". UA electrical idiom is impersonal. |
+| `відрізняється від позначення` | `сильно відрізняється від номіналу` | Same as `номінальні` above — `позначення` means "marking/designation", wrong register for "label value". |
+| `Число з 1 цифрою (або більше) перед комою` | `Число з однією або кількома цифрами перед комою` | Mid-phrase `(або більше)` parenthetical reads as anglicism. |
+| `Перетворіть на I = V/R` (for "rearrange to") | `Виразіть I: I = V/R` | `Перетворіть на X` reads as "transform [something] into X", unclear. UA math idiom: `виразити змінну`. |
+| `напишіть формулу як трикутник` | `запишіть формулу у вигляді трикутника` | EN "write as [a shape]" needs UA `записати у вигляді N`. |
+| `справжні радіо-приклади` | `реальні приклади з радіо` | Hyphenated compound `радіо-приклади` isn't natural UA; also `справжній` too often = "genuine/authentic". |
+| `вільне володіння перетворенням означає, що ви можете` | `якщо ви робите такі перетворення впевнено, то зможете` | `вільне володіння N` in UA is reserved for languages; calqued "being fluent means you can" restructures awkwardly. |
 | `вода летить стрімко` | `вода тече стрімко` | Water flows, doesn't fly |
 | `електрони пролітають повз точку` | `електрони проходять повз точку` | At drift-velocity speeds, electrons don't fly |
 | `струмінь, що виливається` | `струмінь з труби` / `струмінь, що ллється` | `виливатися` = spill/leak (problem), not designed flow |

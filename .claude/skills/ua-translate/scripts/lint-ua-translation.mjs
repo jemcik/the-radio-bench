@@ -368,6 +368,32 @@ const RULES = [
     hint: 'Latin unit symbol in UK text. Use Cyrillic: В/кВ/мВ / А/кА/мА/мкА / Ом/кОм/МОм/мОм / Гц/кГц/МГц/ГГц / Дж/Вт / Ф/мкФ/нФ/пФ / Гн / Вт·год / мВт/кВт.',
   },
 
+  {
+    id: 'punct.mixed-cyr-greek-ohm',
+    category: 'PUNCT',
+    severity: 'ERROR',
+    // Catch Cyrillic prefix GLUED to Greek-Ω (kΩ/МΩ style), which is the
+    // failure mode observed in Ch 0.3 labStep3/labStep4/quiz_q1. Legitimate
+    // bare «Ω» in glossary entries like «Ом (Ω)» or «(Ω)» meter-knob
+    // references are NOT flagged — glossary uses dual-notation by design.
+    pattern: /[кКмМнНпПмгГТ]Ω/gu,
+    hint: 'Mixed Cyrillic-prefix + Greek-Ω (e.g. «кΩ», «МΩ»). Use Cyrillic: «кОм», «МОм», «мОм», «нОм».',
+  },
+
+  {
+    id: 'punct.mixed-cyr-latin-word',
+    category: 'PUNCT',
+    severity: 'ERROR',
+    // Mixed Cyrillic + Latin letters inside a single word (encoding accident).
+    // Three patterns: cyr+lat, lat+cyr, and single-char contamination inside a word.
+    // Examples caught: «пікo» (Latin o at end), «наноfarads» (Latin stem),
+    // «Кlас» (Latin l in middle), «Aрдуіно» (Latin A at start).
+    // Allowed mixed-script like «Arduino-сумісний» (with hyphen) is NOT caught —
+    // it requires letters glued with no separator.
+    pattern: /\p{Script=Cyrillic}[A-Za-z]+(?![\p{Script=Cyrillic}A-Za-z]*-)|[A-Za-z]+\p{Script=Cyrillic}(?![-A-Za-z])/gu,
+    hint: 'Mixed-script word (Cyrillic + Latin letters glued with no separator). Likely an encoding typo — e.g. «пікo» should be «піко», «наноfarads» should be «нанофарад». If intentional (hyphenated brand like «Arduino-сумісний»), add a hyphen.',
+  },
+
   // ── Bare `K` for coulomb (collides with Kelvin) ─────────────────────────
 
   {
