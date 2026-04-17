@@ -165,6 +165,25 @@ Why: `домовленість` = interpersonal agreement (two parties), which d
 | Physics-value error: `Для діапазону 20 метрів (14 МГц) це приблизно 5 м загальної довжини дроту` | `≈ 10 м загальної довжини (по ~5 м на кожне плече)` | Dipole total length = 2 × λ/4. Translator saw "each leg ~5 m" in one entry and reused for "total length" in another — plausible EN→UA slip that should NOT pass technical review. Always run the arithmetic in the glossary, not just the prose. |
 | Open-source **hardware** rendered as "open-source code" | `з відкритою апаратною специфікацією` / `з відкритою схемотехнікою` | Arduino is open-source HARDWARE; `плата з відкритим кодом` is semantically wrong (a board isn't code). Distinguish EN "open-source" (applies to code OR hardware OR docs) from UA `відкритий код` (applies only to software). |
 | Meter "applies voltage 0.5–0.7 V" to diode | Restructure: "Meter applies voltage sufficient to forward-bias (typically 2–3 V open-circuit), displays the forward drop (~0.6 V Si)" | EN "applies a small voltage (typically 0.5–0.7 V)" conflates source voltage with displayed reading. The meter's open-circuit is much higher than the eventual Vf drop. Technical reviewer must verify every quantitative claim. |
+| Modulation-abbreviation mixed scripts (`АМ, SSB, ЧМ` / `CW, SSB, ЧМ`) | Keep ALL modulation acronyms Latin per glossary: `AM, SSB, FM` / `CW, SSB, FM` | Ch subtitles sometimes Cyrillicize AM/FM (Soviet-era textbook register) while leaving CW/SSB/DX Latin. Glossary locks: `QSO, CW, SSB, AM, FM, DX → keep Latin uppercase`. Never mix scripts in one modulation list. |
+| Band abbreviations mixed (`КХ-стрибок, VHF/UHF`) | All Cyrillic when any is Cyrillic: `КХ-стрибок, УКХ/ДМХ` | Same inconsistency trap. Pick one script system per context. |
+| `сайт` as project self-reference (guidedTour, welcome) | `курс` | Brand identity rule: project self-reference is always `курс`, never `сайт`/`книга`/`посібник`. Linter rule `forbidden.sajt-self-ref` enforces. Also posibник — EN "handbook" must become `курс` in UA self-reference. |
+| `посібник` for project self-reference | `курс` | Same rule — `hero.keepLearning` had «до кінця цього посібника»; must be `курсу`. |
+| `vs` (Latin) in UK prose / subtitle | `проти` / em-dash `—` / `чи` | Latin `vs` never belongs in UA prose. Observed in chapterTitles.2-3 and chapterSubtitles.1-7. |
+| `ви у правильному місці` (calque "you're in the right place") | `ви потрапили за адресою` / `вам сюди` | EN idiom → UA native idiom. |
+| `навіть близько` (calque "not even close") | `зовсім` / `жодної` | UA doesn't use `близько` this way as intensifier. |
+| `торкатися формул` (calque "touch a formula") | `переходити до формул` | `торкатися` is physical touch; abstract sense doesn't carry in UA. |
+| `погратися з числами` (calque, too childlike) | `поекспериментувати з числами` / `попідставляти власні числа` | Register match — readers aren't kids playing with blocks. |
+| `отримати повний навчальний досвід` (HR-speak calque) | `пройти курс повноцінно` / `засвоїти весь матеріал` | `навчальний досвід` is bureaucratic/HR; UA hobbyist learning doesn't frame it as "experience". |
+| `здача тесту` (calque "take a test") | `скласти тест` / `скласти іспит` | `здача` for test-taking is Russianism; UA verb is `скласти`. |
+| `перекладено вашою мовою` (instrumental: "translated BY your language") | `перекладено на вашу мову` | Russianism case collocation — UA uses `на + accusative`. |
+| `Зворотний зв'язок` as UI label "Contact / Get in touch" | `Напишіть нам` | `Зворотний зв'язок` is bureaucratic calque for "feedback loop"; warmer UI: direct imperative. |
+| `Перевірка` (for EN "Check recall") | `Закріплення` / `Перевірка знань` | Loses `recall` nuance entirely; pedagogy suffers in a 2-word sub-label. |
+| `робота` (generic) for ham on-air operating | `робота в ефірі` | Context-disambiguating. `робота` = work/labour in general; ham readers miss the on-air-procedures sense. |
+| `розділи вище` when `розділ`=chapter in the app (ambiguous — chapters OR sections?) | `попередні частини` / `попередні підрозділи` | Application overloads `розділ` — use a different UA word when sub-chapter sections are meant. |
+| `куди зникають X` (calque "where X disappear to") | `на що перетворюються X` | EN idiom is "become / end up as" (energy transformation); UA `куди зникають` = "where TO they vanish" reverses the meaning. |
+| `X, такі як Y` (for "X such as Y") | `X на кшталт Y` / `X як-от Y` | `такі як` is accepted but anglicism-leaning; `на кшталт`/`як-от` is more native in expository prose. |
+| `Вважайте це X` (calque "Think of this as X", stiff register) | `Уявіть це як X` | `Вважати + instrumental` is correct but formal; `Уявіть як` is conversational-register match for EN "think of as". |
 | `вода летить стрімко` | `вода тече стрімко` | Water flows, doesn't fly |
 | `електрони пролітають повз точку` | `електрони проходять повз точку` | At drift-velocity speeds, electrons don't fly |
 | `струмінь, що виливається` | `струмінь з труби` / `струмінь, що ллється` | `виливатися` = spill/leak (problem), not designed flow |
