@@ -375,10 +375,10 @@ export default function Chapter1_1() {
           { text: <Trans i18nKey="ch1_1.labStep2" ns="ui" components={{ strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep3" ns="ui" components={{ strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep4" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep5" ns="ui" components={{ strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep6" ns="ui" components={{ strong: <strong /> }} /> },
         ]}
-        expectedResult={t('ch1_1.labExpected')}
+        expectedResult={<Trans i18nKey="ch1_1.labExpected" ns="ui" components={{ var: <MathVar /> }} />}
         connectionToTheory={t('ch1_1.labConnection')}
         troubleshooting={[
           t('ch1_1.labTrouble1'),
