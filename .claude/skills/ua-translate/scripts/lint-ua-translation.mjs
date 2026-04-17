@@ -248,8 +248,9 @@ const RULES = [
     severity: 'ERROR',
     match: (s) => {
       if (!/вод[аиою]/iu.test(s)) return null
-      return matchAllRegex(s, wb('летит[ьі]|літає|лі́тати'),
-        'Physics: water flows, it doesn\'t fly. Use «тече».')
+      // Water doesn't fly, doesn't roll, doesn't crawl. It flows («тече»).
+      return matchAllRegex(s, wb('летит[ьі]|літає|лі́тати|котиться|котяться|скотиться|скотяться|котитися|повзе|повзут[ьи]|повзти'),
+        'Physics: water flows, not flies / rolls / crawls. Use «тече» / «ллється» / «розганяється» depending on context.')
     },
   },
 
