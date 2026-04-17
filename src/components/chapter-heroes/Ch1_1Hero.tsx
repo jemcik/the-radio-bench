@@ -1,12 +1,20 @@
 /**
- * Chapter 1.1 hero — a length of copper wire with a few electrons
- * drifting along it, driven by a battery on the left. The battery's
- * + terminal connects to the wire directly via a short horizontal
- * lead (no U-bend); the − terminal has a short lead that trails off
- * toward the implied return path. The wire's right end shows a
- * dangling lead to signal the cut-away (we're viewing one section of
- * a longer conductor). Electrons are small filled circles labelled
- * "e⁻" to make the "electrons = current carriers" connection concrete.
+ * Chapter 1.1 hero — the water-pipe analogy made visual.
+ *
+ * Two parallel horizontal tubes stacked vertically:
+ *  - Top: a water pipe with droplets inside
+ *  - Bottom: a copper wire with electrons inside
+ *
+ * Each tube has the same structure — arrow indicator on the left
+ * (pressure / voltage applied from outside), dots inside showing what
+ * flows, dangling right end (cut-away — we're viewing one section of
+ * a longer system), a material label above (ВОДА / МІДЬ) and a
+ * direction label below (течія / дрейф).
+ *
+ * The whole point is visual parallelism: the reader opens the chapter,
+ * sees "Voltage is pressure. Current is flow." in prose, and the hero
+ * image above already says the same thing — two tubes, same shape,
+ * same dots, same arrow, only the labels differ.
  *
  * Drawn with Rough.js for the hand-sketched aesthetic. Every stroke
  * path renders with `stroke="currentColor"` so the sketch inherits the
@@ -20,117 +28,193 @@ import {
   roughLinearPath,
 } from '@/lib/rough'
 
+/** Geometry — shared between water row (y0) and copper row (y0). */
+const TUBE_X_START = 100
+const TUBE_X_END = 370
+const TUBE_X_RIGHT_OUT = 395
+const TUBE_HEIGHT = 20
+
+/** y-offsets for each row's top edge. */
+const WATER_TOP_Y = 22
+const COPPER_TOP_Y = 101
+
+/** Helper — build one tube's stroke set (top, bottom, caps, right dangle). */
+function tubeStrokes(topY: number, seed: number) {
+  const botY = topY + TUBE_HEIGHT
+  const midY = topY + TUBE_HEIGHT / 2
+  return {
+    top: roughLine(TUBE_X_START, topY, TUBE_X_END, topY, { seed: seed + 0, strokeWidth: 1.4 }),
+    bot: roughLine(TUBE_X_START, botY, TUBE_X_END, botY, { seed: seed + 1, strokeWidth: 1.4 }),
+    leftCap: roughLine(TUBE_X_START, topY, TUBE_X_START, botY, { seed: seed + 2 }),
+    rightCap: roughLine(TUBE_X_END, topY, TUBE_X_END, botY, { seed: seed + 3 }),
+    rightOut: roughLine(TUBE_X_END, midY, TUBE_X_RIGHT_OUT, midY, { seed: seed + 4, roughness: 0.4 }),
+  }
+}
+
+/** Helper — build a small "applied from left" arrow (shaft + wedge head). */
+function leftArrow(midY: number, seed: number) {
+  return {
+    shaft: roughLine(55, midY, 85, midY, { seed: seed + 0 }),
+    head: roughLinearPath(
+      [[80, midY - 4], [85, midY], [80, midY + 4]],
+      { seed: seed + 1 },
+    ),
+  }
+}
+
+/** Helper — build the "flow / drift" arrow that sits below a tube. */
+function belowArrow(midX: number, y: number, seed: number) {
+  return {
+    shaft: roughLine(midX - 25, y, midX + 25, y, { seed: seed + 0, strokeWidth: 0.9, roughness: 0.3 }),
+    head: roughLinearPath(
+      [[midX + 19, y - 3], [midX + 25, y], [midX + 19, y + 3]],
+      { seed: seed + 1, strokeWidth: 0.9, roughness: 0.3 },
+    ),
+  }
+}
+
+/** Helper — build a row of metallic sheen strokes inside a tube. */
+function sheenStrokes(topY: number, seedBase: number) {
+  const topSheenY = topY + 5
+  const botSheenY = topY + 16
+  const pairs: [number, number, number, number][] = [
+    [118, topSheenY, 130, topSheenY],
+    [160, topSheenY, 172, topSheenY],
+    [220, topSheenY, 232, topSheenY],
+    [280, topSheenY, 292, topSheenY],
+    [340, topSheenY, 352, topSheenY],
+    [140, botSheenY, 152, botSheenY],
+    [200, botSheenY, 212, botSheenY],
+    [260, botSheenY, 272, botSheenY],
+    [320, botSheenY, 332, botSheenY],
+  ]
+  return pairs.map(([x1, y1, x2, y2], i) =>
+    roughLine(x1, y1, x2, y2, { seed: seedBase + i, strokeWidth: 0.5, roughness: 0.4 }))
+}
+
 export default function Ch1_1Hero() {
   const { t } = useTranslation('ui')
-  const s = useMemo(() => ({
-    desk: roughLine(20, 118, 400, 118, { seed: 1, strokeWidth: 1.1 }),
-    hatches: [30, 70, 110, 150, 190, 230, 270, 310, 350].map((x, i) =>
-      roughLine(x, 122, x + 30, 135, { seed: 10 + i, strokeWidth: 0.6, roughness: 0.5 })),
 
-    // Battery (vertical, long plate up = +) centered at x=70.
-    // No upper lead above the + plate — it would dangle orphan now that
-    // + connects sideways to the wire, not up-and-over.
-    batteryPlate: roughLine(58, 60, 82, 60, { seed: 21, strokeWidth: 1.6 }),
-    batteryShort: roughLine(63, 68, 77, 68, { seed: 22 }),
-    // − terminal lead trails off downward — implies the return path of
-    // the full circuit continues somewhere off-frame (toward the other
-    // cut end of the copper wire, not drawn).
-    batteryBotLead: roughLine(70, 68, 70, 95, { seed: 23 }),
+  const s = useMemo(() => {
+    const waterMidY = WATER_TOP_Y + TUBE_HEIGHT / 2
+    const copperMidY = COPPER_TOP_Y + TUBE_HEIGHT / 2
+    return {
+      water: tubeStrokes(WATER_TOP_Y, 30),
+      copper: tubeStrokes(COPPER_TOP_Y, 70),
+      pressureArrow: leftArrow(waterMidY, 40),
+      voltageArrow: leftArrow(copperMidY, 80),
+      flowArrow: belowArrow(235, WATER_TOP_Y + TUBE_HEIGHT + 16, 50),
+      driftArrow: belowArrow(235, COPPER_TOP_Y + TUBE_HEIGHT + 16, 90),
+      waterSheen: sheenStrokes(WATER_TOP_Y, 100),
+      copperSheen: sheenStrokes(COPPER_TOP_Y, 130),
+      desk: roughLine(20, 195, 400, 195, { seed: 1, strokeWidth: 1.1 }),
+      hatches: [30, 70, 110, 150, 190, 230, 270, 310, 350].map((x, i) =>
+        roughLine(x, 199, x + 30, 212, { seed: 10 + i, strokeWidth: 0.6, roughness: 0.5 })),
+    }
+  }, [])
 
-    // Copper wire cut-away
-    wireTop: roughLine(110, 58, 370, 58, { seed: 30, strokeWidth: 1.4 }),
-    wireBot: roughLine(110, 82, 370, 82, { seed: 31, strokeWidth: 1.4 }),
-    wireLeftCap: roughLine(110, 58, 110, 82, { seed: 32 }),
-    wireRightCap: roughLine(370, 58, 370, 82, { seed: 33 }),
-
-    // Battery + plate → wire left edge — clean near-horizontal lead.
-    // Replaces the earlier U-shaped path that detoured up-and-over the
-    // wire, which read as a schematic oddity for no reason.
-    leadPlus: roughLine(82, 60, 110, 59, { seed: 40 }),
-    // Wire's right-end dangle keeps the "cut-away section" semantics.
-    leadRightOut: roughLine(370, 70, 395, 70, { seed: 42, roughness: 0.4 }),
-
-    sheen: ([
-      [118, 62, 130, 62], [160, 62, 172, 62], [220, 62, 232, 62],
-      [280, 62, 292, 62], [340, 62, 352, 62],
-      [140, 78, 152, 78], [200, 78, 212, 78], [260, 78, 272, 78],
-      [320, 78, 332, 78],
-    ] as [number, number, number, number][]).map(([x1, y1, x2, y2], i) =>
-      roughLine(x1, y1, x2, y2, { seed: 50 + i, strokeWidth: 0.5, roughness: 0.4 })),
-
-    driftShaft: roughLine(220, 95, 260, 95, { seed: 70, strokeWidth: 0.9, roughness: 0.3 }),
-    driftHead: roughLinearPath(
-      [[254, 92], [260, 95], [254, 98]],
-      { seed: 71, strokeWidth: 0.9, roughness: 0.3 },
-    ),
-  }), [])
+  const waterMidY = WATER_TOP_Y + TUBE_HEIGHT / 2
+  const copperMidY = COPPER_TOP_Y + TUBE_HEIGHT / 2
 
   return (
     <svg
-      width="540" height="180" viewBox="0 0 420 140"
+      width="540"
+      height="283"
+      viewBox="0 0 420 220"
       fill="none"
       aria-hidden
     >
-      {/* Desk */}
+      {/* ─── Water row (top) ──────────────────────────── */}
+      {/* Material label above */}
+      <text x="235" y="14" fontFamily="Georgia, serif"
+            fontSize="8.5" fill="currentColor" textAnchor="middle"
+            letterSpacing="4" opacity={0.7}>{t('ch1_1.heroWaterLabel')}</text>
+
+      {/* Pipe body */}
+      <RoughPaths paths={s.water.top} />
+      <RoughPaths paths={s.water.bot} />
+      <RoughPaths paths={s.water.leftCap} />
+      <RoughPaths paths={s.water.rightCap} />
+      <RoughPaths paths={s.water.rightOut} opacity={0.55} />
+
+      {/* Pressure arrow on the left */}
+      <RoughPaths paths={s.pressureArrow.shaft} />
+      <RoughPaths paths={s.pressureArrow.head} />
+      <text x="70" y="50" fontFamily="Georgia, serif" fontStyle="italic"
+            fontSize="8" fill="currentColor" textAnchor="middle"
+            opacity={0.7}>{t('ch1_1.heroPressureLabel')}</text>
+
+      {/* Metallic / water sheen strokes */}
+      <g opacity={0.35}>
+        {s.waterSheen.map((ss, i) => <RoughPaths key={i} paths={ss} />)}
+      </g>
+
+      {/* Water droplets — identical dot style as electrons below to
+          reinforce the visual analogy */}
+      <circle cx="140" cy={waterMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <circle cx="205" cy={waterMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <circle cx="270" cy={waterMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <circle cx="335" cy={waterMidY} r="3.5" fill="currentColor" opacity={0.85} />
+
+      {/* Flow arrow below water pipe */}
+      <g opacity={0.55}>
+        <RoughPaths paths={s.flowArrow.shaft} />
+        <RoughPaths paths={s.flowArrow.head} />
+      </g>
+      <text x="235" y="72" fontFamily="Georgia, serif" fontStyle="italic"
+            fontSize="8" fill="currentColor" textAnchor="middle"
+            opacity={0.65}>{t('ch1_1.heroFlowLabel')}</text>
+
+      {/* ─── Copper row (bottom) ──────────────────────── */}
+      {/* Material label above */}
+      <text x="235" y="93" fontFamily="Georgia, serif"
+            fontSize="8.5" fill="currentColor" textAnchor="middle"
+            letterSpacing="4" opacity={0.7}>{t('ch1_1.heroCopperLabel')}</text>
+
+      {/* Wire body */}
+      <RoughPaths paths={s.copper.top} />
+      <RoughPaths paths={s.copper.bot} />
+      <RoughPaths paths={s.copper.leftCap} />
+      <RoughPaths paths={s.copper.rightCap} />
+      <RoughPaths paths={s.copper.rightOut} opacity={0.55} />
+
+      {/* Voltage arrow on the left */}
+      <RoughPaths paths={s.voltageArrow.shaft} />
+      <RoughPaths paths={s.voltageArrow.head} />
+      <text x="70" y="129" fontFamily="Georgia, serif" fontStyle="italic"
+            fontSize="8" fill="currentColor" textAnchor="middle"
+            opacity={0.7}>{t('ch1_1.heroVoltageLabel')}</text>
+
+      {/* Copper sheen strokes */}
+      <g opacity={0.35}>
+        {s.copperSheen.map((ss, i) => <RoughPaths key={i} paths={ss} />)}
+      </g>
+
+      {/* Electrons — same dot style as water droplets above to reinforce
+          the visual analogy. Small "e⁻" label on one of them so the
+          reader can anchor the symbol. */}
+      <circle cx="140" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <text x="140" y="96" fontFamily="Georgia, serif" fontStyle="italic"
+            fontSize="7.5" fill="currentColor" textAnchor="middle"
+            opacity={0.75}>e⁻</text>
+      <circle cx="205" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <circle cx="270" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
+      <circle cx="335" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
+
+      {/* Drift arrow below copper wire */}
+      <g opacity={0.55}>
+        <RoughPaths paths={s.driftArrow.shaft} />
+        <RoughPaths paths={s.driftArrow.head} />
+      </g>
+      <text x="235" y="151" fontFamily="Georgia, serif" fontStyle="italic"
+            fontSize="8" fill="currentColor" textAnchor="middle"
+            opacity={0.65}>{t('ch1_1.heroDriftLabel')}</text>
+
+      {/* Desk with hatching */}
       <RoughPaths paths={s.desk} />
       <g opacity={0.4}>
         {s.hatches.map((h, i) => <RoughPaths key={i} paths={h} />)}
       </g>
-
-      {/* Battery */}
-      <RoughPaths paths={s.batteryPlate} />
-      <RoughPaths paths={s.batteryShort} />
-      <RoughPaths paths={s.batteryBotLead} />
-      <text x="88" y="62" fontFamily="Georgia, serif" fontStyle="italic"
-            fontSize="10" fill="currentColor">+</text>
-      <text x="88" y="74" fontFamily="Georgia, serif" fontStyle="italic"
-            fontSize="10" fill="currentColor">−</text>
-
-      {/* Copper wire cut-away */}
-      <RoughPaths paths={s.wireTop} />
-      <RoughPaths paths={s.wireBot} />
-      <RoughPaths paths={s.wireLeftCap} />
-      <RoughPaths paths={s.wireRightCap} />
-
-      {/* Leads */}
-      <RoughPaths paths={s.leadPlus} />
-      <RoughPaths paths={s.leadRightOut} opacity={0.55} />
-
-      {/* Metallic sheen */}
-      <g opacity={0.35}>
-        {s.sheen.map((ss, i) => <RoughPaths key={i} paths={ss} />)}
-      </g>
-
-      {/* Electrons — plain filled circles for clean look at small scale */}
-      <circle cx="140" cy="68" r="3.5" fill="currentColor" opacity={0.85} />
-      <text x="140" y="55" fontFamily="Georgia, serif" fontStyle="italic"
-            fontSize="7.5" fill="currentColor" textAnchor="middle"
-            opacity={0.75}>e⁻</text>
-
-      <circle cx="205" cy="74" r="3.5" fill="currentColor" opacity={0.85} />
-      <circle cx="268" cy="66" r="3.5" fill="currentColor" opacity={0.85} />
-
-      <circle cx="335" cy="75" r="3.5" fill="currentColor" opacity={0.85} />
-      <text x="335" y="92" fontFamily="Georgia, serif" fontStyle="italic"
-            fontSize="7.5" fill="currentColor" textAnchor="middle"
-            opacity={0.75}>e⁻</text>
-
-      {/* Drift arrow */}
-      <g opacity={0.55}>
-        <RoughPaths paths={s.driftShaft} />
-        <RoughPaths paths={s.driftHead} />
-      </g>
-      <text x="240" y="108" fontFamily="Georgia, serif" fontStyle="italic"
-            fontSize="8" fill="currentColor" textAnchor="middle"
-            opacity={0.65}>{t('ch1_1.heroDriftLabel')}</text>
-
-      {/* Material callout above the wire. Wide letterSpacing gives the
-          airy "textbook callout" look regardless of language (English
-          COPPER, Ukrainian МІДЬ, …) without forcing the translator to
-          pre-space the string with space characters. */}
-      <text x="240" y="46" fontFamily="Georgia, serif"
-            fontSize="8.5" fill="currentColor" textAnchor="middle"
-            letterSpacing="4" opacity={0.7}>{t('ch1_1.heroCopperLabel')}</text>
     </svg>
   )
 }

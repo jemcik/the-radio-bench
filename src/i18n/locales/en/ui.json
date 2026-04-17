@@ -831,8 +831,12 @@
     "quiz_q6_explanation": "A schematic encodes topology (what is connected to what), not geometry (how the drawing looks). The same circuit can be drawn in infinitely many ways."
   },
   "ch1_1": {
-    "heroAriaLabel": "A cross-section of copper wire with a few electrons drifting along it, a battery at one end providing the push.",
+    "heroAriaLabel": "Two parallel horizontal tubes: the top labelled WATER, holding droplets inside a water pipe; the bottom labelled COPPER, holding electrons inside a copper wire. On the left of each tube an identical arrow indicator drives what flows — pressure for the water, voltage for the copper. Below each tube an arrow names the direction — flow for water, drift for electrons. The two tubes carry the same physics: a force applied at one end, controlled motion of carriers along the length.",
     "heroCopperLabel": "COPPER",
+    "heroWaterLabel": "WATER",
+    "heroPressureLabel": "pressure",
+    "heroFlowLabel": "flow",
+    "heroVoltageLabel": "voltage",
     "heroDriftLabel": "drift",
     "intro": "Three words carry almost everything electrical: <strong>voltage</strong>, <strong>current</strong>, and <strong>resistance</strong>. Voltage is the push. Current is the flow. Resistance is how hard the wire and the components push back. Every circuit you will ever read, build, or debug can be understood as an interaction of those three quantities — and everything that comes later in this course, from capacitors to antennas to Arduino code, is built on top of them.",
     "introPreview": "This chapter explains what each quantity is, where it comes from, and how to get an intuitive feel for it before we start working with formulas in Chapter 1.2.",
