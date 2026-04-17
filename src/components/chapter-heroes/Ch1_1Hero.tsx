@@ -1,9 +1,12 @@
 /**
  * Chapter 1.1 hero — a length of copper wire with a few electrons
- * drifting along it, driven by a battery on the left. Two unconnected
- * leads dangle from the cut ends of the wire; the electrons are drawn
- * as small filled circles labelled "e⁻" to make the link between
- * "electrons" and "current" concrete.
+ * drifting along it, driven by a battery on the left. The battery's
+ * + terminal connects to the wire directly via a short horizontal
+ * lead (no U-bend); the − terminal has a short lead that trails off
+ * toward the implied return path. The wire's right end shows a
+ * dangling lead to signal the cut-away (we're viewing one section of
+ * a longer conductor). Electrons are small filled circles labelled
+ * "e⁻" to make the "electrons = current carriers" connection concrete.
  *
  * Drawn with Rough.js for the hand-sketched aesthetic. Every stroke
  * path renders with `stroke="currentColor"` so the sketch inherits the
@@ -24,11 +27,15 @@ export default function Ch1_1Hero() {
     hatches: [30, 70, 110, 150, 190, 230, 270, 310, 350].map((x, i) =>
       roughLine(x, 122, x + 30, 135, { seed: 10 + i, strokeWidth: 0.6, roughness: 0.5 })),
 
-    // Battery (vertical, long plate up = +) centered at x=70
-    batteryLead: roughLine(70, 38, 70, 60, { seed: 20 }),
+    // Battery (vertical, long plate up = +) centered at x=70.
+    // No upper lead above the + plate — it would dangle orphan now that
+    // + connects sideways to the wire, not up-and-over.
     batteryPlate: roughLine(58, 60, 82, 60, { seed: 21, strokeWidth: 1.6 }),
     batteryShort: roughLine(63, 68, 77, 68, { seed: 22 }),
-    batteryBotLead: roughLine(70, 68, 70, 102, { seed: 23 }),
+    // − terminal lead trails off downward — implies the return path of
+    // the full circuit continues somewhere off-frame (toward the other
+    // cut end of the copper wire, not drawn).
+    batteryBotLead: roughLine(70, 68, 70, 95, { seed: 23 }),
 
     // Copper wire cut-away
     wireTop: roughLine(110, 58, 370, 58, { seed: 30, strokeWidth: 1.4 }),
@@ -36,12 +43,11 @@ export default function Ch1_1Hero() {
     wireLeftCap: roughLine(110, 58, 110, 82, { seed: 32 }),
     wireRightCap: roughLine(370, 58, 370, 82, { seed: 33 }),
 
-    // Battery + terminal → wire left end (L-shape)
-    leadPlus: roughLinearPath(
-      [[70, 38], [70, 30], [110, 30], [110, 58]],
-      { seed: 40 },
-    ),
-    leadDangle: roughLine(70, 102, 70, 108, { seed: 41 }),
+    // Battery + plate → wire left edge — clean near-horizontal lead.
+    // Replaces the earlier U-shaped path that detoured up-and-over the
+    // wire, which read as a schematic oddity for no reason.
+    leadPlus: roughLine(82, 60, 110, 59, { seed: 40 }),
+    // Wire's right-end dangle keeps the "cut-away section" semantics.
     leadRightOut: roughLine(370, 70, 395, 70, { seed: 42, roughness: 0.4 }),
 
     sheen: ([
@@ -72,7 +78,6 @@ export default function Ch1_1Hero() {
       </g>
 
       {/* Battery */}
-      <RoughPaths paths={s.batteryLead} />
       <RoughPaths paths={s.batteryPlate} />
       <RoughPaths paths={s.batteryShort} />
       <RoughPaths paths={s.batteryBotLead} />
@@ -89,7 +94,6 @@ export default function Ch1_1Hero() {
 
       {/* Leads */}
       <RoughPaths paths={s.leadPlus} />
-      <RoughPaths paths={s.leadDangle} />
       <RoughPaths paths={s.leadRightOut} opacity={0.55} />
 
       {/* Metallic sheen */}
