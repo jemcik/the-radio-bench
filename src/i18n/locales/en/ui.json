@@ -167,7 +167,7 @@
   "ch0_2": {
     "heroAriaLabel": "Pen-and-ink sketch of a workbench holding a multimeter, an oscilloscope with a sine-wave trace, and a breadboard with a jumper wire arching above it",
     "intro": "Before we touch a single resistor or frequency formula, let's get comfortable with the instruments. A bench without working, understood tools is just a flat surface with expensive decorations on it.",
-    "coversInstruments": "This chapter covers the four instruments you'll use throughout the course: <multimeter>multimeter</multimeter>, <oscilloscope>oscilloscope</oscilloscope>, <vna>VNA (Vector Network Analyser)</vna>, and the <strong>Arduino</strong> in its role as a signal generator.",
+    "coversInstruments": "This chapter covers the four instruments you'll use throughout the course: <multimeter>multimeter</multimeter>, <oscilloscope>oscilloscope</oscilloscope>, <vna>VNA</vna> (Vector Network Analyser), and the <strong>Arduino</strong> in its role as a signal generator.",
     "sectionMultimeter": "The multimeter",
     "multimeterIntro": "The multimeter is the most fundamental instrument in electronics. It measures three things you'll use constantly: <voltage>voltage</voltage>, <current>current</current>, and <resistance>resistance</resistance>. Most also do <continuity>continuity</continuity> (beeps when connected), <diode>diode testing</diode>, and <capacitance>capacitance</capacitance>.",
     "multimeterDanger": "Always check which mode you're in before probing. Measuring voltage in current mode blows the fuse. Measuring mains voltage in resistance mode can damage the meter — or injure you.",

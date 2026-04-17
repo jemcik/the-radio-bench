@@ -457,6 +457,19 @@ const RULES = [
     pattern: /<i>[IVREQfTt]<\/i>/g,
     hint: 'Use <var>X</var> for math variables (renders as KaTeX math italic with serifs). <i>I</i> renders as «/» or «l» in sans-serif.',
   },
+
+  {
+    id: 'markup.glossary-tag-with-parenthetical',
+    category: 'MARKUP',
+    severity: 'WARN',
+    // Match a glossary-style tag that wraps BOTH an abbreviation AND a
+    // parenthetical expansion, e.g. <vna>VNA (Vector Network Analyser)</vna>.
+    // The long underlined inline span wraps across lines (reads as "two
+    // items") and desyncs Radix popper's tooltip positioning.
+    // Exclude the allowed case: `<var>X</var>` for single-letter math vars.
+    pattern: /<([a-z]+)>[^<()]{2,}\s+\([^)]+\)<\/\1>/g,
+    hint: 'Glossary tag wraps both an abbreviation AND its parenthetical expansion. Wrap only the short form: «<tag>ABBR</tag> (Full form)» so the tooltip anchors correctly and the reader sees one underlined term, not two.',
+  },
 ]
 
 // ─── Runner ───────────────────────────────────────────────────────────────
