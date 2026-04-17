@@ -282,8 +282,29 @@ const RULES = [
     id: 'forbidden.strumobmezuvalnyi',
     category: 'FORBIDDEN',
     severity: 'WARN',
-    pattern: wb('струмообмежувальн[иоеаій]+'),
-    hint: 'Use «обмежувальний резистор» — shorter and more common in UA electronics publications.',
+    // Also catches `струмообмежуючий` (double landmine: струмо- prefix + -ючий
+    // Russianism participle). E.g. «струмообмежуючого резистора» in led.detail.
+    pattern: wb('струмообмежувальн[иоеаій]+|струмообмежуюч[иоаіеуою]+'),
+    hint: 'Use «обмежувальний резистор» — shorter and more common in UA electronics publications. If you see «-уючий» form (struwобмежуюч-), it is DOUBLY wrong: verbose prefix + Russianism participle.',
+  },
+
+  {
+    id: 'forbidden.pry-verbal-noun',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Russianism pattern «при + gerund/nominalisation» for "when X-ing".
+    // Native UA uses «коли X», «під час X», «за X-ою» (instrumental), or
+    // an adverbial participle («роблячи X»). Catches common verbal-noun
+    // endings: -нні, -нням, -нні, -онні, -оні, -енні, -анні.
+    //
+    // Exceptions NOT flagged (standard physics/scientific collocations):
+    // - при + temperature / pressure / conditions («при кімнатній температурі»)
+    // - при цьому / при тому (discourse markers)
+    // - при умові (conditional idiom)
+    // Detection: «при + word ending in -нні/-анні/-енні/-онні» where the word
+    // is NOT «температурі/умові/тому/цьому/нагоді».
+    pattern: /(?<!\p{L})при\s+(?!(?:температур|умов|тому|цьому|нагод|розрахунк|вимірюванн[іі]\s+температур))[а-яіїєґ]+(?:анн|енн|інн|онн|янн)[іеаяою](?!\p{L})/giu,
+    hint: 'Russianism: «при + verbal noun» (e.g. «при проходженні», «при прикладенні»). Use «коли …», «під час …», «за + instrumental», or an adverbial participle («роблячи …»). Standard physics collocations («при кімнатній температурі», «при умові») are allowed.',
   },
 
   {
