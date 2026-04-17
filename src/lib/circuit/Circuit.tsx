@@ -92,7 +92,11 @@ export default function Circuit({ width, height, caption, maxWidth, legend, chil
                 return (
                   <div key={i} className="contents">
                     <dt className="flex items-center justify-center">
-                      {entry.kind && <LegendSwatch kind={entry.kind} color={entry.color} />}
+                      {entry.swatch
+                        ? entry.swatch
+                        : entry.kind
+                          ? <LegendSwatch kind={entry.kind} color={entry.color} />
+                          : null}
                     </dt>
                     <dd className="flex items-center">{entry.label}</dd>
                   </div>
@@ -121,12 +125,19 @@ export type LegendSwatchKind = 'line' | 'dot' | 'circle' | 'resistor' | 'battery
 
 export interface LegendItem {
   /**
-   * Visual shape of the swatch. Omit entirely to render a label with no
-   * swatch (useful in a "Quantities" section where the letter itself —
-   * e.g. `<var>V</var>` — acts as its own identifier).
+   * Predefined visual swatch (battery, resistor, LED, line, dot…).
+   * Ignored when `swatch` is also set. Omit both to render an item
+   * with no swatch at all.
    */
   kind?: LegendSwatchKind
-  /** Stroke/fill colour. Defaults to `currentColor` (the sketch-stroke token). */
+  /**
+   * Custom swatch — any ReactNode that goes in the swatch column.
+   * Used e.g. for quantity letters (`<MathVar>V</MathVar>`) so each
+   * letter lines up in its own column and the em-dash / description
+   * that follow in the label column align across rows.
+   */
+  swatch?: ReactNode
+  /** Stroke/fill colour for predefined swatches. Ignored by `swatch`. */
   color?: string
   /**
    * Human-readable description. Accepts a plain string or a React node —

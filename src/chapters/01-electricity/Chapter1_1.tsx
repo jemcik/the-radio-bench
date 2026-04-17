@@ -276,9 +276,15 @@ export default function Chapter1_1() {
         caption={t('ch1_1.circuitCaption')}
         legend={[
           { heading: t('ch1_1.circuitLegendQuantitiesTitle') },
-          { label: <Trans i18nKey="ch1_1.circuitLegendV" ns="ui" components={{ var: <MathVar /> }} /> },
-          { label: <Trans i18nKey="ch1_1.circuitLegendR" ns="ui" components={{ var: <MathVar /> }} /> },
-          { label: <Trans i18nKey="ch1_1.circuitLegendI" ns="ui" components={{ var: <MathVar /> }} /> },
+          // Quantity letter lives in the swatch column, right-aligned there
+          // so its right edge touches the grid gap and the descriptions in
+          // the label column line up flush across rows. Using a plain
+          // italic-serif span (not MathVar) on purpose — KaTeX adds internal
+          // math spacing around single glyphs that would desync the letter
+          // from the right edge of the column, breaking the alignment.
+          { swatch: <span className="font-serif italic text-[15px] leading-none">V</span>, label: t('ch1_1.circuitLegendV') },
+          { swatch: <span className="font-serif italic text-[15px] leading-none">R</span>, label: t('ch1_1.circuitLegendR') },
+          { swatch: <span className="font-serif italic text-[15px] leading-none">I</span>, label: t('ch1_1.circuitLegendI') },
           { heading: t('ch1_1.circuitLegendComponentsTitle') },
           { kind: 'battery',  label: t('ch1_1.circuitLegendBatteryName') },
           { kind: 'resistor', label: t('ch1_1.circuitLegendResistorName') },

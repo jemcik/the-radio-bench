@@ -941,9 +941,9 @@
     "circuitIntro": "You have already seen the simplest complete circuit — a battery, a resistor, and an LED in a loop — back in Chapter 0.5. Here it is again, with the three quantities labelled:",
     "circuitCaption": "Voltage V pushes current I through resistance R. If any of the three is missing — no battery, no complete loop, infinite resistance — no current flows.",
     "circuitLegendQuantitiesTitle": "Quantities",
-    "circuitLegendV": "<var>V</var> — voltage (3 V)",
-    "circuitLegendR": "<var>R</var> — resistance",
-    "circuitLegendI": "<var>I</var> — current",
+    "circuitLegendV": "voltage (3 V)",
+    "circuitLegendR": "resistance",
+    "circuitLegendI": "current",
     "circuitLegendComponentsTitle": "Components",
     "circuitLegendBatteryName": "battery",
     "circuitLegendResistorName": "resistor",
@@ -1057,7 +1057,7 @@
       "voltageLabel": "Voltage (V)",
       "resistanceLabel": "Resistance (R)",
       "currentLabel": "Current (I):",
-      "dangerNote": "That's a lot of current — enough to melt a typical resistor or wire. This is why circuits need current-limiting components.",
+      "dangerNote": "That’s a lot of current — enough to melt a typical resistor or wire.",
       "hint": "Notice: doubling the voltage doubles the current; halving the resistance also doubles the current. Chapter 1.2 turns this intuition into the formula I = V / R."
     }
   },

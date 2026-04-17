@@ -110,7 +110,7 @@ function ChapterHeader({ id }: { id: string }) {
   const heroAriaLabel = t(`ch${id.replace('-', '_')}.heroAriaLabel`, { defaultValue: '' })
 
   return (
-    <div className="mb-10 pb-8 border-b border-border">
+    <div className="mb-10 pb-6 border-b border-border">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span className="text-xs font-mono text-muted-foreground">{t('chapter.chapter')} {meta.number}</span>
         {meta.hasLab && (
