@@ -36,14 +36,16 @@ All units render in Cyrillic in prose. See `glossary.md` for the full table. Key
 - `Гц`, `кГц`, `МГц`, `ГГц` (frequency)
 - `Вт`, `Дж`, `Ф`, `Гн`, `дБ`, `дБм`
 
-## Math variables
+## Math variables AND schematic reference designators
 
-Physics variables (`I`, `V`, `R`, `E`, `Q`, `f_c`, …) must render in KaTeX math italic, not HTML italic.
+Both physics variables (`I`, `V`, `R`, `E`, `Q`, `f_c`, …) and schematic reference designators (`R` for resistor, `C` for capacitor, `L` for inductor, `D` for diode, `Q` for transistor, and their subscripted forms `R_1`, `C_2`) must render in KaTeX math italic, not HTML italic and not plain sans-serif.
 
 **In i18n JSON**, wrap them in `<var>X</var>`:
 
 ```json
-"currentIntro": "… (позначення <var>I</var>) — …"
+"currentIntro": "… (позначення <var>I</var>) — …",
+"symbolResistorDesc": "… Позначається <var>R</var>. …",
+"symbolVoltmeterDesc": "Кружок з літерою <var>V</var> всередині. …"
 ```
 
 **In the chapter JSX**, map `var` to `MathVar`:
@@ -54,9 +56,11 @@ Physics variables (`I`, `V`, `R`, `E`, `Q`, `f_c`, …) must render in KaTeX mat
 />
 ```
 
-where `MathVar` is a small component that takes children and passes them to `<M tex="…" />` from `src/components/ui/math.tsx`.
+`MathVar` is exported from `src/components/ui/math.tsx` — use the shared export, **do not redeclare** per chapter. If your chapter renders a description field (e.g. `SymbolCell`) with plain `t(...)`, convert it to `<Trans>` with the `var` mapping before introducing `<var>` in the i18n string, or the tag renders literally.
 
-**Why**: browser italic of capital `I` in sans-serif renders as `|` or `/`, mistakable for lowercase `l`. KaTeX math fonts have proper serifs.
+**Why**: browser italic of capital `I` in sans-serif renders as `|` or `/`, mistakable for lowercase `l`. Standalone letters like `R`, `C`, `L`, `D`, `Q` in plain prose read as stray English letters and compete visually with surrounding Cyrillic. KaTeX math serifs make them unambiguously "this is a symbol / label".
+
+**Locale parity**: `<var>X</var>` must appear in BOTH `en/ui.json` and `uk/ui.json` — the Trans component mapping requires the same tag structure across locales. Don't put `<var>` only in UK.
 
 ## Typographic details caught during review
 

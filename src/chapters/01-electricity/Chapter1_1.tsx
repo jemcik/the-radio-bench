@@ -5,18 +5,7 @@ import LabActivity from '@/components/lab/LabActivity'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
 import { G } from '@/features/glossary/glossary-term'
-import { M } from '@/components/ui/math'
-
-/**
- * Inline math variable wrapper for use via <Trans> component mapping.
- * Lets us write `<var>I</var>` inside an i18n string and have it
- * render as a KaTeX math italic — proper serif glyph that can't be
- * confused with lowercase `l` or `/`, which was the fate of plain
- * capital I (or `<i>I</i>`) in the site's sans-serif font.
- */
-function MathVar({ children }: { children?: React.ReactNode }) {
-  return <M tex={String(children ?? '')} />
-}
+import { MathVar } from '@/components/ui/math'
 import {
   Circuit, Wire,
   Resistor, Battery, LED,

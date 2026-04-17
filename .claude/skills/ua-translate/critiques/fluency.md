@@ -51,7 +51,11 @@ Examples of the class of issues you're looking for (not exhaustive):
 - **Two EN time clauses collapsed into one** — a meta-pattern
   - When the EN source has TWO distinct temporal clauses (`X when A, and Y when B`) describing two different trigger-events, UA translators often drop one `коли …` and attach both predicates to a single trigger. Result: wrong cause-and-effect.
   - Example: EN "water drags when it starts **and** coasts when you close the valve" became UA "рушає з місця і котиться за інерцією, коли ви перекриваєте клапан" — tied BOTH events to closing the valve. But the physics is: water drags when OPENING, coasts when CLOSING.
-  - **Rule**: whenever you see a sentence with two temporal clauses or two `коли`-phrases in the English, re-verify that the Ukrainian preserves both triggers separately. If only one `коли` survived, something was lost.
+  - **Counting rule** (mechanical, do it on every sentence):
+    1. In the EN source, count occurrences of `when`, `while`, `as` (as a temporal connector — not comparison), `once`, `whenever`, `before`, `after`.
+    2. In the UA translation of that same key, count `коли`, `поки`, `щойно`, `коли-небудь`, `перш ніж`, `після того як`.
+    3. If the UA count is **lower** than the EN count — investigate. Missing one temporal trigger almost always means two events got merged under one trigger. Flag the sentence for review even if it reads smoothly.
+    4. (Minor false positives where EN `when` is rhetorical — `"when in doubt, X"` — don't need a UA `коли`. Those are rare; err on the side of flagging.)
 
 - **Water / physics motion verbs**
   - Water doesn't `котитися` (roll), `летіти` (fly), `повзти` (crawl). It `тече` / `ллється` / `рухається`. Similar constraints for electrons at drift velocity (`не літають`, `не несуться`).

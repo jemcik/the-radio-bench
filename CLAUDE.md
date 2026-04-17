@@ -126,6 +126,33 @@ i18n strings should hold the **prose only** ("Cutoff frequency"); the
 math symbol is composed in JSX. The same plain-text key can serve as
 the `aria-label` (screen readers don't need the symbol).
 
+**In i18n prose — including schematic reference designators** — wrap
+single-letter variables in `<var>X</var>` and map `var: <MathVar />` in
+the `<Trans>` call:
+
+```json
+// ui.json
+"symbolResistorDesc": "… Labelled <var>R</var>. Value in ohms."
+```
+
+```tsx
+// chapter.tsx
+<Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui"
+  components={{ var: <MathVar /> }} />
+```
+
+`MathVar` is exported from `@/components/ui/math`. This covers math
+variables (`I`, `V`, `R`, `f`, `Q`) AND schematic reference designators
+(`R` for resistor, `C` for capacitor, `L` for inductor, `D` for diode,
+`Q` for transistor). Plain `R` in sans-serif reads as an English letter
+intrusion in Cyrillic prose; KaTeX serif marks it as "symbol / label"
+unambiguously. The `<var>` tag must appear in **both** `en/ui.json` and
+`uk/ui.json` — Trans component mapping requires matching tags per locale.
+
+If a chapter's description field (e.g. `SymbolCell`) currently renders
+plain `t(...)`, convert to `<Trans>` before introducing `<var>` in the
+i18n string, or the tag renders literally as text.
+
 ### Plot curves must be clipped to the plot rectangle
 
 When a plotted function can leave the plot area (e.g. an RC roll-off

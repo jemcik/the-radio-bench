@@ -3,7 +3,6 @@
     "title": "The Radio Bench",
     "subtitle": "Radio & electronics from ground up"
   },
-
   "sidebar": {
     "homeBase": "Home Base",
     "bookmarks": "Bookmarks",
@@ -21,7 +20,6 @@
     "closeSidebar": "Close sidebar",
     "openSidebar": "Open sidebar"
   },
-
   "search": {
     "placeholder": "Search...",
     "inputPlaceholder": "Search chapters and terms...",
@@ -32,7 +30,6 @@
     "hintOpen": "open / expand",
     "hintClose": "close"
   },
-
   "tour": {
     "bookmarkDemoLabel": "What you'll need",
     "step1Title": "Your map",
@@ -50,21 +47,18 @@
     "step7Title": "Get in touch",
     "step7Body": "Spotted a mistake? Have a suggestion? Use the links at the bottom of the sidebar to send feedback by email or open an issue on GitHub."
   },
-
   "theme": {
     "changeTheme": "Change theme",
     "theme": "Theme",
     "size": "Size",
     "font": "Font"
   },
-
   "bookmark": {
     "removeBookmark": "Remove bookmark",
     "bookmarkThis": "Bookmark this",
     "bookmark": "Bookmark",
     "bookmarkSaved": "Bookmark saved"
   },
-
   "lab": {
     "title": "Lab Activity",
     "optional": "Optional",
@@ -75,7 +69,6 @@
     "connectionToTheory": "Connection to theory",
     "troubleshooting": "Troubleshooting"
   },
-
   "quiz": {
     "questionOf": "Question {{current}} of {{total}}",
     "correct": "Correct!",
@@ -89,7 +82,6 @@
     "review": "Review the sections above and try again.",
     "noQuestions": "No questions available."
   },
-
   "chapter": {
     "previous": "Previous",
     "next": "Next",
@@ -105,7 +97,6 @@
     "loadFailedBody": "Something went wrong rendering the page. Try going back to the home page or refreshing.",
     "loadFailedRetry": "Try again"
   },
-
   "welcome": {
     "heading": "The Radio Bench",
     "introParagraph": "Welcome! Whether you just got your first licence, are studying for one, or simply want to understand how radio actually works — you're in the right place. This is a free, open learning course that takes you from zero to confident, one concept at a time.",
@@ -137,7 +128,6 @@
     "ercAligned": "ERC Report 32 aligned",
     "ercDetail": "Every topic in the CEPT Amateur Radio Novice Examination Syllabus (ERC Report 32) is covered somewhere in this course. The chapters go well beyond the exam requirements — the goal is real understanding, not just passing a test."
   },
-
   "ch0_1": {
     "heroAriaLabel": "Pen-and-ink sketch of an open book with a magnifying glass hovering over a small schematic on the right-hand page",
     "intro1": "This site is built around one idea: understanding radio means understanding the physics underneath it. Not memorising facts, but building a mental model solid enough that you can reason about things you've never seen before.",
@@ -174,12 +164,10 @@
     "oneMore1": "The goal is not to prepare you for an exam (though the content covers the full <erc>ERC</erc> Report 32 syllabus). The goal is to give you the kind of understanding where, when something odd happens on the air, you have a hypothesis — and when you read the <arrl>ARRL</arrl> Handbook, it makes sense rather than feeling impenetrable.",
     "oneMore2": "Enjoy the bench. Let's start with the instruments."
   },
-
   "ch0_2": {
     "heroAriaLabel": "Pen-and-ink sketch of a workbench holding a multimeter, an oscilloscope with a sine-wave trace, and a breadboard with a jumper wire arching above it",
     "intro": "Before we touch a single resistor or frequency formula, let's get comfortable with the instruments. A bench without working, understood tools is just a flat surface with expensive decorations on it.",
     "coversInstruments": "This chapter covers the four instruments you'll use throughout the course: <multimeter>multimeter</multimeter>, <oscilloscope>oscilloscope</oscilloscope>, <vna>VNA (Vector Network Analyser)</vna>, and the <strong>Arduino</strong> in its role as a signal generator.",
-
     "sectionMultimeter": "The multimeter",
     "multimeterIntro": "The multimeter is the most fundamental instrument in electronics. It measures three things you'll use constantly: <voltage>voltage</voltage>, <current>current</current>, and <resistance>resistance</resistance>. Most also do <continuity>continuity</continuity> (beeps when connected), <diode>diode testing</diode>, and <capacitance>capacitance</capacitance>.",
     "multimeterDanger": "Always check which mode you're in before probing. Measuring voltage in current mode blows the fuse. Measuring mains voltage in resistance mode can damage the meter — or injure you.",
@@ -189,43 +177,34 @@
     "currentDesc": "the meter goes in series — you must break the circuit and put the meter in the gap. Use the mA input for small currents, the A input for large ones. Most meters have a separate socket for the red probe in current mode.",
     "resistanceLabel": "Resistance:",
     "resistanceDesc": "power must be off. The meter applies its own small voltage to measure resistance — an external voltage will give wrong readings and may damage it.",
-
     "multimeterBuying": "When you buy your first meter, three things matter. A high <strong>display count</strong> (3¾ digits or 6000 counts is the modern hobby sweet spot — the higher, the finer the resolution). <strong>Auto-ranging</strong> (the meter picks the right scale for you so you don't blow fuses by guessing) saves endless frustration. And at least a <strong>CAT II 600 V</strong> safety rating — the number inside your meter's probes matter most when something goes wrong. A $30–60 handheld from Aneng, UNI-T, or a similar budget brand is more than enough for everything in this course. Stepping up, Brymen (~$100) and Fluke (~$150 and up) are the most widely trusted professional options — overkill for a first meter, but a fair lifetime investment if you know you'll keep at the hobby.",
     "multimeterTrueRms": "One spec worth looking for: <strong>true-RMS</strong>. Cheaper meters measure <ac>AC</ac> voltage assuming a clean sine wave — they give wrong readings on square waves, <pwm>PWM</pwm>, and other non-sinusoidal signals. True-RMS meters work correctly on any waveform. Almost anything under $30 is not true-RMS; almost anything above $50 is. Check the spec sheet if it matters.",
-
     "sectionOscilloscope": "The oscilloscope",
     "scopeIntro": "The oscilloscope is the instrument that turns invisible electrical behaviour into a picture. It draws a graph of voltage against time — and once you have that habit, so much of electronics clicks into place.",
     "scopeControls": "The two main controls are <timediv>time/div</timediv> (how stretched the time axis is) and <voltdiv>volt/div</voltdiv> (how stretched the voltage axis is). If you can't see a signal, it's almost always one of these two settings that needs adjusting.",
     "scopeKey": "The oscilloscope probe has a ground clip (usually a crocodile clip on a short wire near the probe tip). This <strong>must</strong> be connected to the circuit's ground — otherwise you'll see noise or incorrect readings. On a bench with multiple instruments, all grounds should share a common point.",
-
     "scopeSpecs": "Two specs matter most. <strong>Bandwidth</strong> is the frequency above which the scope starts lying to you — above that, signal amplitudes read artificially low and edges blur. For most amateur work, 50–100 MHz is plenty: <hf>HF</hf> is 3–30 MHz; <vhf>VHF</vhf> 2 m work is around 144 MHz. <strong>Sample rate</strong> should be at least 2× the bandwidth by theory (Nyquist), but 5×–10× is better for waveforms that actually look clean on screen.",
     "scopeRecommendation": "The <strong>Rigol DS1054Z</strong> (100 MHz, 4 channels, ~$350) has been the hobby standard for a decade — if you can swing it. Cheaper USB-based scopes (Hantek 6022BE, ~$60) are fine for DC and audio-frequency work but struggle above a few MHz. Used bench scopes from Tektronix or HP on eBay can be bargains if you know what you are buying; if you do not, stick to new.",
     "scopeProbes": "Oscilloscope probes usually have a small switch marked <strong>×1 / ×10</strong>. In ×10 mode the probe divides the signal by 10 before the scope sees it — this lets you measure up to 10× higher voltage, and (more importantly) loads the circuit ten times less, so the signal you are measuring stays closer to what it would be without the probe. Use ×10 for anything above audio frequency; ×1 only for tiny, low-frequency signals where the extra ×10 attenuation would bury them in noise. The scope needs to know which mode the probe is in — set the channel's probe setting to match.",
     "scopeTriggering": "If the trace is dancing instead of holding still, the scope is not <strong>triggering</strong> cleanly. Trigger means \"redraw the sweep starting from this exact feature\" — without it, the scope draws each sweep at a random point and the overlaid traces blur. Press <strong>AUTO</strong> first (most scopes will pick a sensible trigger automatically). If that fails, set the trigger source to the channel you are probing and adjust the trigger level (usually labelled TRIG LEVEL) until the trace freezes.",
-
     "sectionVna": "The VNA (Vector Network Analyser)",
     "vnaIntro": "The VNA is — for amateur radio purposes — the most powerful instrument of the three. It sweeps a range of frequencies and measures how a component or circuit responds to each one. This makes it ideal for measuring antenna <impedance>impedance</impedance> and <swr>SWR</swr>, finding resonant frequencies of <lc>LC</lc> circuits, and plotting filter responses.",
     "vnaCaution": "Before any measurement, a VNA must be <calibrated>calibrated</calibrated> using an open, short, and load standard (usually supplied as three small terminations). Calibration removes the effect of cables and adapters between the VNA port and your circuit. One minute of calibration saves many minutes of puzzling over wrong results.",
     "vnaNote": "We'll use the VNA starting in Chapter 1.6. For now: know where the calibration standards are, and read your VNA's quick-start guide for the calibration procedure — each model is slightly different.",
-
     "vnaHobby": "For amateur radio the <strong>NanoVNA</strong> turned a once-$1000+ instrument into something anyone can own (~$50–100). The popular current models — <strong>NanoVNA-H4</strong> and <strong>SAA-2N</strong> — cover DC to 1.5–3 GHz, which is plenty for HF, VHF, UHF, and the 23 cm band. A bench VNA from Keysight or Rohde is faster and more accurate, but the NanoVNA is close enough for every measurement in this course — and its open-source software (NanoVNA-Saver on a laptop) plots better than the tiny built-in screen.",
     "vnaSparams": "VNAs report results as <strong>S-parameters</strong>. The one you will use most is <strong>S11</strong> — the reflection at the input. A low S11 (say −20 dB or lower) means \"almost nothing reflected, this antenna or filter accepts the signal cleanly\". A high S11 means \"most of the signal is bouncing back — something is mismatched\". <swr>SWR</swr> is the same reflection expressed in different units; the VNA usually shows both side by side.",
-
     "sectionArduino": "The Arduino as a signal source",
     "arduinoIntro": "Throughout the lab activities, we use the Arduino not as a microcontroller project but purely as a convenient, programmable voltage source. Specifically: <pwm>PWM output</pwm> (Pulse Width Modulation) gives us a <square>square wave</square> at a controllable <freq>frequency</freq> and duty cycle, which is good enough for demonstrating <ac>AC</ac> behaviour, charging curves, and simple modulation concepts.",
     "arduinoPins": "The Arduino's <pwm>PWM</pwm> pins (typically pins 3, 5, 6, 9, 10, 11 on an Uno) output 5V amplitude square waves at frequencies between ~490 Hz and ~8 kHz depending on the pin and timer settings. For our early experiments, this is perfectly adequate.",
     "arduinoNote": "You don't need deep Arduino programming knowledge. The sketches used in the lab activities are short and provided inline — typically 10–15 lines of code.",
-
     "sectionBreadboard": "Breadboard basics",
     "breadboardIntro": "A <breadboard>breadboard</breadboard> lets you build circuits without soldering. Understanding how the rows and columns connect is essential before the first experiment:",
     "breadboardRails": "The long rails at the top and bottom (marked + and −) run the full length of the board horizontally. Use them for power (5V) and ground.",
     "breadboardRows": "The short rows in the middle run horizontally in groups of 5, separated by a gap. A component leg in one hole connects to every other hole in that row of 5.",
     "breadboardGap": "The gap in the middle is intentional — it separates the two sides so you can bridge a <dip>DIP chip</dip> across it.",
-
     "breadboardSizes": "Breadboards come in a few sizes. A <strong>half-size</strong> board (~30 columns, 400 tie-points) is the right starting point — enough room for one or two small circuits with breathing space. Full-size boards (~63 columns, 830 tie-points) are useful once you are building several subcircuits side by side; mini boards (170 tie-points) are for tiny one-offs. Every lab in this course fits on a half-size.",
     "breadboardQuality": "Not all breadboards are equal. Cheap ones ($2 on AliExpress) work for a while but lose spring-grip after a few hundred insertions — a component that should stay put flops loose at the worst moment. Name-brand boards (3M, Wago, BusBoard) hold tight for thousands of cycles. Spend $5–10 extra; you'll keep it for years.",
     "breadboardJumpers": "You will also want <strong>jumper wires</strong>. Pre-cut, pre-stripped kits (Schmartboard, Sparkfun) are tidy and reusable. Flexible male-to-male leads with pin ends are ideal for connecting an Arduino to the breadboard. A roll of 22 AWG solid hookup wire plus a pair of strippers is the cheapest option — but takes longer to prep every time.",
-
     "sectionAccessories": "Accessories you'll want",
     "accessoriesIntro": "None of these are instruments, but each one saves a frustrating evening at some point.",
     "accessoriesClips": "<strong>Test leads with crocodile clips</strong> — attach probes to component legs hands-free. Critical when you need both hands on the scope probe and can't hold a multimeter lead at the same time.",
@@ -233,12 +212,10 @@
     "accessoriesMagnifier": "<strong>A small magnifier or USB microscope</strong> — modern component markings print in 0.5 mm type. A 5× loupe or a cheap USB scope (around $20) turns a guessing game into a glance.",
     "accessoriesEsd": "<strong>ESD awareness</strong> — touch a grounded metal object (a radiator, or a wire clipped to your sink tap) before handling ICs. The walk across a dry carpet generates enough static to kill MOS transistors silently. A wrist strap and mat is cheap insurance if you work on sensitive kit regularly.",
     "accessoriesPsu": "<strong>A bench power supply</strong> is nice-to-have but not required at this stage. Everything in this course runs from a USB-powered Arduino or a pair of AA cells. If you upgrade later, look for a linear 0–30 V / 0–3 A PSU with current-limiting — the current knob has saved more accidentally-shorted circuits than any other feature.",
-
     "sectionSafety": "Voltage safety",
     "safetyIntro": "All the lab activities in this course operate at <strong>5V <dc>DC</dc> or less</strong> — completely safe to touch. The only time mains voltage appears is in the safety chapter (4.3), and even there the activity is limited to inspecting and measuring grounding, not opening live equipment.",
     "safetyDanger": "<strong>Before any lab:</strong> Never probe mains (AC wall voltage) with hobby instruments — they are not rated for it and you risk both damage and injury. Never short-circuit batteries, especially lithium — they get hot fast, can leak, and in bad cases catch fire. Never leave a soldering iron unattended. Always unplug or unclip the power source before changing wiring — a live circuit is an accident waiting to happen.",
     "safetyTip": "Always disconnect power before rewiring. It takes two seconds and prevents the majority of \"it's not working\" puzzles from ever arising.",
-
     "labGoal": "Verify that all four instruments work correctly and that you can read basic measurements from each one.",
     "labEquip1": "Multimeter",
     "labEquip2": "Oscilloscope with probe",
@@ -261,7 +238,6 @@
     "labTrouble1": "Oscilloscope shows noise / flat line: check the ground clip is connected to <arduino>Arduino</arduino> <gnd>GND</gnd>, and try adjusting <voltdiv>volt/div</voltdiv>.",
     "labTrouble2": "No signal on pin 9: confirm the sketch uploaded successfully and the tone() call uses pin 9.",
     "labTrouble3": "Battery reads 0V: check probe polarity and multimeter is in <dc>DC</dc> voltage mode (not resistance or current).",
-
     "voltmeterCaption": "Voltmeter in parallel — probes tap across the component, never break the circuit",
     "ammeterCaption": "Ammeter in series — break the circuit and insert the meter in the gap",
     "legendMainLoop": "main circuit",
@@ -270,13 +246,11 @@
     "legendVoltmeterProbes": "voltmeter probes (parallel)",
     "legendAmmeterInline": "ammeter (in series)",
     "legendJunction": "electrical connection",
-
     "scopeDiagramAria": "Oscilloscope screen showing a 1 kHz square wave at 5V peak-to-peak",
     "scopeDiagramCaption1": "Oscilloscope screen showing the 1 kHz square wave from the lab activity.",
     "scopeDiagramCaption2": "Amplitude = 2.5 div × 2 V/div = 5 V",
     "scopeDiagramCaption3": "Period T = 2 div × 0.5 ms/div = 1 ms. Frequency is the reciprocal of period: f = 1 ÷ T = 1 ÷ 0.001 s = 1000 Hz = <strong>1 kHz</strong>.",
     "scopeDiagramPeriodInline": "T = 2 × 0.5 ms = 1 ms → 1 kHz",
-
     "breadboardAria": "Breadboard anatomy: power rails run horizontally, tie-point columns connect 5 holes vertically",
     "breadboardDipGap": "← DIP gap — separates the two sides →",
     "breadboardCol": "col {{num}}",
@@ -288,16 +262,13 @@
     "breadboardRed": "Red",
     "breadboardBlue": "blue"
   },
-
   "ch0_3": {
     "heroAriaLabel": "Pen-and-ink sketch of an open notebook with hand-written equations, a slide rule, and a sharpened pencil resting on a desk",
     "intro": "Every chapter in this course uses numbers — <freq>frequencies</freq> in megahertz, <cap>capacitance</cap> in picofarads, <res>resistance</res> in kilohms. This chapter gives you the handful of mathematical tools you need to be comfortable with all of them. No calculus, no trigonometry — just arithmetic with a few tricks.",
-
     "sectionFractions": "Fractions and Ratios",
     "fractionsIntro": "A fraction is simply one number divided by another. When we say <i>half the <voltage>voltage</voltage></i>, we mean the voltage multiplied by ½, or equivalently divided by 2. Fractions, decimals, and percentages are three ways of saying the same thing.",
     "fractionsExample": "In radio, you will meet fractions most often in <voltageDivider>voltage dividers</voltageDivider>: two resistors that split a voltage in a fixed ratio. If the top resistor is 1 kΩ and the bottom is 1 kΩ, the output is ½ of the input — 50%.",
     "fractionsKey": "A fraction is just a division. ¾ means 3 ÷ 4 = 0.75 = 75%. Once you see it as division, fractions stop being scary.",
-
     "sectionPowersOf10": "Powers of 10 and Scientific Notation",
     "powersIntro": "Radio frequencies are enormous numbers. The <fm>FM</fm> broadcast band sits around 100,000,000 Hz. Writing all those zeros is tedious and error-prone, so we use <sciNotation>scientific notation</sciNotation>: 100,000,000 becomes 10⁸, and 100 MHz is exactly 1 × 10⁸ Hz. The number in front (here <strong>1</strong>) is called the <strong>mantissa</strong>; the power (here <strong>8</strong>) is the <strong>exponent</strong>.",
     "powersTable": "Here are the powers of 10 you will use most often:",
@@ -305,7 +276,6 @@
     "powersTableValue": "Value",
     "powersTableName": "Name",
     "powersTableExample": "Example",
-
     "prefixPico": "pico (p)",
     "prefixPicoEx": "22 pF capacitor",
     "prefixNano": "nano (n)",
@@ -324,26 +294,21 @@
     "prefixGigaEx": "2.4 GHz Wi-Fi",
     "prefixTera": "tera (T)",
     "prefixTeraEx": "1.3 THz body heat radiation",
-
     "powersCalcTip": "Your calculator's secret button",
     "powersCalcDetail": "Every scientific calculator has an EXP or EE button. It means '× 10 to the power'. To enter 2.4 GHz (2.4 × 10⁹), press: 2.4 EXP 9. A common mistake is typing 2.4 × 10 EXP 9 — that gives 2.4 × 10¹⁰, ten times too big!",
-
     "sectionSIPrefixes": "SI Prefixes",
     "prefixesIntro": "<si>SI</si> prefixes are shorthand for powers of 10. Instead of writing 0.000001 <farad>farads</farad>, we write 1 µF (one microfarad). Instead of 2,400,000,000 Hz, we write 2.4 GHz.",
     "prefixesRule": "To convert between prefixes, count how many steps you are moving on the ladder and shift the decimal point that many places. Moving <strong>right</strong> on the ladder (to a bigger prefix) means the number gets <strong>smaller</strong> — 1 000 mA becomes 1 A. Moving <strong>left</strong> (to a smaller prefix) means the number gets <strong>bigger</strong> — 2.4 GHz becomes 2 400 MHz.",
     "prefixesDiagramCaption": "The SI prefix ladder. Each step is a factor of 1000 (10³). Real radio examples are shown at each level.",
-
     "sectionSquaring": "Squaring and Square Roots",
     "squaringIntro": "Squaring a number means multiplying it by itself: 3² = 3 × 3 = 9. The square root goes the other way: √9 = 3. These operations appear in radio because power depends on the square of <voltage>voltage</voltage> or <current>current</current>.",
     "squaringPower": "The two key power formulas are:",
     "squaringWhy": "This is why doubling the voltage <strong>quadruples</strong> the power (2² = 4), and why a square root appears when you rearrange for voltage or current.",
     "squaringKey": "Squaring makes things bigger fast. Square roots bring them back down. Whenever you see P = I²R or P = V²/R, remember: power grows as the <strong>square</strong> of the voltage or current.",
-
     "sectionTransposing": "Transposing Formulas",
     "transposingIntro": "In radio, you will often know two quantities and need to find the third. The trick is to rearrange (transpose) the formula so the unknown is on one side by itself.",
     "transposingCover": "The <i>cover the unknown</i> trick: write the formula as a triangle. Cover the variable you want to find — what remains is the formula to calculate it.",
     "transposingSteps": "The algebraic approach is always the same: (1) identify which variable you need, (2) do the same operation to both sides to isolate it. We will practise this with every new formula throughout the course.",
-
     "sectionUnits": "Units at a glance",
     "unitsIntro": "Before moving on, here is a one-look reference for the quantities you'll meet throughout the course — what each one is, the SI unit it is measured in, and the prefixes you will actually see on components and datasheets.",
     "unitsHeaderQuantity": "Quantity",
@@ -370,7 +335,6 @@
     "unitsPrefixes_frequency": "Hz, kHz, MHz, GHz",
     "unitsPrefixes_capacitance": "pF, nF, µF",
     "unitsPrefixes_inductance": "nH, µH, mH, H",
-
     "labGoal": "Practice expressing the same measurement in different units and SI prefixes.",
     "labEquip1": "Multimeter",
     "labEquip2": "Assorted resistors: 470 Ω, 4.7 kΩ, 1 MΩ",
@@ -383,7 +347,6 @@
     "labConnection": "Prefix conversion is the most-used arithmetic skill in radio. Every formula in this course involves numbers with prefixes, and being fluent with conversion means you can focus on the physics rather than the arithmetic.",
     "labTrouble1": "Multimeter shows '1' or 'OL': you are on the wrong range. Switch to a higher resistance range, or use auto-ranging if available.",
     "labTrouble2": "Reading is very different from label: make sure you are touching the resistor leads firmly, not the insulation.",
-
     "sciNotationTitle": "Scientific Notation Explorer",
     "sciNotationDescription": "Enter a number to see it broken down into scientific and engineering notation",
     "sciNotationSIPrefix": "SI Prefix",
@@ -417,7 +380,6 @@
     "sciNotationRefEngineeringRule": "exp: multiple of 3",
     "sciNotationRefEngineeringExample": "e.g., 47000 → 47 × 10³ (k)",
     "sciNotationInvalid": "Please enter a valid number",
-
     "prefixConverterTitle": "SI Prefix Converter",
     "prefixConverterDescription": "Convert between metric prefixes (pico, nano, micro, milli, kilo, mega, giga)",
     "prefixConverterEnter": "Enter Value",
@@ -435,13 +397,11 @@
     "prefixConverterPlaces_other": "{{count}} places {{direction}}",
     "prefixConverterDirectionRight": "right",
     "prefixConverterDirectionLeft": "left",
-
     "formulaTransposerTitle": "Formula Transposer",
     "formulaTransposerDescription": "Rearrange formulas to solve for any variable",
     "formulaTransposerChoose": "Choose a formula",
     "formulaTransposerSolveFor": "Solve for",
     "formulaTransposerResult": "Rearranged",
-
     "formulaOhmsLaw": "Ohm's Law",
     "formulaPowerVC": "Power (Voltage & Current)",
     "formulaPowerIR": "Power (Current & Resistance)",
@@ -452,16 +412,13 @@
     "formulaTakeSquareRoot": "Take the square root of both sides",
     "formulaMultiplyBothSides": "Multiply both sides by",
     "formulaTakeReciprocal": "Take the reciprocal of both sides",
-
     "prefixLadderAria": "SI prefix ladder from pico to giga with radio examples at each level",
     "findV": "Find V",
     "findI": "Find I",
     "findR": "Find R",
     "formulaTriangleAria": "Formula triangle showing how covering one variable reveals the equation",
     "formulaTriangleCaption": "Cover the variable you want to find. What remains is the formula.",
-
     "quizTitle": "Chapter 0.3 Quiz",
-
     "quiz_q1": "What is 4700 Ω expressed in kilohms?",
     "quiz_q1_a": "0.47 kΩ",
     "quiz_q1_b": "4.7 kΩ",
@@ -469,7 +426,6 @@
     "quiz_q1_d": "470 kΩ",
     "quiz_q1_correct": "1",
     "quiz_q1_explanation": "4700 ÷ 1000 = 4.7. The prefix kilo means ×10³, so dividing by 1000 converts ohms to kilohms.",
-
     "quiz_q2": "What does the SI prefix \"µ\" (micro) represent?",
     "quiz_q2_a": "10⁻³",
     "quiz_q2_b": "10⁻⁶",
@@ -477,7 +433,6 @@
     "quiz_q2_d": "10⁻¹²",
     "quiz_q2_correct": "1",
     "quiz_q2_explanation": "Micro (µ) = 10⁻⁶ = one millionth. A 100 µF capacitor stores 0.0001 farads.",
-
     "quiz_q3": "Express 2,400,000,000 Hz in scientific notation:",
     "quiz_q3_a": "24 × 10⁸",
     "quiz_q3_b": "2.4 × 10⁹",
@@ -485,7 +440,6 @@
     "quiz_q3_d": "0.24 × 10¹⁰",
     "quiz_q3_correct": "1",
     "quiz_q3_explanation": "Standard scientific notation requires the mantissa between 1 and 10. 2.4 × 10⁹ = 2,400,000,000.",
-
     "quiz_q4": "How many nanofarads is 0.047 µF?",
     "quiz_q4_a": "4.7 nF",
     "quiz_q4_b": "47 nF",
@@ -493,7 +447,6 @@
     "quiz_q4_d": "0.47 nF",
     "quiz_q4_correct": "1",
     "quiz_q4_explanation": "Micro to nano is 3 steps down on the prefix ladder (×1000). 0.047 × 1000 = 47 nF.",
-
     "quiz_q5": "If V = I × R and you know V = 12V and R = 4Ω, what is I?",
     "quiz_q5_a": "48 A",
     "quiz_q5_b": "16 A",
@@ -501,7 +454,6 @@
     "quiz_q5_d": "0.33 A",
     "quiz_q5_correct": "2",
     "quiz_q5_explanation": "Rearrange to I = V/R = 12/4 = 3 A. Divide both sides of the equation by R.",
-
     "quiz_q6": "What is 3² (3 squared)?",
     "quiz_q6_a": "6",
     "quiz_q6_b": "9",
@@ -509,7 +461,6 @@
     "quiz_q6_d": "27",
     "quiz_q6_correct": "1",
     "quiz_q6_explanation": "Squaring means multiplying a number by itself. 3² = 3 × 3 = 9.",
-
     "quiz_q7": "If P = I²R, what happens to the power when the current doubles?",
     "quiz_q7_a": "Doubles",
     "quiz_q7_b": "Triples",
@@ -517,7 +468,6 @@
     "quiz_q7_d": "Stays the same",
     "quiz_q7_correct": "2",
     "quiz_q7_explanation": "P = I²R. If I doubles, I² quadruples (2² = 4), so power increases by a factor of 4.",
-
     "quiz_q8": "Express 0.000033 in engineering notation:",
     "quiz_q8_a": "3.3 × 10⁻⁵",
     "quiz_q8_b": "33 × 10⁻⁶",
@@ -525,7 +475,6 @@
     "quiz_q8_d": "0.33 × 10⁻⁴",
     "quiz_q8_correct": "1",
     "quiz_q8_explanation": "Engineering notation uses exponents divisible by 3. 33 × 10⁻⁶ = 33 µ (micro).",
-
     "quiz_q9": "What is √(25)?",
     "quiz_q9_a": "5",
     "quiz_q9_b": "12.5",
@@ -533,7 +482,6 @@
     "quiz_q9_d": "2.5",
     "quiz_q9_correct": "0",
     "quiz_q9_explanation": "The square root of 25 is 5, because 5 × 5 = 25.",
-
     "quiz_q10": "Convert 2.2 GHz to MHz:",
     "quiz_q10_a": "0.0022 MHz",
     "quiz_q10_b": "22 MHz",
@@ -541,7 +489,6 @@
     "quiz_q10_d": "2200 MHz",
     "quiz_q10_correct": "3",
     "quiz_q10_explanation": "Giga to mega is one step down (×1000). 2.2 × 1000 = 2200 MHz.",
-
     "quiz_q11": "If P = V²/R, solve for R:",
     "quiz_q11_a": "R = P/V²",
     "quiz_q11_b": "R = V²/P",
@@ -549,7 +496,6 @@
     "quiz_q11_d": "R = √(P/V)",
     "quiz_q11_correct": "1",
     "quiz_q11_explanation": "Multiply both sides by R: P×R = V². Then divide by P: R = V²/P.",
-
     "quiz_q12": "What is ¾ as a percentage?",
     "quiz_q12_a": "34%",
     "quiz_q12_b": "43%",
@@ -558,13 +504,11 @@
     "quiz_q12_correct": "2",
     "quiz_q12_explanation": "¾ = 3 ÷ 4 = 0.75 = 75%. A fraction is simply a division."
   },
-
   "ch0_4": {
     "heroAriaLabel": "Pen-and-ink sketch of a vintage VU meter with its needle deflected slightly above zero, beside a flourished \"dB\" inscription",
     "intro": "A radio receiver picks up signals as faint as 0.000000000001 watts. The transmitter across the room puts out 100 watts. That is a ratio of one hundred trillion to one. Nobody wants to write that. <decibel>Decibels</decibel> are the trick radio operators use to write ratios like that as small, friendly numbers — and to add gains and losses with simple arithmetic instead of multiplying long strings of zeros.",
     "introNote": "A decibel is not a unit like the volt or the ohm. It is a way of writing ratios.",
     "introPreview": "By the end of this chapter you will be able to read \"−120 dBm\" and immediately know: that is a weak receive signal, about a millionth of a billionth of a watt.",
-
     "sectionLogs": "Logarithms in Three Examples",
     "logsIntro": "You already know that 10³ = 1000. A <logarithm>logarithm</logarithm> just asks the reverse question: <i>what power do I need to raise 10 to, to get 1000?</i> Answer: 3. So log₁₀(1000) = 3.",
     "logsThree": "Three values to remember, nothing else:",
@@ -573,7 +517,6 @@
     "logsBullet3": "log₁₀(1000) = 3",
     "logsWhy": "Why bother? Because multiplication of big numbers becomes addition of little ones. 1000 × 100 = 100 000 is the same as 3 + 2 = 5. This is exactly why decibels let us add gains and losses instead of multiplying them — and why a chain of amplifiers and cables can be tallied on a napkin.",
     "logsKey": "You do not need to calculate logarithms by hand. You need to recognise them when they show up.",
-
     "sectionRatio": "dB as a Pure Ratio",
     "ratioIntro": "There are two formulas, and they differ by a single factor of 2. Which one you use depends on whether you are comparing <strong>powers</strong> or <strong>voltages and currents</strong>.",
     "ratioPower": "For power ratios:",
@@ -588,7 +531,6 @@
     "ratioTableHeaderDb": "dB",
     "ratioTableHeaderPower": "Power ratio",
     "ratioTableHeaderVoltage": "Voltage ratio",
-
     "sectionShortcut": "The 3 / 10 Shortcut",
     "shortcutIntro": "Memorise just two reference values and every other dB number falls out by composition:",
     "shortcutPlus3": "+3 dB = ×2 in power",
@@ -599,14 +541,12 @@
     "shortcutEg3": "+23 dB = +20 + 3 = 100 × 2 = ×200",
     "shortcutEg4": "−3 dB = ÷2, −10 dB = ÷10, −20 dB = ÷100",
     "shortcutTip": "Every <ham>ham</ham> in the world does this in their head. You will too, in about a week.",
-
     "sectionDbm": "dBm — Power Relative to 1 Milliwatt",
     "dbmIntro": "Everything so far has been dB-as-a-ratio. But most of the time, radio operators want to talk about actual power levels, not ratios. The fix is to pick a fixed reference and measure everything against it. The reference is <strong>1 milliwatt</strong>. A <dbm>dBm</dbm> value says \"this many dB above 1 mW.\"",
     "dbmTableTitle": "The mental table to internalise:",
     "dbmTableHeaderDbm": "dBm",
     "dbmTableHeaderPower": "Power",
     "dbmNegative": "<strong>Negative dBm is the receive side.</strong> −60 dBm is one microwatt. −120 dBm is roughly one femtowatt — the noise floor of a good HF receiver, and the reason a small wire antenna can hear a station on the other side of the planet.",
-
     "sectionAntenna": "dBd and dBi — Two Antenna References",
     "antennaIntro": "Antenna gain is always quoted in dB, but with two different reference antennas. The number alone is meaningless until you know which reference is in use.",
     "antennaDbi": "<strong><dbi>dBi</dbi></strong> — gain compared to an <isotropic>isotropic</isotropic> antenna (an imaginary perfect point that radiates equally in every direction).",
@@ -614,13 +554,11 @@
     "antennaConvert": "The conversion: dBi ≈ dBd + 2.15. A dipole is already about 2.15 dB better than isotropic, so the dBi number is always the bigger-looking one — and manufacturers love bigger-looking numbers.",
     "antennaCaution": "When an advert says \"5 dBi gain,\" subtract 2.15 to get the honest dBd value (≈ 2.85 dBd). Always check which reference is being used.",
     "antennaPreview": "We will return to antennas properly in Chapter 3.3 — for now, just recognise the two letters.",
-
     "sectionLogAxis": "Reading Log-Scale Plots",
     "logAxisIntro": "When you reach Chapter 1.8 (Filters) you will see plots labelled <strong>−3 dB at the cutoff</strong> and <strong>−20 dB per decade</strong>. Both axes on those plots are logarithmic. Two facts are enough to read them:",
     "logAxisFact1": "On a <strong>log frequency axis</strong>, equal screen distance means equal <i>ratios</i>, not equal differences. The space from 10 Hz to 100 Hz is the same as from 100 Hz to 1000 Hz. Each ×10 step is one <strong>decade</strong>.",
     "logAxisFact2": "<strong>−20 dB per decade</strong> describes a <i>slope</i>: each decade (a ×10 step in frequency) brings the signal down by 20 dB. To turn that 20 dB into a physical drop, apply the 10·log / 20·log split from earlier — for <strong>voltage</strong> it is a ÷10 drop, for <strong>power</strong> a ÷100 drop. Same slope on the plot, two different physical ratios depending on what the y-axis is showing. This is exactly the slope of a first-order RC low-pass filter above its cutoff — a curve that looks hopelessly bent on linear paper straightens out on log-log axes, which is why filter datasheets use those axes by default.",
     "logAxisWhy": "A linear axis would squash the interesting low-frequency behaviour into the leftmost pixel. The log axis spreads it out so the curve becomes a near-straight line — much easier to read and reason about.",
-
     "sectionRecognise": "Real Radio Numbers to Recognise",
     "recogniseIntro": "By the end of this chapter you should pattern-match these at a glance — they show up in every product datasheet, every band plan, and every <qso>QSO</qso> that mentions signal strength.",
     "recognise1": "Typical <hf>HF</hf> <transceiver>transceiver</transceiver> output: 100 W = +50 dBm",
@@ -631,7 +569,6 @@
     "recognise6": "Receiver sensitivity threshold: roughly −120 dBm",
     "recognise7": "<coax>Coax</coax> cable loss: typically quoted in dB per 100 m",
     "recognise8": "6 dBi <yagi>Yagi</yagi> antenna ≈ 4× the power towards the front compared to isotropic",
-
     "labGoal": "Feel what 3 dB, 6 dB, and 20 dB differences look like as real measured voltages.",
     "labEquip1": "Multimeter (DC voltage mode)",
     "labEquip2": "AA battery (1.5 V) in a single-cell holder",
@@ -645,7 +582,6 @@
     "labConnection": "You just experienced that −6 dB voltage = −3 dB power. The 1 kΩ + 1 kΩ divider halves the voltage (−6 dB voltage), but because power is V² / R, it quarters the power on the original load — which is −6 dB voltage but the same −6 dB by the voltage formula. The 3 dB power vs 6 dB voltage distinction matters when you are comparing power dissipation, not when you are comparing voltage levels at the same point in a circuit. Re-read the trap callout in section 2 — it lands properly after this lab.",
     "labTrouble1": "Multimeter shows 0 V at the output: you probably have an open joint. With the meter on continuity, check that both resistors are seated firmly in the breadboard.",
     "labTrouble2": "Output voltage is very different from the prediction: real resistor values can drift 5–10%. Measure each resistor individually with the multimeter and recalculate — the dB number will land much closer to theory.",
-
     "dbCalculatorTitle": "dB Calculator",
     "dbCalculatorDescription": "Convert between ratios, decibels, and power levels in dBm",
     "dbCalculatorMode": "Mode",
@@ -674,7 +610,6 @@
     "dbCalculatorRefPlus30": "+30 dB = ×1000",
     "dbCalculatorPlaceholder": "e.g., 100",
     "dbCalculatorInvalid": "Please enter a valid number",
-
     "logAxisToggleTitle": "Log Axis vs Linear Axis",
     "logAxisToggleDescription": "Plot a simple RC low-pass filter response. Toggle the axis to see why log is the right default for radio.",
     "logAxisToggleAxisLabel": "Frequency axis",
@@ -693,13 +628,11 @@
     "logAxisToggleAxisYLabel": "Gain (dB)",
     "logAxisToggleAria": "RC low-pass filter response, with selectable linear or logarithmic frequency axis",
     "logAxisToggleCutoffHint": "drag to retune",
-
     "logVsLinearCaption": "The same three decades plotted on a linear axis (top) and a logarithmic axis (bottom). Linear hides the early decades; log treats every ×10 step equally.",
     "logVsLinearAria": "Linear and logarithmic frequency axes shown side by side, with tick marks at 10, 100, and 1000",
     "logVsLinearTitleLinear": "Linear axis",
     "logVsLinearTitleLog": "Logarithmic axis",
     "logVsLinearFootnote": "Three of the four ticks crowd into the leftmost few percent of the linear scale.",
-
     "dbRulerCaption": "A single ruler mapping decibels, ratios, dBm, and watts at the same markings. The four vocabularies say the same thing.",
     "dbRulerAria": "dB ruler aligning decibels, power ratios, dBm, and watts on a shared horizontal scale",
     "dbRulerRowDb": "dB",
@@ -718,9 +651,7 @@
     "dbRulerWatt7": "1 W",
     "dbRulerWatt8": "10 W",
     "dbRulerWatt9": "100 W",
-
     "quizTitle": "Chapter 0.4 Quiz",
-
     "quiz_q1": "What is 1 watt expressed in dBm?",
     "quiz_q1_a": "0 dBm",
     "quiz_q1_b": "+10 dBm",
@@ -728,7 +659,6 @@
     "quiz_q1_d": "+30 dBm",
     "quiz_q1_correct": "3",
     "quiz_q1_explanation": "1 W = 1000 mW. dBm is referenced to 1 mW, so the ratio is 1000:1 — that is +30 dB above 1 mW, or +30 dBm.",
-
     "quiz_q2": "A filter attenuates a signal by 20 dB. By what factor is the power reduced?",
     "quiz_q2_a": "÷10",
     "quiz_q2_b": "÷20",
@@ -736,7 +666,6 @@
     "quiz_q2_d": "÷200",
     "quiz_q2_correct": "2",
     "quiz_q2_explanation": "Every −10 dB is one division by 10 in power. −20 dB = −10 + −10 = ÷10 × ÷10 = ÷100.",
-
     "quiz_q3": "A signal doubles in voltage. How many decibels is that?",
     "quiz_q3_a": "+3 dB",
     "quiz_q3_b": "+6 dB",
@@ -744,7 +673,6 @@
     "quiz_q3_d": "+20 dB",
     "quiz_q3_correct": "1",
     "quiz_q3_explanation": "For voltage ratios use 20 · log₁₀(2) ≈ 6 dB. (For a power doubling it would be 3 dB — the classic factor-of-two trap.)",
-
     "quiz_q4": "A signal doubles in power. How many decibels is that?",
     "quiz_q4_a": "+3 dB",
     "quiz_q4_b": "+6 dB",
@@ -752,7 +680,6 @@
     "quiz_q4_d": "+12 dB",
     "quiz_q4_correct": "0",
     "quiz_q4_explanation": "For power ratios use 10 · log₁₀(2) ≈ 3 dB. Doubling power = +3 dB; doubling voltage = +6 dB.",
-
     "quiz_q5": "An antenna is rated 8 dBi. What is that approximately in dBd?",
     "quiz_q5_a": "≈ 5.85 dBd",
     "quiz_q5_b": "≈ 8 dBd",
@@ -760,7 +687,6 @@
     "quiz_q5_d": "≈ 16 dBd",
     "quiz_q5_correct": "0",
     "quiz_q5_explanation": "dBi ≈ dBd + 2.15, so dBd ≈ dBi − 2.15 = 8 − 2.15 ≈ 5.85 dBd.",
-
     "quiz_q6": "On a log frequency plot, the distance from 1 kHz to 10 kHz is the same as the distance from 10 kHz to:",
     "quiz_q6_a": "20 kHz",
     "quiz_q6_b": "50 kHz",
@@ -768,7 +694,6 @@
     "quiz_q6_d": "1 MHz",
     "quiz_q6_correct": "2",
     "quiz_q6_explanation": "Equal distance on a log axis means equal ratios. 1 kHz → 10 kHz is ×10 (one decade), so the next decade is 10 kHz → 100 kHz.",
-
     "quiz_q7": "A receiver sensitivity is given as −120 dBm. Roughly how many watts is that?",
     "quiz_q7_a": "≈ 1 µW",
     "quiz_q7_b": "≈ 1 nW",
@@ -776,7 +701,6 @@
     "quiz_q7_d": "≈ 1 fW",
     "quiz_q7_correct": "3",
     "quiz_q7_explanation": "−120 dBm = −120 dB below 1 mW = ÷10¹² of 1 mW = 10⁻¹⁵ W = 1 fW (femtowatt).",
-
     "quiz_q8": "A handheld transmits at +37 dBm. Roughly how many watts is that?",
     "quiz_q8_a": "≈ 0.5 W",
     "quiz_q8_b": "≈ 5 W",
@@ -784,7 +708,6 @@
     "quiz_q8_d": "≈ 50 W",
     "quiz_q8_correct": "1",
     "quiz_q8_explanation": "+37 dBm = +30 dBm (1 W) + 7 dB. +7 dB is just under +10 dB (×10) and well above +3 dB (×2) — about ×5. So roughly 5 W.",
-
     "quiz_q9": "Which of these statements about dB is correct?",
     "quiz_q9_a": "dB is an SI unit like the volt or the ohm.",
     "quiz_q9_b": "dB always refers to a power ratio of 1 mW.",
@@ -792,7 +715,6 @@
     "quiz_q9_d": "dB only applies to antennas.",
     "quiz_q9_correct": "2",
     "quiz_q9_explanation": "dB is a notation for ratios, built on log₁₀. dBm is the variant referenced to 1 mW; plain dB is unitless.",
-
     "quiz_q10": "An RC low-pass filter rolls off at −20 dB per decade above its cutoff. At ten times the cutoff frequency, the output power has dropped by approximately:",
     "quiz_q10_a": "÷2",
     "quiz_q10_b": "÷10",
@@ -801,44 +723,38 @@
     "quiz_q10_correct": "2",
     "quiz_q10_explanation": "−20 dB in power = ÷100. (In voltage it would be ÷10 — the factor-of-two trap appears here too.)"
   },
-
   "ch0_5": {
     "heroAriaLabel": "Pen-and-ink sketch of a schematic drawing on a sheet of paper — a battery connected through a resistor to an LED — with a pencil resting beside it.",
-
     "intro": "A schematic is a <strong>code</strong>, not a picture. It tells you how components are <i>connected</i> — how electricity flows from one to the next — without saying anything about how they are physically laid out on the bench. Geometry on the page does not matter; <topology>topology</topology> does. Two schematics that look completely different can describe the same circuit, and one that looks tidy can describe something impossible to build.",
     "introPreview": "This short chapter teaches you the visual grammar: three rules for wires and junctions, a tour of the standard symbols you will meet on almost every diagram, and one worked example you can read line by line.",
-
     "sectionWires": "Wires, junctions, and the three rules",
     "wiresIntro": "Everything in a schematic is connected by <strong>lines</strong> that represent wires. The lines can bend, fork, and cross — but they never change what they mean. A single continuous line is a single wire, no matter how many corners it turns. With that in mind, three rules cover every wire-or-not-wire question:",
     "wiresRule1": "<strong>A line is a wire.</strong> One continuous line — straight, bent, or L-shaped — is one wire, one node, one electrical potential. If you can follow the line with your finger from end to end without lifting off, everything along it is connected.",
     "wiresRule2": "<strong>Two lines crossing with no dot are not connected.</strong> Think of them as pipes at different heights, passing each other without touching. Some drafters avoid crossings entirely by routing around; the universal reading convention is still: no dot = no connection.",
     "wiresRule3": "<strong>A dot at a T-junction or cross means three or more wires meet and are joined.</strong> The dot is the schematic's only way to say \"these are connected\". Omit it at a crossing and the reader sees two separate wires; add it and they see one node.",
     "wiresKey": "The dot appears <strong>only</strong> at real junctions — three or more wires meeting at one point. A 90° bend in a single continuous wire is never a junction: only one wire passes through that corner. Putting a dot at a plain corner is a common beginner mistake and confuses every reader after you.",
-
     "sectionSymbols": "The symbols you'll meet most",
     "symbolsIntro": "Every schematic uses the same core alphabet. Here are the symbols that appear on almost every diagram — passives first, then sources and ground, then semiconductors, and finally the two meters from Chapter 0.2. The labels (R₁, C₁, Q₁, …) are <strong>reference designators</strong>: a letter for the type, a number to distinguish multiples.",
-
     "symbolResistorName": "Resistor",
-    "symbolResistorDesc": "Opposes current flow. The zigzag (ARRL style) means the same as the rectangle (IEC style). Labelled R. Value is in ohms — often written next to the symbol.",
+    "symbolResistorDesc": "Opposes current flow. The zigzag (ARRL style) means the same as the rectangle (IEC style). Labelled <var>R</var>. Value is in ohms — often written next to the symbol.",
     "symbolCapacitorName": "Capacitor",
-    "symbolCapacitorDesc": "Stores charge — two plates separated by a gap. A curved-plate variant marks a polarised (electrolytic) capacitor where + and − matter. Labelled C. Value in farads (usually µF, nF, pF).",
+    "symbolCapacitorDesc": "Stores charge — two plates separated by a gap. A curved-plate variant marks a polarised (electrolytic) capacitor where + and − matter. Labelled <var>C</var>. Value in farads (usually µF, nF, pF).",
     "symbolInductorName": "Inductor (coil)",
-    "symbolInductorDesc": "A coil of wire that stores energy in a magnetic field. Loops or humps along a line. Labelled L. Value in henries (usually µH, mH).",
+    "symbolInductorDesc": "A coil of wire that stores energy in a magnetic field. Loops or humps along a line. Labelled <var>L</var>. Value in henries (usually µH, mH).",
     "symbolBatteryName": "Battery",
     "symbolBatteryDesc": "A DC voltage source. The long plate is positive (+), the short plate is negative (−). Multiple cells may be stacked to show a higher-voltage pack.",
     "symbolGroundName": "Ground",
     "symbolGroundDesc": "The circuit's 0 V reference. All ground symbols on a schematic are connected to each other by convention, even if no wire is drawn — this is how schematics stay uncluttered.",
     "symbolDiodeName": "Diode",
-    "symbolDiodeDesc": "Lets current flow one way only — from anode (flat side) to cathode (bar side). The triangle points in the direction current can flow. Labelled D.",
+    "symbolDiodeDesc": "Lets current flow one way only — from anode (flat side) to cathode (bar side). The triangle points in the direction current can flow. Labelled <var>D</var>.",
     "symbolLedName": "LED",
     "symbolLedDesc": "A diode that emits light when current flows through it. Same shape as a diode but with small outward arrows marking it as light-emitting. Same polarity rules apply.",
     "symbolTransistorName": "Transistor (NPN)",
-    "symbolTransistorDesc": "A three-terminal switch / amplifier: base, collector, emitter. The arrow on the emitter points outward for NPN, inward for PNP. Labelled Q. Full chapter on this in 1.10.",
+    "symbolTransistorDesc": "A three-terminal switch / amplifier: base, collector, emitter. The arrow on the emitter points outward for NPN, inward for PNP. Labelled <var>Q</var>. Full chapter on this in 1.10.",
     "symbolVoltmeterName": "Voltmeter",
-    "symbolVoltmeterDesc": "Circle with V inside. Connects <i>in parallel</i> — probes touch both sides of the component without breaking the circuit. High input impedance so it barely disturbs what it reads.",
+    "symbolVoltmeterDesc": "Circle with <var>V</var> inside. Connects <i>in parallel</i> — probes touch both sides of the component without breaking the circuit. High input impedance so it barely disturbs what it reads.",
     "symbolAmmeterName": "Ammeter",
-    "symbolAmmeterDesc": "Circle with A inside. Connects <i>in series</i> — you break the wire and insert the meter in the gap. Low resistance so current still flows as normal.",
-
+    "symbolAmmeterDesc": "Circle with <var>A</var> inside. Connects <i>in series</i> — you break the wire and insert the meter in the gap. Low resistance so current still flows as normal.",
     "sectionExample": "Reading a simple circuit",
     "exampleIntro": "Here is the circuit from the chapter's cover sketch — a 3 V battery (two AA cells) lighting an LED through a current-limiting resistor. Read it by starting at the battery's + terminal and walking the loop:",
     "exampleCaption": "Battery → resistor → LED → back to battery. One loop, three components, every wire traceable by a finger.",
@@ -850,9 +766,7 @@
     "exampleStep3": "<strong>Continue through D</strong>, the LED. Current enters the anode (the triangle's wide side), exits at the cathode (the bar side), and photons come out of the package — that's what the little outward arrows next to the symbol represent.",
     "exampleStep4": "<strong>Close the loop</strong> by following the wire down, across the bottom, and back to the battery's − terminal (the short plate). The loop is closed, the source is pushing, current flows.",
     "exampleTakeaway": "<strong>Start at the source, walk the loop, name every component you pass.</strong> Every schematic in this course yields to the same walk. The tidiness of the drawing is irrelevant — only loops, junctions, and symbols matter.",
-
     "keyTakeaway": "Topology, not geometry. A schematic that zig-zags across the page can describe the same circuit as one laid out in a tidy rectangle. Train your eye on connections, not shapes.",
-
     "labGoal": "Read a schematic, translate it to a breadboard, and verify the circuit works by lighting an LED.",
     "labEquip1": "Multimeter",
     "labEquip2": "Breadboard",
@@ -861,23 +775,18 @@
     "labComp1": "1× red LED",
     "labComp2": "1× 220 Ω resistor",
     "labComp3": "2× AA batteries",
-
     "labStep1": "Look at the schematic above. Identify the battery, resistor R, and LED D. Note the polarity markings on the battery (long = +, short = −) and the LED (triangle side = anode, bar side = cathode — on a real LED the longer leg is the anode, and the flat spot on the dome marks the cathode).",
     "labStep2": "Place the resistor across two rows of the breadboard. One leg in the + rail column, the other in a free interior row.",
     "labStep3": "Place the LED so its anode (the longer leg) connects to the same interior row as the other leg of the resistor. The cathode (shorter leg) goes to the − rail.",
     "labStep4": "With power still disconnected, set your multimeter to resistance mode and verify continuity from + rail through R to the LED anode row. It should read some finite resistance (the 220 Ω resistor shows; the LED looks like an open below its forward voltage).",
     "labStep5": "Connect the battery holder: red wire to + rail, black wire to − rail. The LED should light up. If it does not, check polarity — the LED only works one way.",
     "labStep6": "<strong>Optional but instructive:</strong> measure the voltage across the resistor, then across the LED. They should add up to roughly the 3 V of the battery. This is Kirchhoff's Voltage Law in action — a preview of Chapter 1.2.",
-
     "labExpected": "LED lights up. Voltage across R reads about 0.8–1 V; voltage across the LED reads about 1.8–2.2 V (its forward voltage). The two add up to the battery voltage, ≈3 V.",
     "labConnection": "You just translated a schematic into a working circuit. From here on, every lab begins with reading a schematic and ends with building what you read. The schematic is the contract between the author and you.",
-
     "labTrouble1": "LED doesn't light — check polarity first, try flipping the LED. Then check battery voltage (fresh AAs should read ≈1.5 V each, ≈3 V in series).",
     "labTrouble2": "LED very dim — batteries may be partially used, or the resistor value is too high. Try a 100 Ω resistor instead.",
     "labTrouble3": "LED extremely bright, gets hot, then goes dark — the resistor is missing or far too small. An unprotected LED on 3 V lasts about one second before burning out. Replace the LED and always include the 220 Ω limiter.",
-
     "quizTitle": "Quiz — How to Read a Schematic",
-
     "quiz_q1": "On a schematic, two lines crossing with no dot at the intersection means:",
     "quiz_q1_a": "The two wires are electrically connected.",
     "quiz_q1_b": "The two wires are passing each other but not connected.",
@@ -885,7 +794,6 @@
     "quiz_q1_d": "Nothing — it's a cosmetic detail.",
     "quiz_q1_correct": "1",
     "quiz_q1_explanation": "No dot = no connection. The two lines represent wires passing each other, electrically isolated.",
-
     "quiz_q2": "A 90° bend in a single continuous wire needs:",
     "quiz_q2_a": "A dot — every corner is a junction.",
     "quiz_q2_b": "No dot — only one wire passes through, so nothing is joining anything.",
@@ -893,7 +801,6 @@
     "quiz_q2_d": "Two dots — one for each incoming line.",
     "quiz_q2_correct": "1",
     "quiz_q2_explanation": "A corner is still one wire, just bent. Junction dots are only for where three or more wires genuinely meet.",
-
     "quiz_q3": "Which end of a diode or LED is the anode?",
     "quiz_q3_a": "The bar — the flat side of the symbol.",
     "quiz_q3_b": "The triangle's point.",
@@ -901,7 +808,6 @@
     "quiz_q3_d": "Either end — diodes are symmetric.",
     "quiz_q3_correct": "2",
     "quiz_q3_explanation": "The triangle points in the direction of current flow. Current enters the wide (flat) base — the anode — and exits at the bar, the cathode.",
-
     "quiz_q4": "A voltmeter in a schematic is usually connected:",
     "quiz_q4_a": "In series — you break the wire and insert it.",
     "quiz_q4_b": "In parallel — across the component being measured.",
@@ -909,7 +815,6 @@
     "quiz_q4_d": "In place of the power supply.",
     "quiz_q4_correct": "1",
     "quiz_q4_explanation": "Voltmeters tap across a component in parallel. Their high input impedance means they barely disturb the circuit.",
-
     "quiz_q5": "What does a ground symbol on a schematic mean?",
     "quiz_q5_a": "The circuit is dangerous — stay away.",
     "quiz_q5_b": "The point is connected to physical earth via a stake outside.",
@@ -917,7 +822,6 @@
     "quiz_q5_d": "The symbol is only used for outdoor antennas.",
     "quiz_q5_correct": "2",
     "quiz_q5_explanation": "Ground is the circuit's zero-volt reference. Using the symbol lets the draftsperson omit long ground-return wires — every ground symbol on the schematic is connected to every other by convention.",
-
     "quiz_q6": "Two schematics look different on the page but have the same components connected identically. They represent:",
     "quiz_q6_a": "Two different circuits — the layout makes them different.",
     "quiz_q6_b": "The same circuit — topology is what matters, not geometry.",
@@ -926,15 +830,12 @@
     "quiz_q6_correct": "1",
     "quiz_q6_explanation": "A schematic encodes topology (what is connected to what), not geometry (how the drawing looks). The same circuit can be drawn in infinitely many ways."
   },
-
   "ch1_1": {
     "heroAriaLabel": "A cross-section of copper wire with a few electrons drifting along it, a battery at one end providing the push.",
     "heroCopperLabel": "COPPER",
     "heroDriftLabel": "drift",
-
     "intro": "Three words carry almost everything electrical: <strong>voltage</strong>, <strong>current</strong>, and <strong>resistance</strong>. Voltage is the push. Current is the flow. Resistance is how hard the wire and the components push back. Every circuit you will ever read, build, or debug can be understood as an interaction of those three quantities — and everything that comes later in this course, from capacitors to antennas to Arduino code, is built on top of them.",
     "introPreview": "This chapter explains what each quantity is, where it comes from, and how to get an intuitive feel for it before we start working with formulas in Chapter 1.2.",
-
     "sectionWater": "The water-pipe picture",
     "waterIntro": "The single most useful mental model in electronics is a plumbing diagram. It is not perfect, but it will carry you further than you would expect.",
     "waterPipeCaption": "The three quantities of a circuit, drawn as plumbing. Voltage is the water level in the tower (pressure); the narrow section is the resistance; the stream coming out is the current.",
@@ -947,11 +848,9 @@
     "waterBullet3": "<strong>Resistance is how narrow the pipe is.</strong> A wide hose lets water fly through; a drinking straw barely trickles. A thick copper wire has almost no resistance; a resistor is a deliberately narrow section.",
     "waterPayoff": "Hold on to this picture. When we write the formulas in Chapter 1.2, the shapes of the equations will already feel right — more pressure means more flow, a narrower pipe means less flow, and so on.",
     "waterBreaks": "<strong>Where the analogy breaks:</strong> water has mass, so it drags when it starts and coasts when you close the valve; electricity effectively has none at the scales we care about. A leaky pipe dribbles water on the floor; a cut wire just stops — no charge spills. And water in a pipe can flow only one way at a time, but in AC circuits current flips direction thousands or millions of times per second. We will patch these gaps as they come up.",
-
     "sectionCharge": "Charge and the electrons that carry it",
     "chargeIntro": "<charge>Electric charge</charge> is a property of matter, in the same way mass or colour is. Protons carry a positive charge, electrons a negative charge, and neutrons carry none. An ordinary atom has equal numbers of protons and electrons, so it reads as electrically neutral from the outside. Tip the balance either way — rub a balloon on your hair, touch a doorknob on a dry day — and you have an <strong>ion</strong>, an atom or group of atoms with a net charge.",
     "chargeMagnitude": "Charge is measured in <coulomb>coulombs</coulomb> (C). One coulomb is the charge of about 6.25 × 10¹⁸ electrons — not a number you will count out loud. Everyday currents involve fractions of a coulomb moving past a point per second, which is why we almost never talk about charge directly; we talk about the rate at which it flows.",
-
     "sectionCurrent": "Current — the flow of charge",
     "currentIntro": "<current>Current</current> is what happens when charge moves. Specifically, current (symbol <var>I</var>) is the rate at which charge passes a point in a circuit, measured in <ampere>amperes</ampere>. One ampere is one coulomb per second — about 6.25 × 10¹⁸ electrons streaming past each second.",
     "currentDirection": "Currents flow <strong>through</strong> things — through a wire, through a resistor, through a lamp filament. Never say \"the current in the wire is at a point\"; current is always a rate. And always name what it's flowing through.",
@@ -973,7 +872,6 @@
     "currentLadderCharger": "Phone charger",
     "currentLadderFuse": "Household lighting circuit fuse",
     "currentLadderLightning": "Lightning bolt peak",
-
     "voltageLadderTitle": "Voltage — everyday magnitudes",
     "voltageLadderAriaLabel": "A vertical ladder showing typical voltages from 1.5 V (an AA cell) up to 400 kV (a high-voltage transmission line), with the multiplicative ratio between each pair of neighbouring values.",
     "voltageLadderCaption": "Each step up the ladder multiplies the voltage by the amount shown in the middle. A transmission line runs at roughly 1 700× the voltage of wall mains.",
@@ -982,7 +880,6 @@
     "voltageLadderCar": "Car battery",
     "voltageLadderMains": "Household mains",
     "voltageLadderTransmission": "High-voltage transmission line",
-
     "resistanceLadderTitle": "Resistance — everyday magnitudes",
     "resistanceLadderAriaLabel": "A vertical ladder showing typical resistances from 5 milliohms (a short piece of hook-up wire) up to 100 kilohms (dry human skin), with the multiplicative ratio between each pair of neighbouring values.",
     "resistanceLadderCaption": "Each step up the ladder multiplies the resistance by the amount shown in the middle. Dry skin has around 200 000× more resistance than a metre of hook-up wire.",
@@ -990,7 +887,6 @@
     "resistanceLadderLimiting": "Current-limiting resistor",
     "resistanceLadderPullup": "Pull-up resistor (digital logic)",
     "resistanceLadderSkin": "Dry human skin",
-
     "resistanceCollisionTitle": "One collision — kinetic energy → heat",
     "resistanceCollisionCaption": "A drifting electron bounces off a fixed ion core and leaves a little slower. The missing energy has gone into the ion, which vibrates more vigorously — what we feel as heat. Multiply by billions of collisions per second and the wire warms up.",
     "resistanceCollisionAriaLabel": "A sketch showing a fast electron approaching a positive ion core from the upper left, deflecting off it toward the lower right as a slower electron, with small arcs around the ion indicating vibration and short upward rays indicating radiated heat.",
@@ -998,7 +894,6 @@
     "resistanceCollisionLabelSlow": "slower electron",
     "resistanceCollisionLabelIon": "ion core (heated)",
     "resistanceCollisionLabelHeat": "heat",
-
     "atomicCaption": "An ordinary atom has equal numbers of protons (+) and electrons (−); the charges cancel and the atom reads as neutral. Knock one electron loose and the +3/−3 balance is broken, becoming +3/−2 — the atom is now a positive ion with a net charge of +1.",
     "atomicAriaLabel": "Two side-by-side atom sketches. On the left, a neutral atom: a cluster of three protons and three neutrons forms the nucleus, surrounded by three electrons on a circular orbit. On the right, the same atom after one electron has escaped: only two electrons remain on the orbit, and a short arrow shows the third electron flying away.",
     "atomicNeutralTitle": "Neutral atom",
@@ -1009,14 +904,12 @@
     "atomicLegendProton": "proton",
     "atomicLegendNeutron": "neutron",
     "atomicLegendElectron": "electron",
-
     "sectionVoltage": "Voltage — the push",
     "voltageIntro": "<voltage>Voltage</voltage> (symbol <var>V</var>, or sometimes <var>E</var> for older textbooks) is the push that makes charge flow. It is the energy a source gives to each coulomb of charge it sends around the circuit. One volt means one joule of energy per coulomb (1 V = 1 J/C). At 5 V, each coulomb that flows through the circuit delivers 5 joules — five times more than at 1 V. This isn't the energy needed to move the charge; it's the energy each coulomb carries and gives up to the circuit. That's why, at higher voltage, the same LED glows brighter, the same heating element gets hotter, and the same motor spins faster.",
     "voltageBetween": "Voltage is always <strong>between two points</strong> — never at a single point. It is a difference, like altitude difference between two floors of a building. A battery has 1.5 V between its + and − terminals; a resistor might have 0.6 V between its two leads. When engineers say \"the voltage at this point is 5 V\", what they really mean is \"the voltage between this point and the circuit's ground reference is 5 V\". Ground is just the agreed-upon zero.",
     "voltageSources": "Voltage comes from something doing work on charges: the chemistry inside a battery, a generator's spinning magnets, photons hitting a solar cell, friction that builds static on a sweater. Any such device is a <strong>voltage source</strong>.",
     "voltageMagnitudes": "Typical magnitudes:",
     "voltageEmfNote": "You will sometimes see the older term <emf>EMF</emf> (electromotive force) used interchangeably with voltage, especially for sources. They mean the same thing and share the same unit. Modern practice is to just say \"voltage\"; physics textbooks and older literature lean on \"EMF\".",
-
     "sectionResistance": "Resistance — the push-back",
     "resistanceIntro": "<resistance>Resistance</resistance> (symbol <var>R</var>) is how much a material opposes current flow. It is measured in <ohm>ohms</ohm> (Ω). One ohm is the resistance across which one volt produces one ampere of current.",
     "resistanceMechanism": "Physically, resistance is friction at the atomic scale. When electrons drift through a metal, they constantly collide with the atoms that make up the wire. Each collision knocks a little energy out of the electron and into the atom, which responds by vibrating a bit more vigorously. Multiply that by 6 × 10¹⁸ collisions per second and the wire warms up — electrical energy turned into heat. Every real conductor has some resistance; a \"wire\" is just a conductor we decided to ignore the resistance of.",
@@ -1040,12 +933,10 @@
     "materialsLegendFree": "free electron",
     "resistanceResistor": "A <strong>resistor</strong> is a deliberate piece of resistance — a tiny cylinder of resistive material, made to a specific number of ohms, that you drop into a circuit to limit current, divide voltage, pull a logic input high or low, or convert a current into a voltage. After transistors buried inside microprocessors, resistors are the most common electronic component on Earth.",
     "resistanceMagnitudes": "Magnitudes to keep in mind:",
-
     "sectionCircuit": "Putting it together",
     "circuitIntro": "You have already seen the simplest complete circuit — a battery, a resistor, and an LED in a loop — back in Chapter 0.5. Here it is again, with the three quantities labelled:",
     "circuitCaption": "Voltage V pushes current I through resistance R. If any of the three is missing — no battery, no complete loop, infinite resistance — no current flows.",
     "circuitOhmPreview": "Notice how the three quantities are linked: if you double the voltage without changing the resistance, you double the current. If you double the resistance without changing the voltage, you halve the current. This relationship has a name — <strong>Ohm's Law</strong> — and we will spend all of Chapter 1.2 with it. For now, the feel is the point: voltage and current rise together, resistance pushes back.",
-
     "sectionTerms": "Names, units, and vocabulary",
     "termsIntro": "Four quantities, four units, four namesakes:",
     "termsHeaderQuantity": "Quantity",
@@ -1065,16 +956,13 @@
     "termsVoltNamed": "Alessandro Volta (1745–1827)",
     "termsOhmNamed": "Georg Simon Ohm (1787–1854)",
     "termsVocabNote": "<strong>A small plea about vocabulary:</strong> don't call current \"amperage\". Don't call voltage \"voltageage\" (it happens). Don't call resistance \"ohmage\". The quantities are called current, voltage, and resistance; the units are amperes, volts, and ohms. Getting the words right early makes everything that follows feel less foreign.",
-
     "sectionTraffic": "A second analogy — traffic on a road",
     "trafficIntro": "If the water picture does not click for you, try cars on a road. Same three ideas, different imagery:",
     "trafficBullet1": "<strong>Voltage is the slope of the road.</strong> A steep downhill pushes cars forward; a flat road doesn't. Steeper slope, harder push.",
     "trafficBullet2": "<strong>Current is cars per second going past a given point.</strong> A highway sees thousands; a country lane sees a few.",
     "trafficBullet3": "<strong>Resistance is how much the road slows traffic.</strong> A wide, smooth motorway has low resistance; a narrow, potholed one has high resistance. A roadblock is an open circuit — no cars get through, no matter how steep the slope.",
     "trafficClosing": "Use whichever picture makes the arithmetic feel intuitive. They describe the same three quantities; neither is more \"correct\".",
-
     "keyTakeaway": "Voltage pushes. Current flows. Resistance pushes back. Every circuit in this course — from a blinking LED to a short-wave receiver — is a particular arrangement of these three quantities. Chapter 1.2 puts numbers on the relationship; Chapter 1.3 adds alternating current; everything else builds from there.",
-
     "labGoal": "Measure the voltage, resistance, and current of a simple circuit, and verify that they behave as the water-pipe picture predicts.",
     "labEquip1": "<multimeter>Multimeter</multimeter>",
     "labEquip2": "<breadboard>Breadboard</breadboard>",
@@ -1083,23 +971,18 @@
     "labComp1": "1× 100 Ω resistor",
     "labComp2": "1× 1 kΩ resistor",
     "labComp3": "1× 10 kΩ resistor",
-
     "labStep1": "<strong>Measure the battery's open-circuit voltage.</strong> Set the multimeter to DC volts (2 V or auto range). Touch the red probe to the battery's + terminal and the black probe to the − terminal. Write down the reading — it should be close to 1.5 V for a fresh AA, down to 1.2 V for a tired one.",
     "labStep2": "<strong>Measure each resistor on its own.</strong> With no power connected, set the multimeter to ohms (Ω). Touch one probe to each lead of each resistor in turn and record the reading. Real resistors are within ±5 % of their marked value; a resistor marked 1000 Ω might read anywhere from 950 Ω to 1050 Ω.",
     "labStep3": "<strong>Predict the current.</strong> For each resistor, use the water-pipe intuition to guess whether the current will be big or small. Bigger voltage → bigger current; bigger resistance → smaller current. We will not compute numbers yet — just direction.",
     "labStep4": "<strong>Build a series loop and measure the current.</strong> On the breadboard, connect: battery + → one lead of the 1 kΩ resistor → other lead of the 1 kΩ resistor → multimeter red probe → multimeter black probe → battery −. The multimeter in current mode is part of the loop. Switch it to mA (DC). Read the current. Repeat for the 100 Ω and 10 kΩ resistors. Which gave the most current? The least?",
     "labStep5": "<strong>Sanity-check with the formula.</strong> Chapter 1.2 will derive it properly, but you can peek ahead: <strong>I = V / R</strong>. With 1.5 V across 1 kΩ you should see about 1.5 mA. Across 100 Ω you should see 15 mA. Across 10 kΩ you should see 0.15 mA. Close to your measurements? The agreement is usually within a few percent.",
     "labStep6": "<strong>Optional — feel your own resistance.</strong> Set the multimeter back to ohms (on the 20 MΩ or auto range). Hold one probe tip between the thumb and index finger of each hand — pinch firmly. The reading is your body resistance from one hand to the other, through your arms and torso. Typical: 100 kΩ to several MΩ, depending on how sweaty your hands are. Now lick your fingertips and try again — the reading drops by 10× or more. This is a preview of why Chapter 4.3 takes electrical safety seriously.",
-
     "labExpected": "Voltage ≈ 1.5 V (fresh AA). Resistor values within ±5 % of marked. Current approximately equal to V ÷ R for each resistor: about 15 mA with 100 Ω, 1.5 mA with 1 kΩ, 0.15 mA with 10 kΩ. Body resistance dry: ≥ 100 kΩ; wet: may drop below 10 kΩ.",
     "labConnection": "You've just seen the three quantities of this chapter behave exactly the way the analogies said they would — more voltage pushes more current, more resistance allows less. Chapter 1.2 gives you the formula that makes this quantitative, and with the formula in hand you'll stop guessing and start designing.",
-
     "labTrouble1": "Multimeter reads 0 when set to current mode — you probably have the red probe in the wrong socket. Current mode has a separate jack (marked A or mA); voltage and resistance share a different jack (marked V/Ω). Move the red lead to the correct jack.",
     "labTrouble2": "Current reading is much higher than predicted, or the resistor gets hot — you may have shorted out the resistor or used a much smaller value than intended. Disconnect, inspect, and verify the resistor's value with the ohmmeter before re-powering.",
     "labTrouble3": "Body-resistance reading is stuck at \"OL\" (over-limit) on the meter — you're on a range that does not go high enough, or you are not pressing hard enough on the probes. Switch to auto-range or the highest manual range, and squeeze the probe tips firmly.",
-
     "quizTitle": "Quiz — What Is Electricity?",
-
     "quiz_q1": "One coulomb of charge is approximately equal to:",
     "quiz_q1_a": "6.25 × 10⁶ electrons",
     "quiz_q1_b": "6.25 × 10¹² electrons",
@@ -1107,7 +990,6 @@
     "quiz_q1_d": "6.25 × 10²⁴ electrons",
     "quiz_q1_correct": "2",
     "quiz_q1_explanation": "Each electron carries about −1.602 × 10⁻¹⁹ C of charge, so one coulomb is the charge of ≈ 6.25 × 10¹⁸ electrons. That is why we almost never count individual electrons — we count the rate at which they flow, which is the current in amperes.",
-
     "quiz_q2": "One ampere is defined as:",
     "quiz_q2_a": "One volt divided by one ohm.",
     "quiz_q2_b": "One coulomb of charge passing a point per second.",
@@ -1115,7 +997,6 @@
     "quiz_q2_d": "One joule of energy per coulomb of charge.",
     "quiz_q2_correct": "1",
     "quiz_q2_explanation": "The ampere is a rate: one coulomb per second (1 A = 1 C/s). Option (a) happens to be a true consequence (Ohm's Law), but not the definition. Option (d) is the definition of the volt, not the ampere.",
-
     "quiz_q3": "Voltage is always:",
     "quiz_q3_a": "Measured at a single point in a circuit.",
     "quiz_q3_b": "Measured between two points in a circuit.",
@@ -1123,7 +1004,6 @@
     "quiz_q3_d": "Zero inside a conductor.",
     "quiz_q3_correct": "1",
     "quiz_q3_explanation": "Voltage is a difference between two points, like altitude difference between two floors. When someone says \"the voltage at this point\", they really mean \"the voltage between this point and ground\". A single point, with no reference, has no voltage on its own.",
-
     "quiz_q4": "In conventional-current notation, current flows:",
     "quiz_q4_a": "From the negative terminal to the positive terminal.",
     "quiz_q4_b": "From the positive terminal to the negative terminal.",
@@ -1131,7 +1011,6 @@
     "quiz_q4_d": "Only when the battery is removed.",
     "quiz_q4_correct": "1",
     "quiz_q4_explanation": "Conventional current flows from + to −, the direction positive charge would move. Electrons actually go the other way (they are negatively charged), but Benjamin Franklin's convention was set before electrons were discovered, and it is what every schematic and equation uses.",
-
     "quiz_q5": "Which of the following is a good conductor?",
     "quiz_q5_a": "Rubber",
     "quiz_q5_b": "Dry wood",
@@ -1139,7 +1018,6 @@
     "quiz_q5_d": "Glass",
     "quiz_q5_correct": "2",
     "quiz_q5_explanation": "Copper is one of the best electrical conductors at room temperature, with loosely-bound outer electrons that drift easily under an applied voltage. Rubber, dry wood, and glass are all insulators.",
-
     "quiz_q6": "A wire gets warm when current flows through it because:",
     "quiz_q6_a": "The electrons speed up and generate friction.",
     "quiz_q6_b": "Electrons collide with the atoms of the metal, transferring energy that appears as heat.",
@@ -1147,7 +1025,6 @@
     "quiz_q6_d": "Wires are designed to act as small heaters.",
     "quiz_q6_correct": "1",
     "quiz_q6_explanation": "Electrons drifting through a conductor constantly collide with its atoms, handing off a little of their energy each time. The atoms vibrate more vigorously, and we feel the result as heat. This is the physical origin of resistance.",
-
     "quiz_q7": "A battery pushes 3 V across a resistor. You swap it for a 6 V battery and leave the resistor unchanged. The current through the resistor:",
     "quiz_q7_a": "Stays the same.",
     "quiz_q7_b": "Doubles.",
@@ -1155,7 +1032,6 @@
     "quiz_q7_d": "Drops to zero.",
     "quiz_q7_correct": "1",
     "quiz_q7_explanation": "Water-pipe intuition: twice the pressure pushes twice the flow through the same pipe. Ohm's Law (I = V / R) makes this quantitative: doubling V doubles I. Chapter 1.2 derives the formula in detail.",
-
     "quiz_q8": "The drift velocity of electrons in a typical wire carrying a few amperes is:",
     "quiz_q8_a": "Close to the speed of light.",
     "quiz_q8_b": "About the speed of sound in the metal.",
@@ -1163,7 +1039,6 @@
     "quiz_q8_d": "Different for different electrons.",
     "quiz_q8_correct": "2",
     "quiz_q8_explanation": "Individual electrons drift surprisingly slowly — well under a millimetre per second. A light switch works instantly because the electric field propagates through the wire near the speed of light, pushing every electron at once; the same electron does not need to travel from the switch to the lamp.",
-
     "widget": {
       "title": "Current Explorer",
       "description": "Drag the voltage and resistance sliders. Watch the current — and the electrons in the wire below — respond.",
@@ -1174,7 +1049,6 @@
       "hint": "Notice: doubling the voltage doubles the current; halving the resistance also doubles the current. Chapter 1.2 turns this intuition into the formula I = V / R."
     }
   },
-
   "chapterFlow": {
     "analogy": "Analogy",
     "analogySub": "Real-world hook",
@@ -1189,7 +1063,6 @@
     "caption": "Every chapter follows this structure. Lab activities are optional; everything else is always present.",
     "ariaLabel": "Chapter structure flow: Analogy → Formula → Widget → Lab → Quiz"
   },
-
   "hero": {
     "title": "HIGH FREQUENCY SKYWAVE PROPAGATION",
     "ionosphere": "IONOSPHERE",
@@ -1208,7 +1081,6 @@
     "keepLearning": "Keep learning — by the end of this guide, every part of this diagram will make complete sense!",
     "ariaLabel": "HF radio propagation: superheterodyne transmitter and receiver communicate via ionospheric skywave multi-hop"
   },
-
   "guidedTour": {
     "takeATour": "Take a guided tour",
     "guidedTour": "Guided tour",
@@ -1220,11 +1092,9 @@
     "startReading": "Start reading",
     "next": "Next"
   },
-
   "language": {
     "label": "Language"
   },
-
   "parts": {
     "0": "Foundations",
     "1": "Electricity & Circuits",
@@ -1232,7 +1102,6 @@
     "3": "Station Equipment",
     "4": "Propagation, Operations & Regulations"
   },
-
   "chapterTitles": {
     "0-1": "How to Use This Site",
     "0-2": "Lab Bench Setup",
@@ -1262,7 +1131,6 @@
     "4-4": "Operating Procedures",
     "4-5": "Regulations"
   },
-
   "chapterSubtitles": {
     "0-1": "Reading path, widgets, quizzes, and lab activities explained",
     "0-2": "Getting to know your multimeter, oscilloscope, VNA, and Arduino",
@@ -1292,7 +1160,6 @@
     "4-4": "Phonetic alphabet, Q-codes, QSO structure, call signs",
     "4-5": "ITU, CEPT, HAREC, national licence conditions"
   },
-
   "glossary": {
     "_ui": {
       "reference": "Reference",
@@ -1381,7 +1248,6 @@
       "emf": "EMF"
     }
   },
-
   "calloutLabels": {
     "danger": "Danger",
     "key": "Key Concept",
@@ -1392,7 +1258,6 @@
     "onair": "On Air",
     "math": "Math"
   },
-
   "units": {
     "hz": "Hz",
     "khz": "kHz",
