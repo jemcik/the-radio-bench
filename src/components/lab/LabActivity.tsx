@@ -67,7 +67,7 @@ export default function LabActivity({
               <Badge variant="lab" className="text-[10px]">{t('lab.optional')}</Badge>
               <span className="text-sm font-semibold text-foreground">{title}</span>
             </div>
-            <p className="text-sm text-muted-foreground truncate">{goal}</p>
+            <p className={cn('text-sm text-muted-foreground', !open && 'truncate')}>{goal}</p>
           </div>
           <ChevronDown className={cn(
             'w-4 h-4 text-muted-foreground transition-transform shrink-0',

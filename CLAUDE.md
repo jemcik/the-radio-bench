@@ -19,14 +19,25 @@ Diagrams are viewed inline with body copy. Small SVG text reads as
 |---|---|---|
 | Primary tick / row label | **13–14** | Mono for numbers, sans for words |
 | Axis / row title | **14**, weight 600 | The thing the reader scans for |
-| Secondary tick label (units, examples) | **12–13** | Mono ok |
-| Sub-label / hint under a title | **11** | `--muted-foreground` |
-| Footnote / caveat inside the SVG | **11** italic | Not smaller |
+| Secondary tick label (units, examples) | **13** | Mono ok |
+| Sub-label / hint under a title | **13** | `--muted-foreground` |
+| Footnote / caveat inside the SVG | **13** italic | Not smaller |
 | Symbol / hero glyph (e.g. prefix `µ`) | **17**, weight 700 | Anchor point |
 
-**Never** drop below 11 px inside a diagram. If text doesn't fit at
-11 px, the layout is wrong (rotate, stagger, wrap, or shrink the
-content set — don't shrink the type).
+**Never** drop below **13 px** for any standalone text label inside a
+diagram. If a label doesn't fit at 13 px, the layout is wrong (rotate,
+stagger, wrap, or shrink the content set — don't shrink the type).
+
+The old "11 px floor" rule from earlier chapters is deprecated — the
+user has repeatedly flagged 11–12 px text as too small next to body
+copy. Exception: glyph decorations INSIDE a shape (e.g. the `+` inside
+a 5 px-radius ion circle) are typographic artwork, not readable text,
+and may use smaller fontSizes to fit their container.
+
+(Font sizes are **on-screen** values. Do not use CSS `maxWidth`/
+`maxHeight` to scale a diagram — match the viewBox to the display size
+so the fontSize number in source equals the fontSize the reader sees.
+See `feedback_svg_font_minimum_on_screen.md`.)
 
 ### Padding — symmetric and tight
 
@@ -193,6 +204,22 @@ node scripts/check-i18n.mjs   # if you touched locale files
 Then sanity-check visually in `npm run dev`. The dev server is the only
 place font metrics match production — jsdom can't catch label overlap.
 
+## Ukrainian translation — use the `ua-translate` skill
+
+**Before translating any EN → UK content** (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never translate inline key-by-key.
+
+The skill runs six stages:
+1. Load glossary + landmines + style refs
+2. Primary translation via briefed agent
+3. **Parallel critique** — 5 specialist agents in one spawn (fluency / technical / consistency / calques / grammar)
+4. Consolidate findings + apply high-confidence auto-fixes
+5. Automated lint: `npm run check:uk` (fails on mechanical errors — English leftovers, decimal periods, Latin units, forbidden words, capitalised `Ви`, `<i>I</i>` for math vars)
+6. Present only non-obvious decisions to the user
+
+Every time the user pushes back on a specific Ukrainian phrasing, extend `.claude/skills/ua-translate/references/landmines.md` (and, where detectable, the linter). The skill gets smarter per chapter instead of repeating the same 30-issue round-trip.
+
+**Linter CLI**: `npm run check:uk` scans the whole `uk/ui.json`. Scope to one chapter: `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch1_1`.
+
 ## i18n discipline — translate WHOLE widgets, never piecemeal
 
 The single most repeated failure across ch0.3 and ch0.4 was leaving
@@ -300,9 +327,13 @@ least one related term so the tooltip's "see also" chain works.
 
 - **Amateur radio callsigns** in Ukraine are issued by **УДЦР**
   (Український державний центр радіочастот / Ukrainian State Centre
-  of Radio Frequencies, a.k.a. UCRF), not by НКРЗІ. НКРЗІ is the
-  regulator; УДЦР is the licensing body. Any glossary entry, lab
-  callout, or prose mentioning the licensing process must use УДЦР.
+  of Radio Frequencies, a.k.a. UCRF). УДЦР is the licensing body;
+  the regulator ABOVE УДЦР is **НКЕК** (Національна комісія, що
+  здійснює державне регулювання у сферах електронних комунікацій,
+  радіочастотного спектра та надання послуг поштового зв'язку) —
+  НКЕК replaced НКРЗІ in 2022. If you need to mention the regulator,
+  use НКЕК (not НКРЗІ). Any glossary entry, lab callout, or prose
+  about the licensing process must use УДЦР for the issuing body.
 - **Decimal separator** in Ukrainian is a **comma**, not a period:
   `1,55 В`, not `1.55 В`. Every numeric value in `uk/ui.json` should
   follow this — including dB values (`−2,5 дБ`), ratios (`0,1`),

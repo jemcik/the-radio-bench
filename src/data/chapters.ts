@@ -100,7 +100,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'What Is Electricity?',
         subtitle: 'Conductors, insulators, current, voltage, resistance',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['1.1'],
