@@ -24,7 +24,7 @@
  */
 
 // Layout wrapper
-export { default as Circuit, type LegendItem } from './Circuit'
+export { default as Circuit, type LegendItem, type LegendHeading, type LegendEntry } from './Circuit'
 
 // Shared vertical-padding budget so all schematics land at the same size
 export { SCHEMATIC_PAD_TOP, SCHEMATIC_PAD_BOT, schematicHeight } from './layout'

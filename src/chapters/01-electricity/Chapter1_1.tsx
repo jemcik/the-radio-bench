@@ -12,7 +12,7 @@ import {
   pins2,
   SCHEMATIC_PAD_TOP,
   schematicHeight,
-  type LegendItem,
+  type LegendEntry,
 } from '@/lib/circuit'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import CurrentExplorer from '@/components/widgets/CurrentExplorer'
@@ -45,7 +45,7 @@ const bat = pins2(LEFT_X, BAT_Y, 'down')
 const r1 = pins2(150, TOP_Y)
 const led = pins2(230, TOP_Y)
 
-function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[] }) {
+function LedCircuit({ caption, legend }: { caption: string; legend: LegendEntry[] }) {
   return (
     <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} legend={legend}>
       <Wire points={[bat.p1, { x: LEFT_X, y: TOP_Y }, r1.p1]} />
@@ -275,9 +275,14 @@ export default function Chapter1_1() {
       <LedCircuit
         caption={t('ch1_1.circuitCaption')}
         legend={[
-          { kind: 'battery',  label: <Trans i18nKey="ch1_1.circuitLegendBattery"  ns="ui" components={{ var: <MathVar /> }} /> },
-          { kind: 'resistor', label: <Trans i18nKey="ch1_1.circuitLegendResistor" ns="ui" components={{ var: <MathVar /> }} /> },
-          { kind: 'led',      label: <Trans i18nKey="ch1_1.circuitLegendLed"      ns="ui" components={{ var: <MathVar /> }} /> },
+          { heading: t('ch1_1.circuitLegendQuantitiesTitle') },
+          { label: <Trans i18nKey="ch1_1.circuitLegendV" ns="ui" components={{ var: <MathVar /> }} /> },
+          { label: <Trans i18nKey="ch1_1.circuitLegendR" ns="ui" components={{ var: <MathVar /> }} /> },
+          { label: <Trans i18nKey="ch1_1.circuitLegendI" ns="ui" components={{ var: <MathVar /> }} /> },
+          { heading: t('ch1_1.circuitLegendComponentsTitle') },
+          { kind: 'battery',  label: t('ch1_1.circuitLegendBatteryName') },
+          { kind: 'resistor', label: t('ch1_1.circuitLegendResistorName') },
+          { kind: 'led',      label: t('ch1_1.circuitLegendLedName') },
         ]}
       />
 
