@@ -206,7 +206,7 @@
     "breadboardQuality": "Not all breadboards are equal. Cheap ones ($2 on AliExpress) work for a while but lose spring-grip after a few hundred insertions — a component that should stay put flops loose at the worst moment. Name-brand boards (3M, Wago, BusBoard) hold tight for thousands of cycles. Spend $5–10 extra; you'll keep it for years.",
     "breadboardJumpers": "You will also want <strong>jumper wires</strong>. Pre-cut, pre-stripped kits (Schmartboard, Sparkfun) are tidy and reusable. Flexible male-to-male leads with pin ends are ideal for connecting an Arduino to the breadboard. A roll of 22 AWG solid hookup wire plus a pair of strippers is the cheapest option — but takes longer to prep every time.",
     "sectionAccessories": "Accessories you'll want",
-    "accessoriesIntro": "None of these are instruments, but each one saves a frustrating evening at some point.",
+    "accessoriesIntro": "None of these are measurement instruments, but each one saves a frustrating evening at some point.",
     "accessoriesClips": "<strong>Test leads with crocodile clips</strong> — attach probes to component legs hands-free. Critical when you need both hands on the scope probe and can't hold a multimeter lead at the same time.",
     "accessoriesStrippers": "<strong>Wire strippers and small side-cutters</strong> — for trimming component leads flush to the board and preparing hookup wire. A $10 combo is fine for starting out; upgrade to a better pair when the cheap one frustrates you.",
     "accessoriesMagnifier": "<strong>A small magnifier or USB microscope</strong> — modern component markings print in 0.5 mm type. A 5× loupe or a cheap USB scope (around $20) turns a guessing game into a glance.",
