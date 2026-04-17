@@ -74,6 +74,31 @@ Batch related changes into one commit. Don't commit after every
 single fix — the user has flagged this. A commit is a unit of
 reviewable work, not a save point.
 
+### Research resources for chapter content
+
+When working on chapter content (new chapter, expanding a section,
+adding a widget, fact-checking prose), these resources are
+pre-authorised — use them without asking:
+
+- **Web search / WebFetch** — for current specs, part datasheets,
+  regulator pages (ITU, FCC, УДЦР), Wikipedia reality-checks, modern
+  prices, etc. The user expects this to be part of chapter work.
+- **The ARRL Handbook for Radio Communications 2023** (100th edition):
+  `/Users/jemcik/Downloads/ham_26/ARRL handbook 100th/The ARRL Handbook for Radio Communications 2023.pdf`
+  — canonical reference for ham-radio topics, band plans, propagation,
+  antennas, operating practice.
+- **The Art of Electronics** (Horowitz & Hill, 3rd ed.):
+  `/Users/jemcik/Downloads/The Art of Electronics/The Art of Electronics.pdf`
+  — canonical reference for circuit fundamentals, component behaviour,
+  instruments, signals. Use when deriving or double-checking any
+  quantitative claim about electronics.
+
+Both PDFs are large — always pass `pages: "N-M"` to `Read` (max 20
+pages per call) and prefer targeted section reads over scanning the
+table of contents cold. When a claim in the chapter depends on either
+book, cite the source in the commit message / PR description so the
+user can verify.
+
 ## New chapter checklist
 
 A chapter is done when ALL of these are true, not just "prose is
@@ -109,241 +134,37 @@ written":
    `src/data/chapters.ts` only after 1–5 and the full gate above
    are green.
 
-## SVG diagrams (`src/components/diagrams/*`)
+## SVG diagrams / rough.js illustrations — use the `diagram-quality` skill
 
-These render at fixed `viewBox` dimensions and scale responsively
-(`width="100%"` via `SVGDiagram`). They appear inside a tinted card via
-`DiagramFigure`. Past iterations have repeatedly had the same flaws —
-work through this checklist before declaring a diagram done.
+**Before touching any file in `src/components/diagrams/`,
+`src/components/chapter-heroes/`, or any inline SVG inside a chapter
+page**, invoke the `diagram-quality` skill at
+`.claude/skills/diagram-quality/`. Also invoke when fixing a
+user-reported diagram issue (font too small, padding wrong, components
+overlapping, labels clipped, missing translations, scaling hacks).
 
-### Font sizes — readable defaults
+The skill's `SKILL.md` holds an 8-point pre-flight checklist and a
+5-stage workflow. Its `references/` directory covers:
 
-Diagrams are viewed inline with body copy. Small SVG text reads as
-"unreadable footnote" next to 16 px prose. Use these floors:
+- `roughjs-patterns.md` — wrapper surface, seed hierarchies, tonal
+  grouping, helper-function rule, fill-vs-stroke decisions
+- `typography-and-padding.md` — 13 px on-screen floor, `PAD_L`/`PAD_R`
+  math with EN/UK worst-case budgeting, label-collision handling, the
+  no-scaling rule
+- `plotted-curves.md` — `useId` + `clipPath` boilerplate, truncate-at-
+  boundary (don't clamp) for functions that leave the plot rectangle
+- `i18n-in-diagrams.md` — every visible word comes from `t(...)`, units
+  from `units.*`, math variables via `<var>` + `<MathVar />`, in-SVG
+  math via `<tspan>`, aria-labels required
+- `common-failures.md` — numbered catalogue of every diagram issue
+  we've caught, with fix pattern and "how to avoid repeating". Extend
+  it whenever a new class of failure is flagged.
 
-| Role | fontSize | Notes |
-|---|---|---|
-| Primary tick / row label | **13–14** | Mono for numbers, sans for words |
-| Axis / row title | **14**, weight 600 | The thing the reader scans for |
-| Secondary tick label (units, examples) | **13** | Mono ok |
-| Sub-label / hint under a title | **13** | `--muted-foreground` |
-| Footnote / caveat inside the SVG | **13** italic | Not smaller |
-| Symbol / hero glyph (e.g. prefix `µ`) | **17**, weight 700 | Anchor point |
-
-**Never** drop below **13 px** for any standalone text label inside a
-diagram. If a label doesn't fit at 13 px, the layout is wrong (rotate,
-stagger, wrap, or shrink the content set — don't shrink the type).
-
-**HTML-rendered text around diagrams follows the same floor.** Both
-`DiagramFigure` (figcaption) and `Circuit` (figcaption + legend list)
-use `text-[13px]` for caption and legend-label text. Never use
-Tailwind's `text-xs` (= 12 px) or `text-[11px]` for diagram-adjacent
-copy — these read as "tiny footnote" beside 16 px body prose. Apply
-the 13 px floor uniformly so the SVG interior and the surrounding
-HTML are typographically flush.
-
-The old "11 px floor" rule from earlier chapters is deprecated — the
-user has repeatedly flagged 11–12 px text as too small next to body
-copy. Exception: glyph decorations INSIDE a shape (e.g. the `+` inside
-a 5 px-radius ion circle) are typographic artwork, not readable text,
-and may use smaller fontSizes to fit their container.
-
-(Font sizes are **on-screen** values. Do not use CSS `maxWidth`/
-`maxHeight` to scale a diagram — match the viewBox to the display size
-so the fontSize number in source equals the fontSize the reader sees.
-See `feedback_svg_font_minimum_on_screen.md`.)
-
-### Padding — symmetric and tight
-
-Compute padding from content widths, not by feel:
-
-1. Estimate the widest left-edge label (gutter or leftmost tick) and the
-   widest right-edge label (rightmost tick). Mono char ≈ 7.8 px at
-   13 px; sans char ≈ 5.5 px at 11 px.
-2. Pick `PAD_L` and `PAD_R` so each side has **~12–18 px of clearance**
-   from the canvas edge after the half-width of the outermost label.
-3. If both sides have only tick labels (no gutter), use a single `PAD`
-   constant — symmetric padding by construction.
-4. Document the math in a comment block above the geometry constants so
-   the next editor doesn't have to rediscover it.
-
-Common failure: PAD_L sized for an early draft's gutter labels, then the
-gutter shrinks but PAD_L doesn't, leaving a fat empty stripe on the
-left. Re-budget every time labels change.
-
-### Label collisions — stagger, don't shrink
-
-When two labels overlap horizontally (e.g. "1 Hz" and "10 Hz" on a
-linear axis where 10 Hz sits 1% from the origin):
-
-- **Don't** shrink the font to fit. That punishes every reader to fix
-  a problem only one tick has.
-- **Do** stagger the colliding label to a second row below the axis,
-  with a short dashed leader from tick → label so the association is
-  visible.
-- For more than two collisions in a cluster, consider rotating labels
-  30° or replacing the cluster with a single bracketed annotation
-  ("1, 10, 100 Hz crowd here →").
-
-### Theme tokens, not raw colours
-
-Use CSS variables, not literal hex/HSL strings:
-
-- `hsl(var(--foreground))` / `hsl(var(--muted-foreground))`
-- `hsl(var(--border))`
-- `hsl(var(--primary))` for accents
-- `hsl(var(--callout-experiment))` / `--callout-note` / `--callout-warning`
-  for the emphasised tones used in widget result boxes
-
-Exceptions are decorative-only colours that represent a real-world
-object (breadboard green, oscilloscope bezel grey, prefix-segment
-rainbow). Document the exception inline.
-
-### i18n for in-SVG text
-
-Every word the reader sees must come from `t('ch0_X.someKey')` — no
-hardcoded English strings inside the SVG, even if "it's just a label".
-Both `en/ui.json` and `uk/ui.json` get the key. The `aria-label` and
-`<DiagramFigure caption>` already follow this; tick titles, axis
-titles, footnotes, etc. must too.
-
-### Helper functions, not inner components
-
-Splitting an SVG into reusable subgroups: write a plain function
-(`renderFoo(...)`) that returns JSX. Do **not** declare a component
-inside the parent — `react-hooks/static-components` will (correctly)
-reject it because the new component identity on every render breaks
-hook stability.
-
-### Math notation in labels — use KaTeX or `<tspan>`, never raw underscores
-
-`f_c`, `R_1`, `x^2` etc. written as plain text leak the LaTeX source to
-the reader (`f_c` literally appears as `f_c`, not `f` with a subscript).
-Two correct paths:
-
-- **HTML/JSX context** (widget labels, prose): import `M` /`MBlock` from
-  `@/components/ui/math` and render `<M tex="f_c" />`. KaTeX styles it
-  properly and matches the rest of the chapter's typography.
-- **Inside an SVG `<text>`**: KaTeX can't render here. Fake the
-  subscript / superscript with `<tspan>`:
-  ```tsx
-  <text fontSize="11">
-    <tspan fontStyle="italic">f</tspan>
-    <tspan dy="3" fontSize="8">c</tspan>
-    <tspan dy="-3" fontStyle="normal"> · −3 dB</tspan>
-  </text>
-  ```
-  Italic for the variable, ~70 % font size for the subscript, `dy="3"`
-  to drop / `dy="-3"` to return to baseline.
-
-i18n strings should hold the **prose only** ("Cutoff frequency"); the
-math symbol is composed in JSX. The same plain-text key can serve as
-the `aria-label` (screen readers don't need the symbol).
-
-**In i18n prose — including schematic reference designators** — wrap
-single-letter variables in `<var>X</var>` and map `var: <MathVar />` in
-the `<Trans>` call:
-
-```json
-// ui.json
-"symbolResistorDesc": "… Labelled <var>R</var>. Value in ohms."
-```
-
-```tsx
-// chapter.tsx
-<Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui"
-  components={{ var: <MathVar /> }} />
-```
-
-`MathVar` is exported from `@/components/ui/math`. This covers math
-variables (`I`, `V`, `R`, `f`, `Q`) AND schematic reference designators
-(`R` for resistor, `C` for capacitor, `L` for inductor, `D` for diode,
-`Q` for transistor). Plain `R` in sans-serif reads as an English letter
-intrusion in Cyrillic prose; KaTeX serif marks it as "symbol / label"
-unambiguously. The `<var>` tag must appear in **both** `en/ui.json` and
-`uk/ui.json` — Trans component mapping requires matching tags per locale.
-
-If a chapter's description field (e.g. `SymbolCell`) currently renders
-plain `t(...)`, convert to `<Trans>` before introducing `<var>` in the
-i18n string, or the tag renders literally as text.
-
-### Plot curves must be clipped to the plot rectangle
-
-When a plotted function can leave the plot area (e.g. an RC roll-off
-that dives past the −60 dB floor on a linear axis), the SVG `<path>`
-will keep drawing outside the chart and run through axis labels. Always
-add a `<clipPath>`:
-
-```tsx
-const uid = useId().replace(/:/g, '')
-const clipId = `myplot-${uid}`
-…
-<defs>
-  <clipPath id={clipId}>
-    <rect x={PAD_L} y={PAD_T} width={plotW} height={plotH} />
-  </clipPath>
-</defs>
-…
-<path d={path} clipPath={`url(#${clipId})`} … />
-```
-
-`useId()` keeps the id unique across multiple instances of the widget
-on one page. A static id is a footgun — eventually two widgets clash
-and one curve gets clipped by the wrong rect.
-
-**Truncate at the boundary, don't clamp.** When a plotted function
-goes outside the chart's value range:
-
-- **Wrong**: clamp the y to the floor / ceiling. A segment glued along
-  the bottom edge reads as "the function is flat at the floor here",
-  which is a lie — the function is actually continuing past it. Even
-  for monotonic curves where you might think "well, it's monotonic, the
-  reader will figure it out", users see a plateau and ask "why is the
-  filter perfectly flat at −60 dB from 600 kHz onward?".
-- **Right**: truncate. When a sample crosses the boundary, linearly
-  interpolate the exact crossing point against the previous in-range
-  sample, draw the path to that crossing point, and stop (or, for
-  non-monotonic functions, emit an `M` to skip the off-screen region
-  and resume when back in range). Visually the curve exits through the
-  edge, which is the universally-understood "off the chart" indicator.
-
-Sketch:
-
-```tsx
-let prevX: number | null = null, prevY: number | null = null
-for (…) {
-  const y = yFor(value(x))
-  if (y > yMax) {
-    if (prevX !== null && prevY !== null) {
-      const t = (yMax - prevY) / (y - prevY)
-      const xc = prevX + t * (xNow - prevX)
-      pts.push(`L${xc},${yMax}`)
-    }
-    break  // monotonic — no point continuing
-  }
-  pts.push(`${pts.length === 0 ? 'M' : 'L'}${xNow},${y}`)
-  prevX = xNow; prevY = y
-}
-```
-
-Putting `<defs><clipPath>` *inside* the `<g>` that `SVGDiagram` already
-wraps around its children is fragile — some renderers refuse to resolve
-the inner id. Truncation at sampling time is the primary mechanism;
-SVG clipPath is at best a secondary safety net.
-
-### After any geometry change
-
-Run, in order:
-
-```
-npx tsc --noEmit
-npx eslint src
-npx vitest run src/components/diagrams
-node scripts/check-i18n.mjs   # if you touched locale files
-```
-
-Then sanity-check visually in `npm run dev`. The dev server is the only
-place font metrics match production — jsdom can't catch label overlap.
+The top-level Ch 1.1 rules (no scaling, 13 px floor, seed hierarchy,
+`svgTokens` for theme, `<g style={{ color: ... }}>` wrapper for rough
+paths, plain helper functions not inner components, translate whole
+widgets never piecemeal) all live in the skill. This file is no longer
+the source of truth for diagram work — the skill is.
 
 ## Ukrainian translation — use the `ua-translate` skill
 
