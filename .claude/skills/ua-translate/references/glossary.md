@@ -21,6 +21,10 @@ Each entry tracks: **EN term** → **UK rendering** + **grammatical gender** + n
 | insulator (wire sheath / physical sleeve) | ізолятор | m | Only for the physical coating/sleeve on a cable, never for the material category. |
 | semiconductor | напівпровідник | m | |
 | conventional current direction | умовний (технічний) напрям струму | m | Phrase `за напрям струму умовно прийнято напрям руху позитивних зарядів` is standard. |
+| power (the quantity) | потужність | f | Running-prose rendering. Formal-definition label: `Потужність (позначення <var>P</var>)`. Never `сила` — that's reserved for `сила струму`. |
+| watt (unit — name spelled out) | ват | m | **Single `т`** — `ват`, `вата`, `ватом`, gen. pl. `ват`. Unit symbol: `Вт`. The double-`т` form `ватт` / `Ватт` is reserved for the SCIENTIST's surname (Джеймс Ватт, на честь Джеймса Ватта). Mixing them up is a spelling error the user has flagged. |
+| watt-hour (energy unit) | ват-година | f | `Вт·год`. Same single-`т` rule. |
+| joule | джоуль | m | `Дж`. One watt = one joule per second → `один ват дорівнює одному джоулю за секунду`. |
 
 ## Components
 

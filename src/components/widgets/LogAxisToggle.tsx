@@ -248,7 +248,7 @@ export default function LogAxisToggle() {
       </div>
 
       {/* ── Plot ──────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-muted/30 p-2 overflow-x-auto">
+      <div className="rounded-xl border border-border bg-muted/30 p-2">
         <SVGDiagram
           width={W}
           height={H}

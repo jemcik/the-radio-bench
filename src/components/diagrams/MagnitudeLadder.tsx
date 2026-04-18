@@ -1,5 +1,4 @@
-import { useMemo } from 'react'
-import SVGDiagram from './SVGDiagram'
+import { useId, useMemo } from 'react'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
 import { RoughPaths, roughLine, roughLinearPath, roughRect } from '@/lib/rough'
@@ -42,10 +41,17 @@ import { RoughPaths, roughLine, roughLinearPath, roughRect } from '@/lib/rough'
  *     ]}
  *   />
  *
- * Sizing (per feedback_svg_font_minimum_on_screen): viewBox width 600,
- * rendered at maxWidth 560 → ~0.93× scale. Box value at fontSize 16 →
- * ~15 px on screen; description at 14 → ~13 px; ratio label at 13
- * italic → ~12 px. All well above the 11 px floor.
+ * Sizing: strict 1:1 — the `<svg>` element is rendered at fixed pixel
+ * dimensions equal to the viewBox, with NO `width="100%"`, NO
+ * `maxWidth`, and NO `overflow-x-auto` wrapper. fontSize values in
+ * the viewBox render as the pixel sizes on screen in every viewport.
+ * This is why we use a bare `<svg>` here instead of the `SVGDiagram`
+ * wrapper — the wrapper hardcodes `width="100%"`, which scales.
+ *
+ * Description column uses `<foreignObject>` with HTML/CSS so long
+ * descriptions wrap to a second line rather than clipping at the right
+ * edge (important for UK, which runs 30–60 % wider than EN — see
+ * [common-failures.md #21]).
  */
 
 interface LadderItem {
@@ -110,22 +116,25 @@ export default function MagnitudeLadder({
   tone = 'primary',
 }: MagnitudeLadderProps) {
   const colour = TONE_COLOURS[tone]
+  const clipId = useId()
 
   // Sort descending so the biggest value sits at the TOP of the ladder.
   const sorted = useMemo(() => [...items].sort((a, b) => b.value - a.value), [items])
 
   // ── Geometry ────────────────────────────────────────────────────
-  // viewBox is sized to the actual content (box + connector +
-  // generous room for the widest description) with SYMMETRIC left/
-  // right padding. A too-wide viewBox leaves an unbalanced empty
-  // stripe on the right that reads as "content biased to the left"
-  // once the SVG is centred in the card. 1:1 CSS scaling (maxWidth
-  // === W) keeps fonts at their viewBox values on screen.
-  const W = 500
+  // viewBox sized to the actual content (box + connector + room for
+  // the widest description) with symmetric left/right padding. The
+  // `<svg>` below renders at fixed pixel dimensions equal to these
+  // numbers — no `width="100%"`, no `maxWidth`, no `overflow-x-auto`
+  // wrapper, no CSS scaling anywhere. fontSize values in the viewBox
+  // therefore render as the pixel sizes on screen, in every viewport.
+  const W = 560
   const BOX_W = 108
-  const BOX_H = 36
+  const BOX_H = 42            // taller box so wrapped 2-line descriptions
+                              // (fontSize 14, line-height 1.15 → ~32 px
+                              // for 2 lines) still fit vertically-centred
   const BOX_X = 60            // ≈ right padding too, so content is centred
-  const GAP_H = 42            // vertical gap between consecutive boxes
+  const GAP_H = 44            // vertical gap between consecutive boxes
   const TOP_MARGIN = 54       // room for title above first box
   const BOTTOM_MARGIN = 22
 
@@ -174,12 +183,20 @@ export default function MagnitudeLadder({
 
   return (
     <DiagramFigure caption={caption}>
-      <SVGDiagram
+      <svg
         width={W}
         height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
         aria-label={ariaLabel}
-        style={{ maxWidth: 500, margin: '0 auto' }}
+        style={{ display: 'block', margin: '0 auto' }}
       >
+          <defs>
+            <clipPath id={clipId}>
+              <rect width={W} height={H} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${clipId})`}>
         {/* Title */}
         <text
           x={W / 2} y={28}
@@ -222,14 +239,29 @@ export default function MagnitudeLadder({
               <g style={{ color: svgTokens.mutedFg }} opacity={0.6}>
                 <RoughPaths paths={sketch.connectors[i]} />
               </g>
-              {/* Description */}
-              <text
-                x={descriptionX} y={y + BOX_H / 2 + 5}
-                fontSize={14}
-                fill={svgTokens.fg}
+              {/* Description — HTML via foreignObject so long strings
+                  wrap to a second line instead of clipping. UK runs
+                  ~30–60 % wider than EN, and the original EN-only <text>
+                  approach clipped descriptions > ~40 chars EN / ~30 UK. */}
+              <foreignObject
+                x={descriptionX}
+                y={y}
+                width={W - descriptionX - 8}
+                height={BOX_H}
               >
-                {item.description}
-              </text>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '100%',
+                    fontSize: '14px',
+                    lineHeight: 1.18,
+                    color: 'hsl(var(--foreground))',
+                  }}
+                >
+                  {item.description}
+                </div>
+              </foreignObject>
             </g>
           )
         })}
@@ -259,7 +291,8 @@ export default function MagnitudeLadder({
             </g>
           )
         })}
-      </SVGDiagram>
+        </g>
+      </svg>
     </DiagramFigure>
   )
 }
