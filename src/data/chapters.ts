@@ -111,7 +111,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: "Ohm's Law and Power",
         subtitle: 'V = I·R, P = V·I — the two equations that explain everything',
-        status: 'draft',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['1.1'],
