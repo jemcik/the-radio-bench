@@ -352,6 +352,23 @@ Also: the pedagogically tempting energy framing (charge moves round a loop and c
 
 ---
 
+## 12. `заглянемо в X` / `зазирнемо в X` for abstract concepts — lobotomic calque from EN "peek at X"
+
+❌ **`наприкінці заглянемо в ефективність`** (translating EN "end with a peek at efficiency")
+❌ **`заглянемо в калібрування осцилографа`** / **`зазирнемо в принцип роботи фільтра`**
+✅ **`наприкінці коротко торкнемось ефективності`** (genitive-taking `торкнутися`)
+✅ **`наприкінці розглянемо ефективність`** (parallel to other action verbs: побудуємо / розрахуємо / визначимо / розглянемо)
+✅ **`завершимо темою ефективності`**
+✅ **`познайомимося з ефективністю`** (instrumental)
+
+Why:
+- In Ukrainian, you physically `заглядаєте / зазираєте` **в приміщення / у вікно / у шафу** — a concrete container with a visible interior. Abstract concepts (efficiency, calibration, a principle) have no "inside" to peek into, so the preposition `в / у` + accusative-of-abstract-noun reads as a mechanical word-for-word translation of EN "peek at / look into".
+- The EN "peek at" also conveys a **brief / cursory preview** — don't lose that nuance. Use `коротко торкнутися`, `кинути погляд на` (literal but metaphorically established), `коротко ознайомимося`, or simply `розглянемо` if the preview-nuance isn't load-bearing.
+- Watch the case: `торкнутися` takes genitive (`торкнутися ефективності`), `розглянути` takes accusative (`розглянемо ефективність`), `познайомитися` takes instrumental (`познайомимося з ефективністю`). If the sentence continues with a dash-introduced apposition (`— те єдине число…` → `— того єдиного числа…`), remember to align the case of the appositive noun phrase too.
+- The broader family — **avoid physical-space metaphors for abstractions unless Ukrainian has already established them**. `заглянути в майбутнє` works (established idiom). `заглянути в ефективність / у калібрування / у принцип` does not.
+
+---
+
 ## How this list grows
 
 When the user flags something I missed, add it here verbatim with `❌ wrong → ✅ right → why`. This is the permanent record — each new chapter starts with this list loaded.
