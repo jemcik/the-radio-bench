@@ -182,6 +182,50 @@ Every time the user pushes back on a specific Ukrainian phrasing, extend `.claud
 
 **Linter CLI**: `npm run check:uk` scans the whole `uk/ui.json`. Scope to one chapter: `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch1_1`.
 
+## Writing discipline — introduce every concept before using it
+
+**Non-negotiable rule.** Do not use any symbol, abbreviation, or domain
+shorthand in chapter prose, formulas, widget labels, or worked examples
+*before* it has been introduced with an explicit inline definition.
+
+Chapter prose must stand on its own for a reader who does NOT share the
+specific sub-domain background (ham radio / RF / embedded / DSP). If
+the author has to pause and think "a beginner would not get this", the
+sentence needs rewriting.
+
+Typical failure modes (user has flagged all of these in Ch 1.2 alone):
+
+- **Math symbols** — `Q` used in a widget's formula hint before prose
+  introduces charge. Every `<var>X</var>` in a widget or MBlock must be
+  defined in prose first, with its meaning and units.
+- **Abbreviations** — `HT`, `QRP`, `HF`, `UHF`, `AM`, `FM`, `SSB`, `CW`,
+  `VNA` etc. First appearance → inline expansion in parens or apposition.
+- **Band-wavelength shorthand** — `2 m / 70 cm` is ham-radio jargon for
+  the VHF (≈144 MHz) and UHF (≈435 MHz) amateur bands. First appearance
+  → expand: "2 metres (the VHF amateur band, around 144 MHz) and 70
+  centimetres (UHF, around 435 MHz)".
+- **Back-reference to a quantity with `вище` / `above`** — `R_min вище`
+  reads as "higher" (comparative), not "mentioned above in text". Name
+  the SOURCE of the quantity (`the calculator gives…`, `the formula
+  above gives…`) instead of its textual position.
+- **Ambiguous comparatives on components** — `менший резистор` /
+  "smaller resistor" defaults to physical-size reading. Attach the
+  comparative to the QUANTITY: "resistor with lower resistance",
+  `резистор з меншим опором`, `конденсатор більшої ємності`.
+- **Bare generic nouns** — `значення` / `рівень` / `параметр` /
+  `величина` without a qualifier. Always attach the domain noun:
+  `значення опору`, `рівень напруги`, `номінал резистора`.
+- **Vague back-reference pronouns** — `те саме`, `для неї`, `це все`,
+  "it", "that", "the same" — rewrite concretely, naming the partners
+  and the relationship.
+- **"Three numbers / these two values"** when fewer are visible on the
+  page — name the QUANTITIES instead: `напруга, сила струму й
+  потужність`.
+
+Full catalogue of the pattern + prevention checklist in memory at
+`memory/feedback_first_mention_explicitness.md`. **Run that checklist
+before drafting any new section.**
+
 ## i18n discipline — translate WHOLE widgets, never piecemeal
 
 The single most repeated failure across ch0.3 and ch0.4 was leaving

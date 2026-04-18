@@ -294,6 +294,23 @@ function renderSubpart(x: number, y: number) {
 
 ---
 
+## 21. MagnitudeLadder description column clipping — wrap, don't shorten
+
+**Symptom.** User reports "I see truncated text in places" on a magnitude ladder — descriptions are cut off at the right edge of the SVG. UK is the first to break because it runs 30–60 % wider than EN.
+
+**Root cause.** The original `MagnitudeLadder` rendered descriptions as SVG `<text>`, which does NOT wrap — any string wider than the column clips silently. EN descriptions ≳ 40 chars and UK descriptions ≳ 30 chars hit the wall.
+
+**Fix — the RIGHT one.** The description column is part of the ladder's design; widen/wrap to fit the content, do not chop informative text. Two changes:
+
+1. **Switch description rendering from `<text>` to `<foreignObject>` containing an HTML `<div>`.** HTML gets native CSS text wrapping; long strings flow to a second line automatically. Vertical-centre with `display: flex; align-items: center`, `lineHeight: 1.18`.
+2. **Widen the viewBox** enough that single-line descriptions still fit on one line in both locales, but let anything longer wrap to two. Current parameters: `W = 560`, `BOX_H = 42` (fits two fontSize-14 lines), column width = `W − descriptionX − 8 = 356 px` → single-line budget ~55 chars EN / ~50 chars UK, two-line budget ~110/100.
+
+**Wrong fix (rejected by user).** Shortening the descriptions themselves — that trades information density for layout convenience, and the ladder exists *precisely* to carry those descriptions. The widget's job is to present the strings we give it, not dictate what they can contain.
+
+**How to avoid.** When adding a new diagram that has any text column, default to `<foreignObject>` + HTML if the string could plausibly exceed one line in UK. Pure SVG `<text>` is fine for axis ticks, unit labels, and short row headers — reserve it for strings whose length is bounded by design.
+
+---
+
 ## 20. Rough.js fill has jagged edge
 
 **Symptom.** A water body / electron / panel fill has visible jitter along the fill edge.

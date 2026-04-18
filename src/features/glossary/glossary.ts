@@ -126,6 +126,21 @@ export const glossary: Record<string, GlossaryEntry> = {
     formula: 'R = V / I',
     see: ['voltage', 'current', 'impedance'],
   },
+  power: {
+    tip: 'The rate at which energy is transferred or dissipated — volts times amps.',
+    detail:
+      'Power (P) is how fast energy moves through or is spent in a circuit element. For a resistive element it is simply voltage times current, and because Ohm\'s law ties V, I, and R together, the same power can be written three ways: P = V·I, P = I²·R, and P = V²/R. One watt equals one joule per second. In a resistor, that power leaves as heat.',
+    unit: 'Watt (W)',
+    formula: 'P = V · I',
+    see: ['voltage', 'current', 'resistance', 'watt'],
+  },
+  watt: {
+    tip: 'The SI unit of power — one joule per second.',
+    detail:
+      'The watt (W) is the SI unit of power, defined as one joule of energy transferred per second. It is named after James Watt, the Scottish engineer whose work on the steam engine in the 1760s turned "how much energy per second" into a fundamental engineering quantity. In electronics, 1 W = 1 V × 1 A.',
+    unit: 'Watt (W)',
+    see: ['power'],
+  },
   impedance: {
     tip: 'Total opposition to AC current, combining resistance and reactance.',
     detail:

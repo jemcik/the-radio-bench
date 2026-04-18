@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
  *
  * Replaces the repeated
  *   <figure className="my-8 not-prose">
- *     <div className="rounded-xl border border-border bg-muted/40 p-4 overflow-x-auto">
+ *     <div className="rounded-xl border border-border bg-muted/40 p-4">
  *       {children}
  *     </div>
  *     {caption && <figcaption … />}
@@ -14,6 +14,11 @@ import { cn } from '@/lib/utils'
  * block that appeared once per diagram file. Keep the box shape in a
  * single place so diagram padding/border/rounded corners stay visually
  * consistent across chapters.
+ *
+ * NO `overflow-x-auto` on the inner box — per user feedback, we do not
+ * want widget-level scrollbars until absolutely unavoidable. Diagrams
+ * render at their natural fixed pixel width; very narrow viewports
+ * fall back to page-level horizontal scrolling.
  */
 
 interface DiagramFigureProps {
@@ -27,7 +32,7 @@ interface DiagramFigureProps {
 export default function DiagramFigure({ caption, className, children }: DiagramFigureProps) {
   return (
     <figure className={cn('my-8 not-prose', className)}>
-      <div className="rounded-xl border border-border bg-muted/40 p-4 overflow-x-auto">
+      <div className="rounded-xl border border-border bg-muted/40 p-4">
         {children}
       </div>
       {caption && (

@@ -33,12 +33,16 @@ This skill eliminates state 2.
 
 Work the checklist in order. Don't skip items because they seem obvious — the failures come from the obvious ones.
 
-### 1. Sizing — match viewBox to on-screen display (no scaling)
+### 1. Sizing — no scaling, ever
 
-- `SVGDiagram width={W} height={H}` renders `<svg width="100%">`. The diagram **scales to container width** by default. That's the container-fit scaling — fine.
-- **Never** add CSS `maxWidth` or `transform: scale(…)` to shrink the on-screen size below the viewBox size. When you do, a `fontSize="13"` label renders as `13 × scale` pixels on screen, violating the font floor invisibly.
-- Pick viewBox `W × H` to match the on-screen size you want at the chapter's max column width (~672 px typically, or narrower). The diagram can shrink below that in a narrower viewport — that's fine, browsers scale SVG gracefully — but **it should not have to shrink** on the chapter's standard layout.
-- If a diagram feels cramped at W = 540 and you want to make it bigger: **widen the viewBox**, don't unscale a smaller one.
+**Hard rule:** the SVG renders at fixed pixel dimensions equal to the viewBox. Every number in viewBox units is the number of pixels on screen.
+
+- `<svg width={W} height={H} viewBox="0 0 W H">` with W and H as literal numbers. Same values both places.
+- **Never** `width="100%"`. The chapter container is `max-w-5xl` (1024 px); percentage widths inflate every fontSize by the container/viewBox ratio. A `fontSize="13"` in a viewBox 460 wide rendered at 100% becomes ~26 px on screen.
+- **Never** CSS `maxWidth` or `transform: scale(…)`. Same problem — scales everything, breaks the font-floor rule invisibly.
+- The wrapper helper `SVGDiagram` passes `width="100%"` internally and therefore **scales**. Prefer a bare `<svg width={W} height={H} viewBox="0 0 W H" style={{ margin: '0 auto' }}>` for widgets where you control sizing.
+- Narrow viewports: wrap the SVG in a container with `overflow-x-auto`. The diagram keeps its dimensions and the card scrolls, which is the correct trade-off per user feedback (`feedback_svg_font_minimum_on_screen.md`).
+- Pick W and H to match the on-screen size you actually want. If a plot feels too big, shrink W and H — don't leave a big viewBox and add a max-width.
 
 ### 2. Typography — 13 px floor
 
