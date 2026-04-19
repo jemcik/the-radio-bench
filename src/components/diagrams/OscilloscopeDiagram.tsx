@@ -100,11 +100,12 @@ export default function OscilloscopeDiagram() {
     return d
   }
 
+  const nowrap = <span style={{ whiteSpace: 'nowrap' }} />
   const caption = (
     <>
       {t('ch0_2.scopeDiagramCaption1')}{' '}
-      {t('ch0_2.scopeDiagramCaption2')}<sub>pp</sub>.{' '}
-      <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong /> }} />
+      <Trans i18nKey="ch0_2.scopeDiagramCaption2" ns="ui" components={{ nowrap }} /><sub>pp</sub>.{' '}
+      <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong />, nowrap }} />
     </>
   )
 

@@ -105,7 +105,10 @@ describe('Quiz component', () => {
     // Answer all three correctly: 1, 0, 2
     const correct = [1, 0, 2]
     for (let i = 0; i < QUESTIONS.length; i++) {
-      const option = QUESTIONS[i].options[correct[i]]
+      // Test fixtures use string options; assert that back so getByRole's
+      // name matcher accepts it (QuizQuestion.options is ReactNode[] in the
+      // real type, so fixtures just happen to be strings).
+      const option = QUESTIONS[i].options[correct[i]] as string
       fireEvent.click(screen.getByRole('button', { name: option }))
       fireEvent.click(screen.getByRole('button', { name: /submit/i }))
       fireEvent.click(screen.getByRole('button', { name: /next|score/i }))

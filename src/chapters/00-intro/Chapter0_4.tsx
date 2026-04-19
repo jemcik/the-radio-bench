@@ -40,7 +40,9 @@ export default function Chapter0_4() {
   const { t } = useTranslation('ui')
   const tUnit = useUnitFormatter()
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 
@@ -77,7 +79,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.logsWhy" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
@@ -240,7 +242,11 @@ export default function Chapter0_4() {
         </li>
       </ul>
 
-      <p>{t('ch0_4.antennaConvert')}</p>
+      <p>
+        <Trans i18nKey="ch0_4.antennaConvert" ns="ui"
+          components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
 
       <Callout variant="caution">{t('ch0_4.antennaCaution')}</Callout>
 
@@ -258,7 +264,7 @@ export default function Chapter0_4() {
       <ul>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact1" ns="ui"
-            components={{ strong: <strong />, i: <i /> }}
+            components={{ strong: <strong />, i: <i />, decade: <G k="decade" /> }}
           />
         </li>
         <li>
@@ -330,8 +336,8 @@ export default function Chapter0_4() {
         procedure={[
           { text: <Trans i18nKey="ch0_4.labStep1" ns="ui" components={{ multimeter: <G k="multimeter" /> }} /> },
           { text: <Trans i18nKey="ch0_4.labStep2" ns="ui" components={{ voltageDivider: <G k="voltage divider" /> }} /> },
-          { text: t('ch0_4.labStep3') },
-          { text: t('ch0_4.labStep4') },
+          { text: <Trans i18nKey="ch0_4.labStep3" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
+          { text: <Trans i18nKey="ch0_4.labStep4" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
           { text: t('ch0_4.labStep5') },
         ]}
         expectedResult={t('ch0_4.labExpected')}

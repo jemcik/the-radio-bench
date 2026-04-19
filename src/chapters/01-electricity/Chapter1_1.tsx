@@ -69,7 +69,9 @@ export default function Chapter1_1() {
   const u = useUnitFormatter()
   const { locale } = useLocaleFormatter()
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch1_1', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch1_1', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 
@@ -99,7 +101,7 @@ export default function Chapter1_1() {
       <p>{t('ch1_1.waterPayoff')}</p>
 
       <Callout variant="note">
-        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ strong: <strong />, ac: <G k="ac" /> }} />
       </Callout>
 
       {/* ── Section 2: Charge ─────────────────────────────────────── */}
@@ -173,7 +175,7 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.voltageIntro" ns="ui"
-          components={{ voltage: <G k="voltage" />, var: <MathVar /> }}
+          components={{ voltage: <G k="voltage" />, var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
@@ -386,10 +388,10 @@ export default function Chapter1_1() {
           { text: <Trans i18nKey="ch1_1.labStep2" ns="ui" components={{ strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep3" ns="ui" components={{ strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep4" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep6" ns="ui" components={{ strong: <strong /> }} /> },
         ]}
-        expectedResult={<Trans i18nKey="ch1_1.labExpected" ns="ui" components={{ var: <MathVar /> }} />}
+        expectedResult={<Trans i18nKey="ch1_1.labExpected" ns="ui" components={{ var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} />}
         connectionToTheory={t('ch1_1.labConnection')}
         troubleshooting={[
           t('ch1_1.labTrouble1'),

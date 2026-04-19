@@ -118,12 +118,21 @@ export default function Welcome() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {([
-            [t('welcome.multimeter'), t('welcome.multimeterDesc')],
-            [t('welcome.breadboard'), t('welcome.breadboardDesc')],
-            [t('welcome.arduino'), t('welcome.arduinoDesc')],
-            [t('welcome.oscilloscope'), t('welcome.oscilloscopeDesc')],
-            [t('welcome.vna'), t('welcome.vnaDesc')],
-          ] as const).map(([tool, desc]) => (
+            { tool: t('welcome.multimeter'), desc: t('welcome.multimeterDesc') },
+            { tool: t('welcome.breadboard'), desc: t('welcome.breadboardDesc') },
+            { tool: t('welcome.arduino'), desc: t('welcome.arduinoDesc') },
+            { tool: t('welcome.oscilloscope'), desc: t('welcome.oscilloscopeDesc') },
+            {
+              tool: t('welcome.vna'),
+              desc: (
+                <Trans
+                  i18nKey="welcome.vnaDesc"
+                  ns="ui"
+                  components={{ swr: <G k="swr" /> }}
+                />
+              ),
+            },
+          ]).map(({ tool, desc }) => (
             <Card key={tool} radius="lg" className="flex gap-3 px-4 py-3">
               <span className="text-teal-500 mt-0.5 shrink-0">▸</span>
               <div>
@@ -185,7 +194,11 @@ export default function Welcome() {
           <div>
             <p className="text-base font-semibold text-primary mb-1">{t('welcome.ercAligned')}</p>
             <p className="text-base text-muted-foreground">
-              {t('welcome.ercDetail')}
+              <Trans
+                i18nKey="welcome.ercDetail"
+                ns="ui"
+                components={{ cept: <G k="cept" /> }}
+              />
             </p>
           </div>
         </div>

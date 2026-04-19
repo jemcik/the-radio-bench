@@ -136,7 +136,7 @@ export default function Chapter0_2() {
 
       <p>
         <Trans i18nKey="ch0_2.vnaHobby" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" /> }}
         />
       </p>
 

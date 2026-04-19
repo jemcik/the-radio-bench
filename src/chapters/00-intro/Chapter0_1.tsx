@@ -30,7 +30,11 @@ export default function Chapter0_1() {
         </li>
         <li>
           <strong>{t('ch0_1.labActivities')}</strong>{' '}
-          {t('ch0_1.labActivitiesDetail')}
+          <Trans
+            i18nKey="ch0_1.labActivitiesDetail"
+            ns="ui"
+            components={{ vna: <G k="vna" /> }}
+          />
         </li>
         <li>
           <strong>{t('ch0_1.quiz')}</strong>{' '}
@@ -108,7 +112,6 @@ export default function Chapter0_1() {
           ns="ui"
           components={{
             erc: <G k="erc" />,
-            arrl: <G k="arrl" />,
           }}
         />
       </p>

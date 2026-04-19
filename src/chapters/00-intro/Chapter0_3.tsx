@@ -5,7 +5,7 @@ import LabActivity from '@/components/lab/LabActivity'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
 import { G } from '@/features/glossary/glossary-term'
-import { MBlock } from '@/components/ui/math'
+import { MBlock, MathVar } from '@/components/ui/math'
 import PowersOfTenTable from '@/components/diagrams/PowersOfTenTable'
 import PrefixLadderDiagram from '@/components/diagrams/PrefixLadderDiagram'
 import FormulaTriangleDiagram from '@/components/diagrams/FormulaTriangleDiagram'
@@ -35,7 +35,9 @@ const UNIT_QUANTITIES = [
 export default function Chapter0_3() {
   const { t } = useTranslation('ui')
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch0_3', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch0_3', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 
@@ -62,7 +64,11 @@ export default function Chapter0_3() {
         />
       </p>
 
-      <Callout variant="key">{t('ch0_3.fractionsKey')}</Callout>
+      <Callout variant="key">
+        <Trans i18nKey="ch0_3.fractionsKey" ns="ui"
+          components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </Callout>
 
       {/* ── Powers of 10 and Scientific Notation ────────────── */}
       <Section id="powers-of-10" labelKey="ch0_3.sectionPowersOf10" />
@@ -108,11 +114,19 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.squaringIntro" ns="ui"
-          components={{ voltage: <G k="voltage" />, current: <G k="current" /> }}
+          components={{
+            voltage: <G k="voltage" />,
+            current: <G k="current" />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+          }}
         />
       </p>
 
-      <p>{t('ch0_3.squaringPower')}</p>
+      <p>
+        <Trans i18nKey="ch0_3.squaringPower" ns="ui"
+          components={{ strong: <strong />, var: <MathVar /> }}
+        />
+      </p>
 
       <MBlock tex="P = I^2 \times R \qquad P = \frac{V^2}{R}" />
 
@@ -200,7 +214,11 @@ export default function Chapter0_3() {
           { text: t('ch0_3.labStep4') },
           { text: t('ch0_3.labStep5') },
         ]}
-        expectedResult={t('ch0_3.labExpected')}
+        expectedResult={
+          <Trans i18nKey="ch0_3.labExpected" ns="ui"
+            components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+          />
+        }
         connectionToTheory={t('ch0_3.labConnection')}
         troubleshooting={[
           t('ch0_3.labTrouble1'),

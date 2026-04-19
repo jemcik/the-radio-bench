@@ -19,7 +19,9 @@ const QUIZ_QUESTION_COUNT = 8
 export default function Chapter1_3() {
   const { t } = useTranslation('ui')
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch1_3', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch1_3', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 
