@@ -108,9 +108,7 @@
     "statChapters": "Chapters",
     "statLabs": "Lab activities",
     "whatYouNeed": "What you'll need",
-    "justBrowser": "Just a browser.",
     "justBrowserDetail": "<strong>Just a browser.</strong> Every chapter's text, diagrams, and interactive widgets work right here — nothing to install or buy. You can learn all the theory without touching a single piece of equipment.",
-    "handsOnLabs": "hands-on lab activities",
     "handsOnLabsDetail": "Some chapters include optional hands-on lab activities (marked with a flask icon). These are for anyone who wants to go further and verify the theory on a real bench. You can skip every one of them and still get the full learning experience — or come back to them later when you have the gear. Here's what the labs use, roughly in order of how soon you'd want each one:",
     "multimeter": "Multimeter",
     "multimeterDesc": "Affordable starting point — measures voltage, current, and resistance",
@@ -120,13 +118,13 @@
     "arduinoDesc": "A handy signal source for experiments — any Uno-compatible clone works",
     "oscilloscope": "Oscilloscope",
     "oscilloscopeDesc": "See waveforms on screen — useful from Part I onwards",
-    "vna": "VNA",
-    "vnaDesc": "Measures impedance and SWR — needed mainly in the antenna and filter chapters",
+    "vna": "VNA (Vector Network Analyser)",
+    "vnaDesc": "Measures impedance and <swr>SWR</swr> — needed mainly in the antenna and filter chapters",
     "termsHighlighted": "Throughout the chapters, technical terms like <term>impedance</term> are highlighted — hover for a quick definition, or click for the full reference card.",
     "whatsCovered": "What's covered",
     "chapters": "chapters",
     "ercAligned": "ERC Report 32 aligned",
-    "ercDetail": "Every topic in the CEPT Amateur Radio Novice Examination Syllabus (ERC Report 32) is covered somewhere in this course. The chapters go well beyond the exam requirements — the goal is real understanding, not just passing a test."
+    "ercDetail": "Every topic in the <cept>CEPT</cept> Amateur Radio Novice Examination Syllabus (ERC Report 32) is covered somewhere in this course. The chapters go well beyond the exam requirements — the goal is real understanding, not just passing a test."
   },
   "ch0_1": {
     "heroAriaLabel": "Pen-and-ink sketch of an open book with a magnifying glass hovering over a small schematic on the right-hand page",
