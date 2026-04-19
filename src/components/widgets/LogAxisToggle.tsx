@@ -257,10 +257,14 @@ export default function LogAxisToggle() {
           style={{ maxWidth: W, margin: '0 auto' }}
         >
           {/* Clip path so the response curve can never escape the plot
-              rectangle even if a sample lands just past DB_MIN. */}
+              rectangle even if a sample lands just past DB_MIN.
+              Extended by 3 px outside the data rect on all sides so
+              the stroke half-width (1 px) never grazes the boundary —
+              without this margin, the curve looks «flat-topped» when
+              it approaches 0 dB at low frequencies. */}
           <defs>
             <clipPath id={clipId}>
-              <rect x={0} y={0} width={plotW} height={plotH} />
+              <rect x={-3} y={-3} width={plotW + 6} height={plotH + 6} />
             </clipPath>
           </defs>
 

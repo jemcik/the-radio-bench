@@ -166,8 +166,18 @@ export default function OhmsLawPlot() {
           style={{ display: 'block', margin: '0 auto' }}
         >
           <defs>
+            {/* Clip extends 3 px outside the data rect in every
+                direction so the stroke half-width (max 1.25 px at
+                strokeWidth 2.5) never hits the boundary — otherwise
+                the V=I·R line looks «flat-topped» the moment it
+                exits the top axis. */}
             <clipPath id={clipId}>
-              <rect x={PLOT_X0} y={PLOT_Y0} width={PLOT_W} height={PLOT_H} />
+              <rect
+                x={PLOT_X0 - 3}
+                y={PLOT_Y0 - 3}
+                width={PLOT_W + 6}
+                height={PLOT_H + 6}
+              />
             </clipPath>
           </defs>
 

@@ -48,7 +48,7 @@ Agent outputs the draft + a decision log of non-obvious word choices.
 
 ### Stage 3 — Parallel critique (**the critical stage**)
 
-Spawn **5 agents in parallel** (single message with 5 Agent tool calls). Each gets the draft + a specific critique brief from `critiques/`.
+Spawn **6 agents in parallel** (single message with 6 Agent tool calls). Each gets the draft + a specific critique brief from `critiques/`.
 
 | Agent | Brief | What it finds |
 |---|---|---|
@@ -57,6 +57,7 @@ Spawn **5 agents in parallel** (single message with 5 Agent tool calls). Each ge
 | 3 | `critiques/consistency.md` | Same English term translated multiple ways, register drift, voice inconsistency |
 | 4 | `critiques/calques.md` | Known landmine patterns from `references/landmines.md` + English-leftover scan |
 | 5 | `critiques/grammar.md` | Gender agreement (especially after word substitutions), pronoun antecedents, case errors |
+| 6 | `critiques/register.md` | **Technical register purity** — playground verbs on quantities (гойдається/танцює/стрибає), anthropomorphic descriptors (спокійна напруга / поводяться режими), colloquial measurement verbs (міряти/поміряти/щупати vs вимірювати/виміряти), colloquial approximators (щось близько / десь на), diminutives, dramatic register outside callouts. Added after ch1.3 — the prior five critics missed «напруга гойдається» because it's grammatically fine and not a landmine; it's register-wrong and needed its own lane. |
 
 Each agent returns findings in a structured format:
 

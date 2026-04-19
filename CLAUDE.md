@@ -5,6 +5,37 @@ convention here, update this file in the same commit.
 
 ## Workflow — read before starting work
 
+### Per-edit i18n gate — run after EVERY i18n string edit (not just pre-PR)
+
+**Non-negotiable after any change to `src/i18n/locales/**/ui.json`.** Most recurring
+pain has been: I edit a string, say «готово», and the user catches a landmine
+class we've already addressed 3+ times — em-dash before math variable, raw `<`
+comparison, bare generic noun, `<em>` on a technical term without tooltip, etc.
+Memory notes alone do not prevent this. Running the linter does.
+
+```bash
+# After ANY edit to a chapter's i18n block:
+node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch{N}_{M}
+```
+
+Must exit with **0 errors** before saying "готово", "виправлено", or equivalent.
+The linter catches:
+- `forbidden.emdash-before-math-var` — «— <var>X</var>» pattern (minus-sign confusion)
+- `forbidden.raw-lt-gt-in-i18n` — raw `<` / `>` as comparison (renders as `&lt;`)
+- `forbidden.playground-verbs` — дитячі дієслова на величинах («гойдається»)
+- `forbidden.miryaty-measure` — розмовне «міряти» замість «вимірювати»
+- `forbidden.raza-multiplier` — «у √2 раза» (русизм)
+- `forbidden.personify-quantity` — «спокійна напруга»
+- `forbidden.pry-verbal-noun` — «при + віддієслівний іменник» (русизм)
+- `forbidden.oscilogram-generic` — «осцилограма» для generic waveform
+- …and ~25 more. Every user-flagged landmine that can be mechanically detected
+  should end up here — if you see a new recurring class, add a rule.
+
+**After EVERY text-level edit** (adding a new callout, rewriting a paragraph,
+changing a quiz answer — not just bulk translation), run the linter for the
+affected block. Pasting/editing by memory doesn't scale — the machine remembers
+so you don't have to.
+
 ### Pre-PR quality gate — non-negotiable
 
 Before opening a PR for a new chapter, a batch of significant changes,
