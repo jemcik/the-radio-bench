@@ -69,7 +69,9 @@ export default function Chapter1_1() {
   const u = useUnitFormatter()
   const { locale } = useLocaleFormatter()
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch1_1', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch1_1', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 

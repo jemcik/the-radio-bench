@@ -1041,7 +1041,7 @@
     "quiz_q7_c": "Halves.",
     "quiz_q7_d": "Drops to zero.",
     "quiz_q7_correct": "1",
-    "quiz_q7_explanation": "Water-pipe intuition: twice the pressure pushes twice the flow through the same pipe. Ohm's Law (I = V / R) makes this quantitative: doubling V doubles I. Chapter 1.2 derives the formula in detail.",
+    "quiz_q7_explanation": "Water-pipe intuition: twice the pressure pushes twice the flow through the same pipe. Ohm's Law (<nowrap>I = V / R</nowrap>) makes this quantitative: doubling V doubles I. Chapter 1.2 derives the formula in detail.",
     "quiz_q8": "The drift velocity of electrons in a typical wire carrying a few amperes is:",
     "quiz_q8_a": "Close to the speed of light.",
     "quiz_q8_b": "About the speed of sound in the metal.",

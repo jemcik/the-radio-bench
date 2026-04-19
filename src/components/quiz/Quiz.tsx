@@ -1,4 +1,5 @@
-import { useTranslation } from 'react-i18next'
+import type { ReactElement, ReactNode } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import Widget from '@/components/ui/widget'
 import { Button } from '@/components/ui/button'
@@ -11,13 +12,13 @@ export interface QuizQuestion {
   /** Unique identifier for the question */
   id: string
   /** The question text */
-  question: string
+  question: ReactNode
   /** Array of 4 answer choices */
-  options: string[]
+  options: ReactNode[]
   /** Index of the correct answer (0-3) */
   correctIndex: number
   /** Explanation shown after answering */
-  explanation: string
+  explanation: ReactNode
 }
 
 interface QuizProps {
@@ -67,21 +68,43 @@ function normalizeProgress(p: Partial<QuizProgress>): QuizProgress {
  * Every chapter with a quiz follows this convention, so callers can just do:
  *
  *     const questions = useMemo(() => buildQuizFromI18n(t, 'ch0_3', 12), [t])
+ *
+ * Pass `components` to render question / option / explanation strings through
+ * react-i18next's `<Trans>` instead of plain `t()`. Enables chapters to use
+ * `<nowrap>`, `<var>`, `<G>`, `<strong>`, etc. inside quiz strings:
+ *
+ *     const questions = useMemo(() => buildQuizFromI18n(t, 'ch1_1', 8, {
+ *       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+ *       var: <MathVar />,
+ *     }), [t])
+ *
+ * Omit `components` (or pass `undefined`) for the plain-string path — useful
+ * when the chapter's quiz strings have no markup.
  */
-export function buildQuizFromI18n(t: TFunction, prefix: string, count: number): QuizQuestion[] {
+export function buildQuizFromI18n(
+  t: TFunction,
+  prefix: string,
+  count: number,
+  components?: Record<string, ReactElement>,
+): QuizQuestion[] {
+  const render = (key: string): ReactNode =>
+    components
+      ? <Trans i18nKey={`${prefix}.${key}`} ns="ui" components={components} />
+      : t(`${prefix}.${key}`)
+
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1
     return {
       id: `${prefix}-q${n}`,
-      question: t(`${prefix}.quiz_q${n}`),
+      question: render(`quiz_q${n}`),
       options: [
-        t(`${prefix}.quiz_q${n}_a`),
-        t(`${prefix}.quiz_q${n}_b`),
-        t(`${prefix}.quiz_q${n}_c`),
-        t(`${prefix}.quiz_q${n}_d`),
+        render(`quiz_q${n}_a`),
+        render(`quiz_q${n}_b`),
+        render(`quiz_q${n}_c`),
+        render(`quiz_q${n}_d`),
       ],
       correctIndex: Number(t(`${prefix}.quiz_q${n}_correct`)),
-      explanation: t(`${prefix}.quiz_q${n}_explanation`),
+      explanation: render(`quiz_q${n}_explanation`),
     }
   })
 }
