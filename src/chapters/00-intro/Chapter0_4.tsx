@@ -40,7 +40,9 @@ export default function Chapter0_4() {
   const { t } = useTranslation('ui')
   const tUnit = useUnitFormatter()
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT, {
+      nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+    }),
     [t],
   )
 
