@@ -106,16 +106,61 @@ Exceptions (decorative-only, real-world colour): breadboard green, scope bezel g
 
 **Text opacity**: `TEXT_PRIMARY` (0.85), `TEXT_DIM` (0.60), `TEXT_GHOST` (0.45) from [SVGDiagram.tsx](../../../src/components/diagrams/SVGDiagram.tsx). Never below 0.60 for readable labels. Never `currentColor` on a fixed-colour panel (resolves to near-black in light theme, invisible on dark fills).
 
-### 7. Plotted curves — clip + truncate-at-boundary
+### 7. Plotted curves — clip + truncate-at-boundary + stroke-headroom
 
-If you're drawing a function that can leave the plot rectangle (Bode roll-off, exponential, etc.):
+If you're drawing a function that can leave the plot rectangle (Bode roll-off, exponential, sinusoid, V=I·R line, etc.):
 
 1. Add `<clipPath>` with a `useId`-derived unique id. Static ids clash across widget instances.
 2. **Truncate at the boundary**, don't clamp. Clamping draws a false plateau at the floor. Linearly interpolate the crossing point and stop the path there.
+3. **Extend the clipPath rect by ≥ 3 px beyond the data rectangle on every side** — otherwise the curve's stroke half-width (1–1.5 px at the usual stroke-widths 2–2.5) gets clipped at peaks/endpoints and the curve looks «flat-topped». User-flagged globally on ch1.3; the fix is universal:
+
+```tsx
+<clipPath id={clipId}>
+  <rect
+    x={PLOT_X0 - 3}
+    y={PLOT_Y0 - 3}
+    width={PLOT_W + 6}
+    height={PLOT_H + 6}
+  />
+</clipPath>
+```
+
+Axes, ticks and gridlines are drawn as separate elements at the true data boundaries — unaffected by the extended clip. Only the plotted curves benefit from the extra 3 px.
 
 Full boilerplate: [references/plotted-curves.md](references/plotted-curves.md).
 
-### 8. Schematic-specific rules
+### 8. Animate time-based diagrams by default
+
+This is a browser course, not a book. If the diagram depicts a **process in time** — rotation, a travelling wave, charging/discharging, PWM switching, modulation, resonance building up — it should **animate**. Static SVG is reserved for snapshots: schematics, magnitude ladders, pinouts, instantaneous V–I curves.
+
+**Animate when the content is time-based:**
+- Rotating point → sine/cosine generation (see `SineOriginDiagram.tsx` — canonical pattern)
+- Waveform scrolling across an oscilloscope
+- Capacitor charging / discharging
+- Current flow through a schematic (arrow animation)
+- LC resonance build-up
+- PWM duty-cycle visualisation
+- AM/FM modulation (carrier + envelope)
+- Beat frequency (two sines summing)
+
+**Keep it static when content is a snapshot:**
+- Schematics (they depict topology, not motion)
+- Magnitude ladders / bar charts
+- Component symbol / pinout tables
+- V–I characteristic curves at one instant
+- Formula-illustration figures (e.g. triangle for V = I · R)
+
+**Implementation pattern** — follow `SineOriginDiagram.tsx`:
+
+1. `useState<number>` for the animated parameter (angle, phase, progress), initialised to a static-snapshot value.
+2. `useEffect` + `requestAnimationFrame` loop that updates state each frame.
+3. **Respect `prefers-reduced-motion`**: if the media query matches, early-return from the effect — the initial state value is the static snapshot. **Do not call `setState` in that branch** or ESLint (`react-hooks/set-state-in-effect`) will complain.
+4. Clean up with `cancelAnimationFrame` in the effect return.
+5. Derive all animated geometry from the single state variable in the render body.
+6. Pace: **3–5 s per cycle**. Faster than 2 s is dizzying; slower than 8 s is boring.
+7. Include a **riding marker** (dot/line) that helps the eye connect motion on one side to progress on the other. A bare animated curve is much less instructive than one with a leading dot.
+
+### 9. Schematic-specific rules
 
 - **One source of truth for coordinates**: every component's `(x, y)` lives in a single `const NAME = { x, y }` object. `pins2(NAME.x, NAME.y, …)` and `<Component {...NAME} />` both derive from it. Don't duplicate literals between pin helpers and JSX.
 - **Junction dots**: only at real T-junctions (three or more wires meeting). Never at corner bends. Never at phantom two-wire crossings.

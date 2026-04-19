@@ -208,7 +208,11 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.ratingsWidgetIntro"
           ns="ui"
-          components={{ var: <MathVar />, sub: <sub /> }}
+          components={{
+            var: <MathVar />,
+            sub: <sub />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+          }}
         />
       </p>
 
@@ -218,7 +222,12 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.deratingNote"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }}
+          components={{
+            strong: <strong />,
+            var: <MathVar />,
+            sub: <sub />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+          }}
         />
       </Callout>
 

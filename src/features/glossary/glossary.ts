@@ -254,14 +254,116 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Frequency is the reciprocal of period (the time for one complete cycle). A 1 kHz signal completes 1000 cycles per second, with each cycle lasting 1 ms. In radio, frequency determines which band you\'re operating in, how signals propagate, and what size antenna you need (antenna length is related to wavelength, which is inversely proportional to frequency).',
     unit: 'Hertz (Hz)',
     formula: 'f = 1 / T  •  λ = c / f',
-    see: ['time/div'],
+    see: ['hertz', 'period', 'time/div'],
+  },
+  harmonic: {
+    tip: 'A sine wave whose frequency is an integer multiple of the fundamental — the building blocks of every periodic signal.',
+    detail:
+      'A harmonic is a sine wave whose frequency is an integer multiple of the fundamental (base) frequency. For a square wave at frequency f, the 1st harmonic is f itself (the fundamental); the 3rd harmonic is 3f, the 5th is 5f, and so on — a square wave contains only odd harmonics, each with smaller amplitude than the previous. A triangle wave also has only odd harmonics, but with a different amplitude distribution. A pure sine wave is the only waveform with NO harmonics — it is just its fundamental and nothing else. Harmonics matter in radio: a transmitter that is not clean radiates at its fundamental PLUS at 2f, 3f, … — which can interfere with other users. Filters at the final amplifier stage remove these harmonics.',
+    see: ['fourier', 'filter', 'frequency', 'sine wave', 'square wave'],
+  },
+  fourier: {
+    tip: 'A method that decomposes any periodic signal into a sum of sines at different frequencies — the basis of signal processing.',
+    detail:
+      'Fourier analysis, named after Joseph Fourier (1768–1830), decomposes any periodic signal into a sum of sine waves at different frequencies, amplitudes, and phases. Read in reverse: any periodic waveform — however complex — can be built by adding sine waves together. A square wave = fundamental + 3rd + 5th + 7th + … harmonics; a triangle wave = the same, with a different weighting. A single musical note = its fundamental plus overtones in characteristic ratios that define the instrument\'s timbre. Fourier analysis underlies every digital signal processor, every spectrum analyser, every filter design, and most of modern communications engineering.',
+    see: ['harmonic', 'frequency', 'filter', 'sine wave'],
+  },
+  carrier: {
+    tip: 'The clean sine wave at the transmitter\'s operating frequency — information is modulated onto it and broadcast from the antenna.',
+    detail:
+      'A carrier (or carrier wave) is the clean sine wave at the transmitter\'s operating frequency (e.g. 14 MHz for a 20-metre amateur-band signal) that conveys information across space. The carrier itself contains no audio or data — it is simply a sine at one specific frequency. Modulation encodes information by varying one of the sine\'s three parameters: amplitude (AM), frequency (FM), or phase (PM). At the receiver the carrier is stripped away («demodulation») to recover the original audio or data. «Clean» means the carrier has no spurious signals (harmonics, noise) — essential both for legal compliance and so the transmitter does not disturb neighbouring bands.',
+    see: ['frequency', 'sine wave', 'harmonic', 'am', 'fm'],
+  },
+  reactance: {
+    tip: 'AC-only opposition — the frequency-dependent resistance of a capacitor or an inductor.',
+    detail:
+      'Reactance is the opposition that capacitors and inductors present to AC, and only to AC. A capacitor blocks DC completely (after its initial charge-up) but passes AC more and more easily as frequency rises; an inductor does the opposite — passes DC freely but opposes AC more strongly at higher frequencies. Unlike resistance, which dissipates power as heat, reactance is lossless: energy goes into the capacitor\'s electric field or the inductor\'s magnetic field on one half of the cycle and returns to the circuit on the other. The two reactances have names: capacitive reactance X_C = 1 / (2πfC), inductive reactance X_L = 2πfL. We meet both properly in Chapters 1.5 and 1.6; in Chapter 1.3 «reactance» is used only to name the frequency-dependent AC opposition.',
+    unit: 'Ohm (Ω)',
+    formula: 'X_C = 1 / (2πfC)  •  X_L = 2πfL',
+    see: ['capacitor', 'inductor', 'impedance', 'frequency'],
+  },
+  filter: {
+    tip: 'A circuit that lets some frequencies through and blocks others.',
+    detail:
+      'A filter is a circuit designed to pass certain frequencies while blocking others — the four canonical types are low-pass (passes DC and low frequencies, blocks high), high-pass (opposite), band-pass (passes a band in the middle), and band-stop / notch (blocks a band). Filters are built from the frequency-dependent behaviour of capacitors and inductors (and sometimes resistors, op-amps, crystals). Every radio transmitter and receiver contains filters: to clean up harmonics at the transmitter, to select a single station at the receiver, to remove noise, to split frequency bands. We design filters properly in Chapter 1.8.',
+    see: ['reactance', 'capacitor', 'inductor'],
+  },
+  ripple: {
+    tip: 'The small residual AC component left on a DC signal after imperfect smoothing.',
+    detail:
+      'Ripple is the small periodic fluctuation that remains on a DC output when the filter that turned AC into DC hasn\'t smoothed it perfectly. A typical mains-powered power supply rectifies the 50 Hz AC into pulsating DC, then smooths it with a large capacitor; what comes out is mostly steady DC with a small saw-tooth ripple at 100 Hz (twice the mains frequency, because both halves of the AC cycle are rectified). Ripple magnitude is usually specified in millivolts peak-to-peak; less ripple means cleaner DC, which matters for sensitive circuits like oscillators and low-level amplifiers. In a multimeter measurement, ripple shows up as a non-zero reading in AC mode on a nominally-DC source.',
+    unit: 'Volts peak-to-peak (V_pp)',
+    see: ['ac', 'dc', 'rectification'],
+  },
+  'form factor': {
+    tip: 'Waveform-shape ratio of RMS to rectified average — a pure-shape number that lets averaging meters estimate RMS.',
+    detail:
+      'Form factor is the ratio RMS ÷ (rectified average) of a waveform. It depends only on the waveform\'s shape, not its amplitude or frequency. For a pure sine, form factor is π/(2√2) ≈ 1.111; for a square wave it is exactly 1; for a triangle it is 2/√3 ≈ 1.155. Cheap averaging-type multimeters rectify the input, average it, and multiply by 1.111 (the sine-wave form factor) to report an «RMS» reading — which is why they give correct readings on sines and wrong readings on squares (11 % high) and triangles (≈ 3.8 % low). Only a true-RMS meter measures the actual RMS regardless of shape.',
+    formula: 'FF = V_rms / V_avg (rectified)',
+    see: ['rms', 'rectification', 'true rms'],
+  },
+  rectification: {
+    tip: 'Folding the negative half of an AC waveform up above zero — so the signal no longer changes direction.',
+    detail:
+      'Rectification turns an alternating signal into a pulsating one-direction signal. Mathematically it is the |V(t)| operation: the negative half of the wave is flipped up, so both halves point the same way. For a pure sine, rectification produces a series of half-cycle humps; the average of that rectified sine is 2/π ≈ 0.637 of the peak — which is what an averaging-type multimeter responds to in its AC mode. Physical rectification is done by diodes inside a power supply; a bridge rectifier uses four diodes to flip both halves of the AC input. The diode itself is introduced in Chapter 1.10; in Chapter 1.3 we use the word «rectified» only to name the |·| operation on a waveform.',
+    see: ['diode', 'rms'],
+  },
+  hertz: {
+    tip: 'The SI unit of frequency — one hertz means one cycle per second.',
+    detail:
+      'The hertz (Hz) is the SI unit of frequency: 1 Hz equals one complete cycle of a periodic event per second. Named after Heinrich Hertz (1857–1894), the German physicist who first produced and detected radio waves experimentally and confirmed Maxwell\'s prediction of their existence. Multiples in everyday use: mains is 50 Hz (Europe, Ukraine) or 60 Hz (USA); human hearing spans ≈ 20 Hz to 20 kHz; the FM broadcast band is 88–108 MHz; Wi-Fi 2.4 GHz means 2.4 × 10⁹ cycles per second. Hz is a count-per-second unit, so it has no direction — a signal can\'t have «negative Hz».',
+    unit: 'Hertz (Hz)',
+    formula: '1 Hz = 1 cycle / s',
+    see: ['frequency', 'period', 'si'],
   },
   rms: {
     tip: 'Root Mean Square — the effective DC-equivalent value of an AC signal.',
     detail:
-      'RMS is the value of AC voltage or current that delivers the same power as an equivalent DC value. For a sine wave, RMS = peak × 0.707. For a 50% duty cycle square wave, RMS = peak × 0.707 as well. Most multimeters display RMS readings. True-RMS meters measure the actual waveform; cheaper meters assume a sine wave and can give wrong readings for non-sinusoidal signals.',
+      'RMS is the value of AC voltage or current that delivers the same power as an equivalent DC value. For a sine wave, RMS = peak × 0.707. For a 50% duty cycle square wave, RMS = peak × 0.707 as well. Most multimeters display RMS readings. True-RMS meters measure the actual waveform; cheaper meters are calibrated for sine waves only and can give wrong readings for non-sinusoidal signals.',
     formula: 'V_rms = V_peak / √2  (sine wave)',
     see: ['voltage', 'oscilloscope'],
+  },
+
+  'sine wave': {
+    tip: 'A smooth periodic oscillation — the natural shape of an electromagnetic wave or an LC-circuit resonance.',
+    detail:
+      'A sine wave is the shape of the purest periodic signal — a smooth oscillation that swings up and down at a constant rate. Rotating machinery, tuned LC circuits, and radiating antennas all naturally produce sine waves because the underlying physics is a linear oscillation. Three numbers fully describe a sine: its amplitude (how tall it swings), its frequency (how fast it repeats), and its phase (where in the cycle it starts). Every other periodic signal can be decomposed into a sum of sine waves at different frequencies — the insight behind Fourier analysis, and the reason sines are the reference waveform for everything else.',
+    see: ['amplitude', 'frequency', 'period', 'phase', 'ac'],
+  },
+  amplitude: {
+    tip: 'How far a signal swings from its centre to its peak — the \'height\' of the waveform.',
+    detail:
+      'Amplitude is the maximum distance a waveform reaches from its zero (or average) line. For a sine wave centred on zero with peaks at +3 V and −3 V, the amplitude is 3 V. Amplitude is not the same as peak-to-peak: the peak-to-peak voltage of that wave is 6 V (from −3 to +3). For an AC signal, amplitude most often means the peak amplitude — the voltage at the instant of maximum excursion.',
+    unit: 'Volts (V), Amperes (A), …',
+    see: ['peak-to-peak', 'rms', 'sine wave'],
+  },
+  period: {
+    tip: 'The time it takes for a repeating signal to complete one full cycle.',
+    detail:
+      'Period (T) is the duration of one complete cycle of a repeating waveform — the time from any point on the wave to the next identical point. A 1 kHz signal has a period of 1 ms; a 50 Hz mains cycle lasts 20 ms. Frequency and period are reciprocals: f = 1/T. On an oscilloscope, you measure the period directly by reading how many time-per-division squares one cycle occupies; the scope then computes and displays the frequency for you.',
+    unit: 'Seconds (s)',
+    formula: 'T = 1 / f',
+    see: ['frequency', 'sine wave', 'time/div'],
+  },
+  phase: {
+    tip: 'How far into a cycle a signal is — which part of the sine curve it is tracing right now.',
+    detail:
+      'Phase describes the position within a cycle of a periodic signal, usually expressed in degrees (0°–360°) or radians (0–2π). Two sines of the same frequency can be at different phases — one may peak at t = 0 while the other peaks a quarter-cycle (90°) later. That phase difference is what distinguishes a capacitor (current leads voltage by 90°) from an inductor (current lags by 90°) at AC, and is central to impedance, filters, and antenna arrays. In amateur-radio work you will hear "in phase" (0°), "quadrature" (90°), and "anti-phase" (180°) most often.',
+    unit: 'Degrees (°) or radians (rad)',
+    see: ['sine wave', 'impedance', 'frequency'],
+  },
+  mains: {
+    tip: 'The AC electricity supplied to buildings by the national grid — 230 V, 50 Hz in Europe and Ukraine; 120 V, 60 Hz in the USA.',
+    detail:
+      'Mains (also called line power or grid power) is the alternating-current electricity distributed by the national electricity network. The standard values differ by region: 230 V RMS at 50 Hz across most of Europe, the UK, Ukraine, Africa, and Asia; 120 V RMS at 60 Hz across North America and parts of Latin America; a handful of other standards (100 V in Japan, 220 V at 60 Hz in parts of the Americas) survive historically. Mains voltage is always specified as RMS; the actual peak voltage is √2 larger (≈ 325 V peak for a 230 V mains, ≈ 170 V peak for a 120 V mains) — important for rating capacitors and insulation that see the peak, not the RMS.',
+    unit: 'Volts RMS (V)',
+    see: ['ac', 'rms', 'frequency'],
+  },
+  'true rms': {
+    tip: 'A meter that measures the real RMS of any waveform, not just sines — essential for square waves, pulses, and distorted signals.',
+    detail:
+      'A true-RMS meter digitises the waveform (or uses an analogue computation circuit) and calculates the root-mean-square value from the actual sample values — so it reads correctly on any waveform: sine, square, triangle, pulse train, chopped mains. A cheaper average-responding meter scales its average reading by 1.11 (the form factor of a rectified sine), which is only correct for pure sines. On a square wave, an averaging meter reads about 11 % high; on a triangle wave, about 4 % low. Look for the phrase "True RMS" on the front panel before trusting any reading of a non-sinusoidal signal.',
+    see: ['rms', 'multimeter', 'square wave'],
   },
 
   // ── Components ───────────────────────────────────────────────────

@@ -166,7 +166,60 @@ Document the math in a comment above the geometry constants.
 
 **Fix.** Replace clamping with truncation. Interpolate the crossing point once, draw the path to that point, and stop (monotonic) or skip with `M` (non-monotonic). See [plotted-curves.md](plotted-curves.md).
 
+---
+
+## 22. Flat-topped curve peaks — clipPath clips the stroke half-width
+
+**Symptom.** User reports «графіки виглядають обрізаними зверху» / peaks of a sine or triangle wave look truncated at the top (and bottom), endpoints of a V=I·R line look flattened where the line meets the axis boundary. The curve reaches the true maximum of the data range, and the clipPath rectangle sits **at exactly the same boundary**, so half the stroke width (≈ 1–1.5 px at stroke-widths 2–2.5) gets cut off.
+
+**Root cause.** `<clipPath><rect x={PLOT_X0} y={PLOT_Y0} width={PLOT_W} height={PLOT_H} /></clipPath>` — the rect matches the data rectangle exactly. Any curve pixel whose centre lies on the boundary has half its drawn width chopped.
+
+**Fix.** Extend the clipPath rectangle outward by ≥ 3 px on every side:
+
+```tsx
+<clipPath id={clipId}>
+  <rect
+    x={PLOT_X0 - 3}
+    y={PLOT_Y0 - 3}
+    width={PLOT_W + 6}
+    height={PLOT_H + 6}
+  />
+</clipPath>
+```
+
+Axes, ticks, gridlines, and tick labels stay drawn at their original positions — they're separate SVG elements, unaffected by the extended clip. Only the curve benefits from the extra stroke-headroom.
+
+**Complementary fix for widgets where the slider range equals the axis max** (e.g. SineExplorer with `amplitude` slider 0..10 and y-axis ±10 V): add a **V_AXIS_MAX = V_MAX × 1.1** factor so the peak at the slider maximum lands ~8 px below the axis top, not at it. Belt-and-braces with the extended clipPath.
+
+**How to avoid.** Pre-flight checklist item 7. When building any plot with a `clipPath`, default to the +3 px margin pattern. Audit: `grep -n 'clipPath.*rect x={PLOT_X0}'` — any match where the rect uses the raw `PLOT_X0 / PLOT_Y0 / PLOT_W / PLOT_H` values without a margin is a flat-top risk. User-flagged globally on ch1.3; fixed across `OhmsLawPlot`, `LogAxisToggle`, `SineExplorer`, `RmsSelector`.
+
 **How to avoid.** Never clamp a plotted function to the plot boundary. Truncate.
+
+---
+
+## 10b. Label clipped by the SVG viewBox edge (not by padding)
+
+**Symptom.** A text label — axis title, amplitude glyph, atmospheric caption, arrow annotation — sits so close to x=0 or x=VB_W that part of the glyph is cut off by the SVG's own viewBox boundary. Different from issue #2 («label clipped at PAD_L/PAD_R»): there the fix is wider padding; here the text sits **outside the content rect altogether** and collides with the edge of the SVG canvas itself.
+
+**User-flagged example (ch1.3 `SineOriginDiagram`):** «A» label placed outside the circle's left rim at `x = CIRCLE_CX − CIRCLE_R − 14 = 4` with `textAnchor="middle"`. At fontSize 15 the glyph is ~10 px wide, so the left edge of «A» sits at x ≈ −1 — **outside the viewBox** (which starts at x=0). The browser clips it.
+
+**Root cause.** Placing a label by formula (e.g. `CIRCLE_CX − CIRCLE_R − offset`) without running the arithmetic end-to-end to check that `x − halfGlyphWidth ≥ 0` (for `textAnchor="middle"`) or `x + glyphWidth ≤ VB_W` (for `textAnchor="start"`).
+
+**Fix.** Three options, in order of cleanness:
+
+1. **Move the label inside a guaranteed-safe region** — e.g. inside the circle on the static horizontal diameter, rather than outside the leftmost rim. Pedagogically still readable («A = this radius»).
+2. **Shift the enclosing geometry** — e.g. bump CIRCLE_CX right by ~20 px to make room on the left. Ripples through other positions.
+3. **Reduce the label size or swap for a shorter glyph** — last-resort because it sacrifices readability.
+
+**How to avoid.** Before emitting any `<text>` element, compute its bounding box in the viewBox coordinate system and verify all four edges are inside:
+
+- `textAnchor="start"`: `x + width ≤ VB_W` and `x ≥ 0`.
+- `textAnchor="middle"`: `x − width/2 ≥ 0` and `x + width/2 ≤ VB_W`.
+- `textAnchor="end"`: `x ≤ VB_W` and `x − width ≥ 0`.
+- For rotated text (`transform="rotate(-90 …)"`): the **width** becomes the **vertical extent** after rotation; horizontal extent becomes the font-size. Adjust the check accordingly.
+- Approximate character widths at common font sizes (UK worst case): `fontSize 13 Georgia italic ≈ 7 px/char`, `fontSize 15 bold ≈ 9 px/char`, `fontSize 14 sans ≈ 7 px/char`.
+
+Add a mental pre-flight: **for every label, sketch its bounding box against the viewBox dimensions**. Labels at the outer edges (first/last tick, axis title, atmospheric callouts) are the highest-risk spots.
 
 ---
 

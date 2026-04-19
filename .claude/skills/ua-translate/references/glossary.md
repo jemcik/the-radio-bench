@@ -115,7 +115,10 @@ Each entry tracks: **EN term** → **UK rendering** + **grammatical gender** + n
 
 - **Decimal separator**: comma, universal. `1,5 В`, `0,1 мм/с`, `6,25 × 10¹⁸`, `−2,5 дБ`.
 - **Period** is reserved for section numbers and version numbers.
-- **Non-breaking space** between number and unit: `1,5&nbsp;В` (as character `\u00a0`).
+- **Non-breaking space** (character `\u00a0`) required to keep tightly-linked pairs on one line:
+  - Number + unit: `1,5\u00a0В`, `100\u00a0мА`, `50\u00a0Гц`, `20\u00a0мс`.
+  - Structural designator + number/Roman: `Частина\u00a0I`, `Частину\u00a01`, `Розділ\u00a01.3`, `Part\u00a0I`, `§\u00a03.2`.
+  - Without NBSP the pair can break across lines — reader sees «Частини» on one line, «I» on the next (or clipped). User-flagged on welcome page where «Частини I» was torn.
 - **Range dash**: en-dash `–` with NBSPs: `1–3 А`, `3,3–5 В`.
 - For runtime-formatted numbers, use `formatNumber(n, locale)` / `formatDecimal(n, digits, locale)` from `src/lib/format.ts` so the period/comma switches with the locale.
 

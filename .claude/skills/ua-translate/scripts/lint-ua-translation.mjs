@@ -289,6 +289,113 @@ const RULES = [
   },
 
   {
+    id: 'forbidden.raza-multiplier',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Russian uses «в N раза / в N разу» (gen. sg.) as a multiplier. Ukrainian
+    // uses «у N рази» (nom. pl., for factors 2/3/4 or non-integer factors near
+    // them) or «у N разів» (gen. pl., for 5+). The singular forms `раза` and
+    // `разу` as multipliers are hard Russianisms. User-flagged on ch1.3:
+    // «у √2 раза більший» → «у √2 рази більший». Uses `wb()` for Cyrillic
+    // word boundaries; the pattern anchors on a preposition (у/в/і) + a
+    // numeric/variable token + раза/разу.
+    pattern: wb('[уів]\\s+\\S+\\s+(?:раза|разу)'),
+    hint: 'Use «рази» (nom. pl.) for multipliers with 2/3/4 or non-integer factors near them («у 2 рази», «у √2 рази»); use «разів» (gen. pl.) for 5 and above («у 10 разів»). The singular forms «раза» / «разу» as multipliers are Russianisms.',
+  },
+
+  {
+    id: 'forbidden.playground-verbs',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Childish/playground-register verbs applied to physical quantities. A
+    // voltage does NOT «гойдатися» (swing on a swingset), a current does NOT
+    // «танцювати/стрибати/бігати» (dance/jump/run), electrons don't «ворушитися»
+    // (fidget). User-flagged on ch1.3 for «напруга гойдається вгору-вниз» —
+    // children's-book register in a physics textbook. Use technical verbs:
+    // `коливатися`, `періодично змінюватися`, `зростати/спадати`, `відхилятися`.
+    pattern: wb('гойда(?:ється|ються|тися|ються|вся|лися|лася|лося)|танцю(?:є|ють|вати|вав|вала|вали)|стрибає|стрибають|бігає|бігають|ворушит(?:ься|ься|ься)'),
+    hint: 'Playground-register verb applied to a physical quantity. Use «коливається / періодично змінюється / зростає / відхиляється» instead. Voltages don\'t swing; sines oscillate.',
+  },
+
+  {
+    id: 'forbidden.miryaty-measure',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Colloquial «міряти/поміряти» instead of formal «вимірювати/виміряти» in
+    // lab/physics contexts. User-flagged on ch1.3. Matches Ch 1.1 / 1.2 formal
+    // register. Uses `wb()` so compound words like «примірювати» (which starts
+    // with `при-`, not a bare «мір-») are not false-flagged — `wb` anchors on
+    // a non-letter (or start-of-string) before `(по)?мір`.
+    pattern: wb('(?:по)?мір(?:ят[ьи]|яю|яєш|яє(?:мо|те)?|яють|яй(?:те)?|ял[иао]|яв)'),
+    hint: 'Use formal «вимірювати / виміряти / Виміряйте» instead of colloquial «міряти / Поміряйте» in lab and physics contexts. The latter is conversational register and clashes with textbook voice established in Ch 1.1 / 1.2.',
+  },
+
+  {
+    id: 'forbidden.shchupaty-measure',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // «щупати/щупаєте» used as a verb meaning «to measure with probes» is a
+    // colloquialism. Use «торкатися щупами» or «вимірювати». User-flagged on
+    // ch1.3 labTrouble2.
+    pattern: wb('щупає(?:ш|мо|те)?|щупа[юлв][имаоли]*'),
+    hint: 'Colloquial «щупати» for «measure with probes». Use «торкатися щупами» (for the act of touching probes to a node) or «вимірювати» (for the act of taking a reading).',
+  },
+
+  {
+    id: 'forbidden.personify-quantity',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Anthropomorphic language applied to physical quantities. Voltage/current
+    // don't «спокійно сидять», «люблять», «хочуть», «відпочивають», «панікують».
+    // User-flagged on ch1.3 («така спокійна електроніка» → «така стала»).
+    // Pattern: adjective-of-calmness/emotion immediately preceding a quantity
+    // noun (within 0–2 words). `wb()` ensures we catch «спокійна», «спокійно».
+    pattern: /(?<!\p{L})(?:спокійн[аиоуіе]+|спокійно)\s+(?:напруг[аиу]|струм[уи]?|сигнал[и]?|коливанн[яюями]+|електронік[аиою]+)(?!\p{L})/giu,
+    hint: 'Anthropomorphic descriptor «спокійна/спокійно» applied to a physical quantity. Use a physics descriptor: «стала», «незмінна», «не змінюється в часі». Voltages are not emotional.',
+  },
+
+  {
+    id: 'forbidden.emdash-before-math-var',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // An em-dash «—» immediately followed by <var> or <nowrap><var> renders
+    // visually as a UNARY MINUS next to the italic math letter — e.g.
+    // «— V_rms» reads as «−V_rms». User-flagged multiple times on ch1.2 and
+    // ch1.3 (`nonSineIntro`). Fix: either replace the em-dash with an explicit
+    // verb/preposition/colon, or switch to parentheses for the inner clause.
+    pattern: /—\s*<(?:var|nowrap)\b/gi,
+    hint: 'Em-dash directly before a math variable reads as a minus sign — the italic letter + the em-dash collapse into a signed quantity. Use parentheses for the inner clause, a colon, or an explicit verb. Never `— <var>X</var>`.',
+  },
+
+  {
+    id: 'forbidden.raw-lt-gt-in-i18n',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // A raw `<` or `>` inside an i18n string, when rendered via <Trans>,
+    // triggers i18next's HTML-like tag parser and gets HTML-encoded to
+    // `&lt;`/`&gt;` in the browser. User-flagged on ch1.3
+    // («230 В < 250 В» showed as «230 В &lt; 250 В»). Fix: rewrite
+    // comparisons in words (UK «менше за», EN «is less than») — NEVER
+    // use raw `<`/`>` for math operations in prose.
+    // Pattern: `<` or `>` that is NOT part of a recognised tag opener/closer.
+    // Heuristic: math comparators are space-delimited in prose («x < 10»,
+    // «1 ≤ м < 10»). Tag openers have a letter right after the `<`; tag
+    // closers have an alphanumeric right before the `>`. So a bare
+    // math `<`/`>` must be PRECEDED by whitespace (or start-of-string) AND
+    // FOLLOWED by whitespace or a digit. This excludes `</foo2> <bar>`
+    // (closing-tag `>` preceded by digit, not by whitespace — false
+    // positive in the earlier, looser regex).
+    pattern: /(?:^|\s)[<>](?=\s|\d)/g,
+    hint: 'Raw `<` or `>` in an i18n string is interpreted as tag markup by react-i18next and gets encoded to `&lt;`/`&gt;` in the browser. Express comparisons in words: UK «менше за» / «більше за», EN «is less than» / «is greater than». Reserve `<tag>` for actual Trans components.',
+  },
+
+  // NOTE: «formula-without-nowrap» rule omitted from the linter — requires a
+  // stateful check (is this var+sub pair inside an existing <nowrap>?) that
+  // the current single-regex runner doesn't support. Instead, run a dedicated
+  // audit script before shipping each chapter (see scripts/audit-nowrap.mjs if
+  // we later add one). For now, rely on manual grep + pre-PR review.
+
+  {
     id: 'forbidden.pry-verbal-noun',
     category: 'FORBIDDEN',
     severity: 'WARN',
@@ -466,8 +573,14 @@ const RULES = [
     // parenthetical expansion, e.g. <vna>VNA (Vector Network Analyser)</vna>.
     // The long underlined inline span wraps across lines (reads as "two
     // items") and desyncs Radix popper's tooltip positioning.
-    // Exclude the allowed case: `<var>X</var>` for single-letter math vars.
-    pattern: /<([a-z]+)>[^<()]{2,}\s+\([^)]+\)<\/\1>/g,
+    // Exclude the allowed case: `<var>X</var>` for single-letter math vars,
+    // and native HTML formatting tags (`<strong>`, `<em>`, `<b>`, `<i>`,
+    // `<code>`, `<u>`, `<sub>`, `<sup>`, `<span>`, `<a>`, `<mark>`, `<kbd>`,
+    // `<small>`, `<nowrap>`) — those aren't Radix-popped glossary tags and
+    // don't suffer the tooltip-misplacement issue this rule targets. Glossary
+    // tags on this project are always short lowercase custom keys (dc, ac,
+    // rms, vna, ham, …).
+    pattern: /<(?!(?:strong|em|b|i|code|u|sub|sup|span|a|mark|kbd|small|nowrap|var|br)\b)([a-z]+)>[^<()]{2,}\s+\([^)]+\)<\/\1>/g,
     hint: 'Glossary tag wraps both an abbreviation AND its parenthetical expansion. Wrap only the short form: «<tag>ABBR</tag> (Full form)» so the tooltip anchors correctly and the reader sees one underlined term, not two.',
   },
 ]
