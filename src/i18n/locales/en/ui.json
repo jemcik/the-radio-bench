@@ -137,7 +137,7 @@
     "interactiveWidgets": "Interactive widgets.",
     "interactiveWidgetsDetail": "Where there's a formula, there's usually a calculator. Where there's a waveform, there's usually a diagram you can drag. Use them — they make the abstract concrete.",
     "labActivities": "Lab activities",
-    "labActivitiesDetail": "(optional, marked with a flask icon in the sidebar). If you have a multimeter, oscilloscope, VNA, or Arduino, the lab activities let you verify the theory on a real bench. They're completely optional — the chapter stands without them — but doing them rewires the knowledge from \"understood\" to \"experienced.\"",
+    "labActivitiesDetail": "(optional, marked with a flask icon in the sidebar). If you have a multimeter, oscilloscope, <vna>VNA</vna>, or Arduino, the lab activities let you verify the theory on a real bench. They're completely optional — the chapter stands without them — but doing them rewires the knowledge from \"understood\" to \"experienced.\"",
     "quiz": "Quiz",
     "quizDetail": "(marked with a question-mark icon in the sidebar). Chapters include a short quiz at the end to help you check what stuck. The act of trying to recall something is itself part of learning.",
     "sectionIcons": "The icons in the sidebar",
@@ -150,7 +150,7 @@
     "calloutNote": "Background context or historical detail that enriches your understanding but isn't strictly required.",
     "calloutCaution": "Common pitfalls and mistakes. Things that trip up beginners and veterans alike.",
     "calloutExperiment": "Hands-on activity — build it, measure it, try it on your bench.",
-    "calloutOnair": "FCC rules, band plans, and on-air etiquette. Know these before you key up.",
+    "calloutOnair": "Regulator rules, band plans, and on-air etiquette. Know these before you key up.",
     "calloutMath": "Equations and derivations. Don't panic — they're simpler than they look.",
     "sectionPath": "The recommended path",
     "path1": "Start at <strong>Chapter 0.2 — Lab Bench Setup</strong> if you have any of the physical equipment. It walks you through getting comfortable with each instrument before you need them in later chapters.",
@@ -159,7 +159,7 @@
     "maths1": "This site assumes only basic arithmetic: addition, subtraction, multiplication, division, fractions, and square roots. No calculus. Where a full derivation would need calculus, we skip it honestly — we'll say so, give you the result, and explain intuitively where it comes from.",
     "maths2": "Chapter 0.3 covers the specific maths toolkit you'll need. If you're comfortable with scientific notation and SI prefixes (kHz, MHz, µF, pF…), you can skim it. If those feel uncertain, spend time there — they appear constantly.",
     "sectionOneMore": "One more thing",
-    "oneMore1": "The goal is not to prepare you for an exam (though the content covers the full <erc>ERC</erc> Report 32 syllabus). The goal is to give you the kind of understanding where, when something odd happens on the air, you have a hypothesis — and when you read the <arrl>ARRL</arrl> Handbook, it makes sense rather than feeling impenetrable.",
+    "oneMore1": "The goal is not to prepare you for an exam (though the content covers the full <erc>ERC</erc> Report 32 syllabus). The goal is to give you the kind of understanding where, when something odd happens on the air, you have a hypothesis — and when you open a ham-radio handbook, it makes sense rather than feeling impenetrable.",
     "oneMore2": "Enjoy the bench. Let's start with the instruments."
   },
   "ch0_2": {
