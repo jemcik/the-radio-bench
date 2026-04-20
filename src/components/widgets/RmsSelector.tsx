@@ -142,7 +142,7 @@ export default function RmsSelector() {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           role="img"
           aria-label={t('ch1_3.widget.rmsSelector.ariaLabel')}
-          style={{ display: 'block', margin: '0 auto' }}
+          style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
         >
           <defs>
             {/* Clip extends 3 px beyond the data rect on all sides so
@@ -388,9 +388,14 @@ export default function RmsSelector() {
         </svg>
       </div>
 
-      {/* ── Readout — all four values with the current one highlighted */}
+      {/* ── Readout — all four values with the current one highlighted.
+           Stacks to one column on mobile so each cell has room for the
+           label + parenthesised symbol + value on a single line. The
+           value/unit span is `whitespace-nowrap` so "7,07 В" never
+           breaks apart mid-number — previously the narrow mobile cell
+           wrapped the unit onto its own line, which read as broken. */}
       <ResultBox tone="success">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
           {(
             [
               ['peak', V_PEAK, 'v_pk'],
@@ -402,7 +407,7 @@ export default function RmsSelector() {
             <div
               key={m}
               className={cn(
-                'flex items-baseline justify-between',
+                'flex items-baseline justify-between gap-3',
                 mode === m ? 'text-foreground font-medium' : 'text-muted-foreground',
               )}
             >
@@ -410,8 +415,8 @@ export default function RmsSelector() {
                 {t(`ch1_3.widget.rmsSelector.mode_${m}`)}
                 <span className="ml-1 font-mono text-xs opacity-70">({t(`ch1_3.widget.rmsSelector.${sym}`)})</span>
               </span>
-              <span className="font-mono">
-                {formatDecimal(val, 2, locale)} {tUnit('v')}
+              <span className="font-mono whitespace-nowrap shrink-0">
+                {formatDecimal(val, 2, locale)}&nbsp;{tUnit('v')}
               </span>
             </div>
           ))}

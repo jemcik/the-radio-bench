@@ -248,12 +248,37 @@ function BookmarkRow({
 
 // ─── Sidebar root ─────────────────────────────────────────────────────────────
 
-export default function Sidebar({ onNavigation }: { onNavigation?: () => void }) {
+export default function Sidebar({
+  onNavigation,
+  onClose,
+}: {
+  onNavigation?: () => void
+  /** Mobile-only: callback for the explicit close button. When omitted
+   *  the close button isn't rendered — desktop doesn't need it. */
+  onClose?: () => void
+}) {
   const { t } = useTranslation('ui')
   const translatedParts = useTranslatedParts()
 
   return (
     <div className="h-full w-full min-w-0 flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden">
+      {/* Mobile-only close button — the backdrop-tap still works, but an
+          explicit ✕ is expected and removes guesswork. Rendered only
+          when `onClose` is supplied (mobile drawer); desktop passes
+          nothing and this row collapses. */}
+      {onClose && (
+        <div className="shrink-0 flex justify-end px-2 pt-2 lg:hidden">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('sidebar.closeSidebar')}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-foreground/70 hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
       {/* Start page link */}
       <div className="shrink-0 px-2 pt-2">
         <NavLink

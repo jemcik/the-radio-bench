@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
@@ -26,6 +26,21 @@ import {
  * semiconductor.  All strokes via Rough.js for the chapter's
  * hand-sketched aesthetic; ions and electrons stay clean circles.
  *
+ * ANIMATION — relative drift speed IS the lesson. Free electrons in
+ * the conductor panel drift rightward at a readable pace (~5 s per
+ * panel traversal); free electrons in the semiconductor panel creep
+ * at a quarter of that speed (~14 s) to sell "a few carriers slowly
+ * making their way through"; the insulator panel stays fully static
+ * because nothing moves there, and seeing zero motion against the
+ * conductor's flow is exactly the contrast the reader needs. Each
+ * electron wraps from the right edge back to the left so the panel
+ * never runs out of carriers. Imperative DOM writes via refs keep
+ * React out of the per-frame loop.
+ *
+ * Respects `prefers-reduced-motion`: the rAF loop doesn't start and
+ * electrons sit at their original positions — which already compose
+ * a valid static snapshot of the idea.
+ *
  * Sizing (per feedback_svg_font_minimum_on_screen): viewBox 620 × 300
  * rendered 1:1 — `maxWidth` equals the viewBox width, so every
  * fontSize in source is the fontSize on screen. Primary labels at 15;
@@ -34,8 +49,13 @@ import {
  * collision where a reader reads "many free electrons / + ion core"
  * as a single caption stack.
  */
+
+const CONDUCTOR_PERIOD_MS = 5000
+const SEMI_PERIOD_MS = 14000
 export default function MaterialsComparison() {
   const { t } = useTranslation('ui')
+  const conductorRefs = useRef<(SVGCircleElement | null)[]>([])
+  const semiRefs = useRef<(SVGCircleElement | null)[]>([])
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 620
@@ -80,6 +100,44 @@ export default function MaterialsComparison() {
   const semiFreeOffsets: [number, number][] = [
     [panelW * 0.38, -44], [panelW * 0.78, 46],
   ]
+
+  // ── Drift animation ─────────────────────────────────────────────
+  const conductorPanelX = panelStartX
+  const semiPanelX = panelStartX + 2 * (panelW + gutter)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      const elapsed = now - start
+      const cBase = (elapsed % CONDUCTOR_PERIOD_MS) / CONDUCTOR_PERIOD_MS
+      conductorFreeOffsets.forEach((off, i) => {
+        const initialPhase = off[0] / panelW
+        const p = (cBase + initialPhase) % 1
+        const el = conductorRefs.current[i]
+        if (el) el.setAttribute('cx', String(conductorPanelX + p * panelW))
+      })
+      const sBase = (elapsed % SEMI_PERIOD_MS) / SEMI_PERIOD_MS
+      semiFreeOffsets.forEach((off, i) => {
+        const initialPhase = off[0] / panelW
+        const p = (sBase + initialPhase) % 1
+        const el = semiRefs.current[i]
+        if (el) el.setAttribute('cx', String(semiPanelX + p * panelW))
+      })
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conductorPanelX, semiPanelX])
 
   // ── Rough.js geometry ──────────────────────────────────────────
   const sketch = useMemo(() => {
@@ -204,10 +262,17 @@ export default function MaterialsComparison() {
                 }),
               )}
 
-              {/* Free electrons */}
+              {/* Free electrons — animated: conductor drifts quickly,
+                  semi drifts slowly, insulator has none at all.
+                  Initial cx doubles as the prefers-reduced-motion
+                  snapshot. */}
               {freeOffsets.map((off, k) => (
                 <circle
                   key={`free-${k}`}
+                  ref={el => {
+                    if (p.i === 0) conductorRefs.current[k] = el
+                    else if (p.i === 2) semiRefs.current[k] = el
+                  }}
                   cx={p.x + off[0]}
                   cy={atomY + off[1]}
                   r={3.5}

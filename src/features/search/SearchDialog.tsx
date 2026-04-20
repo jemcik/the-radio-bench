@@ -13,19 +13,27 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
   const { t } = useTranslation('ui')
   const isMac = navigator.platform.toUpperCase().includes('MAC')
 
+  // Mobile (< sm): collapses to a 36×36 icon button matching the other
+  // header icons — the full placeholder trigger doesn't fit alongside
+  // hamburger + logo + title + 3 icon buttons on a 375-px viewport
+  // and was overlapping the site title. Desktop: keeps the roomy
+  // trigger with placeholder text and the ⌘K / Ctrl+K hint.
   return (
     <button
       onClick={onClick}
+      aria-label={t('search.placeholder')}
       className={cn(
-        'flex items-center gap-2 w-full max-w-xs',
-        'h-8 px-3 rounded-md border border-border',
-        'text-sm text-muted-foreground',
-        'bg-background/50 hover:bg-accent hover:text-foreground',
-        'transition-colors'
+        'flex items-center shrink-0 transition-colors',
+        // Mobile — icon button
+        'w-9 h-9 justify-center rounded-lg text-foreground/70 hover:text-foreground hover:bg-accent',
+        // sm+ — expanded placeholder trigger
+        'sm:w-full sm:max-w-xs sm:h-8 sm:px-3 sm:gap-2 sm:justify-start sm:rounded-md sm:border sm:border-border sm:text-sm sm:text-muted-foreground sm:bg-background/50 sm:hover:text-foreground',
       )}
     >
-      <Search className="w-3.5 h-3.5 shrink-0" />
-      <span className="flex-1 text-left text-xs">{t('search.placeholder')}</span>
+      <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0" />
+      <span className="hidden sm:flex-1 sm:inline-block sm:text-left sm:text-xs">
+        {t('search.placeholder')}
+      </span>
       <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 h-5 rounded border border-border bg-muted text-[10px] font-mono text-muted-foreground">
         {isMac ? '⌘' : 'Ctrl'}K
       </kbd>

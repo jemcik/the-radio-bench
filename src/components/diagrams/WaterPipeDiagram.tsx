@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
@@ -35,9 +35,39 @@ import {
  * stays as a single smooth path (seam-free per earlier bug); the stream
  * parabola, droplets and text labels stay clean so the motion and
  * vocabulary read crisply. This is an analogy, not a blueprint.
+ *
+ * ANIMATION — small flow indicators carry the "this is moving water"
+ * feeling that static fill cannot. Twelve subtle droplets tile through
+ * the pipe on a ~3 s cycle, their cx attribute written imperatively
+ * via rAF to avoid per-frame React re-renders. The droplet cycle ends
+ * exactly at the pipe exit — from there the existing splash droplets
+ * complete the visual story. Respects `prefers-reduced-motion`: the
+ * rAF loop simply doesn't start, and droplets sit at their mount
+ * positions (tiled across the pipe as a static snapshot).
  */
+
+const FLOW_PERIOD_MS = 3000
+const DROPLET_COUNT = 12
+const STREAM_PERIOD_MS = 900
+const STREAM_DROPLET_COUNT = 5
+const SPLASH_PERIOD_MS = 700
+// Varying droplet sizes break the perceptual uniformity of an
+// evenly-tiled stream — without this the circles look frozen on
+// the parabola even while the rAF loop updates them every frame.
+const STREAM_DROPLET_RADII = [1.4, 2.1, 1.5, 1.9, 1.3]
 export default function WaterPipeDiagram() {
   const { t } = useTranslation('ui')
+  const dropletRefs = useRef<(SVGCircleElement | null)[]>([])
+  const streamRefs = useRef<(SVGCircleElement | null)[]>([])
+  const splashRefs = useRef<(SVGCircleElement | null)[]>([])
+  // Deterministic vertical jitter within each lane so droplets don't
+  // align to a single row. Bounded to ±3 px so even a droplet passing
+  // through the restriction (where the water column is only 6 px tall)
+  // stays inside it. Index mod DROPLET_COUNT selects from this.
+  const dropletJitterY = useMemo(
+    () => [0, 3, -2, 2, -3, 1, -3, 3, 2, -3, 0, 2],
+    [],
+  )
 
   const W = 540
   const H = 240
@@ -66,6 +96,116 @@ export default function WaterPipeDiagram() {
   // Platform / ground reference lines at the bottom
   const platformTopY = tankY + tankH       // 156
   const groundY = H - 16                   // 224
+
+  // ── Droplet flow animation ──────────────────────────────────────────
+  // Pipe horizontal span: from the tank's right wall to the pipe exit.
+  const pipeStartX = tankX + tankW + 2
+  const pipeSpanX = pipeEndX - pipeStartX - 2
+
+  // Stream parabola geometry — matches the visual stream drawn below.
+  // Exit point is the mid-line of the pipe at its right edge; arc spans
+  // arcLenX horizontally and lands on the ground.
+  const streamExitX = pipeEndX
+  const streamExitY = (pipeTopY + pipeBottomY) / 2
+  const streamArcLenX = 48
+  const streamDropY = groundY - streamExitY
+  // Splash droplet anchor positions, stored as [dx, dy] offsets from
+  // (streamExitX, streamExitY + streamDropY). Both the static render
+  // and the rAF bounce animation reference the same list.
+  const splashAnchors: { dx: number; dy: number; r: number }[] = [
+    { dx: 38, dy: -16, r: 1.5 },
+    { dx: 44, dy: -10, r: 1.3 },
+    { dx: 50, dy: -14, r: 1   },
+    { dx: 56, dy:  -8, r: 1.2 },
+    { dx: 42, dy:  -4, r: 1.4 },
+    { dx: 58, dy:  -6, r: 0.9 },
+  ]
+
+  // How much of the assigned jitter a droplet can use at horizontal
+  // position x — 1 in the wide pipe, ~0.25 in the 6-px-tall restriction,
+  // linear through the two 7-px ramps. Without this droplets with
+  // large jitter poke outside the restriction (6 px tall is tighter
+  // than any ±3 px jitter + droplet radius).
+  const compressionAt = (x: number): number => {
+    if (x >= restrictStartX + restrictInset && x <= restrictEndX - restrictInset) return 0.25
+    if (x >= restrictStartX && x < restrictStartX + restrictInset) {
+      const t = (x - restrictStartX) / restrictInset
+      return 1 - 0.75 * t
+    }
+    if (x > restrictEndX - restrictInset && x <= restrictEndX) {
+      const t = (x - (restrictEndX - restrictInset)) / restrictInset
+      return 0.25 + 0.75 * t
+    }
+    return 1
+  }
+  const pipeCenterY = (pipeTopY + pipeBottomY) / 2
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      const elapsed = now - start
+
+      // Pipe droplets — constant-speed flow along the horizontal pipe.
+      // cy is compressed as the droplet transits the restriction so it
+      // never pokes outside the narrow section.
+      const pipePhase = (elapsed % FLOW_PERIOD_MS) / FLOW_PERIOD_MS
+      for (let i = 0; i < DROPLET_COUNT; i++) {
+        const p = (pipePhase + i / DROPLET_COUNT) % 1
+        const cx = pipeStartX + p * pipeSpanX
+        const jitter = dropletJitterY[i] ?? 0
+        const cy = pipeCenterY + jitter * compressionAt(cx)
+        const el = dropletRefs.current[i]
+        if (el) {
+          el.setAttribute('cx', String(cx))
+          el.setAttribute('cy', String(cy))
+        }
+      }
+
+      // Stream droplets — falling along the parabola from pipe exit to
+      // ground. x is linear in phase (constant horizontal velocity),
+      // y accelerates as p², matching projectile motion. Opacity fades
+      // in over the first 15 % and out over the last 15 % so the eye
+      // can track individual droplets; without this the uniform tiled
+      // pattern reads as frozen even while it updates every frame.
+      const streamPhase = (elapsed % STREAM_PERIOD_MS) / STREAM_PERIOD_MS
+      for (let i = 0; i < STREAM_DROPLET_COUNT; i++) {
+        const p = (streamPhase + i / STREAM_DROPLET_COUNT) % 1
+        const el = streamRefs.current[i]
+        if (!el) continue
+        el.setAttribute('cx', String(streamExitX + p * streamArcLenX))
+        el.setAttribute('cy', String(streamExitY + streamDropY * p * p))
+        const fadeIn = Math.min(1, p / 0.15)
+        const fadeOut = Math.min(1, (1 - p) / 0.15)
+        const alpha = Math.min(fadeIn, fadeOut)
+        el.setAttribute('opacity', alpha.toFixed(2))
+      }
+
+      // Splash droplets — small vertical bounce at the landing point,
+      // phase-shifted so the six droplets don't pulse in unison.
+      const splashBase = (elapsed % SPLASH_PERIOD_MS) / SPLASH_PERIOD_MS
+      for (let i = 0; i < splashAnchors.length; i++) {
+        const a = splashAnchors[i]
+        const phase = (splashBase + i / splashAnchors.length) * 2 * Math.PI
+        const bounce = 1.6 * Math.abs(Math.sin(phase))
+        const el = splashRefs.current[i]
+        if (el) el.setAttribute('cy', String(streamExitY + streamDropY + a.dy - bounce))
+      }
+
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pipeStartX, pipeSpanX, streamExitX, streamExitY, streamArcLenX, streamDropY])
 
   // ── Rough.js geometry (memoised, stable seeds) ──────────────────────
   const sketch = useMemo(() => {
@@ -215,9 +355,12 @@ export default function WaterPipeDiagram() {
             L ${tankX + 1} ${tankY + tankH - 1}
             Z
           `}
-          fill="hsl(var(--primary) / 0.22)"
+          fill="hsl(var(--callout-note) / 0.22)"
         />
-        {/* Water surface line */}
+        {/* Water surface line — amber even though the water below is
+            blue, because this line specifically marks the water LEVEL,
+            which encodes pressure (V). The blue water + amber surface
+            line reads as "blue water whose level is the V quantity". */}
         <line
           x1={tankX + 1} y1={waterLevelY}
           x2={tankX + tankW - 1} y2={waterLevelY}
@@ -256,17 +399,41 @@ export default function WaterPipeDiagram() {
           })}
         </g>
 
-        {/* ── Water stream — parabolic trajectory (kept clean) ──── */}
+        {/* ── Flowing droplets inside the pipe ───────────────────── *
+             Twelve tiled droplets cycling through the pipe so the
+             water reads as moving, not static. Initial cx spread
+             (even phase tiling) doubles as the static snapshot when
+             prefers-reduced-motion is enabled. The rAF loop writes
+             cx imperatively to avoid per-frame React re-renders. */}
+        <g>
+          {Array.from({ length: DROPLET_COUNT }).map((_, i) => {
+            const p0 = i / DROPLET_COUNT
+            return (
+              <circle
+                key={i}
+                ref={el => { dropletRefs.current[i] = el }}
+                cx={pipeStartX + p0 * pipeSpanX}
+                cy={(pipeTopY + pipeBottomY) / 2 + (dropletJitterY[i] ?? 0)}
+                r={1.6}
+                fill="hsl(var(--callout-note) / 0.85)"
+              />
+            )
+          })}
+        </g>
+
+        {/* ── Water stream — parabolic trajectory ──────────────── *
+             The static envelope (filled parabola + top outline)
+             stays drawn so the stream's SHAPE is readable even under
+             prefers-reduced-motion; the animated falling droplets on
+             top make it feel like moving water. */}
         {(() => {
           const exitX = pipeEndX
           const exitTopY = pipeTopY + 2
           const exitBotY = pipeBottomY - 2
           const steps = 14
-          // Land the stream on the ground at (exitX + arcLenX, groundY).
-          // arcLenX = 48 keeps landing inside viewBox (476 + 48 = 524 < 540).
-          const arcLenX = 48
-          const botDropY = groundY - exitBotY        // bottom hits ground
-          const topDropY = groundY - exitTopY - 3    // top lands 3 px above bottom
+          const arcLenX = streamArcLenX
+          const botDropY = groundY - exitBotY
+          const topDropY = groundY - exitTopY - 3
           // Contracting jet: top drops MORE than bottom so the 20-px
           // stream tapers to a ~3-px tip at ground level. Without it,
           // the stream closed into a flat horizontal "laser-cut" edge.
@@ -286,35 +453,52 @@ export default function WaterPipeDiagram() {
             <>
               <path
                 d={streamPath}
-                fill="hsl(var(--callout-note) / 0.40)"
+                fill="hsl(var(--callout-note) / 0.35)"
                 stroke="hsl(var(--callout-note))"
                 strokeWidth={1.1}
                 strokeLinejoin="round"
+                opacity={0.7}
               />
               <polyline
                 points={topPts.join(' ')}
                 fill="none"
                 stroke="hsl(var(--callout-note))"
                 strokeWidth={0.8}
-                opacity={0.7}
+                opacity={0.55}
                 strokeLinejoin="round"
               />
-              {/* Splash droplets clustered around the landing point
-                  at (exitX+48, exitBotY+botDropY) = (524, groundY). */}
-              {[
-                { x: 38, y: 72, r: 1.5 },
-                { x: 44, y: 78, r: 1.3 },
-                { x: 50, y: 74, r: 1   },
-                { x: 56, y: 80, r: 1.2 },
-                { x: 42, y: 84, r: 1.4 },
-                { x: 58, y: 82, r: 0.9 },
-              ].map((d, i) => (
+              {/* Falling droplets — tiled along the parabola from exit
+                  to landing. Varying radii + opacity fade-in/out
+                  (applied in the rAF loop) let the eye track
+                  individual droplets instead of perceiving the uniform
+                  tiled pattern as frozen. Initial cx/cy/opacity here
+                  double as the prefers-reduced-motion snapshot. */}
+              {Array.from({ length: STREAM_DROPLET_COUNT }).map((_, i) => {
+                const p0 = i / STREAM_DROPLET_COUNT
+                const fadeIn = Math.min(1, p0 / 0.15)
+                const fadeOut = Math.min(1, (1 - p0) / 0.15)
+                return (
+                  <circle
+                    key={`stream-${i}`}
+                    ref={el => { streamRefs.current[i] = el }}
+                    cx={streamExitX + p0 * streamArcLenX}
+                    cy={streamExitY + streamDropY * p0 * p0}
+                    r={STREAM_DROPLET_RADII[i] ?? 1.6}
+                    fill="hsl(var(--callout-note))"
+                    opacity={Math.min(fadeIn, fadeOut)}
+                  />
+                )
+              })}
+              {/* Splash droplets — bounce around the landing point on
+                  a sub-second cycle to keep the splash visually alive. */}
+              {splashAnchors.map((a, i) => (
                 <circle
-                  key={i}
-                  cx={exitX + d.x}
-                  cy={exitBotY + d.y}
-                  r={d.r}
-                  fill="hsl(var(--callout-note) / 0.55)"
+                  key={`splash-${i}`}
+                  ref={el => { splashRefs.current[i] = el }}
+                  cx={streamExitX + a.dx}
+                  cy={streamExitY + streamDropY + a.dy}
+                  r={a.r}
+                  fill="hsl(var(--callout-note) / 0.7)"
                 />
               ))}
             </>

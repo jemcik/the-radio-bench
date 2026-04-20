@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
@@ -25,6 +25,17 @@ import {
  * ("−1 electron"), making the "tip the balance" idea explicit rather
  * than leaving the reader to infer it from two isolated pictures.
  *
+ * ANIMATION — all orbital electrons in both panels rotate around
+ * their respective nuclei (~8 s per full revolution). The animation
+ * makes each panel feel "alive" and reinforces the Bohr mental model:
+ * electrons are bound to orbits, not parked at fixed points. The
+ * escaped electron + its arrow stay static — it's already left the
+ * system. Keeping the orbital electrons in both panels at the same
+ * angular speed signals that it's the same atom/element.
+ *
+ * Respects `prefers-reduced-motion`: angle freezes at 0, recovering
+ * the original static snapshot.
+ *
  * Rough.js is used for orbits, vibration arcs, and arrows so the
  * aesthetic matches the chapter hero. Individual particles are
  * rendered as clean SVG circles so the +/−/· symbols stay legible
@@ -33,6 +44,8 @@ import {
  * Sizing: viewBox 560 × 280, rendered at maxWidth 560 (1:1) so every
  * fontSize renders at its designed size on screen.
  */
+
+const ORBIT_PERIOD_MS = 8000
 
 type Pt = [number, number]
 
@@ -74,6 +87,27 @@ const LABEL_BG      = 'hsl(var(--background))'
 
 export default function AtomicDiagram() {
   const { t } = useTranslation('ui')
+  const [orbitAngle, setOrbitAngle] = useState<number>(0)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      const elapsed = now - start
+      setOrbitAngle(((elapsed % ORBIT_PERIOD_MS) / ORBIT_PERIOD_MS) * 2 * Math.PI)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 560
@@ -241,9 +275,9 @@ export default function AtomicDiagram() {
         </g>
         {/* Nucleus */}
         {renderNucleus(leftX, atomY)}
-        {/* 3 electrons on orbit */}
+        {/* 3 electrons on orbit — rotating around the nucleus */}
         {electronAngles.map((a, i) =>
-          renderElectron(electronAt(leftX, atomY, a), `L-${i}`),
+          renderElectron(electronAt(leftX, atomY, a + orbitAngle), `L-${i}`),
         )}
 
         {/* Panel 1 summary */}
@@ -280,9 +314,11 @@ export default function AtomicDiagram() {
         {/* Nucleus (same as neutral) */}
         {renderNucleus(rightX, atomY)}
         {/* Only 2 electrons on orbit — skip angles[2] (upper-right),
-            which is the one escaping. Remaining: bottom + upper-left. */}
+            which is the one escaping. Remaining: bottom + upper-left.
+            Rotating at the same angular speed as the left panel so
+            both atoms look like the same element. */}
         {electronAngles.slice(0, 2).map((a, i) =>
-          renderElectron(electronAt(rightX, atomY, a), `R-${i}`),
+          renderElectron(electronAt(rightX, atomY, a + orbitAngle), `R-${i}`),
         )}
         {/* Escape arrow */}
         <g style={{ color: svgTokens.note }} opacity={0.85}>

@@ -28,8 +28,8 @@ const CHAPTER_COMPONENTS: Record<string, React.LazyExoticComponent<() => React.J
 
 // ─── Adjacent chapter nav ─────────────────────────────────────────────────────
 
-const chapterNavLinkClass =
-  'group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors'
+const chapterNavLinkBaseClass =
+  'group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors max-w-full'
 
 function ChapterNavLink({
   to,
@@ -42,17 +42,25 @@ function ChapterNavLink({
 }) {
   const { t } = useTranslation('ui')
   const label = edge === 'prev' ? t('chapter.previous') : t('chapter.next')
+  // Mobile: the ChapterNav container stacks vertically, so each link
+  // anchors to its natural edge (prev left, next right) instead of
+  // both hugging the start. sm:self-auto hands alignment back to the
+  // desktop flex-row. Prev text is left-aligned on mobile (chevron
+  // sits to its left, text flows outward), right-aligned on desktop
+  // where the link hugs the right edge of its half.
+  const alignClass = edge === 'prev' ? 'self-start sm:self-auto' : 'self-end sm:self-auto'
+  const textAlignClass = edge === 'prev' ? 'text-left sm:text-right' : 'text-right'
 
   return (
-    <Link to={to} className={chapterNavLinkClass}>
-      {edge === 'prev' && <ChevronLeft className="w-4 h-4" aria-hidden />}
-      <div className={edge === 'prev' ? 'text-right' : ''}>
-        <div className={edge === 'next' ? 'text-xs text-muted-foreground/70 text-right' : 'text-xs text-muted-foreground/70'}>
+    <Link to={to} className={`${chapterNavLinkBaseClass} ${alignClass}`}>
+      {edge === 'prev' && <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden />}
+      <div className={`min-w-0 ${textAlignClass}`}>
+        <div className="text-xs text-muted-foreground/70">
           {label}
         </div>
         <div className="group-hover:text-foreground transition-colors">{chapterTitle}</div>
       </div>
-      {edge === 'next' && <ChevronRight className="w-4 h-4" aria-hidden />}
+      {edge === 'next' && <ChevronRight className="w-4 h-4 shrink-0" aria-hidden />}
     </Link>
   )
 }
@@ -64,17 +72,17 @@ function ChapterNav({ currentId }: { currentId: string }) {
   const nextTitle = next ? t(`chapterTitles.${next.id}`, { defaultValue: next.title }) : ''
 
   return (
-    <div className="flex items-center justify-between pt-10 mt-10 border-t border-border">
+    <div className="flex flex-col gap-4 pt-10 mt-10 border-t border-border sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       {prev ? (
         <ChapterNavLink to={`/chapter/${prev.id}`} edge="prev" chapterTitle={prevTitle} />
       ) : (
-        <div />
+        <div className="hidden sm:block" />
       )}
 
       {next && next.status !== 'coming-soon' ? (
         <ChapterNavLink to={`/chapter/${next.id}`} edge="next" chapterTitle={nextTitle} />
       ) : (
-        <div />
+        <div className="hidden sm:block" />
       )}
     </div>
   )

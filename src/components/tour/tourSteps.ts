@@ -32,6 +32,12 @@ function tourBookmarkLabel() {
   return i18n.t('tour.bookmarkDemoLabel', { ns: 'ui' })
 }
 
+// Mobile-aware sidebar toggles — on desktop the panel never covers
+// content, so close-sidebar is a no-op there; on mobile it dismisses
+// the drawer so header/content spotlights aren't hidden behind it.
+const openSidebar = () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar'))
+const closeSidebar = () => window.dispatchEvent(new CustomEvent('radiopedia:close-sidebar'))
+
 export const TOUR_STEPS: TourStepDef[] = [
   {
     target: '[data-tour="sidebar"]',
@@ -39,7 +45,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step1Body',
     placement: 'right',
     padding: 0,
-    onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),
+    onEnter: openSidebar,
   },
   {
     target: '[data-tour="search"]',
@@ -47,6 +53,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step2Body',
     placement: 'bottom',
     padding: 6,
+    onEnter: closeSidebar,
   },
   {
     target: '[data-tour="theme"]',
@@ -54,6 +61,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step3Body',
     placement: 'bottom',
     padding: 6,
+    onEnter: closeSidebar,
   },
   {
     target: '[data-tour="glossary-term"]',
@@ -61,6 +69,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step4Body',
     placement: 'top',
     padding: 8,
+    onEnter: closeSidebar,
   },
   {
     target: '[data-tour="bookmark-demo"]',
@@ -70,7 +79,10 @@ export const TOUR_STEPS: TourStepDef[] = [
     padding: 8,
     onEnter: () => {
       addBookmarkImperative(TOUR_BOOKMARK.chapterId, TOUR_BOOKMARK.sectionId, tourBookmarkLabel())
-      window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar'))
+      // Target is in main content — close the drawer on mobile so the
+      // bookmark icon isn't hidden behind the open sidebar. The next
+      // step will re-open the sidebar to show the bookmark landed.
+      closeSidebar()
     },
   },
   {
@@ -79,7 +91,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step6Body',
     placement: 'right',
     padding: 0,
-    onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),
+    onEnter: openSidebar,
     onExit: () => {
       removeBookmarkImperative(TOUR_BOOKMARK.chapterId, TOUR_BOOKMARK.sectionId)
     },
@@ -90,7 +102,7 @@ export const TOUR_STEPS: TourStepDef[] = [
     bodyKey: 'tour.step7Body',
     placement: 'right',
     padding: 8,
-    onEnter: () => window.dispatchEvent(new CustomEvent('radiopedia:open-sidebar')),
+    onEnter: openSidebar,
   },
 ]
 

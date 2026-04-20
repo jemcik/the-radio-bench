@@ -129,7 +129,7 @@ export default function SineOriginDiagram() {
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
         aria-label={t('ch1_3.sineOrigin.ariaLabel')}
-        style={{ display: 'block', margin: '0 auto' }}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
       >
         {/* ─── LEFT: CIRCLE ─────────────────────────────────────── */}
         <circle

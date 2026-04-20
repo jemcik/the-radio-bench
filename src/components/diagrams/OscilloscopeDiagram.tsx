@@ -11,17 +11,49 @@
  * (near-black phosphor, bright green trace). Using the page tokens would
  * make the scope shapeshift with hue between paper/stone/nordic, which
  * isn't what any physical scope does.
+ *
+ * ANIMATION — the trace scrolls slowly leftward at one full period per
+ * 4 s. A stationary square-wave on a scope screen gives the reader no
+ * visual cue that the horizontal axis is time; motion does that job for
+ * free. The pace is slow enough to read the waveform clearly. The wave
+ * path is extended by two full periods on each side so nothing empty
+ * enters the screen as the wave scrolls — the clipPath at the screen
+ * bezel hides the overhang. Respects `prefers-reduced-motion`: the
+ * scroll offset freezes at 0, recovering the previous static look.
  */
+import { useEffect, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { useTheme } from '@/context/ThemeContext'
 import { THEMES } from '@/lib/themes'
 
+const SCROLL_PERIOD_MS = 4000
+
 export default function OscilloscopeDiagram() {
   const { t } = useTranslation('ui')
   const { theme } = useTheme()
   const isDark = THEMES.find(th => th.id === theme)?.isDark ?? false
+  const [scrollPhase, setScrollPhase] = useState<number>(0)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      setScrollPhase(((now - start) % SCROLL_PERIOD_MS) / SCROLL_PERIOD_MS)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   // Two hand-tuned palettes. Opacity is bundled with each colour because
   // the light/dark contrast budgets differ — e.g. a slightly denser grid
@@ -81,24 +113,30 @@ export default function OscilloscopeDiagram() {
   const yLow  = midY + ampDivs * cellH
   const xStart = scrX + cellW * 0.5
 
-  // Build square wave path — 5 full cycles × 2 div each = 10 div = full screen.
+  // Build square wave path — extended by 2 full cycles before xStart
+  // and 2 after the visible screen, so when the wave scrolls leftward
+  // by up to one full period the screen never reveals empty space.
+  // Total: 9 cycles × 2 div = 18 div of drawing, clipped to 10 div
+  // screen.
   const buildWave = () => {
-    let d = ''
-    let x = xStart
-    const cycles = 5
+    const periodWidth = periodDivs * cellW
+    const preCycles = 2
+    const cycles = 5 + preCycles + 2 // 2 before screen + 5 on-screen + 2 after
     const halfPer = (periodDivs / 2) * cellW
+    let x = xStart - preCycles * periodWidth
     let high = true
-    d += `M ${x} ${yHigh}`
+    let d = `M ${x} ${yHigh}`
     for (let i = 0; i < cycles * 2; i++) {
       d += ` H ${x + halfPer}`
       d += ` V ${high ? yLow : yHigh}`
       x += halfPer
       high = !high
     }
-    // clip to screen edge
-    d += ` H ${scrX + scrW - 2}`
+    d += ` H ${x}`
     return d
   }
+
+  const scrollOffsetX = scrollPhase * periodDivs * cellW
 
   const nowrap = <span style={{ whiteSpace: 'nowrap' }} />
   const caption = (
@@ -159,15 +197,23 @@ export default function OscilloscopeDiagram() {
               stroke={c.tick} strokeWidth="1" />
           ))}
 
-          {/* Waveform */}
+          {/* Waveform — the outer <g> holds the clipPath in the SVG's
+              unmoved coordinate system; the inner <g> applies the
+              scroll transform to the path alone. Nesting matters:
+              putting clipPath and transform on the same element makes
+              the clip region move with the wave, which is exactly what
+              we don't want (the screen bezel stays put). */}
           <clipPath id="screenClip">
             <rect x={scrX} y={scrY} width={scrW} height={scrH} />
           </clipPath>
-          <path d={buildWave()}
-            fill="none"
-            stroke={c.trace}
-            strokeWidth="2"
-            clipPath="url(#screenClip)" />
+          <g clipPath="url(#screenClip)">
+            <g transform={`translate(${-scrollOffsetX} 0)`}>
+              <path d={buildWave()}
+                fill="none"
+                stroke={c.trace}
+                strokeWidth="2" />
+            </g>
+          </g>
 
           {/* 0V reference label */}
           <text x={scrX + 4} y={midY - 4} fontSize="11"

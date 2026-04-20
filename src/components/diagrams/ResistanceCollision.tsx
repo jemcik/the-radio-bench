@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
@@ -16,6 +16,24 @@ import { RoughPaths, roughLine, roughLinearPath } from '@/lib/rough'
  * arcs and a radiating heat glyph to convey "that energy is now
  * heat".
  *
+ * ANIMATION — one full collision plays on a ~4 s loop. The key
+ * pedagogical cue is the SPEED CONTRAST between approach and rebound:
+ *   approach (0–20 %, ~800 ms for ~180 px ≈ 228 px/s — fast) →
+ *   impact   (20–28 %, ion pulses briefly) →
+ *   rebound  (28–92 %, ~2560 ms for ~180 px ≈ 70 px/s — slow) →
+ *   reset pause (92–100 %).
+ * That 3:1 speed ratio caricatures the "electron just donated a
+ * large fraction of its kinetic energy to the ion and left slower"
+ * claim — physically a 90 % KE loss corresponds to √0.1 ≈ 0.32×
+ * speed. An equal-duration approach/rebound gave no visible slowdown
+ * and the whole teaching point was lost.
+ * The static trajectory arrows remain drawn as context; the moving
+ * electron dot traces that path. Ion scales up slightly during
+ * impact to sell "kinetic energy just arrived here" before settling.
+ *
+ * Respects `prefers-reduced-motion`: freezes mid-approach so the
+ * diagram still reads as "an electron is about to hit the ion".
+ *
  * Every stroke uses Rough.js for the chapter's hand-sketched style;
  * ion core and electrons stay as clean SVG circles so the symbols
  * read cleanly at small sizes.
@@ -24,6 +42,14 @@ import { RoughPaths, roughLine, roughLinearPath } from '@/lib/rough'
  * at fontSize 13–14 land at 13–14 on screen (well above the 11 px
  * floor).
  */
+
+const CYCLE_MS = 4000
+const STATIC_PHASE = 0.12 // snapshot used under prefers-reduced-motion
+// Phase boundaries — kept in one block so the ion-pulse window and
+// the moving-electron logic can't drift out of sync.
+const APPROACH_END = 0.20
+const IMPACT_END = 0.28
+const REBOUND_END = 0.92
 
 type Pt = [number, number]
 
@@ -61,6 +87,26 @@ function shortened(from: Pt, to: Pt, dist: number): Pt {
 
 export default function ResistanceCollision() {
   const { t } = useTranslation('ui')
+  const [phase, setPhase] = useState<number>(STATIC_PHASE)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      setPhase(((now - start) % CYCLE_MS) / CYCLE_MS)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 500
@@ -158,47 +204,90 @@ export default function ResistanceCollision() {
           <RoughPaths paths={sketch.incoming} />
           <RoughPaths paths={sketch.incomingHead} />
         </g>
-        {/* Incoming electron dot at the start */}
-        <circle
-          cx={inStart[0]} cy={inStart[1]} r={5}
-          fill="hsl(var(--callout-note))"
-        />
 
-        {/* Ion core + vibration arcs + heat rays */}
-        <g style={{ color: svgTokens.caution }} opacity={0.7}>
-          {sketch.vibrations.map((v, i) => (
-            <RoughPaths key={`vib-${i}`} paths={v} />
-          ))}
-        </g>
-        <g style={{ color: svgTokens.caution }}>
-          {sketch.heatRays.map((r, i) => (
-            <RoughPaths key={`ray-${i}`} paths={r} />
-          ))}
-        </g>
-        <circle
-          cx={ionCx} cy={ionCy} r={ionR}
-          fill="hsl(var(--callout-caution) / 0.85)"
-        />
-        <text
-          x={ionCx} y={ionCy + 6}
-          textAnchor="middle"
-          fontSize={20}
-          fontWeight={700}
-          fill="hsl(var(--background))"
-        >+</text>
+        {/* Ion core + vibration arcs + heat rays.
+            During the impact window (40–48 % of cycle) the ion
+            scale nudges up to ~1.18× and the vibration/heat group
+            fades in extra opacity — "energy just arrived". */}
+        {(() => {
+          const inImpact = phase >= APPROACH_END && phase <= IMPACT_END
+          // 0 outside the window, 1 at centre, linear ramp
+          const impactIntensity = inImpact
+            ? 1 - Math.abs((phase - (APPROACH_END + IMPACT_END) / 2)) / ((IMPACT_END - APPROACH_END) / 2)
+            : 0
+          const ionScale = 1 + 0.18 * impactIntensity
+          const heatBoost = 0.3 + 0.7 * impactIntensity
+          return (
+            <>
+              <g
+                style={{ color: svgTokens.caution, opacity: 0.5 + 0.4 * impactIntensity }}
+              >
+                {sketch.vibrations.map((v, i) => (
+                  <RoughPaths key={`vib-${i}`} paths={v} />
+                ))}
+              </g>
+              <g style={{ color: svgTokens.caution, opacity: heatBoost }}>
+                {sketch.heatRays.map((r, i) => (
+                  <RoughPaths key={`ray-${i}`} paths={r} />
+                ))}
+              </g>
+              <g transform={`translate(${ionCx} ${ionCy}) scale(${ionScale}) translate(${-ionCx} ${-ionCy})`}>
+                <circle
+                  cx={ionCx} cy={ionCy} r={ionR}
+                  fill="hsl(var(--callout-caution) / 0.85)"
+                />
+                <text
+                  x={ionCx} y={ionCy + 6}
+                  textAnchor="middle"
+                  fontSize={20}
+                  fontWeight={700}
+                  fill="hsl(var(--background))"
+                >+</text>
+              </g>
+            </>
+          )
+        })()}
 
         {/* Outgoing electron trajectory */}
         <g style={{ color: svgTokens.note }}>
           <RoughPaths paths={sketch.outgoing} />
           <RoughPaths paths={sketch.outgoingHead} />
         </g>
-        {/* Outgoing electron dot at the end — slightly smaller to
-            hint at the lost energy ("slower") */}
-        <circle
-          cx={outEnd[0]} cy={outEnd[1]} r={4.5}
-          fill="hsl(var(--callout-note))"
-          opacity={0.85}
-        />
+
+        {/* Moving electron — one particle cycling through the full
+            collision: approach (0–40 %), hidden during impact
+            (40–48 %, energy is "on the ion"), rebound (48–88 %),
+            reset pause (88–100 %). */}
+        {(() => {
+          if (phase < APPROACH_END) {
+            const f = phase / APPROACH_END
+            const ex = inStart[0] + f * (inEnd[0] - inStart[0])
+            const ey = inStart[1] + f * (inEnd[1] - inStart[1])
+            return (
+              <circle
+                cx={ex} cy={ey} r={5}
+                fill="hsl(var(--callout-note))"
+              />
+            )
+          }
+          if (phase < IMPACT_END) {
+            // Electron absorbed at ion — not rendered.
+            return null
+          }
+          if (phase < REBOUND_END) {
+            const f = (phase - IMPACT_END) / (REBOUND_END - IMPACT_END)
+            const ex = outStart[0] + f * (outEnd[0] - outStart[0])
+            const ey = outStart[1] + f * (outEnd[1] - outStart[1])
+            return (
+              <circle
+                cx={ex} cy={ey} r={4.5}
+                fill="hsl(var(--callout-note))"
+                opacity={0.85}
+              />
+            )
+          }
+          return null
+        })()}
 
         {/* ── Labels ─────────────────────────────────────────── */}
         {/* Incoming electron */}

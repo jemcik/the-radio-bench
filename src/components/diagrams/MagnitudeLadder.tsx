@@ -41,12 +41,16 @@ import { RoughPaths, roughLine, roughLinearPath, roughRect } from '@/lib/rough'
  *     ]}
  *   />
  *
- * Sizing: strict 1:1 — the `<svg>` element is rendered at fixed pixel
- * dimensions equal to the viewBox, with NO `width="100%"`, NO
- * `maxWidth`, and NO `overflow-x-auto` wrapper. fontSize values in
- * the viewBox render as the pixel sizes on screen in every viewport.
- * This is why we use a bare `<svg>` here instead of the `SVGDiagram`
- * wrapper — the wrapper hardcodes `width="100%"`, which scales.
+ * Sizing: fixed width at the viewBox size on desktop, scales DOWN on
+ * narrow viewports via `maxWidth: '100%'` + `height: 'auto'`.
+ * fontSize values therefore equal on-screen pixels wherever the
+ * viewport is wider than the viewBox (almost all desktops), and
+ * shrink proportionally on mobile — accepting smaller fonts is
+ * preferable to the diagram clipping off half the content. The SVG
+ * never *upscales* past the viewBox size, so fonts are never larger
+ * than designed. (We still use a bare `<svg>` rather than the
+ * `SVGDiagram` wrapper because the wrapper's `width="100%"` would
+ * force upscaling on wide containers.)
  *
  * Description column uses `<foreignObject>` with HTML/CSS so long
  * descriptions wrap to a second line rather than clipping at the right
@@ -189,7 +193,7 @@ export default function MagnitudeLadder({
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={ariaLabel}
-        style={{ display: 'block', margin: '0 auto' }}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
       >
           <defs>
             <clipPath id={clipId}>
