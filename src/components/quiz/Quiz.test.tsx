@@ -35,8 +35,10 @@ function setup(opts: { storageKey?: string } = {}) {
 
 describe('buildQuizFromI18n', () => {
   it('builds N questions from prefix and count', () => {
-    // Fake TFunction that echoes the key so the shape is observable.
-    const t = ((key: string) => key) as unknown as Parameters<typeof buildQuizFromI18n>[0]
+    // Fake TFunction that echoes the key (returning '0' for `_correct` so the
+    // dev-time correctIndex validator stays quiet — see the validator below).
+    const t = ((key: string) =>
+      key.endsWith('_correct') ? '0' : key) as unknown as Parameters<typeof buildQuizFromI18n>[0]
     const result = buildQuizFromI18n(t, 'foo', 2)
 
     expect(result).toHaveLength(2)
