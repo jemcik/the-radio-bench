@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
@@ -19,6 +19,19 @@ import {
  * bias that, averaged over many carriers, amounts to a drift of
  * ~0.1 mm/s — many orders of magnitude slower than the thermal zigzag.
  *
+ * ANIMATION — the payoff this diagram exists for. Two dots animate
+ * simultaneously at deliberately different speeds:
+ *   • Thermal dot zips along the full zigzag path in ~0.8 s
+ *   • Drift dot creeps along the horizontal arrow in ~12 s
+ * The 15:1 ratio sells the "many orders of magnitude slower" claim
+ * by *feel* rather than asking the reader to trust a number. The
+ * zigzag path itself remains drawn statically as the trajectory trace
+ * the thermal dot leaves behind.
+ *
+ * Respects `prefers-reduced-motion`: snapshots both dots at an
+ * illustrative position (roughly one-third along each path) and
+ * skips the rAF loop.
+ *
  * LAYOUT RULES (consistent for both sub-visuals):
  *   label-block (title + subtitle, stacked) → visual below.
  *   Both label blocks are left-aligned at the same x so the two
@@ -30,8 +43,32 @@ import {
  * CSS scaling. Every fontSize in source is the fontSize on screen.
  * Primary labels at 15; sub-labels at 13 (the project's floor).
  */
+
+const THERMAL_PERIOD_MS = 800
+const DRIFT_PERIOD_MS = 12000
+const STATIC_PHASE = 0.35 // snapshot used under prefers-reduced-motion
 export default function DriftVelocitySketch() {
   const { t } = useTranslation('ui')
+  const [ts, setTs] = useState<number>(STATIC_PHASE * DRIFT_PERIOD_MS)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    let raf = 0
+    let start: number | null = null
+    const tick = (now: number) => {
+      if (start === null) start = now
+      setTs(now - start)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 620
@@ -168,17 +205,35 @@ export default function DriftVelocitySketch() {
           )}
         </g>
 
-        {/* Electron zigzag */}
-        <g style={{ color: svgTokens.note }}>
+        {/* Electron zigzag — the trajectory trace the moving dot leaves
+            behind. Opacity pulled back so the animated head reads as
+            the "live" electron while the path serves as context. */}
+        <g style={{ color: svgTokens.note, opacity: 0.45 }}>
           <RoughPaths paths={sketch.path} />
         </g>
-        {/* Electron head — dot at the end of the path */}
-        <circle
-          cx={zigzag[zigzag.length - 1][0]}
-          cy={zigzag[zigzag.length - 1][1]}
-          r={4}
-          fill="hsl(var(--callout-note))"
-        />
+        {/* Thermal electron head — animated along the zigzag path.
+            ~0.8 s per full traversal, looping. Linear interpolation
+            between consecutive waypoints; position wraps from tail
+            back to head. */}
+        {(() => {
+          const phase = ((ts % THERMAL_PERIOD_MS) / THERMAL_PERIOD_MS) // 0..1
+          const segs = zigzag.length - 1
+          const pos = phase * segs
+          const i = Math.min(segs - 1, Math.floor(pos))
+          const f = pos - i
+          const [x0, y0] = zigzag[i]
+          const [x1, y1] = zigzag[i + 1]
+          const ex = x0 + f * (x1 - x0)
+          const ey = y0 + f * (y1 - y0)
+          return (
+            <circle
+              cx={ex}
+              cy={ey}
+              r={4}
+              fill="hsl(var(--callout-note))"
+            />
+          )
+        })()}
 
         {/* ═══ Drift section ═══════════════════════════════════ */}
         <text
@@ -200,6 +255,28 @@ export default function DriftVelocitySketch() {
           <RoughPaths paths={sketch.driftShaft} />
           <RoughPaths paths={sketch.driftHead} />
         </g>
+        {/* Drift electron — creeps slowly along the arrow with a tiny
+            sinusoidal wobble to suggest local thermal bouncing overlaid
+            on the net rightward drift. ~12 s to traverse the full wire
+            width vs the thermal dot's ~0.8 s zigzag — the 15:1 visible
+            speed ratio is the pedagogical payoff. */}
+        {(() => {
+          const driftStartX = wireL + 10
+          const driftEndX = wireR - 26
+          const phase = ((ts % DRIFT_PERIOD_MS) / DRIFT_PERIOD_MS) // 0..1
+          const ex = driftStartX + phase * (driftEndX - driftStartX)
+          // Small vertical wobble — 3 wobbles per second to hint at
+          // "local bouncing while drifting slowly".
+          const ey = arrowY + 3 * Math.sin(ts * 0.02)
+          return (
+            <circle
+              cx={ex}
+              cy={ey}
+              r={4}
+              fill="hsl(var(--callout-caution))"
+            />
+          )
+        })()}
       </SVGDiagram>
     </DiagramFigure>
   )
