@@ -78,7 +78,18 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     currentStep.onEnter?.()
 
     const t = setTimeout(() => {
-      const el = document.querySelector(currentStep.target)
+      // Match TourOverlay.measure: Sidebar renders twice (desktop +
+      // mobile copies) so `querySelector` may pick a hidden copy with
+      // a (0,0,0,0) rect. Iterate and pick the first visible match.
+      const els = document.querySelectorAll(currentStep.target)
+      let el: Element | null = null
+      for (const candidate of els) {
+        const r = candidate.getBoundingClientRect()
+        if (r.width > 0 && r.height > 0) {
+          el = candidate
+          break
+        }
+      }
 
       if (!el) {
         // Target doesn't exist — skip to next (with loop guard)
@@ -133,6 +144,9 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     steps[step]?.onExit?.()
     tourPersistence.saveStep(step)
     setPhase('done')
+    // Ensure the mobile drawer doesn't stay open after the tour —
+    // the last-visited step may have opened it. Desktop ignores this.
+    window.dispatchEvent(new Event('radiopedia:close-sidebar'))
     window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
 
@@ -141,6 +155,7 @@ export default function GuidedTour({ children }: { children: React.ReactNode }) 
     steps[step]?.onExit?.()
     tourPersistence.markCompleted()
     setPhase('done')
+    window.dispatchEvent(new Event('radiopedia:close-sidebar'))
     window.dispatchEvent(new Event('radiopedia:scroll-top'))
   }, [step, steps])
 

@@ -223,7 +223,7 @@ export default function SineExplorer() {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           role="img"
           aria-label={t('ch1_3.widget.sineExplorer.ariaLabel')}
-          style={{ display: 'block', margin: '0 auto' }}
+          style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
         >
           <defs>
             {/* Clip extends 3 px beyond the data rect on all sides so

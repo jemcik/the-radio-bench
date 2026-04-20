@@ -155,14 +155,16 @@ export default function WaveformGallery() {
 
   return (
     <figure className="my-6 not-prose">
-      <div
-        className="grid gap-3"
-        style={{ gridTemplateColumns: `repeat(3, ${TILE_W + 16}px)`, justifyContent: 'center' }}
-      >
+      {/* Stacks to a single column below sm — three 176-px tiles side
+          by side add up to ~552 px, which overflows any phone. At sm
+          and above we flip to a 3-column grid centred in the available
+          width. Each tile is capped at its natural width so on mobile
+          it doesn't stretch wider than the SVG's designed viewBox. */}
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 sm:justify-center">
         {tiles.map((tile) => (
           <div
             key={tile.key}
-            className="rounded-lg border border-border bg-card/60 p-2"
+            className="rounded-lg border border-border bg-card/60 p-2 w-full max-w-[176px] mx-auto"
           >
             <h4 className="mb-1 text-center text-sm font-semibold text-foreground">
               {t(`ch1_3.waveformGallery.${tile.key}Title`)}
@@ -173,7 +175,7 @@ export default function WaveformGallery() {
               viewBox={`0 0 ${TILE_W} ${TILE_H}`}
               role="img"
               aria-label={t(`ch1_3.waveformGallery.${tile.key}Aria`)}
-              style={{ display: 'block', margin: '0 auto' }}
+              style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
             >
               {/* Zero line */}
               <line

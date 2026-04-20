@@ -47,14 +47,15 @@ const V_MAX_V = 12
 
 /* ── Plot geometry ───────────────────────────────────────────────────
  *
- * HARD RULE: no scaling. The SVG is rendered at fixed pixel width and
- * height — the same numbers as the viewBox. `width="100%"` is banned
- * because the chapter container is `max-w-5xl` (1024 px), so a
- * percentage width would inflate every fontSize by the container/
- * viewBox ratio. Fixed dimensions mean fontSize values land on screen
- * exactly as written, in light and dark themes, on any viewport.
- * On narrower viewports the container can scroll horizontally rather
- * than shrink the diagram (which would also re-introduce scaling).
+ * Sizing: fixed pixel dimensions equal to the viewBox on wide
+ * containers, scales DOWN proportionally on narrow containers via
+ * `maxWidth: '100%'` + `height: 'auto'`. No `width="100%"` — that
+ * would upscale on wide containers and inflate every fontSize. On
+ * desktop the plot renders at exactly VB_W × VB_H, so fontSize
+ * values land on screen as written; on mobile the SVG shrinks to
+ * the available width, with fonts scaling alongside. Accepting
+ * smaller mobile fonts is preferable to the plot clipping off its
+ * right edge (the I axis past ~30 mA was hidden without this).
  */
 const VB_W = 520
 const VB_H = 220
@@ -163,7 +164,7 @@ export default function OhmsLawPlot() {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           role="img"
           aria-label={t('ch1_2.widget.ohmPlot.ariaLabel')}
-          style={{ display: 'block', margin: '0 auto' }}
+          style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
         >
           <defs>
             {/* Clip extends 3 px outside the data rect in every

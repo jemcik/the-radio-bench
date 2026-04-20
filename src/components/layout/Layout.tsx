@@ -44,8 +44,21 @@ export default function Layout() {
     mainRef.current?.scrollTo(0, 0)
   }, [location.pathname])
 
-  // Tour can request the sidebar open / scroll content to top
-  useEventListener('radiopedia:open-sidebar', () => setDesktopOpen(true))
+  // Tour can request the sidebar open / scroll content to top. On
+  // mobile the sidebar is a drawer controlled by `mobileOpen`, not the
+  // desktop-panel flag — dispatch to the right state so the tour works
+  // at every viewport.
+  useEventListener('radiopedia:open-sidebar', () => {
+    if (isDesktop) setDesktopOpen(true)
+    else setMobileOpen(true)
+  })
+  // Counterpart to open-sidebar: tour steps that target the header or
+  // main content fire this to dismiss the mobile drawer so it doesn't
+  // cover the spotlight. Desktop panel is left alone — it never covers
+  // content, so there's nothing to hide.
+  useEventListener('radiopedia:close-sidebar', () => {
+    if (!isDesktop) setMobileOpen(false)
+  })
   useEventListener('radiopedia:scroll-top', () => mainRef.current?.scrollTo(0, 0))
 
   // When a bookmark is added while the sidebar is closed, show a toast and
@@ -109,8 +122,8 @@ export default function Layout() {
           >
             <LogoIcon size={32} />
             <div className="min-w-0 text-left">
-              <div className="text-base font-bold text-foreground leading-tight">{t('site.title')}</div>
-              <div className="text-xs text-muted-foreground leading-tight hidden sm:block">{t('site.subtitle')}</div>
+              <div className="text-base font-bold text-foreground leading-tight truncate">{t('site.title')}</div>
+              <div className="text-xs text-muted-foreground leading-tight truncate hidden sm:block">{t('site.subtitle')}</div>
             </div>
           </button>
 
@@ -164,26 +177,41 @@ export default function Layout() {
             </div>
           </div>
 
-          {/* ── Mobile sidebar — CSS transform, no Radix portal ── */}
+          {/* ── Mobile sidebar — CSS transform, no Radix portal ── *
+               Both the backdrop and the drawer start BELOW the 56-px
+               header so the hamburger stays visible (and tappable as a
+               close affordance) whenever the drawer is open. Without
+               this, z-50 drawer covered the z-30 header and the user
+               had no way to close the drawer except tapping the sliver
+               of backdrop on the right. */}
           {/* Backdrop */}
           <div
             aria-hidden="true"
             className={cn(
-              'fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden',
+              'fixed top-[56px] inset-x-0 bottom-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden',
               'transition-opacity duration-300',
               mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
             )}
             onClick={() => setMobileOpen(false)}
           />
-          {/* Slide-in panel */}
+          {/* Slide-in panel — carries the same `data-tour="sidebar"`
+              attribute as the desktop wrapper so guided-tour steps
+              targeting the sidebar find a visible match on mobile.
+              TourOverlay picks the first element with a non-zero
+              bounding rect, so the desktop/mobile copies don't
+              interfere with each other. */}
           <div
+            data-tour="sidebar"
             className={cn(
-              'fixed inset-y-0 left-0 z-50 w-80 overflow-hidden lg:hidden',
+              'fixed top-[56px] bottom-0 left-0 z-50 w-80 overflow-hidden lg:hidden',
               'transition-transform duration-300 ease-in-out',
               mobileOpen ? 'translate-x-0' : '-translate-x-full'
             )}
           >
-            <Sidebar onNavigation={() => setMobileOpen(false)} />
+            <Sidebar
+              onNavigation={() => setMobileOpen(false)}
+              onClose={() => setMobileOpen(false)}
+            />
           </div>
 
           {/* Page content */}

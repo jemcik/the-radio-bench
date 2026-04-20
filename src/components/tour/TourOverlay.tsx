@@ -31,25 +31,44 @@ export default function TourOverlay({ step, current, total, onNext, onSkip, onDi
   const [rect, setRect] = useState<Rect | null>(null)
   const isLast = current === total - 1
 
-  // Measure target element
+  // Measure target element.
+  // The Sidebar component is rendered TWICE — once for desktop
+  // (display:none on mobile) and once for mobile (display:none on
+  // desktop). Elements inside it (`data-tour="feedback"`,
+  // `data-tour="bookmark-remove"`, etc.) therefore appear twice in
+  // the DOM. A bare `querySelector` grabs the first match, which on
+  // mobile is the hidden desktop copy — its bounding rect is
+  // (0,0,0,0) and the spotlight lands at the top-left corner of the
+  // viewport. Iterate through every match and pick the first one
+  // that actually has a non-zero box on screen.
   const measure = useCallback(() => {
-    const el = document.querySelector(step.target)
-    if (!el) return
-    const r = el.getBoundingClientRect()
+    const els = document.querySelectorAll(step.target)
+    let chosen: DOMRect | null = null
+    for (const candidate of els) {
+      const r = candidate.getBoundingClientRect()
+      if (r.width > 0 && r.height > 0) {
+        chosen = r
+        break
+      }
+    }
+    if (!chosen) return
     const pad = step.padding ?? 4
     setRect({
-      top: r.top - pad,
-      left: r.left - pad,
-      width: r.width + pad * 2,
-      height: r.height + pad * 2,
+      top: chosen.top - pad,
+      left: chosen.left - pad,
+      width: chosen.width + pad * 2,
+      height: chosen.height + pad * 2,
     })
   }, [step.target, step.padding])
 
   // Reset rect when step changes so the card doesn't animate from the old position.
   // Defer clearing to avoid synchronous setState in the effect body (react-hooks/set-state-in-effect).
+  // 350 ms > the 300 ms mobile drawer slide-in, so we measure AFTER
+  // the target element has settled at its final position; otherwise
+  // step 1 spotlights a still-sliding drawer with a negative `left`.
   useEffect(() => {
     queueMicrotask(() => setRect(null))
-    const t = setTimeout(measure, 250)
+    const t = setTimeout(measure, 350)
     return () => clearTimeout(t)
   }, [step, measure])
 
@@ -204,6 +223,17 @@ function computeCardStyle(
   const gap = 16
   const vw = window.innerWidth
   const vh = window.innerHeight
+
+  // On narrow viewports, declared 'right' / 'left' placements are
+  // nearly always wrong: the mobile sidebar is 320 px of a ~375 px
+  // screen, so there is no "right of the sidebar" to place a 320-px
+  // card. Replace with a top/bottom placement based on where the
+  // target sits vertically. Target above the midline → card below;
+  // target below the midline → card above.
+  if (vw < 640 && (placement === 'right' || placement === 'left')) {
+    const targetCentreY = rect.top + rect.height / 2
+    placement = targetCentreY > vh / 2 ? 'top' : 'bottom'
+  }
 
   let top = 0
   let left = 0
