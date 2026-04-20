@@ -94,16 +94,35 @@ export function buildQuizFromI18n(
 
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1
+    const options = [
+      render(`quiz_q${n}_a`),
+      render(`quiz_q${n}_b`),
+      render(`quiz_q${n}_c`),
+      render(`quiz_q${n}_d`),
+    ]
+    const rawCorrect = t(`${prefix}.quiz_q${n}_correct`)
+    const correctIndex = Number(rawCorrect)
+    // Catch the "all answers wrong" class of bug at the source: a missing or
+    // off-by-one `_correct` value silently makes every submission incorrect
+    // because `selectedOptionIndex === correctIndex` never matches. Ch 1.3
+    // shipped with all 8 values 1-indexed and only the user noticed.
+    if (
+      import.meta.env.DEV &&
+      (!Number.isInteger(correctIndex) ||
+        correctIndex < 0 ||
+        correctIndex >= options.length)
+    ) {
+      console.error(
+        `[Quiz] Invalid correctIndex for ${prefix}.quiz_q${n}_correct: ` +
+          `got ${JSON.stringify(rawCorrect)} (parsed ${correctIndex}); ` +
+          `must be an integer in [0, ${options.length}).`,
+      )
+    }
     return {
       id: `${prefix}-q${n}`,
       question: render(`quiz_q${n}`),
-      options: [
-        render(`quiz_q${n}_a`),
-        render(`quiz_q${n}_b`),
-        render(`quiz_q${n}_c`),
-        render(`quiz_q${n}_d`),
-      ],
-      correctIndex: Number(t(`${prefix}.quiz_q${n}_correct`)),
+      options,
+      correctIndex,
       explanation: render(`quiz_q${n}_explanation`),
     }
   })
