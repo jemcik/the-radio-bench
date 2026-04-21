@@ -80,7 +80,7 @@ export default function LogVsLinearDiagram() {
       {/* Title above the axis */}
       <text
         x={PAD} y={y + TITLE_DY}
-        fontSize="14" fontWeight="600" fill={fg}
+        fontSize="0.875em" fontWeight="600" fill={fg}
       >
         {title}
       </text>
@@ -114,7 +114,7 @@ export default function LogVsLinearDiagram() {
             )}
             <text
               x={x} y={labelY}
-              textAnchor="middle" fontSize="13" fontWeight="600" fill={fg}
+              textAnchor="middle" fontSize="0.812em" fontWeight="600" fill={fg}
             >
               {fmtTick(f)}
             </text>
@@ -156,7 +156,7 @@ export default function LogVsLinearDiagram() {
         {/* Footnote */}
         <text
           x={PAD} y={H - 8}
-          fontSize="11" fill={muted} fontStyle="italic"
+          fontSize="0.687em" fill={muted} fontStyle="italic"
         >
           {t('ch0_4.logVsLinearFootnote')}
         </text>

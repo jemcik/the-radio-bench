@@ -202,7 +202,7 @@ export default function RmsSelector() {
           </g>
 
           {/* Tick labels */}
-          <g fill={svgTokens.mutedFg} fontSize="13" fontFamily="ui-sans-serif, system-ui, sans-serif">
+          <g fill={svgTokens.mutedFg} fontSize="0.812em" fontFamily="ui-sans-serif, system-ui, sans-serif">
             {X_TICKS_MS.map((x) => (
               <text
                 key={`tx${x}`}
@@ -229,7 +229,7 @@ export default function RmsSelector() {
           <text
             x={PLOT_X0 + PLOT_W / 2}
             y={PLOT_Y0 + PLOT_H + 34}
-            fontSize="14"
+            fontSize="0.875em"
             fill={svgTokens.fg}
             textAnchor="middle"
           >
@@ -241,7 +241,7 @@ export default function RmsSelector() {
           <text
             x={16}
             y={PLOT_Y0 + PLOT_H / 2}
-            fontSize="14"
+            fontSize="0.875em"
             fill={svgTokens.fg}
             textAnchor="middle"
             transform={`rotate(-90 16 ${PLOT_Y0 + PLOT_H / 2})`}
@@ -280,12 +280,12 @@ export default function RmsSelector() {
               <text
                 x={labelX}
                 y={vToY(V_PEAK) + 4}
-                fontSize="14"
+                fontSize="0.875em"
                 fill={svgTokens.key}
                 fontFamily="Georgia, serif"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
-                <tspan dy="4" fontSize="10">pk</tspan>
+                <tspan dy="4" fontSize="0.625em">pk</tspan>
               </text>
             </g>
           )}
@@ -328,12 +328,12 @@ export default function RmsSelector() {
               <text
                 x={PLOT_X0 + PLOT_W + 8}
                 y={vToY(0) + 4}
-                fontSize="14"
+                fontSize="0.875em"
                 fill={svgTokens.key}
                 fontFamily="Georgia, serif"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
-                <tspan dy="4" fontSize="10">pp</tspan>
+                <tspan dy="4" fontSize="0.625em">pp</tspan>
               </text>
             </g>
           )}
@@ -352,12 +352,12 @@ export default function RmsSelector() {
               <text
                 x={labelX}
                 y={vToY(V_AVG) + 4}
-                fontSize="14"
+                fontSize="0.875em"
                 fill={svgTokens.key}
                 fontFamily="Georgia, serif"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
-                <tspan dy="4" fontSize="10">avg</tspan>
+                <tspan dy="4" fontSize="0.625em">avg</tspan>
               </text>
             </g>
           )}
@@ -376,12 +376,12 @@ export default function RmsSelector() {
               <text
                 x={labelX}
                 y={vToY(V_RMS) + 4}
-                fontSize="14"
+                fontSize="0.875em"
                 fill={svgTokens.key}
                 fontFamily="Georgia, serif"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
-                <tspan dy="4" fontSize="10">rms</tspan>
+                <tspan dy="4" fontSize="0.625em">rms</tspan>
               </text>
             </g>
           )}
@@ -423,7 +423,7 @@ export default function RmsSelector() {
         </div>
       </ResultBox>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t(`ch1_3.widget.rmsSelector.hint_${mode}`)}
       </p>
     </Widget>

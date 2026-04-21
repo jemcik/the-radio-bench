@@ -119,7 +119,7 @@ export default function ChapterFlowDiagram() {
                   x={boxX + boxW / 2}
                   y={CY - 7}
                   textAnchor="middle"
-                  fontSize="15"
+                  fontSize="0.937em"
                   fontWeight="600"
                   fontFamily="inherit"
                   fill={step.color}
@@ -131,7 +131,7 @@ export default function ChapterFlowDiagram() {
                   x={boxX + boxW / 2}
                   y={CY + 10}
                   textAnchor="middle"
-                  fontSize="12"
+                  fontSize="0.75em"
                   fontFamily="inherit"
                   fill="currentColor"
                   opacity="0.45"

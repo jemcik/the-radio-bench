@@ -100,14 +100,14 @@ export default function DbRulerDiagram() {
           <g key={r.label}>
             <text
               x={PAD_L - 28} y={r.y + 4}
-              textAnchor="end" fontSize="14" fontWeight="600" fill={fg}
+              textAnchor="end" fontSize="0.875em" fontWeight="600" fill={fg}
             >
               {r.label}
             </text>
             {r.sub && (
               <text
                 x={PAD_L - 28} y={r.y + 18}
-                textAnchor="end" fontSize="11" fill={muted}
+                textAnchor="end" fontSize="0.687em" fill={muted}
               >
                 {r.sub}
               </text>
@@ -166,25 +166,25 @@ export default function DbRulerDiagram() {
             <g key={`col-${db}`}>
               {/* dB row */}
               <text x={x} y={ROW_DB + 4}
-                textAnchor="middle" fontSize="14" fontWeight={fw}
+                textAnchor="middle" fontSize="0.875em" fontWeight={fw}
                 fontFamily="monospace" fill={colour}>
                 {sign}
               </text>
               {/* ratio row */}
               <text x={x} y={ROW_RATIO + 4}
-                textAnchor="middle" fontSize="13" fontWeight="500"
+                textAnchor="middle" fontSize="0.812em" fontWeight="500"
                 fontFamily="monospace" fill={muted}>
                 {ratioLabels[i]}
               </text>
               {/* dBm row */}
               <text x={x} y={ROW_DBM + 4}
-                textAnchor="middle" fontSize="14" fontWeight={fw}
+                textAnchor="middle" fontSize="0.875em" fontWeight={fw}
                 fontFamily="monospace" fill={colour}>
                 {sign}
               </text>
               {/* watts row */}
               <text x={x} y={ROW_WATTS + 4}
-                textAnchor="middle" fontSize="13" fontWeight="500"
+                textAnchor="middle" fontSize="0.812em" fontWeight="500"
                 fontFamily="monospace" fill={muted}>
                 {wattLabels[i]}
               </text>

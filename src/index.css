@@ -334,10 +334,16 @@
   }
 
   .prose-chapter code:not(.not-prose *) {
+    /* Inline code in chapter prose. The pill background + monospace font
+       already makes it visually distinct from body text; the text colour
+       stays `--foreground` so it does NOT collide visually with glossary
+       term underlines, which use `--term-accent` (≈ `--primary` in most
+       themes). User-flagged: «code looks like a clickable term» → fix
+       here, not in every chapter. */
     font-family: var(--font-mono, 'IBM Plex Mono', monospace);
     font-size: 0.875em;
     background: hsl(var(--muted));
-    color: hsl(var(--primary));
+    color: hsl(var(--foreground));
     padding: 0.15em 0.4em;
     border-radius: 0.3em;
   }

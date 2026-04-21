@@ -33,6 +33,21 @@ Each entry tracks: **EN term** → **UK rendering** + **grammatical gender** + n
 | current-limiting resistor | обмежувальний резистор | m | **NOT** `струмообмежувальний` — rarer and clunkier. |
 | pull-up resistor | підтягувальний резистор | m | **NEVER** `підтягуючий` — Russianism. Always `-льний`. |
 | pull-down resistor | стягувальний резистор | m | Same rule. |
+| voltage divider | подільник напруги | m | **NEVER** `дільник` — use `подільник` everywhere (glossary, chapter body, chapter subtitles). Enforced by ch1.4 pushback. |
+| tolerance (component spec) | допуск | m | `допуск` — short, canonical. `толеранс` is a calque; avoid. |
+| preferred value (E-series member) | стандартний номінал / номінал зі стандартного ряду | m | Series names stay Latin: E12, E24, E48, E96, E192. |
+| decade (10-fold interval of resistor values) | десяток | m | UA Wikipedia «Ряди номіналів радіоелементів» uses `десяток` exclusively for E-series context. **NOT** `декада` in this context. |
+| decade (frequency, Bode-plot rolloff) | порядок / декада | m | Here `декада` IS acceptable (English borrowing glossed as synonym in `decade.detail`). Do not conflate with resistor-E-series context. |
+| package / form-factor (component body) | корпус | m | Datasheet-canonical. In beginner prose (intro/preview paragraphs), prefer general paraphrase («тип резистора»); introduce the technical term in-section with context. |
+| surface-mount / SMD | SMD / поверхневий монтаж | m / m | `SMT` = technology; `SMD` = component. Both can stay Latin in UA electronics register. |
+| colour code (resistor bands) | кольоровий код / кольорове кодування | m / n | Both accepted; pick one per context. Section-heading style: `кольоровий код`. Prose-definition style: `кольорове кодування`. |
+| orange (colour name — anywhere in the course) | оранжевий | m | **Project-wide convention (user-flagged ch1.4).** UA has three equally-valid synonyms: `оранжевий` / `помаранчевий` / `жовтогарячий`. This course standardises on `оранжевий`. Do NOT introduce the other two forms in new content. Applies to resistor colour bands, diagram arrows, waveform plots, callout tones — every "orange" in every chapter. |
+| biasing (transistor DC operating point) | зміщення (datasheet register) / задавання робочої точки (pedagogical register) | n / n | `зміщення` is the canonical engineering term (every datasheet). In a BEGINNER chapter before transistors are introduced, use `задавання робочої точки` for clarity. Include both on first use if mixing registers. |
+| conductance | провідність | f | Symbol `<var>G</var>`, unit «сіменс» (См). Dual of resistance. |
+| sag (voltage-output collapse under load) | просадка / просідання | f / n | Verb: `просідати` / `просісти`. Contrast `падіння напруги` = voltage DROP across a component (IR drop), different concept. |
+| load (R_L in divider/amplifier input) | навантаження | n | Adj.: `навантажений`. Verb: `навантажувати`. |
+| Thévenin's theorem | теорема Тевенена | f | Canonical UA form (genitive `Тевенена`, not `Тевеніна`/`Тевеніна`). |
+| Horowitz & Hill (AoE attribution) | Горовіц і Гілл | — | Instrumental with `за`: `за Горовіцем і Гіллом`. Full UA name-forms; no Latin inside running prose. |
 | LED | світлодіод | m | |
 | multimeter | мультиметр | m | |
 | breadboard | макетна плата | f | Add `безпайна` when contrasting with solderable protoboard |

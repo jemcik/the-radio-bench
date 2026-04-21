@@ -6,7 +6,7 @@
  */
 
 import { type SinglePinProps, type SymbolProps, orientAngle, STROKE } from '../types'
-import { CenteredLabel, SymbolText } from '../SymbolLabel'
+import { CenteredLabel, SymbolText, LABEL_SIZE } from '../SymbolLabel'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // SINGLE-TERMINAL SYMBOLS
@@ -30,7 +30,7 @@ export function Antenna({ x, y, orient = 'up', label }: SinglePinProps) {
 
       {/* Antenna's label sits below the symbol (unique among single-pin parts) */}
       {label && (
-        <SymbolText x={x} y={y + 25} size={11} weight={600}>
+        <SymbolText x={x} y={y + 25} size={LABEL_SIZE} weight={600}>
           {label}
         </SymbolText>
       )}

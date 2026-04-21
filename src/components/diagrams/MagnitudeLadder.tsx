@@ -139,7 +139,10 @@ export default function MagnitudeLadder({
                               // for 2 lines) still fit vertically-centred
   const BOX_X = 60            // ≈ right padding too, so content is centred
   const GAP_H = 44            // vertical gap between consecutive boxes
-  const TOP_MARGIN = 54       // room for title above first box
+  const TOP_MARGIN = 18       // title is now rendered in HTML above the
+                              // SVG via DiagramFigure's `title` prop, so
+                              // the SVG itself only needs a small top
+                              // breathing-room for the first rough box.
   const BOTTOM_MARGIN = 22
 
   const H = TOP_MARGIN + sorted.length * BOX_H + (sorted.length - 1) * GAP_H + BOTTOM_MARGIN
@@ -186,14 +189,18 @@ export default function MagnitudeLadder({
   }), [sorted.length])
 
   return (
-    <DiagramFigure caption={caption}>
+    <DiagramFigure title={title} caption={caption}>
       <svg
         width={W}
         height={H}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={ariaLabel}
-        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
+        // font-size: 1rem on the SVG root makes in-SVG text that is
+        // declared in `em` units inherit the html-root size (and thus
+        // the user's font-size setting). Each `<text>` below uses an
+        // `em` value relative to this baseline.
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto', fontSize: '1rem' }}
       >
           <defs>
             <clipPath id={clipId}>
@@ -201,17 +208,6 @@ export default function MagnitudeLadder({
             </clipPath>
           </defs>
           <g clipPath={`url(#${clipId})`}>
-        {/* Title */}
-        <text
-          x={W / 2} y={28}
-          textAnchor="middle"
-          fontSize={16}
-          fontWeight={700}
-          fill={svgTokens.fg}
-        >
-          {title}
-        </text>
-
         {/* Boxes */}
         {sorted.map((item, i) => {
           const y = yForBox(i)
@@ -229,11 +225,13 @@ export default function MagnitudeLadder({
               <g style={{ color: colour.stroke }}>
                 <RoughPaths paths={sketch.boxes[i]} />
               </g>
-              {/* Value label inside box */}
+              {/* Value label inside box — em-based so it tracks the
+                  user's font-size setting via the SVG root's 1rem
+                  baseline. */}
               <text
                 x={boxCentreX} y={y + BOX_H / 2 + 6}
                 textAnchor="middle"
-                fontSize={16}
+                fontSize="1em"
                 fontWeight={700}
                 fill={colour.stroke}
               >
@@ -258,7 +256,10 @@ export default function MagnitudeLadder({
                     display: 'flex',
                     alignItems: 'center',
                     height: '100%',
-                    fontSize: '14px',
+                    // rem-based so the user's font-size setting scales
+                    // the description text along with the rest of the
+                    // page, same as prose.
+                    fontSize: '0.875rem',
                     lineHeight: 1.18,
                     color: 'hsl(var(--foreground))',
                   }}
@@ -285,7 +286,7 @@ export default function MagnitudeLadder({
               <text
                 x={boxCentreX + 14}
                 y={midY + 4}
-                fontSize={13}
+                fontSize="0.8125em"
                 fontStyle="italic"
                 fontWeight={600}
                 fill={colour.accent}

@@ -180,7 +180,7 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
           {/* Exponent Explanation */}
           {result.decimalMovement !== 0 && (
             <ResultBox tone="warn" className="p-3">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[13px] text-muted-foreground">
                 <span className="font-semibold text-foreground">
                   {t('ch0_3.prefixConverterExponentDiff')}
                 </span>{' '}

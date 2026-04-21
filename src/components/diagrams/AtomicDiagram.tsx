@@ -215,7 +215,7 @@ export default function AtomicDiagram() {
             <text
               x={cx + p.dx} y={cy + p.dy + 2.2}
               textAnchor="middle"
-              fontSize={8}
+              fontSize="0.5em"
               fontWeight={700}
               fill={LABEL_BG}
             >+</text>
@@ -232,7 +232,7 @@ export default function AtomicDiagram() {
       <text
         x={pt[0]} y={pt[1] + 2.5}
         textAnchor="middle"
-        fontSize={9}
+        fontSize="0.562em"
         fontWeight={700}
         fill={LABEL_BG}
         opacity={opacity}
@@ -252,7 +252,7 @@ export default function AtomicDiagram() {
         <text
           x={leftX} y={40}
           textAnchor="middle"
-          fontSize={14}
+          fontSize="0.875em"
           fontWeight={700}
           fill={svgTokens.fg}
         >
@@ -261,7 +261,7 @@ export default function AtomicDiagram() {
         <text
           x={rightX} y={40}
           textAnchor="middle"
-          fontSize={14}
+          fontSize="0.875em"
           fontWeight={700}
           fill="hsl(var(--callout-caution))"
         >
@@ -284,7 +284,7 @@ export default function AtomicDiagram() {
         <text
           x={leftX} y={atomY + orbitR + 28}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fill={svgTokens.mutedFg}
         >
           {t('ch1_1.atomicNeutralFormula')}
@@ -298,7 +298,7 @@ export default function AtomicDiagram() {
         <text
           x={280} y={atomY - 10}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fontStyle="italic"
           fontWeight={600}
           fill={svgTokens.caution}
@@ -332,7 +332,7 @@ export default function AtomicDiagram() {
         <text
           x={rightX} y={atomY + orbitR + 28}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fill={svgTokens.mutedFg}
         >
           {t('ch1_1.atomicIonFormula')}
@@ -342,23 +342,23 @@ export default function AtomicDiagram() {
         <g transform={`translate(${W / 2 - 150}, ${H - 18})`}>
           {/* Proton */}
           <circle cx={4} cy={0} r={protonR} fill={PROTON_FILL} />
-          <text x={4} y={2.2} textAnchor="middle" fontSize={8}
+          <text x={4} y={2.2} textAnchor="middle" fontSize="0.5em"
             fontWeight={700} fill={LABEL_BG}>+</text>
-          <text x={13} y={3.5} fontSize={13} fill={svgTokens.mutedFg}>
+          <text x={13} y={3.5} fontSize="0.812em" fill={svgTokens.mutedFg}>
             {t('ch1_1.atomicLegendProton')}
           </text>
 
           {/* Neutron */}
           <circle cx={110} cy={0} r={protonR} fill={NEUTRON_FILL} />
-          <text x={119} y={3.5} fontSize={13} fill={svgTokens.mutedFg}>
+          <text x={119} y={3.5} fontSize="0.812em" fill={svgTokens.mutedFg}>
             {t('ch1_1.atomicLegendNeutron')}
           </text>
 
           {/* Electron */}
           <circle cx={200} cy={0} r={electronR} fill={ELECTRON_FILL} />
-          <text x={200} y={2.5} textAnchor="middle" fontSize={9}
+          <text x={200} y={2.5} textAnchor="middle" fontSize="0.562em"
             fontWeight={700} fill={LABEL_BG}>−</text>
-          <text x={209} y={3.5} fontSize={13} fill={svgTokens.mutedFg}>
+          <text x={209} y={3.5} fontSize="0.812em" fill={svgTokens.mutedFg}>
             {t('ch1_1.atomicLegendElectron')}
           </text>
         </g>

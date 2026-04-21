@@ -216,7 +216,7 @@ export default function OscilloscopeDiagram() {
           </g>
 
           {/* 0V reference label */}
-          <text x={scrX + 4} y={midY - 4} fontSize="11"
+          <text x={scrX + 4} y={midY - 4} fontSize="0.687em"
             fill={c.zero}>0V</text>
 
           {/* ── Right-side annotations ──────────────────────────── */}
@@ -231,15 +231,15 @@ export default function OscilloscopeDiagram() {
                 x2={scrX + scrW + 20} y2={midY}
             stroke={c.voltdiv} strokeWidth="1.2" />
           <text x={scrX + scrW + 24} y={(yHigh + midY) / 2 + 4}
-            fontSize="12" fill={c.voltdiv} fontWeight="600">
+            fontSize="0.75em" fill={c.voltdiv} fontWeight="600">
             2.5 div
           </text>
           <text x={scrX + scrW + 24} y={(yHigh + midY) / 2 + 18}
-            fontSize="11" fill={c.voltdiv} opacity="0.7">
+            fontSize="0.687em" fill={c.voltdiv} opacity="0.7">
             × 2V/div
           </text>
           <text x={scrX + scrW + 24} y={(yHigh + midY) / 2 + 31}
-            fontSize="11" fill={c.voltdiv} opacity="0.7">
+            fontSize="0.687em" fill={c.voltdiv} opacity="0.7">
             = 5V
           </text>
 
@@ -260,18 +260,18 @@ export default function OscilloscopeDiagram() {
               this label is enough to associate them. */}
           <text x={scrX + scrW / 2}
                 y={scrY + scrH + 38}
-            textAnchor="middle" fontSize="10" fill={c.timediv} fontWeight="600">
+            textAnchor="middle" fontSize="0.625em" fill={c.timediv} fontWeight="600">
             {t('ch0_2.scopeDiagramPeriodInline')}
           </text>
 
           {/* ── Control labels (bottom-right) ── */}
           <text x={scrX + scrW - 4} y={scrY + scrH - 20}
-            textAnchor="end" fontSize="10" fill={c.voltdiv} opacity="0.8"
+            textAnchor="end" fontSize="0.625em" fill={c.voltdiv} opacity="0.8"
             fontWeight="600">
             VOLT/DIV 2V
           </text>
           <text x={scrX + scrW - 4} y={scrY + scrH - 6}
-            textAnchor="end" fontSize="10" fill={c.timediv} opacity="0.8"
+            textAnchor="end" fontSize="0.625em" fill={c.timediv} opacity="0.8"
             fontWeight="600">
             TIME/DIV 0.5ms
           </text>

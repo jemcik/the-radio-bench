@@ -154,7 +154,7 @@ export default function SciNotationExplorer() {
           <div className="grid grid-cols-2 gap-3">
             <ResultBox tone="warn" label={t('ch0_3.sciNotationMantissa')} className="p-3">
               <p className="text-lg font-mono font-bold text-foreground">{currentMantissa}</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[13px] text-muted-foreground mt-1">
                 {isEngineering
                   ? t('ch0_3.sciNotationMantissaEngDesc')
                   : t('ch0_3.sciNotationMantissaStdDesc')}
@@ -163,7 +163,7 @@ export default function SciNotationExplorer() {
 
             <ResultBox tone="primary" label={t('ch0_3.sciNotationExponent')} className="p-3">
               <p className="text-lg font-mono font-bold text-foreground">{currentExponent}</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[13px] text-muted-foreground mt-1">
                 {isEngineering
                   ? t('ch0_3.sciNotationExponentEngDesc')
                   : t('ch0_3.sciNotationExponentStdDesc')}

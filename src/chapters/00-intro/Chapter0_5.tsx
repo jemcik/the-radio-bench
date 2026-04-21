@@ -47,8 +47,11 @@ function SymbolCell({
         </SVGDiagram>
       </div>
       <div className="flex-1 min-w-0 space-y-1">
-        <p className="text-sm font-semibold text-foreground">{name}</p>
-        <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+        {/* 13 px (0.8125rem) — matches the diagram-floor rule and stays
+            rem-based so it scales with the FontContext size setting.
+            Weight carries the name/description hierarchy, not size. */}
+        <p className="text-[0.8125rem] font-semibold text-foreground">{name}</p>
+        <p className="text-[0.8125rem] text-muted-foreground leading-relaxed">{description}</p>
       </div>
     </div>
   )
@@ -252,7 +255,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolVoltmeterName')}
           description={
-            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i /> }} />
+            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar /> }} />
           }
           svgHeight={56}
         >
@@ -262,7 +265,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolAmmeterName')}
           description={
-            <Trans i18nKey="ch0_5.symbolAmmeterDesc" ns="ui" components={{ i: <i /> }} />
+            <Trans i18nKey="ch0_5.symbolAmmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar /> }} />
           }
           svgHeight={56}
         >

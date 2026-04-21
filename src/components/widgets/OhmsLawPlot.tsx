@@ -216,7 +216,7 @@ export default function OhmsLawPlot() {
           </g>
 
           {/* Tick labels */}
-          <g fill={svgTokens.mutedFg} fontSize="13" fontFamily="ui-sans-serif, system-ui, sans-serif">
+          <g fill={svgTokens.mutedFg} fontSize="0.812em" fontFamily="ui-sans-serif, system-ui, sans-serif">
             {X_TICKS_MA.map(x => (
               <text
                 key={`tx${x}`}
@@ -245,7 +245,7 @@ export default function OhmsLawPlot() {
           <text
             x={PLOT_X0 + PLOT_W / 2}
             y={PLOT_Y0 + PLOT_H + 30}
-            fontSize="13"
+            fontSize="0.812em"
             fill={svgTokens.fg}
             textAnchor="middle"
           >
@@ -257,7 +257,7 @@ export default function OhmsLawPlot() {
           <text
             x={18}
             y={PLOT_Y0 + PLOT_H / 2}
-            fontSize="13"
+            fontSize="0.812em"
             fill={svgTokens.fg}
             textAnchor="middle"
             transform={`rotate(-90 18 ${PLOT_Y0 + PLOT_H / 2})`}
@@ -298,7 +298,7 @@ export default function OhmsLawPlot() {
         </div>
       </ResultBox>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_2.widget.ohmPlot.hint')}
       </p>
     </Widget>

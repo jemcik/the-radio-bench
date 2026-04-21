@@ -114,7 +114,7 @@ export default function PrefixLadderDiagram() {
               <polyline points={chevron(arrowTipX, dir)}
                 fill="none" stroke={arrowC} strokeWidth="0.8" />
               <text x={midX} y={arrowY - 6}
-                textAnchor="middle" fontSize="10" fill={arrowC}>{label}</text>
+                textAnchor="middle" fontSize="0.625em" fill={arrowC}>{label}</text>
             </g>
           )
         })}
@@ -140,13 +140,13 @@ export default function PrefixLadderDiagram() {
               <line x1={x} y1={axisY - 7} x2={x} y2={axisY + 7}
                 stroke={labelC} strokeWidth="1.2" />
               <text x={x} y={axisY - 14}
-                textAnchor="middle" fontSize="17" fontWeight="700"
+                textAnchor="middle" fontSize="1.062em" fontWeight="700"
                 fill="hsl(var(--foreground))">{p.symbol}</text>
               <text x={x} y={axisY + 24}
-                textAnchor="middle" fontSize="12.5"
+                textAnchor="middle" fontSize="0.781em"
                 fill={labelC}>{p.power}</text>
               <text x={x} y={axisY + 40}
-                textAnchor="middle" fontSize="11"
+                textAnchor="middle" fontSize="0.687em"
                 fill={labelC} fontStyle="italic" opacity="0.85">
                 {exampleLines.map((line, li) => (
                   <tspan key={li} x={x} dy={li === 0 ? 0 : 13}>{line}</tspan>

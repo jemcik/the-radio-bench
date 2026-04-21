@@ -180,7 +180,7 @@ export default function Ch1_2Hero() {
         x={TANK_X + TANK_W / 2}
         y={14}
         fontFamily="Georgia, serif"
-        fontSize="8.5"
+        fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
         textAnchor="middle"
@@ -201,7 +201,7 @@ export default function Ch1_2Hero() {
         x={TANK_X + TANK_W / 2}
         y={68}
         fontFamily="Georgia, serif"
-        fontSize="13"
+        fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
         fill="currentColor"
@@ -215,7 +215,7 @@ export default function Ch1_2Hero() {
         x={(PIPE_X_START + PIPE_X_END) / 2}
         y={48}
         fontFamily="Georgia, serif"
-        fontSize="8.5"
+        fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
         textAnchor="middle"
@@ -234,7 +234,7 @@ export default function Ch1_2Hero() {
         x={(PIPE_X_START + PIPE_X_END) / 2}
         y={92}
         fontFamily="Georgia, serif"
-        fontSize="13"
+        fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
         fill="currentColor"
@@ -256,7 +256,7 @@ export default function Ch1_2Hero() {
         x={WHEEL_CX}
         y={48}
         fontFamily="Georgia, serif"
-        fontSize="8.5"
+        fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
         textAnchor="middle"
@@ -282,7 +282,7 @@ export default function Ch1_2Hero() {
         x={WHEEL_CX + WHEEL_R + 8}
         y={WHEEL_CY + 4}
         fontFamily="Georgia, serif"
-        fontSize="13"
+        fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
         fill="currentColor"

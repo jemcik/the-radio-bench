@@ -169,14 +169,14 @@ export default function DriftVelocitySketch() {
         {/* ═══ Thermal section ═════════════════════════════════ */}
         <text
           x={alignX} y={thermalTitleY}
-          fontSize={15} fontWeight={700}
+          fontSize="0.937em" fontWeight={700}
           fill={svgTokens.note}
         >
           {t('ch1_1.driftSketchThermalLabel')}
         </text>
         <text
           x={alignX} y={thermalSubY}
-          fontSize={13} fill={svgTokens.mutedFg}
+          fontSize="0.812em" fill={svgTokens.mutedFg}
         >
           {t('ch1_1.driftSketchThermalSpeed')}
         </text>
@@ -238,14 +238,14 @@ export default function DriftVelocitySketch() {
         {/* ═══ Drift section ═══════════════════════════════════ */}
         <text
           x={alignX} y={driftTitleY}
-          fontSize={15} fontWeight={700}
+          fontSize="0.937em" fontWeight={700}
           fill={svgTokens.caution}
         >
           {t('ch1_1.driftSketchDriftLabel')}
         </text>
         <text
           x={alignX} y={driftSubY}
-          fontSize={13} fill={svgTokens.mutedFg}
+          fontSize="0.812em" fill={svgTokens.mutedFg}
         >
           {t('ch1_1.driftSketchDriftSpeed')}
         </text>

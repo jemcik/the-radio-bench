@@ -207,7 +207,7 @@ export default function MaterialsComparison() {
                 x={p.x + panelW / 2}
                 y={26}
                 textAnchor="middle"
-                fontSize={15}
+                fontSize="0.937em"
                 fontWeight={700}
                 fill={titleColor}
               >
@@ -217,7 +217,7 @@ export default function MaterialsComparison() {
                 x={p.x + panelW / 2}
                 y={48}
                 textAnchor="middle"
-                fontSize={13}
+                fontSize="0.812em"
                 fill={svgTokens.mutedFg}
                 fontStyle="italic"
               >
@@ -239,7 +239,7 @@ export default function MaterialsComparison() {
                   <text
                     x={ax} y={atomY + 3}
                     textAnchor="middle"
-                    fontSize={9}
+                    fontSize="0.562em"
                     fontWeight={700}
                     fill="hsl(var(--background))"
                   >+</text>
@@ -287,7 +287,7 @@ export default function MaterialsComparison() {
                 x={p.x + panelW / 2}
                 y={244}
                 textAnchor="middle"
-                fontSize={14}
+                fontSize="0.875em"
                 fontWeight={600}
                 fill={svgTokens.fg}
               >
@@ -334,10 +334,10 @@ export default function MaterialsComparison() {
               <circle cx={circleCx} cy={282} r={circleR} fill={circleFill} />
               {isIon && (
                 <text x={circleCx} y={285} textAnchor="middle"
-                  fontSize={9} fontWeight={700}
+                  fontSize="0.562em" fontWeight={700}
                   fill="hsl(var(--background))">+</text>
               )}
-              <text x={textX} y={286} fontSize={13} fill={svgTokens.mutedFg}>
+              <text x={textX} y={286} fontSize="0.812em" fill={svgTokens.mutedFg}>
                 {t(labelKey)}
               </text>
             </g>

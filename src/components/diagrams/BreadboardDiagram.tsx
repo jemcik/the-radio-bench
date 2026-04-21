@@ -151,9 +151,9 @@ export default function BreadboardDiagram() {
                 stroke={c.blueInk} strokeWidth="1.5" opacity="0.75" strokeDasharray="7 4" />
               {/* + / − labels */}
               <text x={labelX + 2} y={ry + railH * 0.35 + 3}
-                fontSize="10" fontWeight="700" fill={c.redLabel} textAnchor="middle">+</text>
+                fontSize="0.625em" fontWeight="700" fill={c.redLabel} textAnchor="middle">+</text>
               <text x={labelX + 2} y={ry + railH * 0.7 + 3}
-                fontSize="10" fontWeight="700" fill={c.blueLabel} textAnchor="middle">−</text>
+                fontSize="0.625em" fontWeight="700" fill={c.blueLabel} textAnchor="middle">−</text>
             </g>
           ))}
 
@@ -179,7 +179,7 @@ export default function BreadboardDiagram() {
           <text
             x={bx + bw / 2}
             y={tieTop + halfH + midGapH / 2 - 3}
-            textAnchor="middle" fontSize="10"
+            textAnchor="middle" fontSize="0.625em"
             fill={c.dipGap}>
             {t('ch0_2.breadboardDipGap')}
           </text>
@@ -188,13 +188,13 @@ export default function BreadboardDiagram() {
           {topRows.map((label, ri) => (
             <text key={label}
               x={labelX} y={tieTop + ri * rowStep + 4}
-              textAnchor="middle" fontSize="10" fontWeight="600"
+              textAnchor="middle" fontSize="0.625em" fontWeight="600"
               fill={c.rowLabel}>{label}</text>
           ))}
           {btmRows.map((label, ri) => (
             <text key={label}
               x={labelX} y={tieBtm + ri * rowStep + 4}
-              textAnchor="middle" fontSize="10" fontWeight="600"
+              textAnchor="middle" fontSize="0.625em" fontWeight="600"
               fill={c.rowLabel}>{label}</text>
           ))}
 
@@ -230,7 +230,7 @@ export default function BreadboardDiagram() {
             <text key={n}
               x={holeStartX + (n - 1) * colStep}
               y={by + bh + 14}
-              textAnchor="middle" fontSize="11"
+              textAnchor="middle" fontSize="0.687em"
               fill={c.colNum}>{n}</text>
           ))}
 
@@ -267,7 +267,7 @@ export default function BreadboardDiagram() {
           <text
             x={hlX} y={22}
             textAnchor="middle"
-            fontSize="12" fontWeight="600"
+            fontSize="0.75em" fontWeight="600"
             fill={c.hlAmber}>
             {`${t('ch0_2.breadboardCol', { num: hlColNum })} — ${t('ch0_2.breadboardNode')}`}
           </text>

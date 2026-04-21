@@ -1,5 +1,5 @@
 import { type SymbolProps, orientAngle, isVertical, STROKE } from '../types'
-import { SymbolText, getLabelPosition } from '../SymbolLabel'
+import { SymbolText, getLabelPosition, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 /**
  * Passive components share an "above-the-body" label style: both the
@@ -18,7 +18,7 @@ function PassiveLabel({
   value,
 }: SymbolProps & { orient: NonNullable<SymbolProps['orient']> }) {
   // `getLabelPosition` puts horizontal labels at y-14 — too tight for a
-  // 12 px glyph above a body that extends to y-8 (resistor zigzag peaks,
+  // 14 px glyph above a body that extends to y-8 (resistor zigzag peaks,
   // capacitor plates). Push labels up by 4 more px so there's ~4 px of
   // breathing room between the glyph and the symbol.
   const { lx, ly, anchor } = getLabelPosition(x, y, orient)
@@ -26,12 +26,12 @@ function PassiveLabel({
   return (
     <>
       {label && (
-        <SymbolText x={lx} y={labelY} size={12} weight={600} anchor={anchor}>
+        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight={600} anchor={anchor}>
           {label}
         </SymbolText>
       )}
       {value && (
-        <SymbolText x={lx} y={labelY + 12} size={11} anchor={anchor}>
+        <SymbolText x={lx} y={labelY + LABEL_SIZE} size={VALUE_SIZE} anchor={anchor}>
           {value}
         </SymbolText>
       )}
