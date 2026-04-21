@@ -106,7 +106,7 @@ export function Callout({ variant, title, children, className }: CalloutProps) {
         <p className={cn('text-[10px] font-bold uppercase tracking-[0.15em] mb-1', text)}>
           {title ?? translatedLabel}
         </p>
-        <div className="text-sm leading-relaxed text-foreground/90">{children}</div>
+        <div className="text-[14px] leading-relaxed text-foreground/90">{children}</div>
       </div>
     </div>
   )

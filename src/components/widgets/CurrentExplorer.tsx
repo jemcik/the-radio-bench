@@ -252,7 +252,7 @@ export default function CurrentExplorer() {
       {/* ── Visualisation: wire with drifting electrons ─────────── */}
       <DriftVisualisation driftPxPerSec={driftPxPerSec} />
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_1.widget.hint')}
       </p>
     </Widget>

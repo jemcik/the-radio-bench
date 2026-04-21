@@ -354,12 +354,12 @@ export default function LogAxisToggle() {
                     subscript with <tspan>. */}
                 <text
                   x={cutoffX + 6} y={cutoffY - 6}
-                  fontSize={11}
+                  fontSize="0.687em"
                   fill="hsl(var(--callout-key))"
                   fontWeight={600}
                 >
                   <tspan fontStyle="italic">f</tspan>
-                  <tspan dy="3" fontSize={8}>c</tspan>
+                  <tspan dy="3" fontSize="0.5em">c</tspan>
                   <tspan dy="-3" fontStyle="normal"> · −3 {tUnit('db')}</tspan>
                 </text>
               </g>
@@ -382,14 +382,14 @@ export default function LogAxisToggle() {
           {/* Axis titles — in canvas space (outside the Group) */}
           <text
             x={PAD_L + plotW / 2} y={H - 6}
-            textAnchor="middle" fontSize={10.5}
+            textAnchor="middle" fontSize="0.656em"
             fill="hsl(var(--foreground))"
           >
             {t('ch0_4.logAxisToggleAxisXLabel')}
           </text>
           <text
             transform={`translate(14 ${PAD_T + plotH / 2}) rotate(-90)`}
-            textAnchor="middle" fontSize={10.5}
+            textAnchor="middle" fontSize="0.656em"
             fill="hsl(var(--foreground))"
           >
             {t('ch0_4.logAxisToggleAxisYLabel')}

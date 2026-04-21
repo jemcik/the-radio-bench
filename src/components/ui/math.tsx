@@ -31,3 +31,27 @@ export function MBlock({ tex }: { tex: string }) {
 export function MathVar({ children }: { children?: React.ReactNode }) {
   return <M tex={String(children ?? '')} />
 }
+
+/**
+ * Self-closing inline component that renders the parallel-resistance
+ * operator `∥` via KaTeX. Use via <Trans> component mapping:
+ *
+ *   <Trans i18nKey="…" components={{ pll: <ParallelSym /> }} />
+ *
+ * with the i18n string containing `<pll />` where the operator should
+ * appear, e.g. «R₁ <pll /> R₂».
+ *
+ * Why a dedicated primitive: the Unicode character U+2225 (∥) renders
+ * thin in most web sans-serif fonts — its two strokes visually fuse
+ * into a single pipe `|` at body font size. KaTeX draws `\parallel`
+ * in math font with correct stroke weight and surrounding thin-space,
+ * which is always legible regardless of theme or font-size setting.
+ *
+ * Not usable inside SVG <text> nodes (SVG can't render KaTeX's HTML
+ * output). For SVG diagrams, fall back to the Unicode glyph ‖
+ * (U+2016 DOUBLE VERTICAL LINE), which is rendered thicker than
+ * U+2225 in most fonts.
+ */
+export function ParallelSym() {
+  return <M tex="\parallel" />
+}

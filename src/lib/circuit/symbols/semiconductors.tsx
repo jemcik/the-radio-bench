@@ -6,7 +6,7 @@
  */
 
 import { type SymbolProps, type TransistorProps, type OpAmpProps, orientAngle, STROKE } from '../types'
-import { CenteredLabel, SymbolText } from '../SymbolLabel'
+import { CenteredLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // DIODES
@@ -211,13 +211,13 @@ export function OpAmp({ x, y, orient = 'right', label, value }: OpAmpProps) {
 
       {/* Component label (right of symbol) */}
       {label && (
-        <SymbolText x={x + 32} y={y} size={11} weight={600} anchor="start">
+        <SymbolText x={x + 32} y={y} size={LABEL_SIZE} weight={600} anchor="start">
           {label}
         </SymbolText>
       )}
       {/* Value label (below) */}
       {value && (
-        <SymbolText x={x} y={y + 25} size={10} opacity={0.7}>
+        <SymbolText x={x} y={y + 25} size={VALUE_SIZE} opacity={0.7}>
           {value}
         </SymbolText>
       )}

@@ -63,7 +63,13 @@ export { Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
 export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, OpAmp } from './symbols'
 
 // Symbols — instruments
-export { Meter, SwitchSPST, SwitchSPDT, Fuse } from './symbols'
+export {
+  Meter, SwitchSPST, SwitchSPDT, Fuse,
+  METER_ACCENT_V, METER_ACCENT_A, METER_PIN_SPAN, meterPins,
+} from './symbols'
 
 // Symbols — miscellaneous
 export { Antenna, Crystal, Transformer } from './symbols'
+
+// Symbols — pedagogical annotations (named-node markers, terminal labels)
+export { NodePoint, TerminalLabel } from './symbols'

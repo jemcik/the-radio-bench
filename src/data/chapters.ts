@@ -133,7 +133,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Resistors in Practice',
         subtitle: 'Colour code, series/parallel, voltage divider',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.1'],

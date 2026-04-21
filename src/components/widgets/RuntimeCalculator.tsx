@@ -163,7 +163,7 @@ export default function RuntimeCalculator() {
         </ResultBox>
       </div>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_2.widget.runtime.hint')}
       </p>
     </Widget>

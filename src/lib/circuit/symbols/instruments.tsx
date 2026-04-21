@@ -8,14 +8,46 @@
  *   - Fuse: simple fuse symbol
  */
 
-import { type SymbolProps, orientAngle, STROKE } from '../types'
+import { type SymbolProps, type Orientation, pins2, orientAngle, STROKE } from '../types'
 import { OrientedLabel } from '../SymbolLabel'
 
 // ─── Meter ────────────────────────────────────────────────────────────────────
 
 /**
+ * Pin-span for Meter. Matches the circle diameter (2 × radius = 40) so
+ * wires connect exactly at the circle edge with no gap. Callers MUST
+ * use this span (or the `meterPins` helper below) when computing pin
+ * positions, not the default SPAN=60 — that would leave a 10 px gap
+ * between the wire endpoint and the circle.
+ */
+export const METER_PIN_SPAN = 40
+
+/** Helper returning Meter's pin positions — use instead of bare pins2
+ *  so callers never have to remember the custom span. */
+export function meterPins(cx: number, cy: number, orient: Orientation = 'right') {
+  return pins2(cx, cy, orient, METER_PIN_SPAN)
+}
+
+/**
+ * Accent-colour presets for Meter. These are deliberately hard-coded
+ * HSL values (not theme tokens) so a voltmeter looks identical across
+ * every chapter and every theme. Used in ch0.2 and ch1.4 — future
+ * meter usages MUST import these rather than copy-pasting the HSL
+ * literal, to keep the colour book-wide consistent.
+ */
+export const METER_ACCENT_V = 'hsl(210 70% 55%)'   // voltmeter — blue
+export const METER_ACCENT_A = 'hsl(142 55% 42%)'   // ammeter   — green
+
+/**
  * Meter — general meter circle
  * A circle with a letter inside (V, A, Ω, W, etc.).
+ *
+ * Visual convention: the meter body and its letter are ORIENTATION-
+ * INVARIANT — the circle is rotation-symmetric and the letter is kept
+ * upright regardless of `orient`, because a "V" or "A" on a rotated
+ * schematic is still read as a letter, not a tipped-over shape. Only
+ * the PIN POSITIONS rotate with `orient` (via `meterPins` / pins2).
+ *
  * Props: SymbolProps & { letter: string; accent?: string }
  */
 export function Meter({
@@ -29,26 +61,23 @@ export function Meter({
 }: SymbolProps & { letter: string; accent?: string }) {
   return (
     <g>
-      {/* Component body — circle + letter only, NO leads.
-          Wires connect directly to the circle edge via pins2(…, 40).
-          This avoids colour mismatches between wire and lead strokes. */}
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Circle */}
-        <circle cx={0} cy={0} r={20} stroke={accent} strokeWidth={STROKE} fill="none" />
+      {/* Circle — symmetric under rotation, so no transform needed. */}
+      <circle cx={x} cy={y} r={20} stroke={accent} strokeWidth={STROKE} fill="none" />
 
-        {/* Letter inside — dominantBaseline="central" centers on the em-box
-            middle, which is the correct geometric centre for uppercase
-            letters in a circle. The old `y={7}` hack relied on font-specific
-            baseline metrics and drifted off-centre. */}
-        <text
-          x={0} y={0}
-          fontSize="16" fontWeight="bold"
-          textAnchor="middle" dominantBaseline="central"
-          fill={accent}
-        >
-          {letter}
-        </text>
-      </g>
+      {/* Letter — kept UPRIGHT regardless of `orient`. Circuit-symbol
+          convention (IEEE 315, ARRL Handbook): instrument-designator
+          letters inside meter circles always read upright even when
+          the symbol itself is drawn in a rotated orientation on the
+          schematic. `dominantBaseline="central"` centres on the
+          em-box middle (correct for uppercase letters in a circle). */}
+      <text
+        x={x} y={y}
+        fontSize="16" fontWeight="bold"
+        textAnchor="middle" dominantBaseline="central"
+        fill={accent}
+      >
+        {letter}
+      </text>
 
       <OrientedLabel x={x} y={y} orient={orient} offset={28} label={label} value={value} />
     </g>

@@ -7,7 +7,9 @@
  */
 import { useTranslation } from 'react-i18next'
 import {
-  Circuit, Wire, Junction, Resistor, Battery, Meter, pins2,
+  Circuit, Wire, Junction, Resistor, Battery,
+  Meter, meterPins, METER_ACCENT_V, METER_ACCENT_A,
+  pins2,
   SCHEMATIC_PAD_TOP, schematicHeight,
   type LegendItem,
 } from '@/lib/circuit'
@@ -45,15 +47,16 @@ const A_BAT = { x: 65,  y: (A_TOP + A_BOT) / 2 + 13 } // battery below-centre
 /* ── pin bindings (derived from centres) ───────────────────────────────── */
 const vR1  = pins2(V_R1.x,  V_R1.y)
 const vBat = pins2(V_BAT.x, V_BAT.y, 'down')
-const vMtr = pins2(V_MTR.x, V_MTR.y, 'right', 40) // span=40 matches circle r=20
+const vMtr = meterPins(V_MTR.x, V_MTR.y)
 
-const aAm  = pins2(A_AM.x,  A_AM.y,  'right', 40) // span=40 matches circle r=20
+const aAm  = meterPins(A_AM.x,  A_AM.y)
 const aR1  = pins2(A_R1.x,  A_R1.y)
 const aBat = pins2(A_BAT.x, A_BAT.y, 'down')
 
-/* ── accent colours for meter highlights ───────────────────────────────── */
-const VOLT_ACCENT = 'hsl(210 70% 55%)'
-const AMP_ACCENT  = 'hsl(142 55% 42%)'
+/* ── accent colours for meter highlights — imported from @/lib/circuit ─── *
+ * so every chapter's voltmeter/ammeter uses the same exact hue. */
+const VOLT_ACCENT = METER_ACCENT_V
+const AMP_ACCENT  = METER_ACCENT_A
 
 /* ── Voltmeter in parallel ─────────────────────────────────────────────── *
  *

@@ -60,6 +60,34 @@ Examples of the class of issues you're looking for (not exhaustive):
 - **Water / physics motion verbs**
   - Water doesn't `котитися` (roll), `летіти` (fly), `повзти` (crawl). It `тече` / `ллється` / `рухається`. Similar constraints for electrons at drift velocity (`не літають`, `не несуться`).
 
+- **Adjective-stacking order (EN pre-noun → UA post-noun genitive)** — see landmine 13.3
+  - `прямокутні піщаного кольору чипи` is EN-order, UA wants `прямокутні чипи піщаного кольору`.
+  - Mechanical check: when a UA noun has ≥2 adjectives and one of them is a COLOUR / MATERIAL / ORIGIN descriptor, that descriptor belongs AFTER the noun as a genitive/instrumental phrase, not before.
+  - Trigger words for the descriptor: `кольору`, `відтінку`, `виробництва`, `[якого-небудь]-матеріалу`, `з нержавіючої сталі`, `завдовжки`, `діаметром`.
+
+- **Chained past-participle + prepositional-phrase descriptions** — see landmine 13.4
+  - EN `X, trimmed to Y, with Z, for W` → UA reader loses track by phrase 3.
+  - Mechanical check: count comma-separated modifier phrases after the head noun. ≥3 = investigate. Fix by splitting into two sentences or converting past participles to adjective phrases.
+  - Red-flag pattern: `{noun}, {past-participle ending -аний/-ений/-ана/-ена}, з {noun-phrase}, для {verbal-noun}`.
+
+- **Pronoun-elision calque (EN "one/ones")** — see landmine 13.1
+  - EN `a smaller one` = `a smaller [noun]` with noun elided. UA doesn't elide — the bare adjective grammatically attaches to the nearest matching-gender noun, which may be the WRONG noun.
+  - Example: `перетворює джерело на менше` — «менше» attaches to «джерело» (n), so the sentence literally says "turns supply into smaller supply" which is physically false.
+  - Mechanical check: look for sentences ending with bare predicative adjectives (`на менше`, `у ширший`, `до меншого`) that have NO noun headword. Each such phrase is a potential calque.
+
+- **Comparative adjective on wrong noun** — see landmine 13.2
+  - `X гірші за Y` / `X кращі за Y` / `X вужчий за Y` where X is a component (носій, пристрій, деталь): ask what's REALLY being compared (tolerance? power? precision?).
+  - Fix by attaching the comparative to the actual quantity: «опір X більший за опір Y», «допуск X ширший за допуск Y».
+  - Family: same rule as landmine 149 for size comparatives on components.
+
+- **Beginner-hostile technical vocabulary in intro/preview paragraphs** — see landmines 13.5 + 13.6
+  - If the FIRST paragraph of a chapter uses a term that's properly introduced only in section 2 or later, that's a pedagogical bug.
+  - Rule: the intro can preview topics but should do so in GENERAL vocabulary. Specific canonical terms («корпус», «зміщення», «адмітанс», «гістерезис», «просадка») belong in the section that defines them.
+
+- **English-borrowed term where UA Wikipedia has a native one** — see landmine 13.7
+  - Particular case: **резистор E-series context uses «десяток», not «декада»**. UA Wikipedia's article «Ряди номіналів радіоелементів» is the authority.
+  - Frequency-response (Bode-plot rolloff, filter characteristic): «порядок» / «декада» (synonym). These are two different domains; don't mix.
+
 ## What NOT to flag
 
 - Correct physics terminology taken from the glossary — this is not your job to second-guess

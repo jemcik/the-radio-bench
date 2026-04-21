@@ -9,7 +9,7 @@
  */
 
 import { type SymbolProps, type SinglePinProps, orientAngle, isVertical, STROKE } from '../types'
-import { OrientedLabel, SymbolText } from '../SymbolLabel'
+import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 // ─── Battery ──────────────────────────────────────────────────────────────────
 
@@ -73,12 +73,12 @@ export function Battery({
       {isVertical(orient) ? (
         <>
           {label && (
-            <SymbolText x={x - 12} y={y} size={12} weight="bold" anchor="end">
+            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight="bold" anchor="end">
               {label}
             </SymbolText>
           )}
           {value && (
-            <SymbolText x={x + 14} y={y} size={11} anchor="start">
+            <SymbolText x={x + 14} y={y} size={VALUE_SIZE} anchor="start">
               {value}
             </SymbolText>
           )}

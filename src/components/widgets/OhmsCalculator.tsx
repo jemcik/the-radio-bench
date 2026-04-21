@@ -267,7 +267,7 @@ export default function OhmsCalculator() {
         resistanceLabel={formatQuantityLabel('R', results.R, tUnit, locale)}
       />
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_2.widget.ohmCalc.hint')}
       </p>
     </Widget>
@@ -447,7 +447,7 @@ function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel }: CircuitFlowPro
         </g>
         <text
           x={46} y={WIRE_Y - 22}
-          textAnchor="middle" fontSize="11"
+          textAnchor="middle" fontSize="0.687em"
           fill="hsl(var(--muted-foreground))"
         >
           {voltageLabel}
@@ -477,7 +477,7 @@ function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel }: CircuitFlowPro
         <text
           x={(resistorStartX + resistorEndX) / 2}
           y={WIRE_Y + 28}
-          textAnchor="middle" fontSize="11"
+          textAnchor="middle" fontSize="0.687em"
           fill="hsl(var(--muted-foreground))"
         >
           {resistanceLabel}

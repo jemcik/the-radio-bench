@@ -111,32 +111,32 @@ export default function FormulaTriangleDiagram() {
 
                 {/* ── V (top section) ── */}
                 <text x={cx} y={topCenterY}
-                  textAnchor="middle" fontSize="22" fontWeight="700"
+                  textAnchor="middle" fontSize="1.375em" fontWeight="700"
                   fill={c.covered === 'V' ? 'white' : fg}>
                   V
                 </text>
 
                 {/* ── I (bottom-left) ── */}
                 <text x={botLeftCx} y={botCenterY}
-                  textAnchor="middle" fontSize="20" fontWeight="700"
+                  textAnchor="middle" fontSize="1.25em" fontWeight="700"
                   fill={c.covered === 'I' ? 'white' : fg}>
                   I
                 </text>
 
                 {/* ── R (bottom-right) ── */}
                 <text x={botRightCx} y={botCenterY}
-                  textAnchor="middle" fontSize="20" fontWeight="700"
+                  textAnchor="middle" fontSize="1.25em" fontWeight="700"
                   fill={c.covered === 'R' ? 'white' : fg}>
                   R
                 </text>
 
                 {/* ── Label + formula below ── */}
                 <text x={cx} y={baseY + 18}
-                  textAnchor="middle" fontSize="11" fontWeight="600" fill={muted}>
+                  textAnchor="middle" fontSize="0.687em" fontWeight="600" fill={muted}>
                   {c.label}
                 </text>
                 <text x={cx} y={baseY + 34}
-                  textAnchor="middle" fontSize="13" fontWeight="700"
+                  textAnchor="middle" fontSize="0.812em" fontWeight="700"
                   fontFamily="monospace" fill={fg}>
                   {c.formula}
                 </text>

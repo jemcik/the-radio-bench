@@ -124,6 +124,19 @@ interface CenteredLabelProps {
   labelSide?: 'above' | 'below'
 }
 
+// Schematic-label type sizes. Bumped to respect the diagram-quality
+// skill's 13 px floor for any readable label — the previous 11/12 values
+// were below the floor and rendered component designators (R₁, R₂, …)
+// uncomfortably small compared to surrounding prose and node markers.
+//
+// EXPORTED for use in other label helpers (e.g. `PassiveLabel` in
+// `symbols/passives.tsx`). Every schematic-label helper in the library
+// MUST pull from these constants — do NOT hard-code `size={12}` or
+// similar locally, or the label-size floor silently drifts between
+// component families.
+export const LABEL_SIZE = 14
+export const VALUE_SIZE = 13
+
 export function CenteredLabel({ x, y, label, value, gap = 20, labelSide = 'above' }: CenteredLabelProps) {
   if (!label && !value) return null
   const labelY = labelSide === 'above' ? y - gap : y + gap
@@ -131,12 +144,12 @@ export function CenteredLabel({ x, y, label, value, gap = 20, labelSide = 'above
   return (
     <>
       {label && (
-        <SymbolText x={x} y={labelY} size={11} weight={600}>
+        <SymbolText x={x} y={labelY} size={LABEL_SIZE} weight={600}>
           {label}
         </SymbolText>
       )}
       {value && (
-        <SymbolText x={x} y={valueY} size={10} opacity={0.7}>
+        <SymbolText x={x} y={valueY} size={VALUE_SIZE} opacity={0.7}>
           {value}
         </SymbolText>
       )}
@@ -163,12 +176,12 @@ export function OrientedLabel({
   return (
     <>
       {label && (
-        <SymbolText x={lx} y={labelY} size={12} weight="bold" anchor={anchor}>
+        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight="bold" anchor={anchor}>
           {label}
         </SymbolText>
       )}
       {value && (
-        <SymbolText x={lx} y={valueY} size={11} anchor={anchor} opacity={0.7}>
+        <SymbolText x={lx} y={valueY} size={VALUE_SIZE} anchor={anchor} opacity={0.7}>
           {value}
         </SymbolText>
       )}

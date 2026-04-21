@@ -517,7 +517,7 @@ export default function WaterPipeDiagram() {
           x={tankX + tankW / 2}
           y={tankY - 22}
           textAnchor="middle"
-          fontSize={17}
+          fontSize="1.062em"
           fontWeight={700}
           fill={svgTokens.primary}
         >V</text>
@@ -525,7 +525,7 @@ export default function WaterPipeDiagram() {
           x={tankX + tankW / 2}
           y={tankY - 4}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fill={svgTokens.mutedFg}
         >
           {t('ch1_1.waterPipeLabelVoltage')}
@@ -536,7 +536,7 @@ export default function WaterPipeDiagram() {
           x={(restrictStartX + restrictEndX) / 2}
           y={pipeTopY - 36}
           textAnchor="middle"
-          fontSize={17}
+          fontSize="1.062em"
           fontWeight={700}
           fill={svgTokens.caution}
         >R</text>
@@ -544,7 +544,7 @@ export default function WaterPipeDiagram() {
           x={(restrictStartX + restrictEndX) / 2}
           y={pipeTopY - 18}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fill={svgTokens.mutedFg}
         >
           {t('ch1_1.waterPipeLabelResistance')}
@@ -565,7 +565,7 @@ export default function WaterPipeDiagram() {
           x={pipeEndX - 12}
           y={pipeTopY - 22}
           textAnchor="middle"
-          fontSize={17}
+          fontSize="1.062em"
           fontWeight={700}
           fill={svgTokens.note}
         >I</text>
@@ -573,7 +573,7 @@ export default function WaterPipeDiagram() {
           x={pipeEndX - 12}
           y={pipeTopY - 4}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fill={svgTokens.mutedFg}
         >
           {t('ch1_1.waterPipeLabelCurrent')}

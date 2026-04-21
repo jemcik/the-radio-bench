@@ -33,6 +33,33 @@ This skill eliminates state 2.
 
 Work the checklist in order. Don't skip items because they seem obvious — the failures come from the obvious ones.
 
+### 0. Circuit schematics: ZERO hand-drawn SVG. Always `@/lib/circuit`.
+
+**Absolute rule, no exceptions.** For any schematic-like content — wires, resistors, capacitors, inductors, diodes, LEDs, transistors, meters, batteries, grounds, switches, fuses, junction dots, named nodes, rail/terminal labels, current arrows, measurement marks — the component comes from `@/lib/circuit`. No raw `<circle>`, `<rect>`, `<line>`, `<path>`, or `<text>` for circuit content in chapter diagram files. None.
+
+Before starting any schematic, enumerate the primitives:
+
+```
+grep -E "^export (const|function)" src/lib/circuit/index.ts src/lib/circuit/symbols/index.ts
+```
+
+Decision tree:
+
+1. **Primitive exists and renders correctly** → use it.
+2. **Primitive exists but renders wrong or lacks a feature** → fix the primitive. It lives in `src/lib/circuit/symbols/*.tsx`; every chapter using that symbol benefits from the fix. Do NOT work around the bug in your chapter file.
+3. **Primitive does not exist** → add a new one to `src/lib/circuit/symbols/`, export it from `src/lib/circuit/symbols/index.ts` and `src/lib/circuit/index.ts`, then use it. Typical places something is missing: a new teaching annotation (node-point marker, current-direction arrow, probe marker), a new instrument, a new industrial symbol. The library grows chapter by chapter.
+
+The library is the **single source of truth** for schematic visuals. Hand-rolling is a consistency regression: different stroke weights, different label fonts, different junction-dot conventions, different colour palette, different aria patterns. User has flagged this class of inconsistency multiple times across chapters.
+
+Canonical schematics to mirror:
+- `Chapter0_5.tsx` `LedCircuit` — basic topology, `Circuit` wrapper, `Wire` + `Resistor` + `LED` + `Battery`.
+- `Chapter1_4.tsx` `DividerSchematic` — adds `Meter`, `Junction` at every T-joint, `NodePoint` for named nodes, `TerminalLabel` for rail-end labels.
+
+Self-review checklist when your schematic is drafted:
+- Grep your file for raw `<circle`, `<rect`, `<line`, `<path`, `<text` JSX. Count should be zero for circuit-content elements. If non-zero, stop and ask: does a primitive cover this? If yes, refactor. If no, create the primitive first.
+- Open the rendered schematic alongside `Chapter0_5` / `Chapter1_4` ones. Stroke weights, symbol sizes, label placement — identical? If not, investigate why; the primitive should make them identical automatically.
+- Junction dots: present at every T-joint (3+ wires meeting), absent at plain corners (2-wire bends) and at phantom crossings.
+
 ### 1. Sizing — no scaling, ever
 
 **Hard rule:** the SVG renders at fixed pixel dimensions equal to the viewBox. Every number in viewBox units is the number of pixels on screen.

@@ -379,6 +379,315 @@ Why:
 
 ---
 
+## 13. Word-order & sentence-structure calques (ch1.4 pushback cluster)
+
+A recurring class of feedback across ch1.1–1.4 has been: the translation is grammatically correct AND passes the mechanical linter AND uses the right terminology — but the sentence is structured like English. Re-reading aloud reveals it. These fixes were applied during ch1.4 review; every one is a pattern that repeats across chapters.
+
+### 13.1. Pronoun-elision calque: EN "one/ones" as a bare adjective
+
+❌ **`перетворює будь-яке фіксоване джерело на менше`** (EN: "turns any fixed supply into a smaller one")
+✅ **`отримує меншу напругу з будь-якого фіксованого джерела`**
+
+Why: EN "one" is a pronoun standing in for "supply". UA doesn't elide the noun after an adjective — the bare «менше» grammatically attaches to the nearest neuter noun («джерело»), and now the sentence literally says "turns a supply into a smaller supply", which is both physically wrong (a divider doesn't shrink the supply, it produces a smaller output voltage) and linguistically unnatural.
+
+**Rule**: whenever EN has "a smaller/larger/different ONE", ask what noun "one" is standing in for, and restate that noun explicitly in UA. Never leave a bare adjective as a predicate in UA where EN had "one" as a pronoun.
+
+### 13.2. Comparative adjective attached to the wrong noun
+
+❌ **`Конденсатори зазвичай гірші за резистори`** (EN: "Capacitors are normally worse than resistors" — in a tolerance paragraph)
+✅ **`У конденсаторів допуск зазвичай ширший, ніж у резисторів`**
+
+Why: EN idiomatic "X is worse than Y" relies on context to specify what's being compared. UA readers take the adjective literally: «гірші конденсатори» reads as "bad components", which is nonsense. Same family as landmine 149 («менший резистор» → «резистор з меншим опором»).
+
+**Rule**: name the quality being compared («допуск», «опір», «ємність», «точність», «стабільність»), attach the comparative to it, not to the component noun. Prefer concrete descriptors over abstract value judgments: «ширший допуск» beats «гірший допуск» because it says WHAT is wider.
+
+### 13.3. Adjective stacking order — EN pre-noun → UA post-noun genitive
+
+❌ **`прямокутні піщаного кольору чипи`** (EN: "rectangular sandy-coloured chips")
+✅ **`прямокутні чипи піщаного кольору`**
+
+Why: EN stacks adjectives before the noun freely. UA keeps structural adjectives (shape, size, number) before the noun and moves descriptive ones (colour, material, origin) to a post-noun genitive / instrumental phrase. Literal EN order sounds like a checklist instead of prose.
+
+**Rule**: when an EN noun phrase has ≥2 adjectives where one is structural and another is descriptive (colour, material, country-of-origin, age), put the structural one before, the descriptive one after with genitive/instrumental: `прямокутні чипи піщаного кольору`, `керамічна підкладка білого кольору`, `мідний провід діаметром 0,5 мм`, `деталі вітчизняного виробництва`.
+
+### 13.4. Chained past-participle + prepositional-phrase descriptions
+
+❌ **`пластинка або плівка резистивного матеріалу, підігнана до заданого R, з виводами або торцевими контактами для підключення до схеми`** (EN: "a slab or film of resistive material, trimmed to the target R, with leads or end-caps to connect it into the circuit")
+✅ Split into two sentences + replace past participle with adjectival phrase: **`Усередині — пластинка або плівка резистивного матеріалу із заданим опором R. До схеми її приєднують виводами або торцевими контактами.`**
+
+Why: EN tolerates 3+ comma-separated modifier phrases in one sentence («past-participle, with-phrase, for-purpose»). UA grammar makes each phrase work harder — past participles need case agreement that's often ambiguous, prepositional phrases stack heavily, and the reader has to hold the subject in memory across the whole chain.
+
+**Rule**: after translating any EN sentence with 3+ comma-separated descriptor phrases, read it aloud. If it feels heavy:
+  1. Split into two sentences at the logical break (verb/function vs. property);
+  2. Convert past participles to adjective phrases («підігнана до X» → «із заданим X»);
+  3. OR use a relative clause («який/яка/яке…») to unstack the modifiers.
+
+### 13.5. Canonical technical term in pedagogical prose without gloss
+
+❌ **`схема зміщення`** / **`зміщення транзисторів`** (in a beginner chapter on resistors, before transistors are introduced)
+✅ **`каскад задавання робочої точки транзистора`** / **`для задавання робочої точки транзисторів`**
+
+**Mechanically enforced** via `style.unglossed-canonical-term` rule in `scripts/lint-ua-translation.mjs` as of ch1.4 post-mortem. The rule maintains a registry of jargon terms paired with `safeFromChapter` thresholds. A term appearing in a chapter below its threshold without being wrapped in any `<tag>…</tag>` AND without an immediate parenthetical gloss fires a WARN. Each new user catch of unglossed jargon must add a row to that registry.
+
+Current registry (as of ch1.4): `атенюатор` (safe from ch3+), `адмітанс` (ch1.6+), `гістерезис` (ch2+), `каскад` (ch1.8+), `трансивер` (ch2+), `гетеродин` (ch3.1+), `зміщення` (ch1.10+), `ВЧ` (ch2+), `КХ` (ch4.1+), `реактивний опір` (ch1.5+).
+
+**Extension rule**: whenever the user pushes back on an unglossed technical term, add a row to the REGISTRY in the lint script, don't just add it to landmines.md prose.
+
+Why: «зміщення» IS the canonical UA electronics term for biasing (used in every datasheet, Ohm's-law textbook, diode/op-amp theory). BUT its everyday meaning is "displacement/shift", which gives the wrong mental image for a first-time reader. Pedagogical prose should either paraphrase descriptively OR include both forms on first use.
+
+Same class:
+  - «корпус» (component package) — its everyday meaning is "body/torso". First-time reader in a resistor chapter sees «корпусами резисторів» and pictures a resistor's torso. Prefer the general noun («типи резисторів») in intro paragraphs and let the section itself introduce the technical term with context.
+  - «адмітанс» (in a ch1.6 intro before chapter defines AC impedance) — use «провідність у колах змінного струму» until it's formally defined.
+  - «гістерезис» (in a digital-electronics intro before the Schmitt-trigger section) — use «поріг із запасом» or similar descriptive phrase.
+
+**Rule**: before using a UA engineering term in a beginner chapter, check whether the concept has been introduced EARLIER in the book. If not, either paraphrase with the descriptive form, OR use both («зміщення (задавання робочої точки) транзисторів») on first appearance.
+
+### 13.6. Jargon in intro/preview paragraphs before the section defines it
+
+❌ **`Ми познайомимося з основними <surface>корпусами</surface> резисторів`** (intro preview — packages section hasn't run yet)
+✅ **`Ми познайомимося з основними типами резисторів`** (general word in intro; specific term introduced in-section)
+
+Why: intro/preview paragraphs summarise the chapter for a reader who's about to START reading. Using a term they'll meet in section 2 as if they already know it is bad pedagogy. EN tolerates it (reader fills in); UA readers are stricter.
+
+**Rule**: audit intro/preview paragraphs for technical terms. If a term is formally introduced in a later section with its own glossary tag, use a general paraphrase in the intro. Apply equally to EN source — if the EN preview uses jargon, fix both locales.
+
+### 13.7. English borrowings where UA Wikipedia has a native term — «декада» vs «десяток»
+
+❌ **`логарифмічно у межах кожної декади`** / **`кількість номіналів на декаду`** (resistor E-series context)
+✅ **`логарифмічно у межах кожного десятка`** / **`кількість номіналів на десяток`**
+
+Why: UA Wikipedia on «Ряди номіналів радіоелементів» uses «десяток» (ten-fold interval) exclusively for resistor preferred-value context. «Декада» is a borrowing that IS acceptable in frequency-response contexts (Bode-plot rolloff «на декаду»), but for resistor values the native UA term wins. The `decade.detail` glossary entry (line ~2157 of uk/ui.json) explicitly flags «декада» as «синонім, запозичений з англійської» in that context too.
+
+**Rule**: before using a Latin-derived UA term (decadа, toleransia, precisiyа, attenuaciya), check UA Wikipedia for the same concept. If Wikipedia uses a native Slavic root, use that. Borrowings are acceptable only where Wikipedia itself uses them.
+
+Known domain-by-domain preferences:
+  - Resistor E-series: **десяток** (not декада). Frequency rolloff: **порядок** (декада OK as synonym).
+  - Divider: **подільник напруги** (not дільник).
+  - Bias: **зміщення** in datasheets and theory; **задавання робочої точки** in beginner pedagogy.
+  - Tolerance: **допуск**; «толеранс» is a calque in engineering contexts.
+  - Precision (resistor grade): **точний** / **прецизійний** (both OK, prefer «прецизійний» for the 5-band grade).
+
+### 13.8. Metaphor-carry-over failure — words that are figurative in EN but literal in UA
+
+❌ **`на шві виходить крихітне перекриття, і разом два бункери покривають`** (EN: "there is a tiny overlap at the seam and the two bins together cover …", about tolerance windows of adjacent E-series values)
+✅ **`на межі між цими двома вікнами виходить крихітне перекриття, і разом вони накривають`** — continuing the «вікно» metaphor the paragraph already established
+
+Why: EN engineering prose routinely uses vivid figurative nouns — `seam` (boundary), `bin` (sorting category), `shelf` (parts-drawer), `rail` (power line), `spine` (backplane), `hood` (shroud), `bucket` (batch), `neck` (narrow part), `anchor` (reference point) — and English readers parse them metaphorically without conscious effort. In UA these same words translate to their LITERAL meanings: `шов` = stitched seam on a garment, `бункер` = grain silo / fuel bunker, `полиця` = bookshelf, `рейка` = railway track, `хребет` = human spine, `капот` = car bonnet, `відро` = water bucket, `шия` = anatomical neck, `якір` = ship's anchor. The reader asks «який шов? який бункер? який якір?» and loses the thread.
+
+**Rule**: for every figurative noun in the EN source, ask:
+  1. Does the literal UA translation CARRY the metaphorical extension? (e.g. «вузьке місце» DOES carry "bottleneck"; «бункер» does NOT carry "manufacturing value-bin")
+  2. Has the SAME paragraph already established a metaphor that would continue naturally? (if yes, reuse it — the ch1.4 `eSeriesWhy` had `вікно` established two sentences earlier; I should have continued with `вікна перекриваються`, not introduced new metaphors)
+  3. If the metaphor doesn't carry and no UA-native one fits, describe directly: say what physically happens without trying to preserve the figure.
+
+**Recurring non-carrying metaphors to watch for**:
+  - `seam` (boundary between categories) → `межа` / `стик` / «на границі між»
+  - `bin` (sorting category) → `інтервал` / `категорія` / `діапазон` / just reuse `вікно`
+  - `shelf` (parts inventory) → `асортимент` / `каталог` / `набір номіналів`
+  - `rail` (power-supply line) → `шина` / `лінія живлення` — but `шина` works because UA already uses it for this!
+  - `spine` (connecting backbone) → `основа` / `стрижень` (careful — `стрижень` is literal "rod", often works)
+  - `bucket` (bulk container of same-type items) → `партія` / `група`
+  - `hood` (protective cover) → `кожух` / `оболонка`
+  - `anchor` (fixed reference point) → `опора` / `опорна точка`
+  - `seam`, `bin`, `bucket`, `hood` in engineering prose almost NEVER carry to UA; the others sometimes do (`spine`, `rail`, `anchor`).
+
+### 13.10. Section-heading calque: EN "What to take away" → «Що взяти з собою»
+
+Flagged by user ch 1.4: «"Що взяти з собою" про що мова в цьому заголовку? куди взяти? чи це знову просто калька, якої я просив уникати?»
+
+The English heading "What to take away" is an idiom (≈ "the key points worth remembering"). Literal UA «взяти з собою» preserves only the *verb of motion* — «взяти» implies physical possession or carrying something with you. A reader cannot literally «взяти з собою» a concept, so the heading reads as nonsense: "take where?"
+
+- ❌ «Що взяти з собою» → ✅ «Головне» (shortest, most idiomatic; ch1.2, ch1.4 use this)
+- ❌ «Що винести з розділу» → ✅ «Підсумки» / «Ключове»
+- ❌ «Що треба забрати з собою» → ✅ «Що варто запам’ятати» (ch1.3)
+
+**Rule:** for section-summary headings, prefer a noun («Головне», «Підсумки», «Ключове») or a soft-modal construction with a memory verb («Що варто запам’ятати»), never a verb of physical motion/possession («взяти», «забрати», «понести»).
+
+**Register note on modals:** «Що треба запам’ятати» is grammatically correct but reads as imperative («you have to remember»). «Що варто запам’ятати» («what's worth remembering») is the softer, more reader-friendly variant — prefer it when using this construction.
+
+**Anti-over-correction:** the fix is per-heading, NOT a book-wide consolidation. Different chapters may use different heading variants («Головне», «Підсумки», «Що варто запам’ятати») as long as each one is idiomatic. Do NOT bulldoze existing idiomatic UA headings into matching some other chapter for the sake of consistency alone. The linter targets only the physical-motion calque; other variants are fine.
+
+**Enforcement:** mechanically caught by `forbidden.take-away-calque` in the linter.
+
+### 13.11. Bare parenthetical «(завжди більше)» / «(завжди менше)» — calque of EN "(always larger/smaller)"
+
+Flagged by user ch 1.4 keyTakeaway4: «що означають "завжди більше" і "завжди менше"? виглядає як калька і незрозуміло про що мова».
+
+English summary bullets use short parentheticals — "(always larger)" / "(always smaller)" — that rely on the reader silently supplying the subject (*the resistance* is larger) and the comparison target (*than either resistor*). The literal UA rendering «(завжди більше)» / «(завжди менше)» fails on both counts:
+
+1. **Grammatical subject mismatch.** Neuter «більше/менше» attaches to the nearest neuter noun by default («з'єднання»), producing "the connection is always larger" — nonsense. In EN the parenthetical floats; in UA it cannot.
+2. **Missing comparison target.** «Більше за що?» has no anchor in the UA sentence. EN gets away with it because follow-up prose fills in; UA needs it stated inside the parenthetical or the sentence.
+
+- ❌ «Послідовне: <var>R</var> = <var>R</var><sub>1</sub> + <var>R</var><sub>2</sub> (завжди більше).»
+- ✅ «Послідовне з'єднання: <var>R</var> = <var>R</var><sub>1</sub> + <var>R</var><sub>2</sub> — сумарний опір більший за кожен із резисторів окремо.»
+- ❌ «Паралельне: <var>R</var> = … (завжди менше).»
+- ✅ «Паралельне з'єднання: <var>R</var> = … — сумарний опір менший за кожен із них.»
+
+**Rule:** in UA, every comparative adjective («більший», «менший», «вищий», «нижчий», «коротший», «довший») in prose MUST have:
+  - an explicit grammatical subject (not elided), AND
+  - an explicit comparison target (`за Х`, `від Х`, `ніж Х`).
+
+Bare parentheticals like «(завжди більше)», «(значно менше)», «(трохи вище)» fail both tests and read as translation debris.
+
+**Same class** — flag and rewrite any of:
+  - «(значно нижче)», «(помітно більше)», «(завжди вищий)» without an anchor
+  - «значення тут менше» → «опір тут менший за номінальний»
+  - «частота стає вищою» → «частота стає вищою за резонансну»
+
+**Enforcement:** mechanically caught by `forbidden.bare-zavzhdy-comparative` in the linter (narrow pattern: parentheticals `(завжди + comparative)`). Broader cases — bare comparatives in full sentences — still need the read-aloud pass (13.9).
+
+**Source-side discipline:** when writing the EN original, prefer "(total is larger than either resistor)" over "(always larger)". The more explicit EN survives translation without re-seeding this calque.
+
+
+### 13.12. Case government of «торкнутися» — instrument goes instrumental, not genitive
+
+Flagged by user ch 1.4 labStep2: «"Спочатку торкніться щупів один до одного" має бути "торкніться щупами"».
+
+**The rule.** The Ukrainian verb «торкнутися» («to touch») has two argument slots with different cases:
+
+- **Object** being touched → **genitive** case: «торкнутися руки», «торкнутися аркуша», «торкнутися виводів резистора»
+- **Instrument** used to touch → **instrumental** case: «торкнутися рукою столу» (touched the table with the hand), «торкнутися щупами виводів» (touched the leads with the probes)
+
+When the only noun mentioned is a tool (probe, finger, screwdriver, stylus) being used to make contact, that noun is the **instrument**, not the object — so it takes instrumental case.
+
+- ❌ «торкніться щупів один до одного» — treats the probes as the object-being-touched (genitive «щупів»)
+- ✅ «торкніться щупами один до одного» — probes as the instrument (instrumental «щупами»), reciprocal phrase «один до одного» implies they touch each other
+
+**The trap.** English «touch the probes» is simply transitive — "touch" is a two-place verb with a direct object. The translator calques the English valency onto «торкнутися» and picks genitive (because UA «торкнутися» governs genitive) without noticing that the genitive slot in UA is for the OBJECT, while the probes are actually the INSTRUMENT. The English syntax doesn't distinguish, the UA case system does.
+
+**Audit list** when editing lab steps and any procedural text:
+- «щуп» (probe) — almost always an instrument → instrumental
+- «палець» (finger) in measurement context — usually instrument → instrumental
+- «викрутка», «пінцет», «скальпель» — instruments → instrumental
+- «вивід», «контакт», «клема», «нога» (of a component) — usually the OBJECT being touched → genitive is correct
+
+**Alternative phrasings** that avoid the ambiguity:
+- «зімкніть щупи між собою» — "close the probes against each other"
+- «замкніть щупи» — "short the probes" (electrician's idiom)
+- «з'єднайте щупи» — "join the probes"
+
+**Enforcement:** narrow rule `forbidden.torknutysya-schupiv` catches «торкн*» + «щупів». Extend the pattern when a new instrument noun gets flagged.
+
+### 13.13. «Точніше, ніж на X відсотків» — margin-comparator calque of EN "to within X percent"
+
+Flagged by user ch 1.4 labStep5: «"Вони мають збігатися точніше, ніж на пару відсотків" звучить криво, це знову калька?»
+
+English uses a comparative construction for agreement/tolerance margins: "to within X percent", "better than X percent", "no more than X off". The UA translator calques this onto the comparative «точніше, ніж на X» — grammatically valid, semantically wrong: UA expresses margin/tolerance with completely different constructions.
+
+- ❌ «Вони мають збігатися точніше, ніж на пару відсотків»
+- ✅ «Значення мають збігатися з точністю до кількох відсотків»
+- ✅ «Розбіжність має бути в межах кількох відсотків»
+- ✅ «Похибка не повинна перевищувати кількох відсотків»
+
+**Rule:** never translate "to within X" / "better than X" / "no more than X off" with the comparative «точніше/більше/менше, ніж на X». For tolerance/margin use one of:
+
+| EN pattern                    | UA idiom                                      |
+|-------------------------------|-----------------------------------------------|
+| "agree to within X percent"   | «збігатися з точністю до X %»                 |
+| "accurate to within X"        | «з точністю до X»                             |
+| "within X of the target"      | «у межах X від цільового значення»            |
+| "better than X percent"       | «з похибкою не більше X %»                    |
+| "no more than X off"          | «відхилення не більше X»                      |
+
+**Enforcement:** mechanically caught by `forbidden.tochnishe-nizh-na-calque` for the «точніше, ніж на» form. Other comparator verbs (швидше/більше/менше, ніж на X) would need their own rules if they show up.
+
+### 13.14. «Пару відсотків / герц / хвилин» — russism for "a few" in measurement register
+
+Flagged in the same ch 1.4 sentence. «Пара» in Ukrainian fundamentally means "pair" (two of something): «пара черевиків», «пара резисторів». The extended sense of "a small number, a few" is a **russism** (from ru. «пару процентов», «пару минут») and reads as colloquial at best, informal-inappropriate in technical writing at worst.
+
+- ❌ «на пару відсотків»  → ✅ «на кілька відсотків»
+- ❌ «зачекайте пару хвилин»  → ✅ «зачекайте кілька хвилин» / «декілька хвилин»
+- ❌ «похибка лише пару герц»  → ✅ «похибка лише в кілька герц»
+
+**Legitimate «пара» uses** (NOT flagged):
+- «пара резисторів» — literal pair of two
+- «пара контактів» — literal pair
+- «у мене на столі пара мультиметрів» — literal pair
+
+The tell for the russism is ACCUSATIVE «пару» (not nominative «пара») followed by a plural-genitive measurement unit. The pair-of-two sense uses nominative «пара» + plural-genitive noun («пара резисторів», nominative subject of a clause).
+
+**Enforcement:** mechanically caught by `forbidden.paru-units-russism` for «пар[уи]» + technical unit (відсотк, процент, герц, вольт, ампер, ват, ом, децибел, хвилин, секунд, мілісекунд, мікросекунд, хвиль, канал, розділ). Extend the unit list when new measurements appear.
+
+### 13.15. «Статичні факти» — calque of EN "static facts"
+
+Flagged by user ch 1.4 labConnection: «Ця лабораторна пов'язує статичні факти кольорового коду з поведінкою резисторів усередині робочої схеми … звучить неприродно, схоже на кальку».
+
+English "static facts" = "table-of-values, bookkeeping data that doesn't change". It's idiomatic English academic register. UA «статичний» has a much narrower meaning: **physically motionless** (статична електрика, статичне поле, статична напруга). Applied to «факти» it's semantically empty — facts are never moving anyway — so the adjective sits dead in the sentence.
+
+- ❌ «статичні факти кольорового коду»  → ✅ «теорія кольорового коду», «значення з таблиці», «табличні дані», «довідкові знання»
+- ❌ «статичні дані датчика»  → ✅ «табличні дані», «довідкові значення» (or if truly "not-changing", use «незмінні», «сталі»)
+
+**Rule:** the EN word "static" used to mean "reference / lookup / table-of-values" MUST NOT be translated as «статичний» in UA. Either rephrase around «теорія → практика», «з таблиці — у реальність», or use the concrete UA noun («табличні дані», «довідкові знання»).
+
+**Related calque at the same site:** «усередині робочої схеми» — literal "inside a working circuit". UA natural: «в реальній схемі», «у зібраній схемі», «на робочій платі». Not mechanically enforced (too broad to pattern-match safely) but covered by the read-aloud pass.
+
+**Enforcement:** caught by `forbidden.statychni-fakty-calque` in the linter.
+
+### 13.16. «Мотивує теорему / закон / підхід / …» — academic-English "motivates" calque
+
+Flagged by user ch 1.4 labConnection: «"а це мотивує теорему Тевенена" до чого тут мотивація?».
+
+English academic prose uses "X motivates Y" constantly: "this experiment motivates the theorem", "the result motivates the need for a new approach". It means "provides the rationale for / creates the need for Y". In Ukrainian, **«мотивувати» is ONLY used for motivating a PERSON** — «мотивує студентів», «мотивує команду», «мотивує працівників». Applied to a theorem, law, formula, method, or discussion, it's semantically broken: a theorem has no agency to be motivated.
+
+Native UA equivalents for "X motivates Y" (academic sense):
+
+| EN pattern                    | UA replacement                                                                  |
+|-------------------------------|----------------------------------------------------------------------------------|
+| "this motivates theorem Y"    | «саме тут стає в нагоді теорема Y», «саме для цього потрібна теорема Y»          |
+| "X motivates the need for Y"  | «X робить потрібним Y», «через X нам знадобиться Y»                              |
+| "this motivates the approach" | «саме тому ми оберемо такий підхід», «через це ми введемо такий підхід»          |
+| "motivates the discussion"    | «саме це ми обговоримо у Розділі N», «для цього потрібне обговорення»            |
+
+**Related lazy-verb calque at the same site:** «теорема, якою ми займемося» — "the theorem we'll occupy ourselves with". «Займатися + instrumental» for a theorem/formula/law is a generic deflection. Use the concrete verb: «яку ми розглянемо», «яку ми виведемо», «з якою ми познайомимося», «яку будемо вивчати». Not mechanically enforced (too broad — «займатися» has many legitimate uses) but covered by the read-aloud pass.
+
+**Enforcement:** `forbidden.motyvuye-abstract-calque` catches any form of «мотивує/мотивують/мотивував…» followed within ~40 chars by an abstract target noun (теорем-/закон-/підхід-/метод-/формул-/правил-/обговоренн-/дискус-/висновок-/результат-/рівнянн-). Human-object cases («мотивує студентів», «мотивує команду») are deliberately not flagged — add to the target-noun list if a new abstract class slips through.
+
+### 13.17. English "DC" in a frequency-range spec — dimension clash when calqued as «постійний струм»
+
+Flagged by user ch 0.2 vnaHobby: «"Популярні сучасні моделі … працюють від постійного струму до 1,5–3 ГГц" чому йде мова про струм, а вказана частота?».
+
+**The dual meaning of "DC" in English RF/filter engineering.** The abbreviation carries two distinct senses in English technical writing:
+
+1. **"Direct current"** — a current TYPE (flows in one direction only). Dimension: amperes.
+2. **"Zero frequency"** — a point on the frequency axis. Used in filter and analyser specs: "DC-to-X Hz" means "from 0 Hz up to X Hz". Dimension: hertz.
+
+English readers pick the sense from context: "this amp draws 2 A of DC" (sense 1) vs "this VNA covers DC to 3 GHz" (sense 2). Same abbreviation, different dimension.
+
+**The trap.** UA «постійний струм» literally translates only sense 1 — a current type. When sense 2 is calqued as «постійний струм», the phrase «від постійного струму до 3 ГГц» reads as a nonsensical cross-dimensional range: "from CURRENT to FREQUENCY".
+
+**The fix.** In a frequency-range spec, name the lower bound in frequency units:
+
+- ❌ «працюють від постійного струму до 1,5–3 ГГц»  → ✅ «працюють у діапазоні від 0 Гц до 1,5–3 ГГц»
+- ❌ «фільтр пропускає від постійного струму до 10 кГц»  → ✅ «фільтр пропускає від 0 Гц до 10 кГц»
+- ❌ «смуга пропускання — від постійного струму до 500 МГц»  → ✅ «смуга пропускання — від 0 Гц до 500 МГц»
+
+If you want to preserve the RF-engineering flavor, use a gloss:  «від 0 Гц (постійний струм) до X Гц». Most contexts don't need it.
+
+**Sense 1 uses are unaffected** (not flagged by the linter):
+- «споживає 2 А постійного струму» — current draw of a load
+- «постійний струм у колі — 1,5 А» — current magnitude
+- «лінійний блок живлення видає постійний струм до 5 А» — "up to 5 A" is a current limit, not a frequency range
+
+The tell for the dimension clash is **«постійн* струм*» within ~30 chars of «до» + a frequency unit (Гц/кГц/МГц/ГГц/ТГц)**. Current-magnitude uses end in an ampere unit (А/мА/кА), never a hertz unit — so the linter's window is unambiguous.
+
+**Enforcement:** mechanically caught by `forbidden.dc-to-freq-dimension-clash`.
+
+**Source-side note:** the EN source keeps "DC to X GHz" because it's idiomatic English RF-speak and English readers parse it correctly. Translation asymmetry is fine — what matters is that each language communicates the same content via its own idiom.
+
+### 13.9. Meta-rule: the «read-aloud» pass
+
+The critiques caught many of these earlier in the session, but several slipped through because they pass every mechanical check (no forbidden words, correct apostrophes, decimal commas, `<var>` wrapping, none of the catalogued landmines 1–12) AND they're grammatically correct — they just feel translated.
+
+**Discipline for future chapters**: after the full critique + lint pass, before presenting to the user, the translator must re-read the ENTIRE BLOCK once more, sentence by sentence, asking:
+  1. **Is the word order natural UA?** (color/material after the noun; structural adjectives before; comparative attached to the right noun)
+  2. **Are there 3+ modifier phrases in one sentence?** (if yes, consider splitting)
+  3. **Is the grammatical subject the RIGHT subject?** (not «конденсатори гірші» when the real subject is their допуск; not «джерело менше» when the real subject is the output voltage)
+  4. **Does each UA pronoun have exactly one plausible antecedent?** (no floating «це/той/такий/менше» that attaches to the nearest noun by default when the intended referent is further away)
+  5. **Would a UA reader who doesn't know the EN source parse this sentence the way I intended?**
+
+If any answer is "no" or "maybe", rewrite. This pass costs minutes and saves hours of round-trip.
+
+---
+
 ## How this list grows
 
 When the user flags something I missed, add it here verbatim with `❌ wrong → ✅ right → why`. This is the permanent record — each new chapter starts with this list loaded.

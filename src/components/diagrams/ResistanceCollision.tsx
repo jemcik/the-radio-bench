@@ -192,7 +192,7 @@ export default function ResistanceCollision() {
         <text
           x={W / 2} y={24}
           textAnchor="middle"
-          fontSize={16}
+          fontSize="1em"
           fontWeight={700}
           fill={svgTokens.fg}
         >
@@ -239,7 +239,7 @@ export default function ResistanceCollision() {
                 <text
                   x={ionCx} y={ionCy + 6}
                   textAnchor="middle"
-                  fontSize={20}
+                  fontSize="1.25em"
                   fontWeight={700}
                   fill="hsl(var(--background))"
                 >+</text>
@@ -293,7 +293,7 @@ export default function ResistanceCollision() {
         {/* Incoming electron */}
         <text
           x={inStart[0] + 10} y={inStart[1] - 6}
-          fontSize={13}
+          fontSize="0.812em"
           fontWeight={600}
           fill={svgTokens.note}
         >
@@ -303,7 +303,7 @@ export default function ResistanceCollision() {
         <text
           x={outEnd[0] - 10} y={outEnd[1] + 16}
           textAnchor="end"
-          fontSize={13}
+          fontSize="0.812em"
           fontWeight={600}
           fill={svgTokens.note}
         >
@@ -313,7 +313,7 @@ export default function ResistanceCollision() {
         <text
           x={ionCx} y={ionCy + ionR + 28}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fontWeight={600}
           fill={svgTokens.caution}
         >
@@ -323,7 +323,7 @@ export default function ResistanceCollision() {
         <text
           x={ionCx} y={ionCy - ionR - 36}
           textAnchor="middle"
-          fontSize={13}
+          fontSize="0.812em"
           fontStyle="italic"
           fill={svgTokens.caution}
         >

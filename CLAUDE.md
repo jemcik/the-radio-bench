@@ -161,8 +161,34 @@ written":
    `"The … table:"` / `"The … diagram:"` — every such promise has
    the referenced artefact actually rendered. Run
    `node scripts/check-i18n-usage.mjs` to catch orphan keys too.
-6. **Status flip last.** `'coming-soon'` → `'published'` in
-   `src/data/chapters.ts` only after 1–5 and the full gate above
+6. **Schematic consistency — zero hand-drawn SVG.** Every circuit
+   diagram is composed ENTIRELY from `@/lib/circuit` primitives:
+   `Circuit`, `Wire`, `Junction`, `Resistor`, `Capacitor`, `Inductor`,
+   `Meter`, `Battery`, `Ground`, `Diode`, `LED`, `TransistorNPN`,
+   `NodePoint`, `TerminalLabel`, etc. **No exceptions.** No raw
+   `<circle>`, `<rect>`, `<line>`, `<text>` in chapter diagram files
+   for circuit-like content.
+
+   - If a primitive exists — use it.
+   - If a primitive renders incorrectly — fix the primitive; do not
+     work around it in a chapter file.
+   - If a primitive is missing — add a new one to
+     `src/lib/circuit/symbols/` and export from `src/lib/circuit/index.ts`,
+     then use it. The library is the single source of truth for
+     schematic-element visuals; every new primitive makes every
+     future chapter cheaper.
+
+   Check: junction dots at every T-joint (three or more wires meeting)
+   and NOT at plain corners; meter symbols from the `Meter` primitive
+   (circle + bold letter, `stroke=currentColor`) matching ch0.2 / ch0.5;
+   stroke widths, label fonts, and node-label conventions identical
+   to the rest of the book.
+
+   User has flagged inconsistent symbols / missing junction dots /
+   hand-rolled SVG multiple times — this gate exists because each
+   violation costs a round-trip.
+7. **Status flip last.** `'coming-soon'` → `'published'` in
+   `src/data/chapters.ts` only after 1–6 and the full gate above
    are green.
 
 ## SVG diagrams / rough.js illustrations — use the `diagram-quality` skill
@@ -252,6 +278,21 @@ Typical failure modes (user has flagged all of these in Ch 1.2 alone):
 - **"Three numbers / these two values"** when fewer are visible on the
   page — name the QUANTITIES instead: `напруга, сила струму й
   потужність`.
+- **Spatial direction as pedagogical scaffolding** — `moving right on
+  the ladder`, `above the cutoff line`, `рух праворуч по шкалі`. Only
+  acceptable when (a) the reader is CURRENTLY looking at a diagram
+  whose orientation is unambiguous (e.g. a frequency plot — lower=left
+  is universal), AND (b) the direction is not the load-bearing part of
+  the explanation. A ch 0.3 prose rule about prefix conversion phrased
+  around «рух праворуч → більший префікс → менше число» fails both:
+  the prefix ladder's orientation is a drawing choice, and the two
+  inversions (right→bigger prefix→smaller number) create avoidable
+  cognitive load. Teach the DIMENSIONAL rule instead: the physical
+  quantity is invariant, so number and unit change inversely (bigger
+  unit ↔ smaller number), then state the mechanics explicitly
+  («один крок на шкалі = ×1000 = 3 позиції коми»). Spatial metaphors
+  are fine as a mnemonic AFTER the dimensional rule is established,
+  but never as the primary explanation.
 
 Full catalogue of the pattern + prevention checklist in memory at
 `memory/feedback_first_mention_explicitness.md`. **Run that checklist

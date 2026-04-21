@@ -376,6 +376,58 @@ function renderSubpart(x: number, y: number) {
 
 ---
 
+## 21. Diagram title clips off both ends when user picks a wider font
+
+**Symptom.** A long title inside the SVG — e.g. Ukrainian «Номінальна потужність резисторів — фізичний розмір і призначення» — shows up truncated («інальна потужність резисторів — фізичний розмір і призначе»), with characters eaten on both sides.
+
+**Root cause.** Two-layered: (1) the title is rendered as an in-SVG `<text>` at `x={W/2}` with `textAnchor="middle"`; when the translated text in the user's chosen font exceeds the viewBox width `W`, the overflow extends past both edges and gets clipped by the viewBox (or an explicit `<clipPath>` the diagram uses for other reasons). (2) The title's `fontSize={16}` is a numeric SVG attribute, NOT a CSS value — it ignores the html-root font-size that FontContext adjusts. So the "font-size" setting has no effect on the title even when the clipping isn't happening.
+
+**Fix.** Move the title OUT of the SVG into `DiagramFigure`'s `title` prop (added for exactly this). HTML titles wrap naturally across lines when they outgrow their box, AND they inherit font-size from the html root so they respond to the setting:
+
+```tsx
+<DiagramFigure title={t('...')} caption={t('...')}>
+  <svg ...>
+    {/* no more in-SVG title — shrink TOP_MARGIN accordingly */}
+  </svg>
+</DiagramFigure>
+```
+
+**How to avoid.** When designing any new diagram, render the title as HTML above the SVG via `DiagramFigure title={...}`. Reserve in-SVG `<text>` for sub-region labels that belong visually inside the diagram body (e.g. «Series» / «Parallel» on side-by-side halves).
+
+---
+
+## 22. Diagram text doesn't respond to the font-size setting
+
+**Symptom.** User changes the "font size" setting (FontContext, 14–18 px slider). Prose text resizes; diagram text doesn't budge.
+
+**Root cause.** SVG `<text>` elements have `fontSize={16}` or `fontSize="13"` as numeric attributes. These are user-space units in the viewBox, NOT CSS values — they don't participate in the rem/em cascade from the html root, so `html { font-size: 18px }` has no effect on them.
+
+**Fix.** Replace every numeric `fontSize={N}` with an `em`-relative string, and pin the SVG root's CSS font-size to `1rem` so `em` resolves predictably:
+
+```tsx
+<svg ... style={{ ..., fontSize: '1rem' }}>
+  <text fontSize="1em">{label}</text>         {/* was 16 */}
+  <text fontSize="0.8125em">{tick}</text>     {/* was 13 */}
+  <text fontSize="0.875em">{axisTitle}</text> {/* was 14 */}
+</svg>
+```
+
+For HTML inside `<foreignObject>`, use `rem` directly (absolute to html root):
+
+```tsx
+<foreignObject ...>
+  <div style={{ fontSize: '0.875rem', ... }}>{description}</div>
+</foreignObject>
+```
+
+See [typography-and-padding.md](typography-and-padding.md) for the full conversion table.
+
+**How to avoid.** Never write `fontSize={N}` (numeric) in new diagram code. Reach for `em` / `rem` from the start. Pre-flight checklist item.
+
+**Side effect to watch.** At the 18 px max setting, all em-based labels grow 12.5 % vs. default. PAD_L / gutter budgets that were tight at 16 px may overflow — budget against worst-case-UK-at-18-px when tuning margins on new diagrams.
+
+---
+
 ## When adding a new entry
 
 1. Number it sequentially after the last entry.

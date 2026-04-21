@@ -358,13 +358,22 @@ const RULES = [
     id: 'forbidden.emdash-before-math-var',
     category: 'FORBIDDEN',
     severity: 'ERROR',
-    // An em-dash «—» immediately followed by <var> or <nowrap><var> renders
-    // visually as a UNARY MINUS next to the italic math letter — e.g.
-    // «— V_rms» reads as «−V_rms». User-flagged multiple times on ch1.2 and
-    // ch1.3 (`nonSineIntro`). Fix: either replace the em-dash with an explicit
-    // verb/preposition/colon, or switch to parentheses for the inner clause.
-    pattern: /—\s*<(?:var|nowrap)\b/gi,
-    hint: 'Em-dash directly before a math variable reads as a minus sign — the italic letter + the em-dash collapse into a signed quantity. Use parentheses for the inner clause, a colon, or an explicit verb. Never `— <var>X</var>`.',
+    // An em-dash «—» followed by an italic math variable reads visually
+    // as a UNARY MINUS — the italic letter and the dash collapse into a
+    // signed quantity. Triggers:
+    //   1) em-dash + <var>                                 («— V»)
+    //   2) em-dash + short-word (1–4 chars) + <var>        («— і V»)
+    //   3) em-dash + <nowrap> that STARTS with <var>       («— <nowrap><var>V</var>…»)
+    //   4) em-dash + short-word + <nowrap><var>
+    // A <nowrap> wrapping plain text (numbers, units, words) is NOT
+    // ambiguous — «— це <nowrap>10 кОм</nowrap>» reads cleanly as a
+    // prose definition, not a minus sign, because «10» is not italic.
+    // So the rule is narrower than "any <nowrap>": only nowraps that
+    // begin with a math variable count.
+    // User-flagged on ch1.2 / ch1.3 (`nonSineIntro`) and ch1.4
+    // (`dividerFormulaSubstLead`, `labStep4`).
+    pattern: /—\s*(?:\S{1,4}\s+)?(?:<var>|<nowrap>\s*<var>)/gi,
+    hint: 'Em-dash directly before a math variable (or with only a short word between) reads as a minus sign — the italic letter + the em-dash collapse into a signed quantity. Use a period + new sentence, a colon, or restructure so no math variable follows the em-dash within ~10 characters. Never `— <var>X</var>` or `— word <var>X</var>` (short word).',
   },
 
   {
@@ -457,6 +466,353 @@ const RULES = [
     severity: 'ERROR',
     pattern: /—\s*це\s+наскільки\s+(вузьк|широк|велик|малий|довг|коротк)/giu,
     hint: 'Verb-less calque: replace subordinate clause with noun phrase. «Опір — це звуження труби», not «це наскільки вузька труба».',
+  },
+
+  // ── «паралельна/послідовна комбінація» — circuit-topology calque ─────────────
+  //
+  // For series/parallel CIRCUIT CONNECTIONS, UA uses «з'єднання» (neuter),
+  // never «комбінація». «Паралельна комбінація [резисторів]» is an English
+  // calque («parallel combination»). Canonical: «паралельне з'єднання».
+  // (Generic «комбінація значень / комбінація кольорів» for non-topology
+  // meanings is fine — only circuit-topology usage is flagged here.)
+  //
+  // Matches «паралельн*/послідовн* + any whitespace + комбінаці*» where the
+  // surrounding context suggests circuit topology (resistor / з'єднання /
+  // опір / струм / схема within ~40 chars).
+  {
+    id: 'forbidden.parallel-combination-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    match: (s) => {
+      const results = []
+      const re = /(паралельн|послідовн)[ауиеіоюяй]+\s+комбінаці[ьїіюяям]+/giu
+      let mt
+      while ((mt = re.exec(s)) !== null) {
+        const ctx = s.slice(Math.max(0, mt.index - 40), mt.index + mt[0].length + 40)
+        if (/резистор|з[’']єднанн|опор|струм|схем|коло|подільник/giu.test(ctx)) {
+          results.push({
+            index: mt.index,
+            match: mt[0],
+            hint: 'Circuit-topology term: use «з\'єднання» (neuter) not «комбінація». «Паралельна комбінація резисторів» → «паралельне з\'єднання резисторів». Generic non-topology use of «комбінація» (e.g. «комбінація кольорів») is fine.',
+          })
+        }
+      }
+      return results
+    },
+  },
+
+  // ── «взяти з собою» as section heading — calque of "take away" ────────────────
+  //
+  // English «What to take away» is idiomatic (≈ «key lessons to remember»).
+  // Literal UA «що взяти з собою» reads as "what to physically take along
+  // with yourself" — the verb «взяти» governs motion/possession, not
+  // learning. Use «Головне», «Підсумки», «Ключове» for section summaries.
+  // The calque is especially likely on section-summary headings.
+  {
+    id: 'forbidden.take-away-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /взят[иь]\s+з\s+соб(?:ою|і)/giu,
+    hint: 'Calque of English "take away" / "take with you". «Взяти» implies physical motion — a reader can\'t literally «взяти» a concept. For section summaries use «Головне» (matches ch1.2). Other options: «Підсумки», «Ключове», «Що треба запам\'ятати».',
+  },
+
+  // ── «(завжди більше)» / «(завжди менше)» bare parenthetical ──────────────────
+  //
+  // Flagged by user on ch 1.4 keyTakeaway4. Calque of EN "(always larger)" /
+  // "(always smaller)". Two problems:
+  //
+  //   1. Agreement — the bare neuter form «більше/менше» grammatically attaches
+  //      to the nearest neuter noun (usually «з'єднання»), not to the intended
+  //      implicit subject (the resistance R). Reader parses it as "the
+  //      connection is always larger" — nonsense.
+  //   2. Missing comparison target — "bigger than WHAT?" UA prose cannot elide
+  //      the compared-to the way an EN parenthetical does.
+  //
+  // Fix: name the subject («сумарний опір», «вихід», «струм», etc.) and the
+  // comparison target («більший за кожен із резисторів», «менша за вхідну
+  // напругу»). Only fires on the exact parenthetical form — ordinary «завжди
+  // більше/менше» inside a full sentence with an explicit subject is fine.
+  {
+    id: 'forbidden.bare-zavzhdy-comparative',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /\(\s*завжди\s+(?:більш[аеіеоєи]?|менш[аеіеоєи]?|вищ[аеіоєи]?|нижч[аеіоєи]?)\s*\)/giu,
+    hint: 'Bare parenthetical «(завжди більше/менше)» has no grammatical subject and no comparison target — reads as ambiguous calque of EN "(always larger)". Name the subject and the compared-to explicitly: «сумарний опір більший за кожен із резисторів», «вихід завжди менший за вхід».',
+  },
+
+  // ── «торкнутися» + instrument in genitive — should be instrumental ──────────
+  //
+  // Flagged by user ch 1.4 labStep2: «торкніться щупів один до одного» must be
+  // «торкніться щупами». Grammar: «торкнутися» governs the OBJECT in genitive
+  // («торкнутися руки» = touch the hand) and the INSTRUMENT in instrumental
+  // («торкнутися рукою столу» = touch the table with the hand). When the thing
+  // you name is a tool/probe/finger — the instrument — it must be instrumental.
+  //
+  // Narrow rule: any form of «торкнутися» / «торкатися» followed by «щупів»
+  // (the canonical instrument noun in our lab prose). Pattern «торк\p{L}+»
+  // covers all inflected forms — both perfective (торкнутися, торкнувся,
+  // торкнулися, торкніться, торкнеться) and imperfective (торкатися,
+  // торкаюся, торкається). Other instrument nouns (пальців, викруткою)
+  // aren't caught yet — add if flagged. Legitimate genitive objects
+  // («торкнутися виводів резистора») are not false-positived because «виводи»
+  // IS the thing being touched, not the instrument.
+  {
+    id: 'forbidden.torknutysya-schupiv',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /(?<!\p{L})торк\p{L}+\s+щупів(?!\p{L})/giu,
+    hint: '«Торкнутися щупів» treats probes as the object being touched, but probes are the INSTRUMENT — use instrumental case: «торкніться щупами» / «торкнутися щупами». General rule: «торкнутися» + genitive = object touched; «торкнутися» + instrumental = tool used to touch. Probes, fingers, screwdrivers → instrumental.',
+  },
+
+  // ── «точніше, ніж на X відсотків» — margin-comparator calque ─────────────────
+  //
+  // Flagged by user ch 1.4 labStep5: «Вони мають збігатися точніше, ніж на
+  // пару відсотків» must be «з точністю до кількох відсотків».
+  //
+  // English «to within X» / «better than X» maps onto a margin/tolerance
+  // phrase. UA literal translation «точніше, ніж на X» uses «ніж» as the
+  // comparison conjunction (which is correct grammar for comparatives) but
+  // the SEMANTICS of "agreement to within a margin" is expressed in UA by
+  // different constructions: «з точністю до X», «в межах X», «з похибкою
+  // не більше X». The literal «точніше, ніж на X» reads as translation debris.
+  //
+  // Narrow rule: matches the exact calqued pattern «точніше, ніж на \w+
+  // відсотк…» / «процент…». Other comparator verbs (швидше, сильніше) would
+  // need their own rule if they show up.
+  {
+    id: 'forbidden.tochnishe-nizh-na-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /точніше,?\s+ніж\s+на\s+\p{L}+\s+(?:відсотк|процент)/giu,
+    hint: 'Calque of EN "to within X percent". «Точніше, ніж на» is not the native UA construction for agreement-within-a-margin. Use «з точністю до кількох відсотків», «в межах кількох відсотків», or «з похибкою не більше X %».',
+  },
+
+  // ── «пару відсотків/герц/ват/…» — colloquial/russism in technical register ───
+  //
+  // Flagged by user ch 1.4 labStep5: «на пару відсотків» is the Russian-
+  // influenced «пару процентов» carrying a colloquial count-word into a
+  // technical context. Native UA uses «кілька» / «декілька»  for "a few"
+  // in engineering prose. «пара» in UA primarily means "pair" (two of
+  // something); the extended colloquial sense of "a few" is a russism and
+  // in any case reads as informal.
+  //
+  // Narrow rule: «пару» or «пари» followed by a plural-genitive
+  // technical/measurement unit. Pair-of-objects uses («пара черевиків»,
+  // «пара резисторів») use NOMINATIVE singular «пара» — not caught, as they
+  // are legitimate. The accusative «пару» with a measurement unit is the
+  // colloquial-count-word form we want to flag.
+  {
+    id: 'forbidden.paru-units-russism',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /(?<!\p{L})пар[уи]\s+(?:відсотк|процент|герц|вольт|ампер|ват|ом[ах]?|децибел|хвилин|секунд|мілісекунд|мікросекунд|хвиль|канал|розділ)/giu,
+    hint: 'Russism/colloquialism: «пару X» for "a few X" in technical measurement register. Use «кілька відсотків», «кілька герц», «декілька хвилин». «Пара» in UA = "pair (of two)"; the "a few" sense is a russism (ru: «пару процентов»).',
+  },
+
+  // ── «статичні факти» — calque of EN academic "static facts" ─────────────────
+  //
+  // Flagged by user ch 1.4 labConnection. UA «статичний» means physically
+  // motionless (статична електрика, статичне поле); it does NOT carry the
+  // English sense "information that sits in a table and doesn't change".
+  // The calque «статичні факти» reads as dead academic translationese.
+  // Use: «теорія», «довідкові знання», «значення з таблиці», «табличні дані».
+  {
+    id: 'forbidden.statychni-fakty-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /(?<!\p{L})статичн[іихаоиіе]{1,3}\s+факт[иівуаомах]{1,4}/giu,
+    hint: 'Calque of EN "static facts". UA «статичний» means physically motionless, not "table-of-data". Use «теорія», «довідкові знання», «значення з таблиці», «табличні дані», or rephrase around «теорія → практика».',
+  },
+
+  // ── «мотивує теорему/закон/підхід/…» — academic-motivate calque ──────────────
+  //
+  // Flagged by user ch 1.4 labConnection: «а це мотивує теорему Тевенена». UA
+  // «мотивувати» only means "to motivate a person to do X" (an agent's
+  // decision/action). Applied to an abstract noun (теорема, закон, формула,
+  // підхід, метод) it's a calque of EN academic "this motivates the theorem"
+  // and reads as nonsense in UA.
+  //
+  // Native constructions for "X motivates Y" (EN academic sense):
+  //   • «саме тут стає в нагоді Y» / «саме для цього потрібна Y»
+  //   • «X робить потрібним Y»  • «через X нам знадобиться Y»
+  //   • «саме тому в розділі N ми введемо Y»
+  //
+  // Pattern catches any form of «мотивує/мотивують/мотивувало/…» followed
+  // within ~25 chars by an abstract target noun. Legitimate «мотивує
+  // студентів» (motivates students — actual agent) is not caught because the
+  // target noun is human.
+  {
+    id: 'forbidden.motyvuye-abstract-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    match: (s) => {
+      const results = []
+      const re = /(?<!\p{L})мотив(?:ує|ують|ував[аоиі]?|уватиме|уватимуть|увало)(?!\p{L})/giu
+      let mt
+      while ((mt = re.exec(s)) !== null) {
+        const tail = s.slice(mt.index + mt[0].length, mt.index + mt[0].length + 40)
+        if (/\s+(?:теорем|закон|підхід|метод|формул|правил|обговоренн|дискус|висновок|результат|рівнянн)/iu.test(tail)) {
+          results.push({
+            index: mt.index,
+            match: mt[0] + tail.slice(0, 30),
+            hint: 'Calque of EN academic "motivates the theorem/law/…". UA «мотивувати» means "to motivate a person"; applied to an abstract noun it\'s translationese. Use «саме тут стає в нагоді Y», «робить потрібним Y», «через це нам знадобиться Y», «саме для цього ми введемо Y».',
+          })
+        }
+      }
+      return results
+    },
+  },
+
+  // ── «від постійного струму до X Гц» — frequency-range dimension clash ────────
+  //
+  // Flagged by user ch 0.2 vnaHobby: «працюють від постійного струму до 1,5–3
+  // ГГц». EN "DC" is dual-meaning: (1) "direct current" — a current TYPE; (2)
+  // "zero frequency" — a point on the frequency axis (standard RF/filter
+  // engineering shorthand). In "VNA covers DC to 3 GHz" it's meaning (2).
+  //
+  // UA «постійний струм» only carries meaning (1) — a current type. When used
+  // in a frequency-range phrase («постійного струму до X Гц»), it collides
+  // with the frequency unit on the other side and reads as a dimension clash:
+  // "from CURRENT to FREQUENCY". Fix: name the lower bound in frequency units
+  // («від 0 Гц до X»), optionally with a gloss («від 0 Гц (постійний струм) до X»).
+  //
+  // Pattern: «постійн* струм*» within ~30 chars of «до» + [freq unit]. Freq
+  // units: Гц/кГц/МГц/ГГц (+ declension). Other «постійного струму» uses
+  // («споживає 2 А постійного струму») are not touched because they don't
+  // cross a frequency unit.
+  {
+    id: 'forbidden.dc-to-freq-dimension-clash',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /постійн[оиа][гм][оу]\s+струм[ауом]\s+до\s+[^.]{0,30}?(?:Гц|кГц|МГц|ГГц|ТГц)(?!\p{L})/giu,
+    hint: 'Dimension clash: EN "DC" in a frequency-range spec means "0 Hz" (zero frequency), not «постійний струм» (current type). Use «від 0 Гц до X Гц» — or «від 0 Гц (постійний струм) до X Гц» if you want to preserve the RF flavor.',
+  },
+
+  // ── «дільник напруги» — MUST be «подільник напруги» (landmine 13.7 + glossary) ─
+  {
+    id: 'forbidden.dilnyk-napruhy',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Matches «дільник напруги», «дільника напруги», «дільників напруги», etc.
+    // NOT prefixed by «по-» (so «подільник напруги» is fine). Negative lookbehind
+    // for `по` to avoid flagging the correct form.
+    pattern: /(?<!по)(?<!\p{L})дільник(?:а|ів|ом|ами|у|и|ами|ах|ові|ами)?\s+напруг[иауі]/giu,
+    hint: 'Voltage divider in UA is «подільник напруги», NEVER «дільник напруги». (Frequency divider «дільник частоти» is a separate case — this rule targets voltage-divider phrases only.)',
+  },
+
+  // ── «декада» in a resistor E-series context — use «десяток» (landmine 13.7) ───
+  {
+    id: 'style.dekada-for-resistor-eseries',
+    category: 'STYLE',
+    severity: 'WARN',
+    // Heuristic: «декад[ауиі]» within 80 characters of «номінал», «ряд E», «резистор»,
+    // «E12»/«E24»/«E48»/«E96»/«E192» — strongly suggests resistor preferred-value context.
+    // Frequency-response contexts («на декаду» with «частот», «Гц», «dB», «фільтр»)
+    // do NOT match.
+    match: (s) => {
+      const results = []
+      const re = /декад[ауиіюі]/giu
+      let m
+      while ((m = re.exec(s)) !== null) {
+        const windowStart = Math.max(0, m.index - 80)
+        const windowEnd = Math.min(s.length, m.index + 80)
+        const ctx = s.slice(windowStart, windowEnd)
+        const isResistorCtx = /номінал|ряд[уи]?\s*E|резистор|E12|E24|E48|E96|E192/giu.test(ctx)
+        const isFrequencyCtx = /частот|Гц|кГц|МГц|дБ|фільтр|спад[уі]?|рол/giu.test(ctx)
+        if (isResistorCtx && !isFrequencyCtx) {
+          results.push({
+            index: m.index,
+            match: m[0],
+            hint: 'UA Wikipedia «Ряди номіналів радіоелементів» uses «десяток» for resistor E-series, NOT «декада». Use «на десяток», «у кожному десятку», etc. (Frequency-response rolloff context keeps «декада»/«порядок».)',
+          })
+        }
+      }
+      return results
+    },
+  },
+
+  // ── Unglossed canonical technical terms (landmine 13.5) ───────────────────────
+  //
+  // Registry: UA technical jargon that reads as opaque to beginners unless
+  // introduced with a gloss, paraphrased, or wrapped in a <G> glossary tag.
+  // Each entry is paired with `safeFromChapter` — the chapter number at or
+  // after which the term is considered "canonical for the reader" and the
+  // warning is suppressed.
+  //
+  // The rule fires on any occurrence in a block whose chapter number is
+  // below the threshold AND the term is NOT wrapped in a <G>…</G> tag AND
+  // there is no parenthetical gloss immediately after (≤50 chars window).
+  //
+  // Grows from every user pushback. If the user flags a new term, add it
+  // here with its formal-introduction chapter.
+  {
+    id: 'style.unglossed-canonical-term',
+    category: 'STYLE',
+    severity: 'WARN',
+    match: (s, meta) => {
+      // Parse chapter number from the key (e.g. "ch1_4.loadingIntro" → 1.04)
+      const key = meta?.key ?? ''
+      const m = key.match(/^ch(\d+)_(\d+)/)
+      const chapterNumber = m ? parseInt(m[1], 10) + parseInt(m[2], 10) / 100 : null
+
+      const REGISTRY = [
+        // term pattern (word-boundary), safeFromChapter, suggested paraphrase
+        { term: /(?<!\p{L})атенюатор[ауиеіою]?(?!\p{L})/giu, safeFrom: 3.00, hint: 'атенюатор — canonical from ch3+; before that, use «ступінь послаблення сигналу» or describe directly.' },
+        { term: /(?<!\p{L})адмітанс[ауі]?(?!\p{L})/giu,      safeFrom: 1.06, hint: 'адмітанс — canonical from ch1.6+; before that, use «провідність у колах змінного струму» or wrap in <G>.' },
+        { term: /(?<!\p{L})гістерезис[ауі]?(?!\p{L})/giu,    safeFrom: 2.00, hint: 'гістерезис — introduce with a gloss («поріг із запасом») or wrap in <G>.' },
+        { term: /(?<!\p{L})каскад[ауіиовх]?(?!\p{L})/giu,    safeFrom: 1.08, hint: 'каскад — electronics jargon; for beginner prose use «ступінь», «частина схеми», «блок схеми», or wrap in <G>.' },
+        { term: /(?<!\p{L})трансивер[ауі]?(?!\p{L})/giu,     safeFrom: 2.00, hint: 'трансивер — introduce with a gloss or wrap in <G>.' },
+        { term: /(?<!\p{L})гетеродин[ауі]?(?!\p{L})/giu,     safeFrom: 3.01, hint: 'гетеродин — introduce with a gloss or wrap in <G>.' },
+        { term: /(?<!\p{L})зміщенн[яіюеі]/giu,               safeFrom: 1.10, hint: 'зміщення (biasing) — canonical from ch1.10+; in earlier chapters prefer «задавання робочої точки».' },
+        { term: /(?<!\p{L})ВЧ(?!\p{L})/gu,                   safeFrom: 2.00, hint: 'ВЧ — abbreviation for «високі частоти»; in beginner prose expand the full form.' },
+        { term: /(?<!\p{L})КХ(?!\p{L})/gu,                   safeFrom: 4.01, hint: 'КХ (short waves) — ham-radio term; in earlier chapters expand to «діапазон коротких хвиль».' },
+        { term: /(?<!\p{L})реактивн(?:ий|ого|ому|им|ій|ої|ою|е|і|их|ими)\s+опір/giu, safeFrom: 1.05, hint: 'реактивний опір — canonical from ch1.5+; before that, describe directly.' },
+      ]
+
+      const results = []
+      if (chapterNumber == null) return results // skip for unscoped lints
+      for (const { term, safeFrom, hint } of REGISTRY) {
+        if (chapterNumber >= safeFrom) continue
+        let mt
+        const re = new RegExp(term.source, term.flags)
+        while ((mt = re.exec(s)) !== null) {
+          // Skip if the term is wrapped in ANY tag (gloss wrapper like <G>,
+          // <hf>, <transceiver>, etc. — the project uses many component
+          // names for term-tagging). Match: opening tag immediately before
+          // (optional whitespace), closing tag immediately after.
+          const immediateBefore = s.slice(Math.max(0, mt.index - 60), mt.index)
+          const immediateAfter = s.slice(mt.index + mt[0].length, mt.index + mt[0].length + 60)
+          if (/<\w+[^>]*>\s*$/.test(immediateBefore) && /^\s*<\/\w+>/.test(immediateAfter)) continue
+          // Skip if a parenthetical gloss is immediately after (≤50 chars).
+          if (/^\s*\(/.test(immediateAfter)) continue
+          results.push({
+            index: mt.index,
+            match: mt[0],
+            hint,
+          })
+        }
+      }
+      return results
+    },
+  },
+
+  // ── Pronoun-elision calque «на менше/ширше/меншого» without noun headword ─────
+  {
+    id: 'style.pronoun-elision-on-smaller',
+    category: 'STYLE',
+    severity: 'WARN',
+    // Matches «на менше.», «на ширше,», «до меншого;» — bare predicative adjective
+    // at end-of-clause with no accompanying noun. Common EN "one/ones" calque.
+    //
+    // Positive lookahead requires that AFTER optional whitespace the next char is
+    // clause-end punctuation or end-of-string. That excludes:
+    //   «меншу одиницю»         — followed by another letter-word (noun)
+    //   «менше вихідне значення» — followed by another adjective
+    //   «менше за 250 В»         — comparative «за X», followed by letters
+    //   «менше ніж X»            — comparative, same
+    // Negative lookbehind on `.` avoids matching inside decimal numbers or URLs.
+    pattern: /(?<![.\p{L}])\s(на|у|в|до|з)\s+(менш[еогоийому]|більш[еогоийому]|ширш[еогоийому]|вужч[еогоийому]|кращ[еогоийому]|гірш[еогоийому])(?=\s*[.,;:!?»—]|\s*$)/giu,
+    hint: 'Bare predicative adjective («на менше», «до меншого») at end-of-clause is likely a calque of EN "one/ones" pronoun elision. Name the noun explicitly: «на меншу напругу», «до меншого опору». See landmine 13.1.',
   },
 
   // ── Capitalised «Ви» mid-sentence ───────────────────────────────────────
@@ -598,8 +954,8 @@ function matchAllRegex(s, re, hint) {
   return found.length ? found : null
 }
 
-function runRule(rule, s) {
-  if (rule.match) return rule.match(s)
+function runRule(rule, s, meta) {
+  if (rule.match) return rule.match(s, meta)
   if (rule.pattern) return matchAllRegex(s, rule.pattern, rule.hint)
   return null
 }
@@ -624,7 +980,7 @@ const findings = []
 
 for (const { key, value } of strings) {
   for (const rule of RULES) {
-    const hits = runRule(rule, value)
+    const hits = runRule(rule, value, { key })
     if (hits) {
       for (const hit of hits) {
         findings.push({ key, rule, hit, value })

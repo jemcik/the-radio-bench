@@ -23,9 +23,61 @@ Glyph decorations **inside a shape** — the `+` inside a 5 px-radius ion circle
 
 ## HTML around the diagram also uses 13 px
 
-`DiagramFigure`'s caption uses `text-[13px]`. `Circuit`'s figcaption and legend also use `text-[13px]`. **Never** use Tailwind's `text-xs` (= 12 px) or `text-[11px]` for diagram-adjacent copy. Apply the floor uniformly so the SVG interior and the surrounding HTML are typographically flush.
+`DiagramFigure`'s caption uses `text-sm` (0.875 rem, ≈ 14 px at the default setting). **Never** use Tailwind's `text-xs` (= 12 px) or `text-[11px]` for diagram-adjacent copy. Apply the floor uniformly so the SVG interior and the surrounding HTML are typographically flush.
 
 The old "11 px floor" rule that appeared in earlier chapters is deprecated.
+
+## Font-size MUST respond to the site's setting — use `em` / `rem`, not numeric `fontSize`
+
+The site has a font-size setting (FontContext, 14–18 px range, applied to `html` via inline `fontSize`). **SVG `<text>` with a numeric `fontSize={16}` attribute IGNORES this setting** — the attribute value is in viewBox user units and is not subject to CSS inheritance from `html`. User-flagged on Ch 1.2 MagnitudeLadder (title didn't scale with settings).
+
+**Rule**: every readable label inside an SVG — titles, tick labels, axis titles, value readouts, ratio labels — must use CSS-relative units so the user's setting flows through:
+
+```tsx
+<svg
+  width={W} height={H} viewBox={`0 0 ${W} ${H}`}
+  // ONE baseline declaration on the svg root so em inherits predictably
+  style={{ fontSize: '1rem', ... }}
+>
+  {/* size in em, relative to the svg's 1rem baseline */}
+  <text fontSize="1em">           {/* was 16 */}
+  <text fontSize="0.875em">       {/* was 14 */}
+  <text fontSize="0.8125em">      {/* was 13 */}
+  <text fontSize="0.75em">        {/* was 12 — minimum readable-label size */}
+</svg>
+```
+
+For HTML inside `<foreignObject>` use `rem` instead of `em` (so scaling is absolute to the html root, not dependent on the SVG's computed font-size):
+
+```tsx
+<foreignObject ...>
+  <div style={{ fontSize: '0.875rem', ... }}>
+    {description}
+  </div>
+</foreignObject>
+```
+
+Conversion table from the old numeric attributes:
+
+| Old `fontSize={N}` | New `fontSize="Xem"` | Approx on screen (default 16 px) |
+|---|---|---|
+| 7 | 0.4375em | 7 px (glyph-inside-shape only) |
+| 9 | 0.5625em | 9 px (decoration) |
+| 11 | 0.6875em | 11 px (decoration) |
+| 12 | 0.75em | 12 px (borderline — avoid) |
+| 13 | 0.8125em | 13 px (readable floor) |
+| 14 | 0.875em | 14 px |
+| 16 | 1em | 16 px |
+| 17 | 1.0625em | 17 px |
+| 20 | 1.25em | 20 px |
+
+**Titles do NOT live inside the SVG anymore.** Pass the title to `DiagramFigure`'s `title` prop — it renders as an HTML `<h3>` above the diagram, which wraps naturally on wider fonts and inherits the setting automatically. An in-SVG title hits both failure modes at once: it clips at the viewBox edge in wider fonts AND it ignores the size setting. `MagnitudeLadder` is the reference implementation of the post-migration pattern.
+
+**Sub-region labels INSIDE a side-by-side diagram** (e.g. «Series» / «Parallel» in `SeriesParallelSchematic`, «Розімкнений вихід» / «Вихід під навантаженням» in `DividerLoadingDiagram`) stay inside the SVG — they are LABELS for halves of the diagram, not the diagram's title. They still use `em` so they scale with settings.
+
+### PAD_L re-budget at 18 px setting
+
+When the reader picks 18 px (max setting), all em-based labels grow by 12.5 %. Tight left-padding budgets that were tuned for 16 px may overflow at 18 px. Rule: when budgeting PAD_L for Y-axis labels or left gutters, multiply the worst-case UK pixel width by `18/16 = 1.125` to leave margin for the max setting. Record the math in the geometry comment block.
 
 ## "fontSize on screen" means no scaling hacks
 

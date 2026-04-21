@@ -373,7 +373,53 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Resistors are the most common electronic component. Their value in ohms sets the ratio of voltage to current (Ohm\'s Law). Colour bands encode the value: the first bands give significant digits, followed by a multiplier and tolerance band. Power rating matters too — exceed it and the resistor overheats.',
     unit: 'Ohm (Ω)',
     formula: 'V = I × R',
-    see: ['resistance', 'voltage', 'current'],
+    see: ['resistance', 'voltage', 'current', 'tolerance', 'colour code'],
+  },
+  tolerance: {
+    tip: 'How far a component\'s actual value may drift from the number printed on it — expressed as a percentage.',
+    detail:
+      'A 10 kΩ resistor with ±5 % tolerance may measure anywhere from 9.5 kΩ to 10.5 kΩ and still be within spec. The looser the tolerance the cheaper the part: ±20 % is bottom-of-the-barrel, ±5 % is the hobby default, ±1 % is the precision-divider grade, ±0.1 % is for instrumentation. Capacitor tolerances are typically looser than resistor tolerances (±10 % to ±20 % is normal). Tolerance interacts with the preferred-value series: a ±5 % part is sold in 24 values per decade, a ±1 % part in 96, because finer tolerance narrows the gap between values.',
+    see: ['resistor', 'preferred value'],
+  },
+  'preferred value': {
+    tip: 'A resistor or capacitor value from the standard E-series — the reason "4.7 kΩ" exists but "5 kΩ" mostly doesn\'t.',
+    detail:
+      'Preferred values are a worldwide convention that spaces component values logarithmically across each decade. The E12 series (±10 % tolerance) has 12 values: 10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82. E24 (±5 %) has 24, E48 (±2 %) has 48, E96 (±1 %) has 96. Each value is chosen so that the ±tolerance window of one part just meets the window of the next — if you need 5 kΩ at ±5 %, the nearest E24 value of 4.7 kΩ (within tolerance of anything from 4.47 to 4.94 kΩ) is what you get, and 5 kΩ is simply not manufactured.',
+    see: ['tolerance', 'resistor'],
+  },
+  'colour code': {
+    tip: 'Coloured bands on a through-hole resistor that encode its value and tolerance.',
+    detail:
+      'A through-hole resistor is normally too small to print numbers on, so the value is encoded as 3 to 6 coloured bands read from the tolerance-band end inward. 4-band parts: first two bands = significant digits, third band = decimal multiplier (×10ⁿ), fourth band = tolerance. 5-band (precision) parts have three significant-digit bands. The digit-colour mapping runs through the spectrum (black=0, brown=1, red=2, orange=3, yellow=4, green=5, blue=6, violet=7, grey=8, white=9); tolerance colours are a separate set (gold=±5 %, silver=±10 %, brown=±1 %, red=±2 %). Surface-mount resistors are too small for bands and use a printed 3- or 4-digit number instead.',
+    see: ['resistor', 'tolerance'],
+  },
+  'power rating': {
+    tip: 'The maximum power a component can dissipate as heat before it is damaged.',
+    detail:
+      'Every resistor has a power rating: ⅛ W and ¼ W are the hobby-shelf defaults; 1 W, 2 W and larger sizes exist for power circuits. When current flows through a resistor it dissipates P = I²R watts as heat. Exceed the rating and the part drifts in value, discolours, and eventually burns open. Good practice: pick a resistor rated at two to four times the worst-case dissipation, so it runs cool and lasts. The rating is printed in datasheets, not on the part itself — you read it from the physical size of the resistor body (a ¼ W axial is a couple of millimetres across; a 2 W wirewound is finger-sized).',
+    unit: 'Watt (W)',
+    formula: 'P = I² × R',
+    see: ['power', 'resistor'],
+  },
+  potentiometer: {
+    tip: 'A three-terminal variable resistor used as an adjustable voltage divider.',
+    detail:
+      'A potentiometer ("pot") is a resistor with a sliding contact that taps off a fraction of the total resistance — mechanically, that is exactly the schematic of a voltage divider with the divide ratio under your finger. The three terminals are the two ends of the resistive track plus the wiper. Wire the two ends across a supply and the wiper gives a variable voltage; wire only one end and the wiper, and you have a plain variable resistor (rheostat). Volume knobs, contrast controls, and bench-supply adjust knobs are almost always potentiometers.',
+    see: ['voltage divider', 'resistor'],
+  },
+  'surface mount': {
+    tip: 'A component package soldered flat onto pads on the board surface — no leads through the board.',
+    detail:
+      'Surface-mount (SMT, also SMD for "device") components replaced most through-hole parts in mass production from the 1990s onward. A surface-mount resistor is a flat rectangular ceramic chip a millimetre or two long, with metallised ends that sit on top of the board\'s copper pads. You lose the colour-code — values are printed as 3- or 4-digit numbers ("472" = 47 × 10² = 4.7 kΩ). Standard sizes are named by their imperial dimensions in hundredths of an inch: 0805 (2 mm × 1.3 mm), 0603, 0402, 0201. Hobbyists usually stick to 0805 and above because smaller parts need reflow ovens and steady hands.',
+    see: ['resistor', 'colour code'],
+  },
+  conductance: {
+    tip: 'The reciprocal of resistance — how easily current flows through a component. Measured in siemens (S).',
+    detail:
+      'Conductance (symbol G) is just resistance written the other way up: G = 1/R. A 1 Ω resistor has conductance 1 S; a 1 kΩ resistor has 1 mS; a 1 MΩ resistor has 1 µS. Why bother with a separate name? Because of a beautiful symmetry in how circuits combine: series resistances add (R = R₁ + R₂ + …) and parallel conductances add (G = G₁ + G₂ + …), in the same arithmetic shape. The unit is the siemens (S), named after the German industrialist Werner von Siemens; its older name was the mho ("ohm" spelled backwards, symbol ℧), which you still see on some vintage schematics and in older American textbooks. Conductance becomes genuinely useful once you are thinking about admittance in AC circuits (ch 1.6 / 1.8) — where Y = G + jB generalises Z = R + jX.',
+    unit: 'Siemens (S)',
+    formula: 'G = 1 / R',
+    see: ['resistance', 'resistor'],
   },
   capacitor: {
     tip: 'Stores energy in an electric field. Blocks DC, passes AC.',

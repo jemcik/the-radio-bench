@@ -165,7 +165,7 @@ export default function SafeZoneCalculator() {
         </div>
       </ResultBox>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_2.widget.safeZone.hint')}
       </p>
     </Widget>

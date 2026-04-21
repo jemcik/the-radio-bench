@@ -285,7 +285,7 @@ export default function SineExplorer() {
           </g>
 
           {/* Tick labels */}
-          <g fill={svgTokens.mutedFg} fontSize="13" fontFamily="ui-sans-serif, system-ui, sans-serif">
+          <g fill={svgTokens.mutedFg} fontSize="0.812em" fontFamily="ui-sans-serif, system-ui, sans-serif">
             {X_TICKS_MS.map((x) => (
               <text
                 key={`tx${x}`}
@@ -312,7 +312,7 @@ export default function SineExplorer() {
           <text
             x={PLOT_X0 + PLOT_W / 2}
             y={PLOT_Y0 + PLOT_H + 34}
-            fontSize="14"
+            fontSize="0.875em"
             fill={svgTokens.fg}
             textAnchor="middle"
           >
@@ -324,7 +324,7 @@ export default function SineExplorer() {
           <text
             x={16}
             y={PLOT_Y0 + PLOT_H / 2}
-            fontSize="14"
+            fontSize="0.875em"
             fill={svgTokens.fg}
             textAnchor="middle"
             transform={`rotate(-90 16 ${PLOT_Y0 + PLOT_H / 2})`}
@@ -384,7 +384,7 @@ export default function SineExplorer() {
           <text
             x={ampMarkerX + 7}
             y={(ampMarkerY0 + ampMarkerY1) / 2 + 4}
-            fontSize="14"
+            fontSize="0.875em"
             fontStyle="italic"
             fontFamily="Georgia, serif"
             fontWeight="700"
@@ -408,7 +408,7 @@ export default function SineExplorer() {
           <text
             x={(periodX0 + periodX1) / 2}
             y={periodY + 15}
-            fontSize="14"
+            fontSize="0.875em"
             fontStyle="italic"
             fontFamily="Georgia, serif"
             fontWeight="700"
@@ -437,7 +437,7 @@ export default function SineExplorer() {
         </div>
       </ResultBox>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[13px] text-muted-foreground">
         {t('ch1_3.widget.sineExplorer.hint')}
       </p>
     </Widget>
