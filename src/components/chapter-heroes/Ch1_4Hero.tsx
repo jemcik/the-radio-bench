@@ -63,6 +63,15 @@ const BAND_ORANGE = '#e87722'
 const BAND_GOLD = '#c9a833'
 const BODY_BEIGE = '#e8d9b8'
 
+/* Potentiometer ceramic body — the signature blue of Arduino-set
+ * trimmers (Bourns 3362P and similar). Opacity is tuned so the blue
+ * reads as a soft pastel on light backgrounds (blends around
+ * rgb(167, 199, 251) on white) and as a legible medium navy on
+ * dark backgrounds (blends around rgb(27, 62, 117) on near-black).
+ * The hand-drawn outline stays in `currentColor` so it still
+ * follows the theme. */
+const POT_CERAMIC_BLUE = '#3b82f6'
+
 /* ── Axial resistor strokes ──────────────────────────────────────── */
 
 function axialStrokes(seed: number): RoughPath[] {
@@ -234,10 +243,12 @@ export default function Ch1_4Hero() {
       </text>
 
       {/* ── POTENTIOMETER ──────────────────────────────────────── */}
+      {/* Ceramic blue fill sits behind the rough outline — conveys the
+          "Arduino trimmer" identity without fighting the sketch aesthetic. */}
       <circle
         cx={POT_CENTRE_X} cy={POT_CENTRE_Y} r={POT_RADIUS}
-        fill="#2a2a2a"
-        opacity={0.15}
+        fill={POT_CERAMIC_BLUE}
+        opacity={0.45}
       />
       <RoughPaths paths={strokes.pot} />
 
