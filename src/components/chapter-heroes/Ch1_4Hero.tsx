@@ -41,8 +41,12 @@ const AX_BODY_W = 110
 const AX_BODY_H = 28
 const AX_LEAD_LEN = 24
 
-/* SMD chip — centre */
-const SMD_CENTRE_X = 270
+/* SMD chip — centre.
+ * Not at viewport midpoint (270): the axial on the left extends ~24 px
+ * further than its body thanks to its leads, so equal centres yield
+ * unequal visual gaps. Shifted right of centre to even the edge-to-edge
+ * gaps between axial→SMD and SMD→pot. */
+const SMD_CENTRE_X = 291
 const SMD_CENTRE_Y = 72
 const SMD_BODY_W = 60
 const SMD_BODY_H = 30

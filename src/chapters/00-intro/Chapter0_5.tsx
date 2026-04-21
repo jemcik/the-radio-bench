@@ -47,11 +47,11 @@ function SymbolCell({
         </SVGDiagram>
       </div>
       <div className="flex-1 min-w-0 space-y-1">
-        {/* 13 px (0.8125rem) — matches the diagram-floor rule and stays
-            rem-based so it scales with the FontContext size setting.
-            Weight carries the name/description hierarchy, not size. */}
-        <p className="text-[0.8125rem] font-semibold text-foreground">{name}</p>
-        <p className="text-[0.8125rem] text-muted-foreground leading-relaxed">{description}</p>
+        {/* 14 px (0.875rem) — rem-based so it scales with the FontContext
+            size setting. Weight carries the name/description hierarchy,
+            not size. */}
+        <p className="text-[0.875rem] font-semibold text-foreground">{name}</p>
+        <p className="text-[0.875rem] text-muted-foreground leading-relaxed">{description}</p>
       </div>
     </div>
   )
