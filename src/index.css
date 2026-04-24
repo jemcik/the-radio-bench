@@ -326,11 +326,20 @@
     color: hsl(var(--foreground));
   }
 
-  /* em used as a highlight/key-term marker */
+  /* <em> is HTML5-semantic emphasis — italic, inherits text colour.
+   *
+   * IMPORTANT: never style <em> with `color: hsl(var(--primary))` or any
+   * other accent hue. Glossary terms (<G k="...">) already use the accent
+   * via a dashed underline + tooltip/popup, and any other accent-coloured
+   * word reads as a broken glossary link (orange, not clickable). Readers
+   * repeatedly flagged this confusion in ch 1.5.
+   *
+   * If you want to highlight a phrase that ISN'T a glossary term, use
+   * <strong> (bold) — visually distinct from both body text and <G>. */
   .prose-chapter em:not(.not-prose *) {
-    font-style: normal;
-    font-weight: 500;
-    color: hsl(var(--primary));
+    font-style: italic;
+    font-weight: inherit;
+    color: inherit;
   }
 
   .prose-chapter code:not(.not-prose *) {

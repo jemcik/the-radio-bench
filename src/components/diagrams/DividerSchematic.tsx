@@ -15,6 +15,7 @@
  * A / B / C let the derivation prose refer to specific points.
  */
 import { useTranslation } from 'react-i18next'
+import { MathText } from '@/components/ui/math-text'
 import {
   Circuit, Wire, Junction,
   Resistor, Meter, meterPins, METER_ACCENT_V,
@@ -58,7 +59,7 @@ export default function DividerSchematic() {
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
       maxWidth={480}
-      caption={t('ch1_4.dividerSchematicCaption')}
+      caption={<MathText>{t('ch1_4.dividerSchematicCaption')}</MathText>}
     >
       {/* ── Rails ────────────────────────────────────────────────── */}
       <Wire points={[{ x: RAIL_L, y: TOP_Y }, { x: RAIL_R, y: TOP_Y }]} />

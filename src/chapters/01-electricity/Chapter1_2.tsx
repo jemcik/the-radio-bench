@@ -14,6 +14,7 @@ import RuntimeCalculator from '@/components/widgets/RuntimeCalculator'
 import MagnitudeLadder from '@/components/diagrams/MagnitudeLadder'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-2'
 const QUIZ_QUESTION_COUNT = 8
@@ -31,11 +32,11 @@ export default function Chapter1_2() {
   return (
     <>
       <p>
-        <Trans i18nKey="ch1_2.intro" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch1_2.intro" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </p>
 
       <p>
-        <Trans i18nKey="ch1_2.introPreview" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch1_2.introPreview" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </p>
 
       {/* ── Section 1: Ohm's law ──────────────────────────────────── */}
@@ -45,12 +46,10 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.ohmIntro"
           ns="ui"
-          components={{
-            voltage: <G k="voltage" />,
+          components={{ ...mathComponents, voltage: <G k="voltage" />,
             current: <G k="current" />,
             resistance: <G k="resistance" />,
-            resistor: <G k="resistor" />,
-          }}
+            resistor: <G k="resistor" />, }}
         />
       </p>
 
@@ -106,11 +105,9 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.powerIntro"
           ns="ui"
-          components={{
-            strong: <strong />,
+          components={{ ...mathComponents, strong: <strong />,
             resistor: <G k="resistor" />,
-            power: <G k="power" />,
-          }}
+            power: <G k="power" />, }}
         />
       </p>
 
@@ -146,7 +143,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.powerLadderIntro"
           ns="ui"
-          components={{ watt: <G k="watt" /> }}
+          components={{ ...mathComponents, watt: <G k="watt" /> }}
         />
       </p>
 
@@ -240,7 +237,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.energyIntro"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -250,7 +247,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.energyUnitsNote"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -274,7 +271,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.energyWorkedExample"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -285,7 +282,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.efficiencyIntro"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -301,14 +298,14 @@ export default function Chapter1_2() {
             <Trans
               i18nKey="ch1_2.kirchhoffKcl"
               ns="ui"
-              components={{ strong: <strong /> }}
+              components={{ ...mathComponents, strong: <strong /> }}
             />
           </li>
           <li>
             <Trans
               i18nKey="ch1_2.kirchhoffKvl"
               ns="ui"
-              components={{ strong: <strong /> }}
+              components={{ ...mathComponents, strong: <strong /> }}
             />
           </li>
         </ul>
@@ -331,8 +328,8 @@ export default function Chapter1_2() {
         label="1.2"
         goal={t('ch1_2.labGoal')}
         equipment={[
-          <Trans key="e1" i18nKey="ch1_2.labEquip1" ns="ui" components={{ multimeter: <G k="multimeter" /> }} />,
-          <Trans key="e2" i18nKey="ch1_2.labEquip2" ns="ui" components={{ breadboard: <G k="breadboard" /> }} />,
+          <Trans key="e1" i18nKey="ch1_2.labEquip1" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} />,
+          <Trans key="e2" i18nKey="ch1_2.labEquip2" ns="ui" components={{ ...mathComponents, breadboard: <G k="breadboard" /> }} />,
           t('ch1_2.labEquip3'),
           t('ch1_2.labEquip4'),
         ]}

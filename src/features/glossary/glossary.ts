@@ -427,7 +427,65 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Capacitors come in many types: ceramic (small, cheap, unpolarised), electrolytic (large values, polarised — watch the polarity!), and film (precise, stable). In AC circuits, a capacitor\'s opposition to current (reactance) decreases with frequency — this is why capacitors are used in filters and tuning circuits.',
     unit: 'Farad (F)',
     formula: 'Xc = 1 / (2πfC)',
-    see: ['capacitance', 'impedance'],
+    see: ['capacitance', 'dielectric', 'impedance'],
+  },
+  derivative: {
+    tip: 'The rate of change — how fast a quantity is changing at a given instant.',
+    detail:
+      'The derivative measures how fast one quantity is changing with respect to another — usually with respect to time. If a voltage V is climbing at 2 volts per second, then its derivative dV/dt equals 2 V/s. A steady, unchanging quantity has derivative zero. A quantity that climbs linearly with time has a constant derivative. The key intuition: the derivative answers the question "how fast?". In the capacitor equation I = C·dV/dt, the derivative dV/dt is literally "how fast the voltage across the capacitor is changing right now", and the equation says the current flowing into the capacitor is proportional to that rate.',
+    formula: 'dV/dt  •  "rate of change of V with respect to t"',
+  },
+  dielectric: {
+    tip: 'The insulating material between the plates of a capacitor — sets how much charge the capacitor stores per volt.',
+    detail:
+      'A dielectric is the insulating layer sandwiched between the two conductive plates of a capacitor. It serves two roles: it prevents current from flowing between the plates (otherwise you have a short, not a capacitor), and its electrical property — the dielectric constant εr — multiplies the capacitance you get for a given plate area and spacing. Air has εr = 1 (the reference); polyester film is ≈ 3; ceramic C0G is ≈ 45; ceramic X7R is ≈ 3000; aluminium oxide (inside electrolytics) is ≈ 8. The dielectric also sets the capacitor\'s voltage rating — every material has a breakdown field strength above which it ionises and conducts, destroying the capacitor. A thicker dielectric survives higher voltages but reduces capacitance for the same plate area.',
+    see: ['capacitor', 'capacitance'],
+  },
+  electrolytic: {
+    tip: 'A polarised capacitor type using an oxide-on-metal-foil dielectric — gives large capacitance in a small can, but only works with correct polarity.',
+    detail:
+      'In an electrolytic capacitor, the dielectric is a very thin oxide layer (aluminium oxide or tantalum pentoxide) grown on one metal foil; the "other plate" is a conductive electrolyte (liquid or gel) in contact with the oxide. The oxide is thin and the effective plate area is enormous (foils are rolled up or made of porous pressed powder), so capacitance can reach hundreds of thousands of microfarads in a finger-sized can. The catch is polarity: the oxide is grown electrochemically in one direction, so reverse voltage breaks it down — an aluminium electrolytic then heats, swells, and vents; a tantalum electrolytic can literally explode. The longer lead (or the un-striped side of SMT tantalums) is positive; the stripe on an aluminium can marks the negative lead.',
+    see: ['capacitor', 'dielectric'],
+  },
+  'time constant': {
+    tip: 'The product τ = R · C fully determines how fast a capacitor charges or discharges through a resistor.',
+    detail:
+      'When a capacitor C charges through a resistor R toward a supply voltage, its voltage follows the curve V(t) = V∞·(1 − e^(−t/RC)). One time constant later (t = RC), the voltage has reached 63 % of its final value; at 2RC, 86 %; at 3RC, 95 %; at 5RC, 99.3 % — considered "fully charged" for most engineering purposes. Discharge follows the mirror image. The units work out neatly: ohms × farads = seconds. A useful mnemonic — megohms × microfarads = seconds, kilohms × microfarads = milliseconds. Time constants govern everything from 555-timer delays and debouncing networks to power-supply smoothing and audio high-pass filters.',
+    unit: 'Seconds (s)',
+    formula: 'τ = R · C  •  V(t) = V∞ · (1 − e^(−t/RC))',
+    see: ['capacitor', 'rc circuit', 'capacitance'],
+  },
+  debouncing: {
+    tip: 'Filtering out the burst of spurious pulses a mechanical switch emits when its springs bounce open-and-closed after being pressed.',
+    detail:
+      'When you press a mechanical switch or button, the contacts do not make a single clean connection — the moving spring bounces physically against the fixed contact for 1–10 ms before settling, emitting a burst of spurious ON/OFF pulses. A microcontroller reading the pin would see what looks like ten rapid button presses when only one happened. "Debouncing" filters that burst down to a single clean event. The classic hardware solution is a small RC low-pass network (a resistor feeding a capacitor with a time constant τ ≈ 10 ms) that turns the bounce burst into one smooth rising edge; firmware then reads the settled level. In software, the same idea is implemented as "ignore further pin changes for N ms after the first edge."',
+    see: ['rc circuit', 'time constant'],
+  },
+  'rc circuit': {
+    tip: 'A resistor and a capacitor wired together — the simplest circuit with a memory of the recent past.',
+    detail:
+      'An RC circuit is any circuit containing a resistor R in series or parallel with a capacitor C. Its characteristic behaviour is a smooth exponential response: a step input does not appear instantly at the output but builds up (or decays) on a timescale of τ = R·C seconds. In the time domain that means timing, debouncing, and edge-softening; in the frequency domain the same circuit is a first-order filter — arrange R and C one way and you have a low-pass (passes DC, attenuates high frequencies); swap them and you have a high-pass (blocks DC, passes AC above the cutoff). The cutoff frequency where response has dropped 3 dB is f_c = 1 / (2πRC). RC circuits appear everywhere: power-supply smoothing, microphone coupling, op-amp compensation, 555 timers, Arduino button debouncing.',
+    formula: 'τ = RC  •  f_c = 1 / (2πRC)',
+    see: ['capacitor', 'time constant', 'filter', 'reactance'],
+  },
+  'coupling capacitor': {
+    tip: 'A capacitor wired in series to pass an AC signal from one stage to the next while blocking any DC offset.',
+    detail:
+      'A coupling capacitor sits in series between two circuit stages whose DC operating points are different but whose AC signals must travel between them intact. Because a capacitor blocks DC once charged, but passes AC (the higher the frequency, the more easily), it acts as a DC block and an AC pass-through. Typical uses: between amplifier stages so each transistor\'s bias is independent; between a microphone and the first preamp stage; at the input of an oscilloscope in AC-coupling mode. Value is chosen so the capacitor looks like a near-short at the lowest frequency of interest — for audio (20 Hz and up) that\'s typically 1–10 µF into a kΩ-range load; for RF it drops to nanofarads or picofarads.',
+    see: ['capacitor', 'bypass capacitor', 'filter'],
+  },
+  'bypass capacitor': {
+    tip: 'A capacitor wired between a DC supply rail and ground — shorts high-frequency noise to ground while leaving the DC voltage intact.',
+    detail:
+      'A bypass capacitor (also called a decoupling capacitor) sits between a DC power rail and ground, as close as possible to the pin of the chip it serves. The DC supply passes straight through the chip untouched; any high-frequency noise that would otherwise ride on the rail sees a near-short to ground through the capacitor instead, because a capacitor\'s reactance falls as frequency rises. A typical arrangement is a 100 nF ceramic at every chip plus a bigger 10 µF electrolytic once per board — the small ceramic handles fast transients, the electrolytic buffers slower sags. Skipping bypass capacitors is one of the most common causes of "it works on the bench but fails on the oscilloscope" bugs in digital and RF designs.',
+    see: ['capacitor', 'coupling capacitor'],
+  },
+  esr: {
+    tip: 'Equivalent Series Resistance — the real-world series resistance of a capacitor, responsible for its losses and self-heating under AC.',
+    detail:
+      'ESR (Equivalent Series Resistance) models the unavoidable ohmic losses inside a real capacitor — from lead wires, plates, electrolyte conductivity, and dielectric hysteresis — as a single lumped resistance in series with the ideal capacitance. Ceramic capacitors have ESR of milliohms; film caps a few tens of milliohms; aluminium electrolytics typically 50 mΩ to several ohms; older tired electrolytics can drift to 10 Ω or more. ESR matters most in switch-mode power supplies, where the capacitor handles high ripple currents and the I²·ESR heat can dry out the electrolyte. "Low-ESR" electrolytics exist precisely for this application. ESR is specified at a test frequency (commonly 100 kHz) because it depends on frequency.',
+    unit: 'Ohm (Ω)',
+    see: ['capacitor', 'electrolytic'],
   },
   inductor: {
     tip: 'Coil of wire that stores energy in a magnetic field.',

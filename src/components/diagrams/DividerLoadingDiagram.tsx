@@ -13,6 +13,7 @@
  */
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
+import { renderLabelContent, renderSvgInlineMath } from '@/lib/circuit/SymbolLabel'
 
 const VB_W = 560
 const VB_H = 260
@@ -86,7 +87,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
         fontFamily="Georgia, serif" fontSize="0.687em" fontStyle="italic"
         fill={svgTokens.fg} textAnchor="end"
       >
-        {t('ch1_4.loadingVinLabel')}
+        {renderLabelContent(t('ch1_4.loadingVinLabel'))}
       </text>
 
       {/* Ground terminal label */}
@@ -143,7 +144,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
             fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.fg} textAnchor="start"
           >
-            {t('ch1_4.loadingVoutLabel')}
+            {renderLabelContent(t('ch1_4.loadingVoutLabel'))}
           </text>
         </>
       )}
@@ -158,7 +159,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
             fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.fg} textAnchor="start"
           >
-            {t('ch1_4.loadingVoutLabel')}
+            {renderLabelContent(t('ch1_4.loadingVoutLabel'))}
           </text>
           {/* Load vertical resistor down to ground rail */}
           <path
@@ -226,14 +227,14 @@ export default function DividerLoadingDiagram() {
           fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
-          {t('ch1_4.loadingNoLoadFormula')}
+          {renderSvgInlineMath(t('ch1_4.loadingNoLoadFormula'))}
         </text>
         <text
           x={HALF_W + HALF_W / 2} y={FORMULA_Y}
           fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
-          {t('ch1_4.loadingLoadedFormula')}
+          {renderSvgInlineMath(t('ch1_4.loadingLoadedFormula'))}
         </text>
       </svg>
     </figure>

@@ -81,6 +81,51 @@ const wb = (inner) => new RegExp(`${WB_START}(?:${inner})${WB_END}`, 'giu')
 
 const RULES = [
 
+  // ── Markup hygiene ──────────────────────────────────────────────────────
+
+  {
+    id: 'markup.var-sub-linebreak',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // KaTeX's <var> (inline-block math span) + plain <sub> creates a
+    // line-break opportunity at the element boundary; browsers can
+    // orphan a subscript onto the next line (e.g. V_C rendered as
+    // "V" / "ᴄ"). Authors MUST put the subscript inside the TeX:
+    // `<var>V_{\mathrm{C}}</var>` / `<var>V_{i}</var>`. One-pass
+    // migration landed in ch 1.5; this rule exists to prevent
+    // regression.
+    pattern: /<var>[^<]+<\/var>\s*<sub>/g,
+    hint: '<var>X</var><sub>Y</sub> pattern — breaks across lines. Use <var>X_{\\mathrm{Y}}</var> (Latin subscript) or <var>X_{Y}</var> (italic variable index) instead.',
+  },
+
+  {
+    id: 'markup.bare-subscript-pattern',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // Bare X_Y («V_pk», «R_1», «V_out») rendered from a raw `t()` call
+    // shows a literal underscore in the UI. Either wrap the string in
+    // `<var>X_{\\mathrm{Y}}</var>` so it routes through KaTeX via
+    // <Trans>/<MathText>, or the render site uses <MathText> on raw
+    // t() output. WARN (not ERROR) because some strings are ARIA-only
+    // and never seen; check each case.
+    pattern: /(?<![<>\\{])\b[A-Za-z]_[A-Za-zА-ЯІЇЄа-яіїє0-9]+\b(?![<>}])/g,
+    hint: 'Bare X_Y pattern outside <var>…</var>. Wrap in <var>X_{\\mathrm{Y}}</var> (or X_{Y} for variable indices, X_{\\text{Y}} for Cyrillic).',
+  },
+
+  {
+    id: 'markup.cyrillic-subscript-in-var',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Classic Gemini regression: V_in → V_вх, f_c → f_зр, etc.
+    // Project convention (per glossary.md «Subscripts — hard
+    // typographic rule»): keep Latin subscripts for standard physics
+    // labels (in, out, min, max, rms, pk, c for cutoff, etc.). If a
+    // genuinely Ukrainian-only subscript becomes necessary later,
+    // add an explicit allow-list exception here.
+    pattern: /<var>[^<]*\\text\{[^{}]*[\u0400-\u04FF][^{}]*\}[^<]*<\/var>/g,
+    hint: 'Cyrillic subscript inside <var>…</var>. Keep Latin: V_{\\mathrm{in}} not V_{\\text{вх}}, f_{\\mathrm{c}} not f_{\\text{зр}}. Known Gemini regression.',
+  },
+
   // ── Forbidden words from landmines.md ───────────────────────────────────
 
   {
@@ -317,6 +362,55 @@ const RULES = [
     hint: 'Playground-register verb applied to a physical quantity. Use «коливається / періодично змінюється / зростає / відхиляється» instead. Voltages don\'t swing; sines oscillate.',
   },
 
+  // ── Playground-register PLACEMENT verbs for components/materials ────────
+  //
+  // User-flagged on ch1.5 (repeatedly): «покладіть між ними ізолятор»,
+  // «Поставте обкладки обличчям», «Поставте резистор послідовно», etc.
+  // Placing a component into a circuit in UA technical prose uses:
+  //   - `розмістити / розмістіть` (generic placement)
+  //   - `помістити / помістіть` (placing between / inside something)
+  //   - `установити / установіть` (installing a component)
+  //   - `увімкнути послідовно/паралельно` (connecting in series/parallel)
+  //   - `під'єднати / під'єднайте` (connecting terminals)
+  //
+  // Colloquial «покласти / покладіть», «поставити / поставте» for
+  // components read as playground/kitchen register in a physics lab text.
+  // Also «висіти» as intransitive for a wire end — «залишається вільним»
+  // is the technical form.
+  //
+  // **Exceptions**: «поставити прилад у розрив», «поставити метальну
+  // крапку», «поставити задачу» — established collocations; not flagged.
+  //
+  // Pattern is narrow: verb form + 0-3 words + component/placement noun.
+  {
+    id: 'forbidden.playground-placement',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    pattern: /(?<!\p{L})(?:покладіть|покладемо|покладуть|покласти|кладіть|покладу|кладемо)\s+(?:\S+\s+){0,3}?(ізолятор|діелектрик|резистор|конденсатор|індуктивність|котушку|діод|компонент|дротину|провід|перемичку|плату|мікросхему|транзистор|обкладк[уи])/giu,
+    hint: 'Playground-register verb for placing a component. Use «розмістіть», «помістіть», «установіть», «увімкніть послідовно/паралельно» or «під\'єднайте». See landmines — «покладіть між ними X» is colloquial; lab-register is «розмістіть між ними X».',
+  },
+
+  {
+    id: 'forbidden.postavte-component',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // «Поставте резистор послідовно / Поставте обкладку / Поставте
+    // конденсатор» — for component placement, not for «поставити задачу»
+    // or «поставити крапку» (abstract, OK).
+    pattern: /(?<!\p{L})(?:поставте|поставити|постав)\s+(?:\S+\s+){0,2}?(резистор|конденсатор|індуктивність|котушку|діод|обкладк[уи]|пластин[уи]|компонент|мікросхему|транзистор|запобіжник)\b/giu,
+    hint: 'Playground-register «поставте» for a component. Use «розмістіть» / «установіть» / «увімкніть» (for connection) / «під\'єднайте». Compare the existing ch1_5 labStep1 fix: «Поставте резистор послідовно» → «Увімкніть резистор послідовно».',
+  },
+
+  {
+    id: 'forbidden.visity-wire',
+    category: 'FORBIDDEN',
+    severity: 'WARN',
+    // «залиште кінець дроту висіти» — a wire/lead does not «hang» in UA
+    // tech prose; use «залишатися вільним» / «бути неприєднаним».
+    pattern: /(?<!\p{L})(?:висіти|висить|висять)\s+(?:до|поки|аж|—|\.)/giu,
+    hint: 'A wire/lead in UA tech prose does not «висіти». Use «залишається вільним» / «лишається неприєднаним» instead.',
+  },
+
   {
     id: 'forbidden.miryaty-measure',
     category: 'FORBIDDEN',
@@ -421,6 +515,24 @@ const RULES = [
     // is NOT «температурі/умові/тому/цьому/нагоді».
     pattern: /(?<!\p{L})при\s+(?!(?:температур|умов|тому|цьому|нагод|розрахунк|вимірюванн[іі]\s+температур))[а-яіїєґ]+(?:анн|енн|інн|онн|янн)[іеаяою](?!\p{L})/giu,
     hint: 'Russianism: «при + verbal noun» (e.g. «при проходженні», «при прикладенні»). Use «коли …», «під час …», «за + instrumental», or an adverbial participle («роблячи …»). Standard physics collocations («при кімнатній температурі», «при умові») are allowed.',
+  },
+
+  // ── Polarity of poles/terminals must be позитивний/негативний ──────────
+  //
+  // User-flagged on ch1.5: «додатний вивід», «від’ємний вивід», «додатна
+  // обкладка» etc. — in UA, poles / terminals / leads / plates ALWAYS
+  // take `позитивний/негативний`, never `додатний/від'ємний`. The latter
+  // is reserved for scalar/math contexts (`додатне число`, `від'ємна
+  // півхвиля`) — not for physical polarity labels. See landmine (row in
+  // section 3) «Polarity of POLES/TERMINALS — always позитивний/негативний».
+  {
+    id: 'forbidden.dodatny-polarity',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Match `додатн*` / `від'ємн*` (both ' and ’ apostrophe forms)
+    // followed within 0-2 words by a physical-polarity noun.
+    pattern: /(?<!\p{L})(додатн|від['’]ємн)\S*\s+(?:\S+\s+)?(вивід|виводу|виводі|виводом|виводи|виводів|виводах|полюс|полюсу|полюсі|полюсом|полюси|полюсів|полюсах|клем[ауиоюі]?|клемам[иі]?|клемах|обкладк[ауиоюі]?|обкладок|обкладкам[иі]?|обкладках|електрод|електрода|електроду|електродом|електроди|електродів|електродах|терміналь\S*|провід|провода|проводу|проводом)(?!\p{L})/giu,
+    hint: 'Polarity of poles/terminals: use «позитивний / негативний», never «додатний / від’ємний». The latter is for scalar/math contexts only (додатне число, від’ємна півхвиля). Applies to: вивід, полюс, клема, обкладка, електрод, термінал, провід.',
   },
 
   {

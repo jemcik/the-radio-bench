@@ -36,7 +36,7 @@ export function MathVar({ children }: { children?: React.ReactNode }) {
  * Self-closing inline component that renders the parallel-resistance
  * operator `∥` via KaTeX. Use via <Trans> component mapping:
  *
- *   <Trans i18nKey="…" components={{ pll: <ParallelSym /> }} />
+ *   <Trans i18nKey="…" components={{ ...mathComponents, pll: <ParallelSym /> }} />
  *
  * with the i18n string containing `<pll />` where the operator should
  * appear, e.g. «R₁ <pll /> R₂».

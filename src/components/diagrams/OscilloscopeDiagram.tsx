@@ -27,6 +27,7 @@ import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { useTheme } from '@/context/ThemeContext'
 import { THEMES } from '@/lib/themes'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const SCROLL_PERIOD_MS = 4000
 
@@ -142,8 +143,8 @@ export default function OscilloscopeDiagram() {
   const caption = (
     <>
       {t('ch0_2.scopeDiagramCaption1')}{' '}
-      <Trans i18nKey="ch0_2.scopeDiagramCaption2" ns="ui" components={{ nowrap }} /><sub>pp</sub>.{' '}
-      <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ strong: <strong />, nowrap }} />
+      <Trans i18nKey="ch0_2.scopeDiagramCaption2" ns="ui" components={{ ...mathComponents, nowrap }} /><sub>pp</sub>.{' '}
+      <Trans i18nKey="ch0_2.scopeDiagramCaption3" ns="ui" components={{ ...mathComponents, strong: <strong />, nowrap }} />
     </>
   )
 
