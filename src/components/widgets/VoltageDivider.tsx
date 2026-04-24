@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
+import { MathText } from '@/components/ui/math-text'
 import { Slider } from '@/components/ui/slider'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 
@@ -200,7 +201,7 @@ export default function VoltageDivider() {
 
       {/* ── Primary readouts ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <ResultBox tone="success" label={t('ch1_4.widget.divider.voutNoLoadLabel')}>
+        <ResultBox tone="success" label={<MathText>{t('ch1_4.widget.divider.voutNoLoadLabel')}</MathText>}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {formatted.vOutNoLoadStr}
           </p>
@@ -245,7 +246,7 @@ export default function VoltageDivider() {
               onValueChange={([v]) => setRL(sliderToR(v, RL_LOG_MIN, RL_LOG_MAX))}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-              <ResultBox tone="warn" label={t('ch1_4.widget.divider.voutLoadedLabel')}>
+              <ResultBox tone="warn" label={<MathText>{t('ch1_4.widget.divider.voutLoadedLabel')}</MathText>}>
                 <p className="text-xl font-mono font-semibold text-foreground">
                   {formatted.vOutLoadedStr}
                 </p>
@@ -272,7 +273,7 @@ export default function VoltageDivider() {
       </div>
 
       <p className="text-[13px] text-muted-foreground">
-        {t('ch1_4.widget.divider.hint')}
+        <MathText>{t('ch1_4.widget.divider.hint')}</MathText>
       </p>
     </Widget>
   )

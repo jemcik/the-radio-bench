@@ -4,6 +4,7 @@ import ChapterFlowDiagram from '@/components/diagrams/ChapterFlowDiagram'
 import { Callout } from '@/components/ui/callout'
 import { Section } from '@/components/ui/section-heading'
 import { G } from '@/features/glossary/glossary-term'
+import { mathComponents } from '@/lib/trans-defaults'
 
 export default function Chapter0_1() {
   const { t } = useTranslation('ui')
@@ -33,7 +34,7 @@ export default function Chapter0_1() {
           <Trans
             i18nKey="ch0_1.labActivitiesDetail"
             ns="ui"
-            components={{ vna: <G k="vna" /> }}
+            components={{ ...mathComponents, vna: <G k="vna" /> }}
           />
         </li>
         <li>
@@ -48,10 +49,8 @@ export default function Chapter0_1() {
         <Trans
           i18nKey="ch0_1.iconsDetail"
           ns="ui"
-          components={{
-            flask: <strong />,
-            qmark: <strong />,
-          }}
+          components={{ ...mathComponents, flask: <strong />,
+            qmark: <strong />, }}
         />
       </p>
 
@@ -60,11 +59,11 @@ export default function Chapter0_1() {
       <p>{t('ch0_1.calloutsIntro')}</p>
 
       <Callout variant="danger">
-        <Trans i18nKey="ch0_1.calloutDanger" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch0_1.calloutDanger" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </Callout>
 
       <Callout variant="key">
-        <Trans i18nKey="ch0_1.calloutKey" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch0_1.calloutKey" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </Callout>
 
       <Callout variant="tip">
@@ -94,7 +93,7 @@ export default function Chapter0_1() {
       <Section id="recommended-path" labelKey="ch0_1.sectionPath" />
 
       <p>
-        <Trans i18nKey="ch0_1.path1" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch0_1.path1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </p>
 
       <p>{t('ch0_1.path2')}</p>
@@ -110,9 +109,7 @@ export default function Chapter0_1() {
         <Trans
           i18nKey="ch0_1.oneMore1"
           ns="ui"
-          components={{
-            erc: <G k="erc" />,
-          }}
+          components={{ ...mathComponents, erc: <G k="erc" />, }}
         />
       </p>
 

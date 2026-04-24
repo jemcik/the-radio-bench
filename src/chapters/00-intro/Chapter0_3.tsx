@@ -14,6 +14,7 @@ import SciNotationExplorer from '@/components/widgets/SciNotationExplorer'
 import FormulaTransposer from '@/components/widgets/FormulaTransposer'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '0-3'
 const QUIZ_QUESTION_COUNT = 12
@@ -45,7 +46,7 @@ export default function Chapter0_3() {
     <>
       <p>
         <Trans i18nKey="ch0_3.intro" ns="ui"
-          components={{ freq: <G k="frequency" />, cap: <G k="capacitance" />, res: <G k="resistance" /> }}
+          components={{ ...mathComponents, freq: <G k="frequency" />, cap: <G k="capacitance" />, res: <G k="resistance" /> }}
         />
       </p>
 
@@ -54,13 +55,13 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.fractionsIntro" ns="ui"
-          components={{ voltage: <G k="voltage" />, i: <i /> }}
+          components={{ ...mathComponents, voltage: <G k="voltage" />, i: <i /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_3.fractionsExample" ns="ui"
-          components={{ voltageDivider: <G k="voltage divider" /> }}
+          components={{ ...mathComponents, voltageDivider: <G k="voltage divider" /> }}
         />
       </p>
 
@@ -75,7 +76,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.powersIntro" ns="ui"
-          components={{ fm: <G k="fm" />, sciNotation: <G k="scientific notation" /> }}
+          components={{ ...mathComponents, fm: <G k="fm" />, sciNotation: <G k="scientific notation" /> }}
         />
       </p>
 
@@ -95,7 +96,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.prefixesIntro" ns="ui"
-          components={{ si: <G k="si" />, farad: <G k="farad" /> }}
+          components={{ ...mathComponents, si: <G k="si" />, farad: <G k="farad" /> }}
         />
       </p>
 
@@ -103,7 +104,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.prefixesRule" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -132,13 +133,13 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.squaringWhy" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <Callout variant="key">
         <Trans i18nKey="ch0_3.squaringKey" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -149,7 +150,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.transposingCover" ns="ui"
-          components={{ i: <i /> }}
+          components={{ ...mathComponents, i: <i /> }}
         />
       </p>
 
@@ -208,7 +209,7 @@ export default function Chapter0_3() {
           t('ch0_3.labEquip2'),
         ]}
         procedure={[
-          { text: <Trans i18nKey="ch0_3.labStep1" ns="ui" components={{ multimeter: <G k="multimeter" /> }} /> },
+          { text: <Trans i18nKey="ch0_3.labStep1" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} /> },
           { text: t('ch0_3.labStep2') },
           { text: t('ch0_3.labStep3') },
           { text: t('ch0_3.labStep4') },

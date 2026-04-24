@@ -13,6 +13,7 @@
  * — do NOT hand-roll SVG inside a chapter-level diagram file.
  */
 import { svgTokens } from '@/components/diagrams/svgTokens'
+import { renderLabelContent } from '../SymbolLabel'
 
 interface NodePointProps {
   /** Logical x-coordinate (centre of the circle). */
@@ -119,6 +120,7 @@ export function TerminalLabel({
 }: TerminalLabelProps) {
   const fill = color
     ?? (tone === 'mutedFg' ? svgTokens.mutedFg : svgTokens.fg)
+
   return (
     <text
       x={x} y={y}
@@ -130,7 +132,7 @@ export function TerminalLabel({
       dominantBaseline="central"
       fill={fill}
     >
-      {children}
+      {renderLabelContent(children)}
     </text>
   )
 }

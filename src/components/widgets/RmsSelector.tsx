@@ -2,6 +2,7 @@ import { useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
+import { MathText } from '@/components/ui/math-text'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatDecimal } from '@/lib/format'
 import { svgTokens } from '@/components/diagrams/svgTokens'
@@ -413,7 +414,7 @@ export default function RmsSelector() {
             >
               <span>
                 {t(`ch1_3.widget.rmsSelector.mode_${m}`)}
-                <span className="ml-1 font-mono text-xs opacity-70">({t(`ch1_3.widget.rmsSelector.${sym}`)})</span>
+                <span className="ml-1 font-mono text-xs opacity-70">(<MathText>{t(`ch1_3.widget.rmsSelector.${sym}`)}</MathText>)</span>
               </span>
               <span className="font-mono whitespace-nowrap shrink-0">
                 {formatDecimal(val, 2, locale)}&nbsp;{tUnit('v')}
@@ -424,7 +425,7 @@ export default function RmsSelector() {
       </ResultBox>
 
       <p className="text-[13px] text-muted-foreground">
-        {t(`ch1_3.widget.rmsSelector.hint_${mode}`)}
+        <MathText>{t(`ch1_3.widget.rmsSelector.hint_${mode}`)}</MathText>
       </p>
     </Widget>
   )

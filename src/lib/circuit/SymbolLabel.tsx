@@ -1,3 +1,4 @@
+import React from 'react'
 import { type Orientation, isVertical } from './types'
 
 /**
@@ -26,6 +27,109 @@ interface SymbolTextProps {
   children: React.ReactNode
 }
 
+/**
+ * Parse an SVG schematic label for a TeX-ish subscript pattern.
+ * Returns `{ base, sub }` or `null` if no subscript is present.
+ *
+ * Accepted shapes:
+ *   «V_C»       → { base: 'V', sub: 'C' }
+ *   «V_in»      → { base: 'V', sub: 'in' }
+ *   «V_{pk-pk}» → { base: 'V', sub: 'pk-pk' }   (braces stripped)
+ *
+ * Plain labels without `_` (e.g. `R`, `C`, `S`, `0 V`, `GND`) return
+ * `null` and render verbatim. Exported so both the SVG text helpers
+ * in this file AND the standalone `TerminalLabel` (in
+ * `symbols/annotations.tsx`) share the same parsing behaviour — every
+ * schematic label in the project benefits from a single fix.
+ */
+function parseLabelSubscript(s: string): { base: string; sub: string } | null {
+  // Strip outer <var>…</var> wrapper so strings that live in i18n in
+  // canonical wrapped form («<var>V_{\mathrm{in}}</var>») also work
+  // when dropped into a SVG <text> via raw `t()`.
+  const stripped = s.replace(/^<var>(.+)<\/var>$/, '$1')
+  // Braced subscript: X_{…}. Greedy content, anchored at the final `}`,
+  // so nested braces in «V_{\mathrm{in}}» are handled correctly.
+  const braced = /^(.+?)_\{(.+)\}$/.exec(stripped)
+  if (braced) {
+    let sub = braced[2]
+    // Unwrap common TeX upright-text wrappers (\mathrm, \text,
+    // \operatorname) so the SVG subscript shows plain letters, not
+    // «\mathrm{in}».
+    const inner = /^\\(?:mathrm|text|operatorname)\{([^{}]+)\}$/.exec(sub)
+    if (inner) sub = inner[1]
+    return { base: braced[1], sub }
+  }
+  const plain = /^(.+?)_(.+)$/.exec(stripped)
+  if (plain) return { base: plain[1], sub: plain[2] }
+  return null
+}
+
+/**
+ * Render the text children of a schematic label. If the children are
+ * a plain string with a `X_Y` / `X_{Y}` pattern, split into an italic
+ * base + upright, baseline-shifted subscript (matching HTML `<sub>`
+ * default and KaTeX math-italic convention).
+ *
+ * The base is rendered italic via inheritance — callers who want
+ * upright base text must explicitly pass italic=false (unused so far).
+ */
+export function renderLabelContent(children: React.ReactNode): React.ReactNode {
+  if (typeof children !== 'string') return children
+  const parsed = parseLabelSubscript(children)
+  if (!parsed) return children
+  return (
+    <>
+      {parsed.base}
+      <tspan fontSize="70%" dy="4" fontStyle="normal">
+        {parsed.sub}
+      </tspan>
+    </>
+  )
+}
+
+/**
+ * Render a mixed-content SVG label that may contain multiple
+ * `<var>X_{…}</var>` fragments interleaved with plain text (e.g. a
+ * short formula like «V_out = V_in × R₂ / (R₁ + R₂)»). Emits a
+ * sequence of `<tspan>` children suitable for dropping inside a
+ * parent `<text>` element.
+ *
+ * Each var fragment is rendered as italic base + upright subscript
+ * with a baseline shift; the shift is reset by a second zero-width
+ * tspan so subsequent plain text lands on the normal baseline.
+ *
+ * For simple single-variable labels use `renderLabelContent` instead
+ * — this one is only needed when the SVG label is a sentence or
+ * formula with several embedded vars.
+ */
+export function renderSvgInlineMath(s: string): React.ReactNode {
+  const parts = s.split(/(<var>[^<]+<\/var>)/)
+  return parts.map((part, i) => {
+    const m = /^<var>(.+)<\/var>$/.exec(part)
+    if (!m) return <React.Fragment key={i}>{part}</React.Fragment>
+    const parsed = parseLabelSubscript(m[1])
+    if (!parsed) {
+      return (
+        <tspan key={i} fontStyle="italic">
+          {m[1]}
+        </tspan>
+      )
+    }
+    return (
+      <React.Fragment key={i}>
+        <tspan fontStyle="italic">{parsed.base}</tspan>
+        <tspan fontSize="70%" dy="4" fontStyle="normal">
+          {parsed.sub}
+        </tspan>
+        {/* Reset baseline for any plain text that follows. */}
+        <tspan dy="-4" fontSize="0">
+          {'\u200B' /* ZWSP — non-visual character to carry the dy shift */}
+        </tspan>
+      </React.Fragment>
+    )
+  })
+}
+
 export function SymbolText({
   x,
   y,
@@ -46,7 +150,7 @@ export function SymbolText({
       fill="currentColor"
       opacity={opacity}
     >
-      {children}
+      {renderLabelContent(children)}
     </text>
   )
 }

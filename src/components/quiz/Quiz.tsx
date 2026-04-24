@@ -4,6 +4,8 @@ import type { TFunction } from 'i18next'
 import Widget from '@/components/ui/widget'
 import { Button } from '@/components/ui/button'
 import { ResultBox } from '@/components/ui/result-box'
+import { MathText } from '@/components/ui/math-text'
+import { MathVar } from '@/components/ui/math'
 import { codec, usePersistedState } from '@/lib/hooks/usePersistedState'
 import { cn } from '@/lib/utils'
 
@@ -87,10 +89,32 @@ export function buildQuizFromI18n(
   count: number,
   components?: Record<string, ReactElement>,
 ): QuizQuestion[] {
-  const render = (key: string): ReactNode =>
-    components
-      ? <Trans i18nKey={`${prefix}.${key}`} ns="ui" components={components} />
-      : t(`${prefix}.${key}`)
+  const render = (key: string): ReactNode => {
+    const raw = t(`${prefix}.${key}`)
+    // Decide the render path based on what's actually in the string:
+    //   - HTML-tagged («<var>…</var>», «<strong>…</strong>») → route
+    //     through <Trans> with a default components map that includes
+    //     `var: <MathVar />` so KaTeX renders subscripts. User-passed
+    //     components merge on top.
+    //   - Bare «X_Y» math (after migration this is rare, but may
+    //     reappear) → <MathText> handles it inline.
+    //   - Plain strings pass through verbatim (tests expect this, and
+    //     React is happiest with raw strings).
+    const hasHtmlTag = /<[a-z]+[ >]/.test(raw)
+    if (hasHtmlTag) {
+      return (
+        <Trans
+          i18nKey={`${prefix}.${key}`}
+          ns="ui"
+          components={{ var: <MathVar />, ...components }}
+        />
+      )
+    }
+    if (/\b[A-Za-z]_[A-Za-zА-ЯІЇЄа-яіїє0-9]+\b/.test(raw)) {
+      return <MathText>{raw}</MathText>
+    }
+    return raw
+  }
 
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1

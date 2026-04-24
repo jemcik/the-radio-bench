@@ -20,6 +20,7 @@ import {
 } from '@/lib/circuit'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '0-5'
 const QUIZ_QUESTION_COUNT = 6
@@ -122,7 +123,7 @@ export default function Chapter0_5() {
     <>
       <p>
         <Trans i18nKey="ch0_5.intro" ns="ui"
-          components={{ strong: <strong />, i: <i />, topology: <G k="topology" /> }}
+          components={{ ...mathComponents, strong: <strong />, i: <i />, topology: <G k="topology" /> }}
         />
       </p>
 
@@ -133,31 +134,31 @@ export default function Chapter0_5() {
 
       <p>
         <Trans i18nKey="ch0_5.wiresIntro" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <ul>
         <li>
           <Trans i18nKey="ch0_5.wiresRule1" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_5.wiresRule2" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_5.wiresRule3" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
       </ul>
 
       <Callout variant="key">
         <Trans i18nKey="ch0_5.wiresKey" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -166,7 +167,7 @@ export default function Chapter0_5() {
 
       <p>
         <Trans i18nKey="ch0_5.symbolsIntro" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -292,29 +293,29 @@ export default function Chapter0_5() {
       <ol>
         <li>
           <Trans i18nKey="ch0_5.exampleStep1" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_5.exampleStep2" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_5.exampleStep3" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_5.exampleStep4" ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong /> }}
           />
         </li>
       </ol>
 
       <Callout variant="key">
         <Trans i18nKey="ch0_5.exampleTakeaway" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -326,17 +327,17 @@ export default function Chapter0_5() {
         goal={t('ch0_5.labGoal')}
         equipment={[
           <Trans key="e1" i18nKey="ch0_5.labEquip1" ns="ui"
-            components={{ multimeter: <G k="multimeter" /> }}
+            components={{ ...mathComponents, multimeter: <G k="multimeter" /> }}
           />,
           <Trans key="e2" i18nKey="ch0_5.labEquip2" ns="ui"
-            components={{ breadboard: <G k="breadboard" /> }}
+            components={{ ...mathComponents, breadboard: <G k="breadboard" /> }}
           />,
           t('ch0_5.labEquip3'),
           t('ch0_5.labEquip4'),
         ]}
         components={[
           <Trans key="c1" i18nKey="ch0_5.labComp1" ns="ui"
-            components={{ led: <G k="led" /> }}
+            components={{ ...mathComponents, led: <G k="led" /> }}
           />,
           t('ch0_5.labComp2'),
           t('ch0_5.labComp3'),
@@ -349,7 +350,7 @@ export default function Chapter0_5() {
           { text: t('ch0_5.labStep5') },
           {
             text: <Trans i18nKey="ch0_5.labStep6" ns="ui"
-              components={{ strong: <strong /> }}
+              components={{ ...mathComponents, strong: <strong /> }}
             />,
           },
         ]}

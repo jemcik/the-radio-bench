@@ -22,8 +22,13 @@ interface CircuitProps {
   width: number
   /** Viewbox / logical height in px. */
   height: number
-  /** Optional caption rendered below the diagram. */
-  caption?: string
+  /**
+   * Optional caption rendered below the diagram. Accepts a React node,
+   * so callers can pass a `<Trans components={{ var: <MathVar /> }} />`
+   * element when the caption contains math / subscripts — otherwise a
+   * plain string like "V_C" would render with a literal underscore.
+   */
+  caption?: ReactNode
   /**
    * Optional max-width (CSS value) for the surrounding card. Without this,
    * `SVGDiagram` sets `width="100%"` so a small schematic scales up to fill

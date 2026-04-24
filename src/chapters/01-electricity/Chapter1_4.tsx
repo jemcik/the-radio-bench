@@ -15,6 +15,7 @@ import SeriesParallelSchematic from '@/components/diagrams/SeriesParallelSchemat
 import DividerSchematic from '@/components/diagrams/DividerSchematic'
 import DividerLoadingDiagram from '@/components/diagrams/DividerLoadingDiagram'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-4'
 const QUIZ_QUESTION_COUNT = 8
@@ -76,7 +77,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesThroughHole"
           ns="ui"
-          components={{ strong: <strong />, colour: <G k="colour code" /> }}
+          components={{ ...mathComponents, strong: <strong />, colour: <G k="colour code" /> }}
         />
       </p>
 
@@ -84,7 +85,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesSMT"
           ns="ui"
-          components={{ strong: <strong />, surface: <G k="surface mount" />, code: <code /> }}
+          components={{ ...mathComponents, strong: <strong />, surface: <G k="surface mount" />, code: <code /> }}
         />
       </p>
 
@@ -92,11 +93,9 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesRange"
           ns="ui"
-          components={{
-            strong: <strong />,
+          components={{ ...mathComponents, strong: <strong />,
             tol: <G k="tolerance" />,
-            rating: <G k="power rating" />,
-          }}
+            rating: <G k="power rating" />, }}
         />
       </p>
 
@@ -104,7 +103,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesTypes"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -115,7 +114,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.colourCodeIntro"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -123,7 +122,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.colourCodeDigits"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -131,7 +130,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.colourCodeWorkedExample"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -143,7 +142,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.colourCodeNotation"
           ns="ui"
-          components={{ strong: <strong />, code: <code /> }}
+          components={{ ...mathComponents, strong: <strong />, code: <code /> }}
         />
       </p>
 
@@ -151,7 +150,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.colourCodeSMTNote"
           ns="ui"
-          components={{ code: <code /> }}
+          components={{ ...mathComponents, code: <code /> }}
         />
       </p>
 
@@ -162,7 +161,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.eSeriesIntro"
           ns="ui"
-          components={{ preferred: <G k="preferred value" />, tol: <G k="tolerance" /> }}
+          components={{ ...mathComponents, preferred: <G k="preferred value" />, tol: <G k="tolerance" /> }}
         />
       </p>
 
@@ -172,7 +171,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.eSeriesTable"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -184,7 +183,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.eSeriesCallout"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -199,7 +198,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.seriesFormula"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -216,7 +215,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.parallelFormula"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -284,7 +283,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.parallelDerivationDualityLead"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -302,7 +301,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.shortcutCallout"
           ns="ui"
-          components={{ strong: <strong />, pll: <ParallelSym /> }}
+          components={{ ...mathComponents, strong: <strong />, pll: <ParallelSym /> }}
         />
       </Callout>
 
@@ -315,7 +314,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.dividerIntro"
           ns="ui"
-          components={{ divider: <G k="voltage divider" /> }}
+          components={{ ...mathComponents, divider: <G k="voltage divider" /> }}
         />
       </p>
 
@@ -425,7 +424,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.powerDividerExample"
           ns="ui"
-          components={{ nowrap: nowrap }}
+          components={{ ...mathComponents, nowrap: nowrap }}
         />
       </p>
 
@@ -441,7 +440,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.powerDeratingCallout"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </Callout>
 
@@ -474,8 +473,8 @@ export default function Chapter1_4() {
         goal={t('ch1_4.labGoal')}
         equipment={[
           t('ch1_4.labEquip1'),
-          <Trans key="e2" i18nKey="ch1_4.labEquip2" ns="ui" components={{ multimeter: <G k="multimeter" /> }} />,
-          <Trans key="e3" i18nKey="ch1_4.labEquip3" ns="ui" components={{ breadboard: <G k="breadboard" /> }} />,
+          <Trans key="e2" i18nKey="ch1_4.labEquip2" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} />,
+          <Trans key="e3" i18nKey="ch1_4.labEquip3" ns="ui" components={{ ...mathComponents, breadboard: <G k="breadboard" /> }} />,
           t('ch1_4.labEquip4'),
         ]}
         components={[
@@ -484,9 +483,9 @@ export default function Chapter1_4() {
           t('ch1_4.labComp3'),
         ]}
         procedure={[
-          { text: <Trans i18nKey="ch1_4.labStep1" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_4.labStep2" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_4.labStep3" ns="ui" components={{ strong: <strong />, nowrap: nowrap }} /> },
+          { text: <Trans i18nKey="ch1_4.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_4.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_4.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }} /> },
           { text: <Trans i18nKey="ch1_4.labStep4" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} /> },
           { text: <Trans i18nKey="ch1_4.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: nowrap }} /> },
           { text: <Trans i18nKey="ch1_4.labStep6" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} /> },
@@ -494,8 +493,8 @@ export default function Chapter1_4() {
         expectedResult={t('ch1_4.labExpected')}
         connectionToTheory={t('ch1_4.labConnection')}
         troubleshooting={[
-          <Trans key="t1" i18nKey="ch1_4.labTrouble1" ns="ui" components={{ strong: <strong /> }} />,
-          <Trans key="t2" i18nKey="ch1_4.labTrouble2" ns="ui" components={{ strong: <strong /> }} />,
+          <Trans key="t1" i18nKey="ch1_4.labTrouble1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />,
+          <Trans key="t2" i18nKey="ch1_4.labTrouble2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />,
           <Trans key="t3" i18nKey="ch1_4.labTrouble3" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} />,
         ]}
       />

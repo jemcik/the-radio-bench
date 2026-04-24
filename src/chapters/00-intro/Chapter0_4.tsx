@@ -13,6 +13,7 @@ import DbRulerDiagram from '@/components/diagrams/DbRulerDiagram'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
+import { mathComponents } from '@/lib/trans-defaults'
 
 // Memorable dBm landmarks — a power decade every 10 dBm. The 0 dBm row
 // is the anchor (reference point 1 mW). Values extend from TX levels
@@ -50,7 +51,7 @@ export default function Chapter0_4() {
     <>
       <p>
         <Trans i18nKey="ch0_4.intro" ns="ui"
-          components={{ decibel: <G k="decibel" /> }}
+          components={{ ...mathComponents, decibel: <G k="decibel" /> }}
         />
       </p>
 
@@ -65,7 +66,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.logsIntro" ns="ui"
-          components={{ logarithm: <G k="logarithm" />, i: <i /> }}
+          components={{ ...mathComponents, logarithm: <G k="logarithm" />, i: <i /> }}
         />
       </p>
 
@@ -90,7 +91,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.ratioIntro" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -104,31 +105,31 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyTen" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyTenMultiply" ns="ui"
-          components={{ strong: <strong />, i: <i /> }}
+          components={{ ...mathComponents, strong: <strong />, i: <i /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyPowerUnit" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyPowerUnitDetail" ns="ui"
-          components={{ strong: <strong />, i: <i /> }}
+          components={{ ...mathComponents, strong: <strong />, i: <i /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhy" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -167,7 +168,7 @@ export default function Chapter0_4() {
 
       <Callout variant="tip">
         <Trans i18nKey="ch0_4.shortcutTip" ns="ui"
-          components={{ ham: <G k="ham radio" /> }}
+          components={{ ...mathComponents, ham: <G k="ham radio" /> }}
         />
       </Callout>
 
@@ -178,7 +179,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.dbmIntro" ns="ui"
-          components={{ strong: <strong />, dbm: <G k="dbm" /> }}
+          components={{ ...mathComponents, strong: <strong />, dbm: <G k="dbm" /> }}
         />
       </p>
 
@@ -220,7 +221,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.dbmNegative" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -232,12 +233,12 @@ export default function Chapter0_4() {
       <ul>
         <li>
           <Trans i18nKey="ch0_4.antennaDbi" ns="ui"
-            components={{ strong: <strong />, dbi: <G k="dbi" />, isotropic: <G k="isotropic" /> }}
+            components={{ ...mathComponents, strong: <strong />, dbi: <G k="dbi" />, isotropic: <G k="isotropic" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_4.antennaDbd" ns="ui"
-            components={{ strong: <strong />, dbd: <G k="dbd" />, dipole: <G k="dipole" /> }}
+            components={{ ...mathComponents, strong: <strong />, dbd: <G k="dbd" />, dipole: <G k="dipole" /> }}
           />
         </li>
       </ul>
@@ -257,19 +258,19 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.logAxisIntro" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <ul>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact1" ns="ui"
-            components={{ strong: <strong />, i: <i />, decade: <G k="decade" /> }}
+            components={{ ...mathComponents, strong: <strong />, i: <i />, decade: <G k="decade" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact2" ns="ui"
-            components={{ strong: <strong />, i: <i /> }}
+            components={{ ...mathComponents, strong: <strong />, i: <i /> }}
           />
         </li>
       </ul>
@@ -285,41 +286,41 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.recogniseIntro" ns="ui"
-          components={{ qso: <G k="qso" /> }}
+          components={{ ...mathComponents, qso: <G k="qso" /> }}
         />
       </p>
 
       <ul>
         <li>
           <Trans i18nKey="ch0_4.recognise1" ns="ui"
-            components={{ hf: <G k="hf" />, transceiver: <G k="transceiver" /> }}
+            components={{ ...mathComponents, hf: <G k="hf" />, transceiver: <G k="transceiver" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_4.recognise2" ns="ui"
-            components={{ qrp: <G k="qrp" /> }}
+            components={{ ...mathComponents, qrp: <G k="qrp" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_4.recognise3" ns="ui"
-            components={{ vhf: <G k="vhf" /> }}
+            components={{ ...mathComponents, vhf: <G k="vhf" /> }}
           />
         </li>
         <li>{t('ch0_4.recognise4')}</li>
         <li>
           <Trans i18nKey="ch0_4.recognise5" ns="ui"
-            components={{ rf: <G k="rf" /> }}
+            components={{ ...mathComponents, rf: <G k="rf" /> }}
           />
         </li>
         <li>{t('ch0_4.recognise6')}</li>
         <li>
           <Trans i18nKey="ch0_4.recognise7" ns="ui"
-            components={{ coax: <G k="coax" /> }}
+            components={{ ...mathComponents, coax: <G k="coax" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch0_4.recognise8" ns="ui"
-            components={{ yagi: <G k="yagi" /> }}
+            components={{ ...mathComponents, yagi: <G k="yagi" /> }}
           />
         </li>
       </ul>
@@ -334,8 +335,8 @@ export default function Chapter0_4() {
           t('ch0_4.labEquip3'),
         ]}
         procedure={[
-          { text: <Trans i18nKey="ch0_4.labStep1" ns="ui" components={{ multimeter: <G k="multimeter" /> }} /> },
-          { text: <Trans i18nKey="ch0_4.labStep2" ns="ui" components={{ voltageDivider: <G k="voltage divider" /> }} /> },
+          { text: <Trans i18nKey="ch0_4.labStep1" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} /> },
+          { text: <Trans i18nKey="ch0_4.labStep2" ns="ui" components={{ ...mathComponents, voltageDivider: <G k="voltage divider" /> }} /> },
           { text: <Trans i18nKey="ch0_4.labStep3" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
           { text: <Trans i18nKey="ch0_4.labStep4" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
           { text: t('ch0_4.labStep5') },

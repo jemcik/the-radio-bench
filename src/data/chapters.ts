@@ -144,7 +144,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Capacitors',
         subtitle: 'Capacitance, types, RC time constant, blocks DC passes AC',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.2'],

@@ -223,21 +223,109 @@ paths, plain helper functions not inner components, translate whole
 widgets never piecemeal) all live in the skill. This file is no longer
 the source of truth for diagram work — the skill is.
 
-## Ukrainian translation — use the `ua-translate` skill
+## Ukrainian translation — use the `ua-translate` skill (Gemini-primary workflow)
 
-**Before translating any EN → UK content** (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never translate inline key-by-key.
+**Before translating any EN → UK content** (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never translate inline key-by-key. **Never fall back to Claude-only translation — it produces non-native UA that fails review.** The workflow below is MANDATORY going forward, including for every new chapter from ch 1.6 onward.
 
-The skill runs six stages:
-1. Load glossary + landmines + style refs
-2. Primary translation via briefed agent
-3. **Parallel critique** — 5 specialist agents in one spawn (fluency / technical / consistency / calques / grammar)
-4. Consolidate findings + apply high-confidence auto-fixes
-5. Automated lint: `npm run check:uk` (fails on mechanical errors — English leftovers, decimal periods, Latin units, forbidden words, capitalised `Ви`, `<i>I</i>` for math vars)
-6. Present only non-obvious decisions to the user
+### Why Gemini, not Claude
 
-Every time the user pushes back on a specific Ukrainian phrasing, extend `.claude/skills/ua-translate/references/landmines.md` (and, where detectable, the linter). The skill gets smarter per chapter instead of repeating the same 30-issue round-trip.
+Intento 2025 benchmark: Gemini 2.5 Pro is #1 for EN→UA; Claude doesn't make the top tier. Claude-only translation of ch 1.1–1.4 produced ~30 user-caught landmines per chapter. Switching to Gemini primary + Claude reviewer + linter in ch 1.5 cut the round-trip cost roughly tenfold.
 
-**Linter CLI**: `npm run check:uk` scans the whole `uk/ui.json`. Scope to one chapter: `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch1_1`.
+### The five-stage workflow
+
+1. **Batch the section.** Translate logical sections, not whole chapters. Typical batches: `intro`+`introPreview` (always first — sets style anchor); then per-section (§1 Geometry, §2 Types, etc.); then Summary; then Lab; then Quiz (split Q1–Q4 + Q5–Q8); then `widget` subtree.
+2. **Run both Gemini Pro models** via `python3 .claude/skills/ua-translate/scripts/gemini-translate.py ch<N>_<M> <key1> [<key2> ...]`. The script loads `GEMINI_API_KEY` silently from `.env.local`, attaches the project glossary + landmine summary to the system prompt, and writes outputs to `/tmp/gemini-section/`.
+3. **Claude analyzes three candidates per key** (current Claude UA + 2.5 Pro + 3.1 Pro) and recommends one per key with justification. Must catch Gemini regressions: `V_in`→`V_вх`, «розряджувальний»→«розрядний», «вивід»→«висновок», «осцилограма» for generic waveform, etc. See `SKILL.md` for the full regression table.
+4. **User approves, apply via Python script** (replace uk[key] + manual fixes for regressions).
+5. **Always re-lint** via `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch<N>_<M>` (or `npm run check:uk` for the whole file). Exit code 0 required. Warnings for `style.unglossed-canonical-term` on «зміщення» in DC-bias contexts are domain-legitimate false positives.
+
+### Prerequisites
+
+- `.env.local` (repo root, git-ignored) contains `GEMINI_API_KEY=...`
+- Google Cloud Paid Tier enabled on the Gemini API. Pro models have free-tier quota = 0. Cost: ~$0.10–0.15 per chapter section, ~$5 for the whole course.
+
+### Evergreen rules
+
+Every time the user pushes back on a specific Ukrainian phrasing:
+1. Decide: is Gemini right (our convention was wrong) or wrong (regression)?
+2. If Gemini right → update `.claude/skills/ua-translate/references/glossary.md` with the canonical form + ch-1.5 decisions section.
+3. If Gemini wrong → add row to "Known Gemini regressions" in `SKILL.md` + add a linter rule if mechanically catchable.
+
+The skill gets smarter per chapter. Never run the same manual fix twice across different chapters — enshrine it in the glossary/linter the first time.
+
+**Linter CLI**: `npm run check:uk` (whole file) or `node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch1_1` (scoped to one chapter).
+
+### Mid-conversation UA rewrites — same rule applies
+
+When the user flags a single sentence and I rewrite it inline, the temptation is to hand-author UA because Gemini feels «heavy» for one line. **Don't.** The core reason Gemini is the primary translator is exactly this: Claude, writing UA from scratch, produces calques even on short sentences. ch 1.5 landed a fresh one mid-fix (`найчесніше взяти нову деталь` — literal translation of "the honest move is to…" where EN "honest" means pragmatic, not moral; UA `найчесніше` reads as ethically honest → nonsense). For any inline UA rewrite of more than a clause:
+
+1. Write the new EN sentence first.
+2. Run it through Gemini (same script: `gemini-translate.py <chapter_id> <single_key>`) or, if truly trivial, cross-check the draft against `.claude/skills/ua-translate/references/landmines.md` section «Calqued idioms» BEFORE saving.
+3. Re-lint.
+
+For genuinely one-word swaps (fixing a noun case, replacing one term from the glossary) Gemini is overkill — but any rewrite that touches idiom or sentence structure MUST go through the workflow or the landmine check.
+
+## If the prose describes a circuit — the schematic goes BEFORE the prose
+
+**Non-negotiable, retroactive to every section.** Any paragraph that
+begins with «Wire X in series with Y», «Connect A to B», «Close the
+switch», «between V_in and ground», or any other topology-by-words must
+be accompanied by a schematic the reader can look at *while reading the
+sentence*. Readers without engineering backgrounds (the entire target
+audience) cannot build a mental circuit from prose — that's exactly
+what a schematic is for.
+
+Minimum bar: the schematic renders BEFORE the first prose paragraph
+that names its components, and it shows every element the prose
+references (supply, switch, resistor, capacitor, each labelled node
+like V_C). Use `@/lib/circuit` primitives; see the working example
+`src/components/diagrams/RCChargingSchematic.tsx` for the standard
+two-rail topology.
+
+**Don't float voltage-name labels in empty space — draw a voltmeter.**
+If prose names a voltage (V_C, V_out, V_B, V_probe…) and the reader
+needs to understand *what physical quantity that name refers to*, don't
+just drop a bare text label at a wire point — that's schematic
+shorthand for "the potential at this node", which non-engineer readers
+can't parse. Instead, draw a `<Meter letter="V">` connected across the
+two points whose difference the label names, with blue probe wires
+(`METER_ACCENT_V`) and the label hanging off the meter in blue. That
+way the answer to «what is V_C?» is visible in the drawing itself:
+it's the reading of the voltmeter across C. See
+`RCChargingSchematic.tsx` for the pattern. Past fix: ch 1.5 §6 had a
+bare `V_C` terminal label floating next to the top of the capacitor
+and a reader had to read a full paragraph of caption to learn what it
+meant — replaced with a proper voltmeter.
+
+**Battery designator vs value — don't duplicate.** The `<Battery>`
+primitive takes both `label` (component designator like "B", "V") and
+`value` (quantity like "9V", "V_in"). In a schematic with only one
+battery, the designator adds nothing — it just creates two labels
+hanging off the battery that the reader has to parse. Supply only
+`value` in that case. If there ARE multiple batteries in a schematic,
+then `label="B1"` / `B2` earns its place. Past fix: ch 1.5
+RCChargingSchematic had `label="V" value="V_in"` — dropped the label.
+
+**`<Ground>` vs battery — don't show both.** If the schematic includes
+an explicit `<Battery>`, the battery's negative terminal already
+defines the 0 V reference; adding a separate `<Ground>` symbol creates
+the illusion of two distinct references and confuses the reader. Use
+`<Ground>` only when (a) the supply is shown as a bare terminal label
+(`V_in`) with no `<Battery>` component, or (b) several branches share
+a common return rail and the ground symbol helps declutter. For
+simple single-loop schematics with an explicit `<Battery>`, omit
+`<Ground>` and let the bottom rail speak for itself. The prose should
+match: if the schematic has no ground, don't write «between V_in and
+ground» — write «between the positive and negative terminals of
+V_in» or similar. Past fix: `ch1_5.rcIntro` / `RCChargingSchematic`.
+
+This rule was violated multiple times across ch 1.5 — the RC circuit
+in §6 was described in prose for multiple paragraphs before any visual
+appeared, forcing the reader to imagine wiring they've never seen
+before. Retroactive fix landed ch 1.5. **For every new chapter and
+every new section in an existing chapter: inventory the circuits
+described in prose, and gate the PR on each having a schematic above
+the prose that describes it.**
 
 ## Writing discipline — introduce every concept before using it
 
@@ -297,6 +385,88 @@ Typical failure modes (user has flagged all of these in Ch 1.2 alone):
 Full catalogue of the pattern + prevention checklist in memory at
 `memory/feedback_first_mention_explicitness.md`. **Run that checklist
 before drafting any new section.**
+
+## Don't cargo-cult existing patterns without checking the rendered output
+
+When adding a new component or schematic and reaching for a pattern
+from an existing file — especially something subtle like a label
+string, an SVG tspan attribute, or a Trans components map — **look at
+the actual rendered output first**, not just the code. A pattern that
+appears in the codebase may itself be a bug nobody has flagged yet.
+Past failures in ch 1.5 that traced to this:
+
+- Copied `value="V_in"` from `DividerSchematic` into
+  `RCChargingSchematic`, then the user caught that BOTH render with a
+  literal underscore («V_in» instead of *V* + subscript). Fix landed
+  in `SymbolLabel.tsx` / `annotations.tsx` (shared
+  `renderLabelContent` helper) — retroactively fixes ch 1.4 too.
+- Copied `<em>key-term</em>` pattern thinking the CSS rule
+  intentionally styled `<em>` as a highlight; it was actually a
+  bug-compatible rule that made `<em>` indistinguishable from a
+  glossary term. Fixed the CSS + migrated everything.
+
+Rule: **when adopting a pattern from another file, explicitly verify
+it renders correctly for the new case BEFORE committing the copy.**
+Don't treat "it's in the codebase" as "it works."
+
+## Subscripts — write them INSIDE `<var>…</var>` (TeX), never as separate `<sub>`
+
+**Hard rule.** Never use the pattern `<var>X</var><sub>Y</sub>` in i18n
+strings. Write subscripts inside the TeX: `<var>X_{…}</var>`. The old
+pattern produces two adjacent inline-block spans and browsers CAN
+(and do) break lines between them, orphaning the subscript onto the
+next line (`V_C` rendered as «V» on one line, «ᴄ» on the next).
+
+Subscript-form conventions (preserves visual parity with plain HTML
+`<sub>`):
+
+- **Latin multi-char label** (in, out, rms, pk, pk-pk, min, avg,
+  rated): `<var>V_{\mathrm{in}}</var>` — upright, matches physics
+  notation.
+- **Latin single-char label** (C, L, R, D): `<var>V_{\mathrm{C}}</var>`
+  — also `\mathrm{}` for upright. (Using `\mathrm{1}` for digits is
+  fine too; KaTeX renders digits upright either way.)
+- **Italic variable subscript** (i, j, k, n as index): `<var>V_{i}</var>`
+  — no `\mathrm`, italic is correct for indices.
+- **Cyrillic subscript** (ном, вх, вых): `<var>V_{\text{ном}}</var>` —
+  `\text{}` switches out of math mode to render Cyrillic correctly.
+
+Linter rule `markup.var-sub-linebreak` (in
+`.claude/skills/ua-translate/scripts/lint-ua-translation.mjs`) is an
+ERROR for any `<var>X</var><sub>Y</sub>` it finds. One-pass migration
+of 260 instances (EN + UA) landed in ch 1.5.
+
+## Term styling — `<G>` for terms, `<strong>` for emphasis, NEVER `<em>` on terms
+
+Hard rule established ch 1.5 after a reader saw orange «заряд» (wrapped in
+`<em>`) and clicked it expecting a tooltip — but `<em>` is just typographic
+emphasis, not a glossary term. The project's CSS historically styled `<em>`
+as orange (`color: hsl(var(--primary))`) which looked identical to how
+readers expect interactive terms to look. That CSS has been fixed so `<em>`
+is now plain italic + inherit colour, but the authoring rule stands:
+
+- **Glossary term (defined in `src/features/glossary/glossary.ts` and
+  `glossary._names.*` in ui.json)** → `<G k="term-key">` or the
+  chapter-local alias tag (`<deb>`, `<charge>`, `<vna>`, `<ham>`, etc.
+  registered in the `<Trans components={{...}} />` map). Renders with
+  dashed underline, hover tooltip, click-to-pin popup.
+- **Non-term emphasis** (comparative adjectives like "smaller / *larger*
+  voltage", key-phrase italics like "*rate of change*", stress on a word
+  like "*all* curves have the same shape") → `<em>`. Plain italic after
+  the CSS fix, no orange colour, no tooltip.
+- **Key-concept highlight that isn't a glossary term** → `<strong>`.
+  Bold, clearly distinct from both body text and glossary terms.
+
+NEVER wrap a known glossary term in `<em>`. If the term has a glossary
+entry, use `<G>`; if it doesn't, either add the entry (if it's worth
+defining) or don't give the word special styling. **If you're tempted
+to make a word "stand out" but aren't sure whether to use `<em>`,
+`<strong>`, or `<G>`, ask: does the reader need a definition?** Yes →
+`<G>` (create the entry if missing). No → `<strong>` for key concepts,
+`<em>` for grammatical emphasis (contrast / stress / italicised phrase).
+
+Past fix: `ch1_5.seriesFormulaLead` had `<em>заряд</em>`; switched to
+`<charge>заряд</charge>` → `<G k="charge" />`.
 
 ## i18n discipline — translate WHOLE widgets, never piecemeal
 

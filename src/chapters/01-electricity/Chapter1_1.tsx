@@ -25,6 +25,7 @@ import AtomicDiagram from '@/components/diagrams/AtomicDiagram'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { useUnitFormatter, useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatNumber } from '@/lib/format'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-1'
 const QUIZ_QUESTION_COUNT = 8
@@ -79,7 +80,7 @@ export default function Chapter1_1() {
     <>
       <p>
         <Trans i18nKey="ch1_1.intro" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -93,15 +94,15 @@ export default function Chapter1_1() {
       <WaterPipeDiagram />
 
       <ul>
-        <li><Trans i18nKey="ch1_1.waterBullet1" ns="ui" components={{ strong: <strong /> }} /></li>
-        <li><Trans i18nKey="ch1_1.waterBullet2" ns="ui" components={{ strong: <strong /> }} /></li>
-        <li><Trans i18nKey="ch1_1.waterBullet3" ns="ui" components={{ strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.waterBullet1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.waterBullet2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.waterBullet3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
       </ul>
 
       <p>{t('ch1_1.waterPayoff')}</p>
 
       <Callout variant="note">
-        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ strong: <strong />, ac: <G k="ac" /> }} />
+        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ ...mathComponents, strong: <strong />, ac: <G k="ac" /> }} />
       </Callout>
 
       {/* ── Section 2: Charge ─────────────────────────────────────── */}
@@ -109,13 +110,13 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.chargeIntro" ns="ui"
-          components={{ charge: <G k="charge" />, strong: <strong /> }}
+          components={{ ...mathComponents, charge: <G k="charge" />, strong: <strong /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch1_1.chargeMagnitude" ns="ui"
-          components={{ coulomb: <G k="coulomb" /> }}
+          components={{ ...mathComponents, coulomb: <G k="coulomb" /> }}
         />
       </p>
 
@@ -132,18 +133,18 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.currentDirection" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch1_1.currentConvention" ns="ui"
-          components={{ conventionalcurrent: <G k="conventional current" /> }}
+          components={{ ...mathComponents, conventionalcurrent: <G k="conventional current" /> }}
         />
       </p>
 
       <Callout variant="note">
-        <Trans i18nKey="ch1_1.currentFranklin" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch1_1.currentFranklin" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </Callout>
 
       <p>{t('ch1_1.currentMagnitudes')}</p>
@@ -164,7 +165,7 @@ export default function Chapter1_1() {
 
       <Callout variant="key">
         <Trans i18nKey="ch1_1.currentDriftNote" ns="ui"
-          components={{ drift: <G k="drift velocity" />, strong: <strong /> }}
+          components={{ ...mathComponents, drift: <G k="drift velocity" />, strong: <strong /> }}
         />
       </Callout>
 
@@ -181,13 +182,13 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.voltageBetween" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch1_1.voltageSources" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -209,7 +210,7 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.voltageEmfNote" ns="ui"
-          components={{ emf: <G k="emf" /> }}
+          components={{ ...mathComponents, emf: <G k="emf" /> }}
         />
       </p>
 
@@ -231,17 +232,17 @@ export default function Chapter1_1() {
       <ul>
         <li>
           <Trans i18nKey="ch1_1.resistanceCat1" ns="ui"
-            components={{ strong: <strong />, conductor: <G k="conductor" /> }}
+            components={{ ...mathComponents, strong: <strong />, conductor: <G k="conductor" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch1_1.resistanceCat2" ns="ui"
-            components={{ strong: <strong />, insulator: <G k="insulator" /> }}
+            components={{ ...mathComponents, strong: <strong />, insulator: <G k="insulator" /> }}
           />
         </li>
         <li>
           <Trans i18nKey="ch1_1.resistanceCat3" ns="ui"
-            components={{ strong: <strong />, semiconductor: <G k="semiconductor" /> }}
+            components={{ ...mathComponents, strong: <strong />, semiconductor: <G k="semiconductor" /> }}
           />
         </li>
       </ul>
@@ -250,7 +251,7 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.resistanceResistor" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -296,7 +297,7 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.circuitOhmPreview" ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong /> }}
         />
       </p>
 
@@ -348,7 +349,7 @@ export default function Chapter1_1() {
       </div>
 
       <Callout variant="tip">
-        <Trans i18nKey="ch1_1.termsVocabNote" ns="ui" components={{ strong: <strong /> }} />
+        <Trans i18nKey="ch1_1.termsVocabNote" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
       </Callout>
 
       {/* ── Section 8: Traffic analogy (secondary) ────────────────── */}
@@ -357,9 +358,9 @@ export default function Chapter1_1() {
       <p>{t('ch1_1.trafficIntro')}</p>
 
       <ul>
-        <li><Trans i18nKey="ch1_1.trafficBullet1" ns="ui" components={{ strong: <strong /> }} /></li>
-        <li><Trans i18nKey="ch1_1.trafficBullet2" ns="ui" components={{ strong: <strong /> }} /></li>
-        <li><Trans i18nKey="ch1_1.trafficBullet3" ns="ui" components={{ strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.trafficBullet1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.trafficBullet2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.trafficBullet3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
       </ul>
 
       <p>{t('ch1_1.trafficClosing')}</p>
@@ -373,8 +374,8 @@ export default function Chapter1_1() {
         label="1.1"
         goal={t('ch1_1.labGoal')}
         equipment={[
-          <Trans key="e1" i18nKey="ch1_1.labEquip1" ns="ui" components={{ multimeter: <G k="multimeter" /> }} />,
-          <Trans key="e2" i18nKey="ch1_1.labEquip2" ns="ui" components={{ breadboard: <G k="breadboard" /> }} />,
+          <Trans key="e1" i18nKey="ch1_1.labEquip1" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} />,
+          <Trans key="e2" i18nKey="ch1_1.labEquip2" ns="ui" components={{ ...mathComponents, breadboard: <G k="breadboard" /> }} />,
           t('ch1_1.labEquip3'),
           t('ch1_1.labEquip4'),
         ]}
@@ -384,12 +385,12 @@ export default function Chapter1_1() {
           t('ch1_1.labComp3'),
         ]}
         procedure={[
-          { text: <Trans i18nKey="ch1_1.labStep1" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep2" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep3" ns="ui" components={{ strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep4" ns="ui" components={{ strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
-          { text: <Trans i18nKey="ch1_1.labStep6" ns="ui" components={{ strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep6" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
         ]}
         expectedResult={<Trans i18nKey="ch1_1.labExpected" ns="ui" components={{ var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} />}
         connectionToTheory={t('ch1_1.labConnection')}

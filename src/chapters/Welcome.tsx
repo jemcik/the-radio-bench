@@ -10,6 +10,7 @@ import { G } from '@/features/glossary/glossary-term'
 import { BookmarkButton } from '@/features/bookmarks/bookmark-button'
 import { Card } from '@/components/ui/card'
 import LanguageBanner from '@/components/LanguageBanner'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const stats = {
   chapters: PARTS.flatMap(p => p.chapters).length,
@@ -46,10 +47,8 @@ export default function Welcome() {
             <Trans
               i18nKey="welcome.detailParagraph"
               ns="ui"
-              components={{
-                glossaryWrap: <span data-tour="glossary-term" />,
-                glossary: <G k="voltage" />,
-              }}
+              components={{ ...mathComponents, glossaryWrap: <span data-tour="glossary-term" />,
+                glossary: <G k="voltage" />, }}
             />
           </p>
 
@@ -110,7 +109,7 @@ export default function Welcome() {
           <Trans
             i18nKey="welcome.justBrowserDetail"
             ns="ui"
-            components={{ strong: <strong className="text-foreground" /> }}
+            components={{ ...mathComponents, strong: <strong className="text-foreground" /> }}
           />
         </p>
         <p className="text-muted-foreground leading-relaxed">
@@ -128,7 +127,7 @@ export default function Welcome() {
                 <Trans
                   i18nKey="welcome.vnaDesc"
                   ns="ui"
-                  components={{ swr: <G k="swr" /> }}
+                  components={{ ...mathComponents, swr: <G k="swr" /> }}
                 />
               ),
             },
@@ -146,7 +145,7 @@ export default function Welcome() {
           <Trans
             i18nKey="welcome.termsHighlighted"
             ns="ui"
-            components={{ term: <G k="impedance" /> }}
+            components={{ ...mathComponents, term: <G k="impedance" /> }}
           />
         </p>
       </div>
@@ -197,7 +196,7 @@ export default function Welcome() {
               <Trans
                 i18nKey="welcome.ercDetail"
                 ns="ui"
-                components={{ cept: <G k="cept" /> }}
+                components={{ ...mathComponents, cept: <G k="cept" /> }}
               />
             </p>
           </div>

@@ -3,6 +3,7 @@ import SVGDiagram from './diagrams/SVGDiagram'
 import { renderRxStation, renderTxStation } from './HeroStations'
 import { useTheme } from '@/context/ThemeContext'
 import { THEMES } from '@/lib/themes'
+import { mathComponents } from '@/lib/trans-defaults'
 
 /**
  * Welcome page hero illustration — HF Skywave Propagation.
@@ -423,7 +424,7 @@ export default function HeroIllustration() {
           <Trans
             i18nKey="hero.superheterodyneExplainer"
             ns="ui"
-            components={{ strong: <strong className="text-foreground font-medium" /> }}
+            components={{ ...mathComponents, strong: <strong className="text-foreground font-medium" /> }}
           />
         </p>
         <p className="mt-2 italic opacity-80">
