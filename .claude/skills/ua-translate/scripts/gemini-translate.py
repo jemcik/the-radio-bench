@@ -58,8 +58,8 @@ if len(sys.argv) < 3:
 chapter_id = sys.argv[1]
 keys = sys.argv[2:]
 
-if not re.match(r'^ch\d+_\d+$', chapter_id):
-    sys.exit(f'Invalid chapter_id {chapter_id!r}. Expected ch<N>_<M> (e.g. ch1_6).')
+if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', chapter_id):
+    sys.exit(f'Invalid block id {chapter_id!r}. Expected an i18n top-level block name (e.g. ch1_6, welcome, hero).')
 
 api_key = load_api_key()
 
@@ -67,10 +67,24 @@ api_key = load_api_key()
 en_root = json.loads(Path('src/i18n/locales/en/ui.json').read_text())
 uk_root = json.loads(Path('src/i18n/locales/uk/ui.json').read_text())
 
-if chapter_id not in en_root:
+# EN content for glossary entries lives in src/features/glossary/glossary.ts,
+# not en/ui.json (which only has glossary._names and glossary._ui). Run
+# `node scripts/extract-glossary.mjs` to dump it to /tmp/glossary-en.json
+# before translating any glossary terms.
+if chapter_id == 'glossary':
+    glossary_dump = Path('/tmp/glossary-en.json')
+    if not glossary_dump.exists():
+        sys.exit('Run `node scripts/extract-glossary.mjs` first to dump the '
+                 'EN glossary defaults to /tmp/glossary-en.json.')
+    en_block = json.loads(glossary_dump.read_text())
+elif chapter_id not in en_root:
     sys.exit(f'Chapter {chapter_id!r} not found in en/ui.json')
-en_block = en_root[chapter_id]
+else:
+    en_block = en_root[chapter_id]
 uk_block = uk_root.get(chapter_id, {})
+if chapter_id == 'glossary':
+    # uk_block has the glossary entries directly; strip _names/_ui meta.
+    uk_block = {k: v for k, v in uk_block.items() if not k.startswith('_')}
 
 missing = [k for k in keys if k not in en_block]
 if missing:

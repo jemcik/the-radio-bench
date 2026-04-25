@@ -11,6 +11,7 @@
     "check:uk": "node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json",
     "check:gitignore": "sh -c '! git ls-files | git check-ignore --no-index --stdin -q || (echo \"Tracked paths match .gitignore (remove with git rm --cached):\"; git ls-files | git check-ignore --no-index --stdin -v; exit 1)'",
     "dev": "vite",
+    "extract:glossary": "node --experimental-strip-types scripts/extract-glossary.mjs",
     "knip": "knip",
     "lint": "eslint .",
     "preview": "vite preview",
