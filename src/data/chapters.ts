@@ -155,7 +155,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Coils (Inductors)',
         subtitle: 'Inductance, reactance, RF chokes — wind and measure your own',
-        status: 'draft',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.3'],
