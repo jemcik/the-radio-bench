@@ -36,3 +36,5 @@ Thumbs.db
 
 # Ephemeral git worktrees created by agent spawn (ccd_session). Never commit.
 .claude/worktrees/
+# Runtime lock for scheduled-tasks MCP — recreated per session.
+.claude/scheduled_tasks.lock
