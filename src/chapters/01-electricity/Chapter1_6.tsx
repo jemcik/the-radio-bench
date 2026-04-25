@@ -7,7 +7,9 @@ import { MBlock, MathVar } from '@/components/ui/math'
 import { G } from '@/features/glossary/glossary-term'
 import LabActivity from '@/components/lab/LabActivity'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
-import Ch1_6Placeholder from '@/components/widgets/Ch1_6Placeholder'
+import InductanceBuilder from '@/components/widgets/InductanceBuilder'
+import SeriesParallelInductorCalc from '@/components/widgets/SeriesParallelInductorCalc'
+import RLChargeDischarge from '@/components/widgets/RLChargeDischarge'
 import RLChargingSchematic from '@/components/diagrams/RLChargingSchematic'
 import IndSeriesParallelSchematic from '@/components/diagrams/IndSeriesParallelSchematic'
 import RfChokeSchematic from '@/components/diagrams/RfChokeSchematic'
@@ -156,7 +158,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="InductanceBuilder widget" />
+      <InductanceBuilder />
 
       {/* ── Section 3: Types ──────────────────────────────────── */}
       <Section id="types" labelKey="ch1_6.sectionTypes" />
@@ -314,7 +316,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="RLChargeDischarge widget" />
+      <RLChargeDischarge />
 
       <Callout variant="note">
         <Trans
@@ -407,7 +409,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="SeriesParallelInductorCalc widget" />
+      <SeriesParallelInductorCalc />
 
       {/* ── Section 7: Opposes AC, passes DC ────────────────── */}
       <Section id="blocks-ac-passes-dc" labelKey="ch1_6.sectionBlocksAcPassesDc" />

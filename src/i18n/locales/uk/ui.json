@@ -2712,7 +2712,11 @@
     "mf": "мФ",
     "uf": "мкФ",
     "nf": "нФ",
-    "pf": "пФ"
+    "pf": "пФ",
+    "henry": "Гн",
+    "mh": "мГн",
+    "uh": "мкГн",
+    "nh": "нГн"
   },
   "ch1_6": {
     "heroAriaLabel": "A hand-drawn cross-section of an air-core inductor: a cylindrical coil of insulated wire wound around an empty space, with magnetic field lines threading through the centre and curving back around the outside, forming closed loops. Current flows through the leads, labelled with an arrow showing direction; a curved arrow on one of the turns shows how the right-hand rule links current direction to field direction.",
@@ -2902,7 +2906,10 @@
         "iSteadyLabel": "I∞ = V / R",
         "chargeButton": "charge",
         "dischargeButton": "discharge",
-        "hint": "Doubling L doubles τ, just like doubling C doubled τ in RC. But doubling R now halves τ — because here R sits in the denominator, the opposite of RC."
+        "hint": "Doubling L doubles τ, just like doubling C doubled τ in RC. But doubling R now halves τ — because here R sits in the denominator, the opposite of RC.",
+        "currentAxisLabel": "I",
+        "timeAxisLabel": "t",
+        "resetButton": "reset"
       }
     },
     "rlSchematicCaption": "RL charging circuit. Battery <var>V_{\\mathrm{in}}</var>, switch S, resistor <var>R</var>, and inductor <var>L</var> wired in series. The ammeter inline reads the current through the inductor — this is <var>I</var>(t), which we'll track over time.",

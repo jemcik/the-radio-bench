@@ -112,8 +112,8 @@ function trianglePath(x0: number, xEnd: number, midY: number, amp: number, cycle
   const totalSegs = cycles * segPerCycle
   const dx = span / totalSegs
   let d = `M ${x0} ${midY}`
-  let yHi = midY - amp
-  let yLo = midY + amp
+  const yHi = midY - amp
+  const yLo = midY + amp
   // Start at midY, go up to yHi over the first half-segment, then alternate.
   // For a clean triangle starting at the baseline going up:
   // segments: midY→yHi over dx/2, yHi→yLo over dx, ... then back down.
