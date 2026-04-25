@@ -156,7 +156,7 @@ export default function Welcome() {
         <div className="space-y-3">
           {translatedParts.map(part => (
             <Card key={part.number} className="overflow-hidden">
-              <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+              <div className="px-4 py-3 border-b border-border flex items-baseline gap-2">
                 <span className="text-[13px] font-mono font-bold text-primary">
                   {['0', 'I', 'II', 'III', 'IV'][part.number]}
                 </span>

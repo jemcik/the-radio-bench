@@ -383,7 +383,12 @@ export default function HeroIllustration() {
           <text x={696} y={4} fontSize={10.5} fill={c.legendText}>{t('hero.rxReceiver')}</text>
         </g>
 
-        {/* Row 2: Circuit symbols — 6 items, evenly spaced across 760px */}
+        {/* Row 2: Circuit symbols — 6 items.
+             Inductor cell is wider than the others to fit the UA worst-case
+             label «Котушка індуктивності» (21 chars × ~5.625 px @ 10.5 px sans
+             ≈ 118 px). Items 2–6 are shifted +45 px relative to the original
+             EN-budgeted layout; last label «Генератор» ends at x≈767, well
+             within the 790 px usable row width. */}
         <g transform="translate(30,468)">
           <path
             d="M 0 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0 a 2.5 3.5 0 0 0 5 0"
@@ -391,31 +396,31 @@ export default function HeroIllustration() {
           />
           <text x={28} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.inductor')}</text>
 
-          <g transform="translate(127,0)">
+          <g transform="translate(172,0)">
             <line x1={-2} y1={-6} x2={-2} y2={6} stroke={lc} strokeWidth={1.1} />
             <line x1={2} y1={-6} x2={2} y2={6} stroke={lc} strokeWidth={1.1} />
           </g>
-          <text x={137} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.capacitor')}</text>
+          <text x={182} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.capacitor')}</text>
 
           <polyline
-            points="254,0 257,-5 263,5 269,-5 275,5 278,0"
+            points="299,0 302,-5 308,5 314,-5 320,5 323,0"
             fill="none" stroke={tx} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round"
           />
-          <text x={286} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.resistor')}</text>
+          <text x={331} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.resistor')}</text>
 
-          <polygon points="381,-5 381,5 393,0" fill="none" stroke={tx} strokeWidth={1.1} />
-          <text x={401} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.amplifier')}</text>
+          <polygon points="426,-5 426,5 438,0" fill="none" stroke={tx} strokeWidth={1.1} />
+          <text x={446} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.amplifier')}</text>
 
-          <circle cx={514} cy={0} r={6} fill="none" stroke={tx} strokeWidth={1.1} />
-          <line x1={510} y1={-4} x2={518} y2={4} stroke={tx} strokeWidth={0.9} />
-          <line x1={518} y1={-4} x2={510} y2={4} stroke={tx} strokeWidth={0.9} />
-          <text x={528} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.mixer')}</text>
+          <circle cx={559} cy={0} r={6} fill="none" stroke={tx} strokeWidth={1.1} />
+          <line x1={555} y1={-4} x2={563} y2={4} stroke={tx} strokeWidth={0.9} />
+          <line x1={563} y1={-4} x2={555} y2={4} stroke={tx} strokeWidth={0.9} />
+          <text x={573} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.mixer')}</text>
 
           <path
-            d="M 635,0 C 639,-7 645,-7 649,0 C 653,7 659,7 663,0"
+            d="M 680,0 C 684,-7 690,-7 694,0 C 698,7 704,7 708,0"
             fill="none" stroke={vfoTx} strokeWidth={1.4} strokeLinecap="round"
           />
-          <text x={671} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.oscillator')}</text>
+          <text x={716} y={3} fontSize={10.5} fill={c.legendText}>{t('hero.oscillator')}</text>
         </g>
       </SVGDiagram>
 

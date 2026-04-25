@@ -58,8 +58,8 @@ if len(sys.argv) < 3:
 chapter_id = sys.argv[1]
 keys = sys.argv[2:]
 
-if not re.match(r'^ch\d+_\d+$', chapter_id):
-    sys.exit(f'Invalid chapter_id {chapter_id!r}. Expected ch<N>_<M> (e.g. ch1_6).')
+if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', chapter_id):
+    sys.exit(f'Invalid block id {chapter_id!r}. Expected an i18n top-level block name (e.g. ch1_6, welcome, hero).')
 
 api_key = load_api_key()
 

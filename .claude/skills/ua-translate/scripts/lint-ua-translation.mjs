@@ -553,16 +553,12 @@ const RULES = [
     hint: 'If this refers to a generic waveform, use «форма хвилі» / «хвиля» / «сигнал». «Осцилограма» = specific captured scope trace. Skip this warning if you really mean a scope capture.',
   },
 
-  {
-    id: 'leftover.vna-latin',
-    category: 'LEFTOVER',
-    severity: 'ERROR',
-    // VNA left in Latin — canonical UA form is ВАЛ.
-    // Exclude product names (NanoVNA, NanoVNA-H4, NanoVNA-Saver, etc.) — the brand
-    // string is kept as-is since it's a specific hardware model.
-    pattern: /(?<![\p{L}-])VNA(?![\p{L}-])/gu,
-    hint: 'Leftover: Latin «VNA» in UK text. Use «ВАЛ» (векторний аналізатор ланцюгів) — see vna.label in ui.json.',
-  },
+  // (Removed leftover.vna-latin) — per project convention from welcome
+  // pass: Latin «VNA» / «SWR» are the primary UA forms (matches what UA hams
+  // actually write on equipment, datasheets, manuals). UA expansion («ВАЛ»,
+  // «КСХ») appears in parens on first mention per chapter; mechanical
+  // detection of "first mention per chapter" isn't reliable, so this is a
+  // style rule enforced by review, not by the linter.
 
   {
     id: 'forbidden.trymaites-kartynky',
