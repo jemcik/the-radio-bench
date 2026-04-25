@@ -8,6 +8,12 @@ import { G } from '@/features/glossary/glossary-term'
 import LabActivity from '@/components/lab/LabActivity'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import Ch1_6Placeholder from '@/components/widgets/Ch1_6Placeholder'
+import RLChargingSchematic from '@/components/diagrams/RLChargingSchematic'
+import IndSeriesParallelSchematic from '@/components/diagrams/IndSeriesParallelSchematic'
+import RfChokeSchematic from '@/components/diagrams/RfChokeSchematic'
+import LcFilterSchematic from '@/components/diagrams/LcFilterSchematic'
+import BlocksAcPassesDcDiagram from '@/components/diagrams/BlocksAcPassesDcDiagram'
+import InductorTypeGallery from '@/components/diagrams/InductorTypeGallery'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
 
@@ -157,7 +163,7 @@ export default function Chapter1_6() {
 
       <p>{t('ch1_6.typesIntro')}</p>
 
-      <Ch1_6Placeholder label="InductorTypeGallery diagram" />
+      <InductorTypeGallery />
 
       <p>
         <Trans
@@ -238,7 +244,7 @@ export default function Chapter1_6() {
       {/* ── Section 5: RL time constant ──────────────────────── */}
       <Section id="rl-time-constant" labelKey="ch1_6.sectionRL" />
 
-      <Ch1_6Placeholder label="RLChargingSchematic diagram" />
+      <RLChargingSchematic />
 
       <p>
         <Trans
@@ -329,7 +335,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="IndSeriesParallelSchematic diagram" />
+      <IndSeriesParallelSchematic />
 
       <p>
         <Trans
@@ -432,7 +438,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="BlocksAcPassesDcDiagram" />
+      <BlocksAcPassesDcDiagram />
 
       <p>{t('ch1_6.blocksApplications')}</p>
 
@@ -444,7 +450,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="RfChokeSchematic" />
+      <RfChokeSchematic />
 
       <p>
         <Trans
@@ -454,7 +460,7 @@ export default function Chapter1_6() {
         />
       </p>
 
-      <Ch1_6Placeholder label="LcFilterSchematic" />
+      <LcFilterSchematic />
 
       {/* ── Summary ─────────────────────────────────────────── */}
       <Section id="summary" labelKey="ch1_6.sectionSummary" />

@@ -68,6 +68,12 @@ export function roughCircle(cx: number, cy: number, diameter: number, opts?: Opt
   return toPaths(gen.circle(cx, cy, diameter, merge(opts)))
 }
 
+/** Rough ellipse — `width` and `height` are the full diameters along
+ *  each axis (matching the rough-js / SVG convention, not radii). */
+export function roughEllipse(cx: number, cy: number, width: number, height: number, opts?: Options): RoughPath[] {
+  return toPaths(gen.ellipse(cx, cy, width, height, merge(opts)))
+}
+
 export function roughLinearPath(points: Point[], opts?: Options): RoughPath[] {
   return toPaths(gen.linearPath(points, merge(opts)))
 }
