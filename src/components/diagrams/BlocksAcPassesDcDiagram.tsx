@@ -20,7 +20,7 @@
  */
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
-import { renderLabelContent } from '@/lib/circuit/SymbolLabel'
+import { renderLabelContent, renderSvgInlineMath } from '@/lib/circuit/SymbolLabel'
 import { MathText } from '@/components/ui/math-text'
 
 const VB_W = 540
@@ -43,25 +43,14 @@ function Panel({
   w,
   inputSVG,
   outputSVG,
-  title,
 }: {
   x0: number
   w: number
   inputSVG: React.ReactNode
   outputSVG: React.ReactNode
-  title: string
 }) {
   return (
     <g>
-      <text
-        x={x0 + w / 2} y={22}
-        fontFamily="inherit" fontSize="0.875em"
-        fontStyle="italic" fontWeight="700"
-        fill={svgTokens.fg} textAnchor="middle"
-      >
-        {title}
-      </text>
-
       {/* Input baseline */}
       <line
         x1={x0 + PANEL_PAD_X} y1={INPUT_MID_Y}
@@ -132,36 +121,95 @@ function trianglePath(x0: number, xEnd: number, midY: number, amp: number, cycle
   return d
 }
 
+/** Trapezoidal current pulse for the SLOW panel: long flat at 0, brief
+ *  ramp up to +amp, long flat at +amp, brief ramp back to 0, long flat
+ *  at 0 again. Designed to match the panel's caption «...між ними вона
+ *  поводиться як провідник» — the long flats are exactly where the
+ *  inductor acts as a plain wire (dI/dt = 0 → V = 0). */
+function slowPulseCurrentPath(x0: number, xEnd: number, midY: number, amp: number): string {
+  const span = xEnd - x0
+  const ramp = span * 0.06               // brief transition (6 % of span each)
+  const flat = (span - 2 * ramp) / 3     // three equal flat sections
+  let t = x0
+  let d = `M ${t.toFixed(2)} ${midY.toFixed(2)}`
+  t += flat;        d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`           // flat at 0
+  t += ramp;        d += ` L ${t.toFixed(2)} ${(midY - amp).toFixed(2)}`   // ramp up to +amp
+  t += flat;        d += ` L ${t.toFixed(2)} ${(midY - amp).toFixed(2)}`   // flat at +amp
+  t += ramp;        d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`           // ramp back to 0
+  d += ` L ${xEnd.toFixed(2)} ${midY.toFixed(2)}`                          // final flat at 0
+  return d
+}
+
+/** Spike-like voltage trace paired with `slowPulseCurrentPath`: V is
+ *  zero everywhere EXCEPT during the two ramps, where V is +amp (rising
+ *  ramp) and −amp (falling ramp) respectively. The geometry must match
+ *  the current path's `ramp` / `flat` proportions exactly so the spikes
+ *  align with the ramps above. */
+function slowSpikeVoltagePath(x0: number, xEnd: number, midY: number, amp: number): string {
+  const span = xEnd - x0
+  const ramp = span * 0.06
+  const flat = (span - 2 * ramp) / 3
+  let t = x0
+  let d = `M ${t.toFixed(2)} ${midY.toFixed(2)}`
+  t += flat;        d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`           // V = 0 (initial flat)
+  // Positive spike during the rising ramp
+  d += ` L ${t.toFixed(2)} ${(midY - amp).toFixed(2)}`                     // jump up
+  t += ramp;        d += ` L ${t.toFixed(2)} ${(midY - amp).toFixed(2)}`   // horizontal at +amp
+  d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`                             // jump back to 0
+  t += flat;        d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`           // V = 0 (top flat)
+  // Negative spike during the falling ramp
+  d += ` L ${t.toFixed(2)} ${(midY + amp).toFixed(2)}`                     // jump down
+  t += ramp;        d += ` L ${t.toFixed(2)} ${(midY + amp).toFixed(2)}`   // horizontal at −amp
+  d += ` L ${t.toFixed(2)} ${midY.toFixed(2)}`                             // jump back to 0
+  d += ` L ${xEnd.toFixed(2)} ${midY.toFixed(2)}`                          // V = 0 (final flat)
+  return d
+}
+
 /** Square-wave voltage proportional to dI/dt. For a triangle-wave
  *  current, dI/dt is constant within each ramp segment but flips sign
  *  at each peak. The amplitude of V depends on the slope of the input
- *  ramp (= dI/dt). */
+ *  ramp (= dI/dt).
+ *
+ *  The triangle current trace runs midY → +pk → −pk → … → ±pk → midY,
+ *  with (2·cycles + 1) ramps total: the first and last ramps have
+ *  half-width (dx/2) — they're the partial half-period at start/end —
+ *  and the middle (2·cycles − 1) ramps have full width (dx). dI/dt has
+ *  the same magnitude throughout but flips sign at every peak/valley.
+ *
+ *  V follows that sign: positive during rising ramps, negative during
+ *  falling ramps, starting and ending at +amp (rising ramp). Drawn as
+ *  a sequence of (2·cycles + 1) rectangles plus a final vertical drop
+ *  back to the baseline at xEnd.
+ *
+ *  Past bug: the previous version's final segment was `L xEnd midY` —
+ *  drawn from the last full-width position (still at ±amp), so it
+ *  appeared as a DIAGONAL slope from the last rectangle down to the
+ *  baseline. That looked like «the voltage is sloping back to zero»
+ *  which contradicts the «V mirrors dI/dt» story we're telling. */
 function squareVoltagePath(x0: number, xEnd: number, midY: number, amp: number, cycles: number): string {
-  const span = xEnd - x0
-  const segPerCycle = 2
-  const totalSegs = cycles * segPerCycle
-  const dx = span / totalSegs
-  let d = `M ${x0} ${midY}`
-  // First half-segment: I is ramping up (midY → yHi), so dI/dt > 0,
-  // so V is positive (above baseline).
-  // Within each ramp, V is constant.
-  // First segment is half-length (matching the triangle's first half-up).
-  let cur: 'pos' | 'neg' = 'pos'
-  // First half-segment from x0 to x0 + dx/2 at +amp (V positive)
-  d += ` L ${x0.toFixed(2)} ${(midY - amp).toFixed(2)}`
-  d += ` L ${(x0 + dx / 2).toFixed(2)} ${(midY - amp).toFixed(2)}`
-  // Then a vertical step back to baseline-then-flip
-  for (let i = 0; i < totalSegs - 1; i++) {
-    cur = cur === 'pos' ? 'neg' : 'pos'
-    const yNext = cur === 'pos' ? midY - amp : midY + amp
-    const xi = x0 + dx / 2 + i * dx
-    const xNext = x0 + dx / 2 + (i + 1) * dx
-    // Vertical jump at xi
-    d += ` L ${xi.toFixed(2)} ${yNext.toFixed(2)}`
-    // Horizontal segment to xNext at yNext
-    d += ` L ${xNext.toFixed(2)} ${yNext.toFixed(2)}`
+  const totalSegs = 2 * cycles
+  const dx = (xEnd - x0) / totalSegs
+
+  let d = `M ${x0.toFixed(2)} ${midY.toFixed(2)}`
+  let curX = x0
+
+  // 2·cycles + 1 rectangles. Rectangle i has:
+  //   width  = dx/2 if i is first or last,  else dx
+  //   sign   = positive (above midY) when i is EVEN (0, 2, …), else negative
+  // Sign convention: y = midY − amp is visually ABOVE midY (SVG y-axis
+  // is inverted), corresponding to V > 0.
+  for (let i = 0; i <= totalSegs; i++) {
+    const isFirstOrLast = i === 0 || i === totalSegs
+    const w = isFirstOrLast ? dx / 2 : dx
+    const yRect = i % 2 === 0 ? midY - amp : midY + amp
+    // Vertical jump (or initial rise from baseline) to yRect
+    d += ` L ${curX.toFixed(2)} ${yRect.toFixed(2)}`
+    // Horizontal segment of width w
+    curX += w
+    d += ` L ${curX.toFixed(2)} ${yRect.toFixed(2)}`
   }
-  // Final vertical drop back to midY at xEnd
+  // Snap back to baseline at xEnd, mirroring the trace's initial rise
+  // from baseline at x0.
   d += ` L ${xEnd.toFixed(2)} ${midY.toFixed(2)}`
   return d
 }
@@ -186,22 +234,42 @@ export default function BlocksAcPassesDcDiagram() {
         aria-label={t('ch1_6.blocksVisualAria')}
         style={{ display: 'block', maxWidth: 640, margin: '0 auto' }}
       >
+        {/* Single global title — both panels share the same input/output
+            channels (top trace = current I, bottom = voltage V), so the
+            title is per-diagram, not per-panel. `renderSvgInlineMath`
+            turns any <var>X</var> fragments in the i18n string into
+            italic <tspan>s. */}
+        <text
+          x={VB_W / 2} y={22}
+          fontFamily="inherit" fontSize="0.875em"
+          fontStyle="italic" fontWeight="700"
+          fill={svgTokens.fg} textAnchor="middle"
+        >
+          {renderSvgInlineMath(
+            t('ch1_6.blocksVisualInput') + ' / ' + t('ch1_6.blocksVisualOutput'),
+          )}
+        </text>
+
         {/* Divider hairline */}
         <line
-          x1={HALF_W} y1={12} x2={HALF_W} y2={VB_H - 30}
+          x1={HALF_W} y1={32} x2={HALF_W} y2={VB_H - 30}
           stroke={svgTokens.border}
           strokeWidth={0.75}
           strokeDasharray="3 3"
         />
 
-        {/* Slow panel: 1 cycle, small dI/dt, small V output */}
+        {/* Slow panel: trapezoidal current pulse (long flats + brief
+            transitions). The caption advertises «між ними вона
+            поводиться як провідник» — those «між» moments are the
+            flats, where dI/dt = 0 and V is exactly zero. The two
+            spikes in V land on the two ramps. Spike amplitude matches
+            the FAST panel's V height for visual balance. */}
         <Panel
           x0={leftX0}
           w={HALF_W}
-          title={t('ch1_6.blocksVisualInput') + ' / ' + t('ch1_6.blocksVisualOutput')}
           inputSVG={
             <path
-              d={trianglePath(leftWaveX0, leftWaveX1, INPUT_MID_Y, INPUT_AMP, 1)}
+              d={slowPulseCurrentPath(leftWaveX0, leftWaveX1, INPUT_MID_Y, INPUT_AMP)}
               stroke={svgTokens.fg}
               strokeWidth={1.4}
               fill="none"
@@ -211,7 +279,7 @@ export default function BlocksAcPassesDcDiagram() {
           }
           outputSVG={
             <path
-              d={squareVoltagePath(leftWaveX0, leftWaveX1, OUTPUT_MID_Y, OUTPUT_AMP_BASE, 1)}
+              d={slowSpikeVoltagePath(leftWaveX0, leftWaveX1, OUTPUT_MID_Y, OUTPUT_AMP_BASE * FAST_FACTOR)}
               stroke={svgTokens.fg}
               strokeWidth={1.4}
               fill="none"
@@ -226,7 +294,6 @@ export default function BlocksAcPassesDcDiagram() {
         <Panel
           x0={rightX0}
           w={HALF_W}
-          title={t('ch1_6.blocksVisualInput') + ' / ' + t('ch1_6.blocksVisualOutput')}
           inputSVG={
             <path
               d={trianglePath(rightWaveX0, rightWaveX1, INPUT_MID_Y, INPUT_AMP, 3)}

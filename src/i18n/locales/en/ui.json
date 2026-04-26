@@ -1753,6 +1753,9 @@
         "resetButton": "Reset",
         "voltageAxisLabel": "V(t)",
         "timeAxisLabel": "t",
+        "chargingLabel": "↗ charging",
+        "dischargingLabel": "↘ discharging",
+        "idleLabel": "— idle",
         "hint": "The «5τ rule»: after five time constants, the capacitor is within 0.7 % of its final value and is treated as fully charged (or discharged) for engineering purposes."
       }
     },
@@ -2208,7 +2211,8 @@
     "sectionEnergy": "Energy stored",
     "energyIntro": "When you push current into an inductor against its self-induced opposition, you do <strong>work</strong>. That work is not dissipated as heat (an ideal inductor doesn't dissipate anything); it is stored in the magnetic field around the coil. The amount, derived by integrating <nowrap><var>V</var> · <var>I</var> · d<var>t</var></nowrap> from zero current to the final current, is:",
     "energyWorkedExample": "A small 1 mH choke carrying 100 mA stores <nowrap><var>U</var> = 0.5 · 1·10⁻³ · (0.1)² = 5 µJ</nowrap> — tiny. But a 10 mH choke in a switching supply carrying 10 A stores <nowrap>0.5 · 10·10⁻³ · 10² = 0.5 J</nowrap> — modest, but try interrupting that current in a microsecond and the resulting voltage spike will be measured in kilovolts.",
-    "energySparkCallout": "<strong>Where the spark comes from.</strong> The defining equation <nowrap><var>V</var> = <var>L</var> · d<var>I</var>/d<var>t</var></nowrap> is also a warning. An ideal switch opens in zero time — d<var>I</var>/d<var>t</var> goes to infinity, and so does the induced voltage (<bemf>back-EMF</bemf>). In practice, the voltage rises until something breaks down: the air gap between the contacts ionises and a spark carries the current across, dissipating the stored energy as heat and light. This is why mechanical relays carrying inductive loads have a flyback diode wired across the coil (clamping the spike to one diode-drop above the supply), why ignition coils in petrol engines work by deliberately interrupting current through a heavily-inductive primary winding, and why you should never disconnect a battery while a high-power transmitter is on key — the supply leads themselves are inductive enough to spark.",
+    "energySparkCallout": "<strong>Where the spark comes from.</strong> The defining equation <nowrap><var>V</var> = <var>L</var> · d<var>I</var>/d<var>t</var></nowrap> is also a warning. An ideal switch opens in zero time — d<var>I</var>/d<var>t</var> goes to infinity, and so does the induced voltage (<bemf>back-EMF</bemf>). In practice, the voltage rises until something breaks down: the air gap between the contacts ionises and a spark carries the current across, dissipating the stored energy as heat and light. This is why mechanical relays carrying inductive loads have a <diode>flyback diode</diode> wired across the coil, why ignition coils in petrol engines work by deliberately interrupting current through a heavily-inductive primary winding, and why you should never disconnect a battery while a high-power transmitter is on key — the supply leads themselves are inductive enough to spark.",
+    "energySparkCalloutMechanism": "<strong>How the flyback diode does it.</strong> Wire it cathode to the +V rail, anode to the switched end of the coil. During normal operation the diode is reverse-biased and invisible to the circuit. The instant the switch opens, the coil's back-EMF flips the polarity across the diode and forward-biases it; current that was flowing through the coil now circulates through the diode loop and decays smoothly while the coil's own resistance dissipates the stored energy as heat. The contact voltage never exceeds the supply voltage plus one diode drop (≈ 0.7 V) — instead of the kilovolts a bare inductor would generate.",
     "sectionRL": "The RL time constant",
     "rlIntro": "Wire a resistor <var>R</var> in series with an inductor <var>L</var> across a supply <var>V_{\\mathrm{in}}</var>. Close the switch. <strong>In the very first instant</strong> the current is zero and the inductor's defining equation says all of <var>V_{\\mathrm{in}}</var> appears as a voltage across <var>L</var> — none across <var>R</var>. As current ramps up, the voltage on <var>R</var> grows (<nowrap><var>V_R</var> = <var>I</var><var>R</var></nowrap>), the voltage on <var>L</var> shrinks to <nowrap><var>V_{\\mathrm{in}}</var> − <var>V_R</var></nowrap>, the rate of change tapers, and the current creeps ever more slowly toward its steady-state value <nowrap><var>I_{\\mathrm{∞}}</var> = <var>V_{\\mathrm{in}}</var> / <var>R</var></nowrap> but never quite reaches it. The waveform is the same exponential as RC — only this time it is the <em>current</em> that climbs, not the voltage:",
     "rlTauDefn": "The ratio <nowrap><var>L</var> / <var>R</var></nowrap> has units of <strong>seconds</strong> (H / Ω = s — chase the SI units through to verify) and is, like its RC cousin, called the <strong>time constant</strong>, symbol <strong>τ</strong>. It sets the whole timescale of the current-rise curve. Two handy shortcuts to memorise:",
@@ -2357,12 +2361,15 @@
         "rLabel": "Resistance R",
         "vLabel": "Supply V",
         "tauLabel": "τ = L / R",
-        "iSteadyLabel": "I∞ = V / R",
+        "iSteadyFormula": "I∞ = V / R",
         "chargeButton": "charge",
         "dischargeButton": "discharge",
         "hint": "Doubling L doubles τ, just like doubling C doubled τ in RC. But doubling R now halves τ — because here R sits in the denominator, the opposite of RC.",
-        "currentAxisLabel": "I",
+        "currentAxisLabel": "I(t)",
         "timeAxisLabel": "t",
+        "chargingLabel": "↗ charging",
+        "dischargingLabel": "↘ discharging",
+        "idleLabel": "— idle",
         "resetButton": "reset"
       }
     },

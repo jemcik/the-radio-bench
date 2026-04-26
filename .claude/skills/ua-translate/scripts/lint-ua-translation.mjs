@@ -113,6 +113,23 @@ const RULES = [
   },
 
   {
+    id: 'markup.glossary-suffix-outside-tag',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Glossary tag (e.g. <filt>, <rip>, <cap>, <res>, <diode>) wrapping
+    // ONLY the noun stem, with a Cyrillic declension suffix dangling
+    // outside the close tag. Renders as a partial-word dashed underline
+    // («фільтр» highlighted, «а» trailing) — looks like a broken word.
+    // Author was thinking in EN where «filter» stays «filter»; in UA the
+    // whole inflected form must go inside the tag: <filt>фільтрів</filt>.
+    // Standard formatting tags (var, em, strong, sub, sup, …) are
+    // excluded — they don't render an underline so the visual issue
+    // doesn't apply to them.
+    pattern: /<\/(?!var|em|strong|sub|sup|i|b|nowrap|code|a|br|p|li|ul|ol|span|div|h[1-6]|tspan|tr|td|th|thead|tbody|table|figure|figcaption|button|small|s|u|kbd|mark|q)[a-z][a-z0-9-]*>[Ѐ-ӿ]/g,
+    hint: 'Glossary close-tag followed by a Cyrillic letter — likely a declension suffix that should be INSIDE the tag (e.g. <filt>фільтр</filt>а → <filt>фільтра</filt>).',
+  },
+
+  {
     id: 'markup.cyrillic-subscript-in-var',
     category: 'FORBIDDEN',
     severity: 'ERROR',

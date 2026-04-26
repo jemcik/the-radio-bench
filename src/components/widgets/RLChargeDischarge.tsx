@@ -56,7 +56,11 @@ function formatCurrent(amps: number, fmt: (n: number, d: number) => string, tUni
 const VB_W = 480
 const VB_H = 220
 const PAD_L = 44
-const PAD_R = 16
+// PAD_R holds room for both the «5τ» last-tick label (centered on the
+// plot's right edge) AND the italic «t» axis label that sits to the
+// right of it. See sibling RCChargeDischarge for the same layout
+// constraint and rationale.
+const PAD_R = 24
 const PAD_T = 14
 const PAD_B = 28
 const PLOT_W = VB_W - PAD_L - PAD_R
@@ -109,6 +113,10 @@ export default function RLChargeDischarge() {
     }
     return iCurrent
   }, [mode, iAnchor, iCurrent, iSteady, elapsed])
+
+  // Format the LIVE current shown in the I(t) box. During an animation
+  // this re-formats every frame; in idle it shows the held value.
+  const iNowFmt = formatCurrent(iNow, fmt, tUnit)
 
   useEffect(() => {
     if (mode === 'idle') return
@@ -206,66 +214,77 @@ export default function RLChargeDischarge() {
       title={t('ch1_6.widget.rl.title')}
       description={t('ch1_6.widget.rl.description')}
     >
+      {/* Inputs — stacked layout (label on top row, input + unit selector
+          on row below). The previous horizontal layout fixed the label
+          to w-20 (80 px), which clipped UA «Індуктивність L» (~105 px).
+          Stacking lets the label use the full column width and wrap
+          freely without pushing inputs out of the column. */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* L */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rl-l" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rl-l" className="text-foreground font-medium">
             {t('ch1_6.widget.rl.lLabel')}
           </label>
-          <input
-            id="rl-l"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={lDisp}
-            onChange={e => setLDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <select
-            value={lUnit}
-            onChange={e => setLUnit(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground"
-            aria-label={`${t('ch1_6.widget.rl.lLabel')} unit`}
-          >
-            {(['nh', 'uh', 'mh'] as const).map(u => (
-              <option key={u} value={u}>{tUnit(u)}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <input
+              id="rl-l"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={lDisp}
+              onChange={e => setLDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <select
+              value={lUnit}
+              onChange={e => setLUnit(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground"
+              aria-label={`${t('ch1_6.widget.rl.lLabel')} unit`}
+            >
+              {(['nh', 'uh', 'mh'] as const).map(u => (
+                <option key={u} value={u}>{tUnit(u)}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {/* R */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rl-r" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rl-r" className="text-foreground font-medium">
             {t('ch1_6.widget.rl.rLabel')}
           </label>
-          <input
-            id="rl-r"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={rDisp}
-            onChange={e => setRDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <select
-            value={rUnit}
-            onChange={e => setRUnit(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground"
-            aria-label={`${t('ch1_6.widget.rl.rLabel')} unit`}
-          >
-            {(['ohm', 'kohm'] as const).map(u => (
-              <option key={u} value={u}>{tUnit(u)}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <input
+              id="rl-r"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={rDisp}
+              onChange={e => setRDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <select
+              value={rUnit}
+              onChange={e => setRUnit(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground"
+              aria-label={`${t('ch1_6.widget.rl.rLabel')} unit`}
+            >
+              {(['ohm', 'kohm'] as const).map(u => (
+                <option key={u} value={u}>{tUnit(u)}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {/* V_in */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rl-vin" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rl-vin" className="text-foreground font-medium">
             {t('ch1_6.widget.rl.vLabel')}
           </label>
-          <input
-            id="rl-vin"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={vinDisp}
-            onChange={e => setVinDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <span className="font-mono text-foreground">{tUnit('v')}</span>
+          <div className="flex items-center gap-2">
+            <input
+              id="rl-vin"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={vinDisp}
+              onChange={e => setVinDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <span className="font-mono text-foreground">{tUnit('v')}</span>
+          </div>
         </div>
       </div>
 
@@ -319,10 +338,13 @@ export default function RLChargeDischarge() {
           {t('ch1_6.widget.rl.currentAxisLabel')}
         </text>
 
+        {/* x-axis label — sits PAST the «5τ» tick label (textAnchor=start)
+            instead of overlapping it. Both share the same y row but
+            different x. */}
         <text
-          x={PAD_L + PLOT_W} y={PAD_T + PLOT_H + 14}
+          x={PAD_L + PLOT_W + 8} y={PAD_T + PLOT_H + 14}
           fontFamily="inherit" fontStyle="italic" fontSize="11"
-          fill="currentColor" textAnchor="end" opacity={0.7}
+          fill="currentColor" textAnchor="start" opacity={0.7}
         >
           {t('ch1_6.widget.rl.timeAxisLabel')}
         </text>
@@ -354,14 +376,22 @@ export default function RLChargeDischarge() {
             τ = L / R
           </p>
         </ResultBox>
-        <ResultBox tone="success" label={t('ch1_6.widget.rl.iSteadyLabel')}>
+        {/* I(t) box: shows the LIVE current — animates 0 → I∞ during
+            «накопичити», I₀ → 0 during «розрядити», then holds the final
+            value in idle. Mirror of RC widget's V(t) box. The asymptote
+            formula I∞ = V/R sits as a small subtitle so the reader can
+            still see the target. */}
+        <ResultBox tone="success" label={t('ch1_6.widget.rl.currentAxisLabel')}>
           <p className="text-2xl font-mono font-semibold text-foreground">
-            {iSteadyFmt.value} {iSteadyFmt.unit}
+            {iNowFmt.value} {iNowFmt.unit}
           </p>
           <p className="text-xs font-mono text-muted-foreground mt-1">
-            {mode === 'charging' ? '↗ charging'
-              : mode === 'discharging' ? '↘ discharging'
-              : '— idle'}
+            {mode === 'charging' ? t('ch1_6.widget.rl.chargingLabel')
+              : mode === 'discharging' ? t('ch1_6.widget.rl.dischargingLabel')
+              : t('ch1_6.widget.rl.idleLabel')}
+          </p>
+          <p className="text-xs font-mono text-muted-foreground mt-0.5">
+            {t('ch1_6.widget.rl.iSteadyFormula')} = {iSteadyFmt.value} {iSteadyFmt.unit}
           </p>
         </ResultBox>
       </div>

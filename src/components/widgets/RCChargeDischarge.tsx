@@ -53,7 +53,12 @@ function formatTau(tauSec: number, num: (n: number) => string, tUnit: (k: string
 const VB_W = 480
 const VB_H = 220
 const PAD_L = 44
-const PAD_R = 16
+// PAD_R holds room for both the «5τ» last-tick label (centered on the
+// plot's right edge) AND the italic «t» axis label that sits to the
+// right of it. With PAD_R=16 the «t» (textAnchor=end on plot's right
+// edge) overlapped the «5τ» label at the same y; fix is more right
+// padding plus moving the axis label past the last tick — see render.
+const PAD_R = 24
 const PAD_T = 14
 const PAD_B = 28
 const PLOT_W = VB_W - PAD_L - PAD_R
@@ -277,66 +282,76 @@ export default function RCChargeDischarge() {
       description={t('ch1_5.widget.rc.description')}
     >
       {/* ── Inputs ─────────────────────────────────────────────────── */}
+      {/* Stacked layout (label on top, input + unit selector below) so
+          long UA labels like «Напруга живлення» get the full column
+          width instead of being clipped at w-20 = 80 px. Same fix as
+          RLChargeDischarge. */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* R */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rc-r" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rc-r" className="text-foreground font-medium">
             {t('ch1_5.widget.rc.rLabel')}
           </label>
-          <input
-            id="rc-r"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={rDisp}
-            onChange={e => setRDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <select
-            value={rUnit}
-            onChange={e => setRUnit(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground"
-            aria-label={`${t('ch1_5.widget.rc.rLabel')} unit`}
-          >
-            {(['ohm', 'kohm', 'mohm'] as const).map(u => (
-              <option key={u} value={u}>{tUnit(u)}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <input
+              id="rc-r"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={rDisp}
+              onChange={e => setRDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <select
+              value={rUnit}
+              onChange={e => setRUnit(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground"
+              aria-label={`${t('ch1_5.widget.rc.rLabel')} unit`}
+            >
+              {(['ohm', 'kohm', 'mohm'] as const).map(u => (
+                <option key={u} value={u}>{tUnit(u)}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {/* C */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rc-c" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rc-c" className="text-foreground font-medium">
             {t('ch1_5.widget.rc.cLabel')}
           </label>
-          <input
-            id="rc-c"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={cDisp}
-            onChange={e => setCDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <select
-            value={cUnit}
-            onChange={e => setCUnit(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground"
-            aria-label={`${t('ch1_5.widget.rc.cLabel')} unit`}
-          >
-            {(['pf', 'nf', 'uf'] as const).map(u => (
-              <option key={u} value={u}>{tUnit(u)}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <input
+              id="rc-c"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={cDisp}
+              onChange={e => setCDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <select
+              value={cUnit}
+              onChange={e => setCUnit(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground"
+              aria-label={`${t('ch1_5.widget.rc.cLabel')} unit`}
+            >
+              {(['pf', 'nf', 'uf'] as const).map(u => (
+                <option key={u} value={u}>{tUnit(u)}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {/* V_in */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label htmlFor="rc-vin" className="text-foreground font-medium shrink-0 w-20">
+        <div className="flex flex-col gap-1 text-sm">
+          <label htmlFor="rc-vin" className="text-foreground font-medium">
             {t('ch1_5.widget.rc.vinLabel')}
           </label>
-          <input
-            id="rc-vin"
-            type="number" inputMode="decimal" step="any" min="0"
-            value={vinDisp}
-            onChange={e => setVinDisp(e.target.value)}
-            className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
-          />
-          <span className="font-mono text-foreground">{tUnit('v')}</span>
+          <div className="flex items-center gap-2">
+            <input
+              id="rc-vin"
+              type="number" inputMode="decimal" step="any" min="0"
+              value={vinDisp}
+              onChange={e => setVinDisp(e.target.value)}
+              className="border border-border rounded px-2 py-1 bg-background text-foreground w-20 font-mono"
+            />
+            <span className="font-mono text-foreground">{tUnit('v')}</span>
+          </div>
         </div>
       </div>
 
@@ -394,11 +409,13 @@ export default function RCChargeDischarge() {
           {t('ch1_5.widget.rc.voltageAxisLabel')}
         </text>
 
-        {/* x-axis label */}
+        {/* x-axis label — sits PAST the «5τ» tick label (textAnchor=start)
+            instead of overlapping it. Both share the same y row but
+            different x. */}
         <text
-          x={PAD_L + PLOT_W} y={PAD_T + PLOT_H + 14}
+          x={PAD_L + PLOT_W + 8} y={PAD_T + PLOT_H + 14}
           fontFamily="inherit" fontStyle="italic" fontSize="11"
-          fill="currentColor" textAnchor="end" opacity={0.7}
+          fill="currentColor" textAnchor="start" opacity={0.7}
         >
           {t('ch1_5.widget.rc.timeAxisLabel')}
         </text>
@@ -438,9 +455,9 @@ export default function RCChargeDischarge() {
             {fmt(vNow, 2)} {tUnit('v')}
           </p>
           <p className="text-xs font-mono text-muted-foreground mt-1">
-            {mode === 'charging' ? '↗ charging'
-              : mode === 'discharging' ? '↘ discharging'
-              : '— idle'}
+            {mode === 'charging' ? t('ch1_5.widget.rc.chargingLabel')
+              : mode === 'discharging' ? t('ch1_5.widget.rc.dischargingLabel')
+              : t('ch1_5.widget.rc.idleLabel')}
           </p>
         </ResultBox>
       </div>

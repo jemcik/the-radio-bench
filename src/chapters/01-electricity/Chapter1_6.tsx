@@ -277,11 +277,20 @@ export default function Chapter1_6() {
       </p>
 
       <Callout variant="danger">
-        <Trans
-          i18nKey="ch1_6.energySparkCallout"
-          ns="ui"
-          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap, bemf: <G k="back-emf" /> }}
-        />
+        <p>
+          <Trans
+            i18nKey="ch1_6.energySparkCallout"
+            ns="ui"
+            components={{ ...mathComponents, strong: <strong />, nowrap: nowrap, bemf: <G k="back-emf" />, diode: <G k="diode" /> }}
+          />
+        </p>
+        <p className="mt-3">
+          <Trans
+            i18nKey="ch1_6.energySparkCalloutMechanism"
+            ns="ui"
+            components={{ ...mathComponents, strong: <strong />, bemf: <G k="back-emf" /> }}
+          />
+        </p>
       </Callout>
 
       {/* ── Section 5: RL time constant ──────────────────────── */}

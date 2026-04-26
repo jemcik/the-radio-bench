@@ -28,7 +28,14 @@ import {
 import { useTranslation } from 'react-i18next'
 import { MathText } from '@/components/ui/math-text'
 
-const SCHEMATIC_W = 480
+// Width budgeted for worst-case UA labels: «ВЧ вхід» / «ВЧ вихід»
+// (~50 px each at TerminalLabel size). Earlier 480-px viewBox left only
+// ~4 px of right margin after the «ВЧ вихід» glyphs — the rounded card
+// wrapping the SVG has `overflow-hidden`, so anything past the SVG
+// bounds gets clipped. With 540 px the label gets ~25 px margin on
+// each side. Per CLAUDE.md «Per-locale geometry budget»: budget for
+// the WIDEST translation, not the English original.
+const SCHEMATIC_W = 540
 
 const TOP_Y = SCHEMATIC_PAD_TOP
 const RAIL_SPAN = 130
@@ -37,11 +44,12 @@ const SCHEMATIC_H = schematicHeight(RAIL_SPAN)
 
 const SIG_Y = TOP_Y + 90 // signal rail (collector node)
 
-// Column positions
-const RF_IN_X = 60
-const C_X = 200      // bypass capacitor column
-const RFC_X = 280    // RF choke column
-const RF_OUT_X = 420
+// Column positions — shifted right by 20 from the original to centre the
+// schematic body in the wider viewBox.
+const RF_IN_X = 80
+const C_X = 220      // bypass capacitor column
+const RFC_X = 300    // RF choke column
+const RF_OUT_X = 460
 const NODE_X = RFC_X // collector node = bottom of RFC
 
 const c = pins2(C_X, (TOP_Y + BOT_Y) / 2, 'down')
