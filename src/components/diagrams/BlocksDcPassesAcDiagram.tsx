@@ -21,7 +21,7 @@
  */
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
-import { renderLabelContent } from '@/lib/circuit/SymbolLabel'
+import { renderLabelContent, renderSvgInlineMath } from '@/lib/circuit/SymbolLabel'
 import { MathText } from '@/components/ui/math-text'
 
 const VB_W = 540
@@ -47,30 +47,18 @@ function Panel({
   w,
   inputSVG,
   outputSVG,
-  title,
   idSuffix,
 }: {
   x0: number
   w: number
   inputSVG: React.ReactNode
   outputSVG: React.ReactNode
-  title: string
   idSuffix: string
 }) {
   const inputBaselineY = INPUT_MID_Y
   const outputBaselineY = OUTPUT_MID_Y
   return (
     <g>
-      {/* Title */}
-      <text
-        x={x0 + w / 2} y={22}
-        fontFamily="Georgia, serif" fontSize="0.875em"
-        fontStyle="italic" fontWeight="700"
-        fill={svgTokens.fg} textAnchor="middle"
-      >
-        {title}
-      </text>
-
       {/* Input baseline (reference) */}
       <line
         x1={x0 + PANEL_PAD_X} y1={inputBaselineY}
@@ -98,7 +86,7 @@ function Panel({
        *  how HTML <sub> renders in the prose. */}
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET} y={inputBaselineY - INPUT_AMP - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >
@@ -106,7 +94,7 @@ function Panel({
       </text>
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET} y={outputBaselineY - OUTPUT_AMP - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >
@@ -247,9 +235,25 @@ export default function BlocksDcPassesAcDiagram() {
         aria-label={t('ch1_5.blocksVisualAria')}
         style={{ display: 'block', maxWidth: 640, margin: '0 auto' }}
       >
+        {/* Single global title — both panels share the same input/output
+            channels (top trace = input, bottom = output), so the title
+            is per-diagram, not per-panel. `renderSvgInlineMath` turns
+            any <var>X</var> fragments in the i18n string into italic
+            <tspan>s. */}
+        <text
+          x={VB_W / 2} y={22}
+          fontFamily="inherit" fontSize="0.875em"
+          fontStyle="italic" fontWeight="700"
+          fill={svgTokens.fg} textAnchor="middle"
+        >
+          {renderSvgInlineMath(
+            t('ch1_5.blocksVisualInput') + ' / ' + t('ch1_5.blocksVisualOutput'),
+          )}
+        </text>
+
         {/* Divider hairline */}
         <line
-          x1={HALF_W} y1={12} x2={HALF_W} y2={VB_H - 30}
+          x1={HALF_W} y1={32} x2={HALF_W} y2={VB_H - 30}
           stroke={svgTokens.border}
           strokeWidth={0.75}
           strokeDasharray="3 3"
@@ -258,7 +262,6 @@ export default function BlocksDcPassesAcDiagram() {
         <Panel
           x0={leftX0}
           w={HALF_W}
-          title={t('ch1_5.blocksVisualInput') + ' / ' + t('ch1_5.blocksVisualOutput')}
           idSuffix="slow"
           inputSVG={
             <path
@@ -286,7 +289,6 @@ export default function BlocksDcPassesAcDiagram() {
         <Panel
           x0={rightX0}
           w={HALF_W}
-          title={t('ch1_5.blocksVisualInput') + ' / ' + t('ch1_5.blocksVisualOutput')}
           idSuffix="fast"
           inputSVG={
             <path

@@ -54,8 +54,7 @@ export default function Chapter1_5() {
           ns="ui"
           components={{
             strong: <strong />,
-            var: <MathVar />,
-          }}
+            var: <MathVar />, res: <G k="resistor" />, capt: <G k="capacitor" /> }}
         />
       </p>
 
@@ -70,8 +69,7 @@ export default function Chapter1_5() {
             elec: <G k="electrolytic" />,
             tc: <G k="time constant" />,
             nowrap: nowrap,
-            var: <MathVar />,
-          }}
+            var: <MathVar />, ac: <G k="ac" />, dc: <G k="dc" />, reac: <G k="reactance" /> }}
         />
       </p>
 
@@ -193,7 +191,7 @@ export default function Chapter1_5() {
         <Trans
           i18nKey="ch1_5.typesCeramicCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, filt: <G k="filter" /> }}
         />
       </Callout>
 
@@ -219,7 +217,7 @@ export default function Chapter1_5() {
         <Trans
           i18nKey="ch1_5.typesElectrolyticCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, diode: <G k="diode" /> }}
         />
       </Callout>
 
@@ -559,8 +557,7 @@ export default function Chapter1_5() {
             strong: <strong />,
             var: <MathVar />,
             sub: <sub />,
-            nowrap: nowrap,
-          }}
+            nowrap: nowrap, imp: <G k="impedance" /> }}
         />
       </p>
 

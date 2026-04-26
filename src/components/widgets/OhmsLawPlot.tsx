@@ -249,7 +249,7 @@ export default function OhmsLawPlot() {
             fill={svgTokens.fg}
             textAnchor="middle"
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">I</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">I</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('ma')}{')'}
             </tspan>
@@ -262,7 +262,7 @@ export default function OhmsLawPlot() {
             textAnchor="middle"
             transform={`rotate(-90 18 ${PLOT_Y0 + PLOT_H / 2})`}
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">V</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('v')}{')'}
             </tspan>

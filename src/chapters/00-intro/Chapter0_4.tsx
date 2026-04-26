@@ -270,7 +270,7 @@ export default function Chapter0_4() {
         </li>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact2" ns="ui"
-            components={{ ...mathComponents, strong: <strong />, i: <i /> }}
+            components={{ ...mathComponents, strong: <strong />, i: <i />, filt: <G k="filter" /> }}
           />
         </li>
       </ul>

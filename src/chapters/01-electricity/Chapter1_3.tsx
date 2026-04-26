@@ -29,7 +29,7 @@ export default function Chapter1_3() {
   return (
     <>
       <p>
-        <Trans i18nKey="ch1_3.intro" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
+        <Trans i18nKey="ch1_3.intro" ns="ui" components={{ ...mathComponents, strong: <strong />, res: <G k="resistor" /> }} />
       </p>
 
       <p>
@@ -66,7 +66,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.sineWaveIntro"
           ns="ui"
-          components={{ ...mathComponents, sine: <G k="sine wave" /> }}
+          components={{ ...mathComponents, sine: <G k="sine wave" />, lc: <G k="lc" />, cap: <G k="capacitor" />, ind: <G k="inductor" /> }}
         />
       </p>
 
@@ -92,6 +92,7 @@ export default function Chapter1_3() {
             phase: <G k="phase" />,
             hertz: <G k="hertz" />,
             period: <G k="period" />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
           }}
         />
       </p>

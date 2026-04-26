@@ -206,7 +206,7 @@ export default function SineOriginDiagram() {
           x={CIRCLE_CX}
           y={CIRCLE_CY - CIRCLE_R - 10}
           fontSize="0.812em"
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontStyle="italic"
           fill={svgTokens.mutedFg}
           textAnchor="middle"
@@ -223,7 +223,7 @@ export default function SineOriginDiagram() {
           x={CIRCLE_CX - CIRCLE_R + 12}
           y={CIRCLE_CY - 6}
           fontSize="0.937em"
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontStyle="italic"
           fontWeight="700"
           fill={svgTokens.key}
@@ -236,7 +236,7 @@ export default function SineOriginDiagram() {
           x={CIRCLE_CX + 32}
           y={CIRCLE_CY - 10}
           fontSize="0.875em"
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontStyle="italic"
           fill={svgTokens.key}
         >
@@ -298,7 +298,7 @@ export default function SineOriginDiagram() {
           x={SINE_X1 + 17}
           y={SINE_CY + 4}
           fontSize="0.875em"
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontStyle="italic"
           fill={svgTokens.fg}
         >
@@ -309,7 +309,7 @@ export default function SineOriginDiagram() {
           x={(SINE_X0 + SINE_X1) / 2}
           y={SINE_CY - SINE_AMP - 10}
           fontSize="0.812em"
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontStyle="italic"
           fill={svgTokens.mutedFg}
           textAnchor="middle"

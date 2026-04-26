@@ -97,14 +97,14 @@ export default function Ch0_5Hero() {
         <RoughPaths paths={sheet.batShort} />
 
         {/* Reference designators */}
-        <text x="85"  y="18" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.5em"
+        <text x="85"  y="18" fontFamily="inherit" fontStyle="italic" fontSize="0.5em"
               fill="currentColor" textAnchor="middle">R₁</text>
-        <text x="136" y="45" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.5em"
+        <text x="136" y="45" fontFamily="inherit" fontStyle="italic" fontSize="0.5em"
               fill="currentColor" textAnchor="middle">D₁</text>
-        <text x="28"  y="55" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.5em"
+        <text x="28"  y="55" fontFamily="inherit" fontStyle="italic" fontSize="0.5em"
               fill="currentColor" textAnchor="middle">B₁</text>
 
-        <text x="220" y="10" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.468em"
+        <text x="220" y="10" fontFamily="inherit" fontStyle="italic" fontSize="0.468em"
               fill="currentColor" textAnchor="end" opacity={0.75}>
           Fig. 0.5
         </text>

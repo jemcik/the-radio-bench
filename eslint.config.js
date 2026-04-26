@@ -23,6 +23,13 @@ export default tseslint.config(
     ...reactHooks.configs.flat.recommended,
   },
   {
+    // Node CLI scripts — give them `process`, `__dirname`, etc.
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
     // Vitest globals (configured via `globals: true` in vite.config.ts)
     files: ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
     languageOptions: {

@@ -316,7 +316,7 @@ export default function SineExplorer() {
             fill={svgTokens.fg}
             textAnchor="middle"
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">t</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">t</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('ms')}{')'}
             </tspan>
@@ -329,7 +329,7 @@ export default function SineExplorer() {
             textAnchor="middle"
             transform={`rotate(-90 16 ${PLOT_Y0 + PLOT_H / 2})`}
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">V</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('v')}{')'}
             </tspan>
@@ -386,7 +386,7 @@ export default function SineExplorer() {
             y={(ampMarkerY0 + ampMarkerY1) / 2 + 4}
             fontSize="0.875em"
             fontStyle="italic"
-            fontFamily="Georgia, serif"
+            fontFamily="inherit"
             fontWeight="700"
             fill={svgTokens.key}
           >
@@ -410,7 +410,7 @@ export default function SineExplorer() {
             y={periodY + 15}
             fontSize="0.875em"
             fontStyle="italic"
-            fontFamily="Georgia, serif"
+            fontFamily="inherit"
             fontWeight="700"
             fill={svgTokens.note}
             textAnchor="middle"

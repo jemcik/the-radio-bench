@@ -60,7 +60,7 @@ export default function Ch0_4Hero() {
         {meter.ticks.map((t, i) => <RoughPaths key={i} paths={t} />)}
 
         {/* Scale labels */}
-        <g fontFamily="Georgia, serif" fontSize="0.468em" fill="currentColor" textAnchor="middle">
+        <g fontFamily="inherit" fontSize="0.468em" fill="currentColor" textAnchor="middle">
           <text x="-62" y="36">−20</text>
           <text x="-54" y="2">−10</text>
           <text x="-31" y="-22">−3</text>
@@ -70,7 +70,7 @@ export default function Ch0_4Hero() {
         </g>
 
         {/* "VU" engraving */}
-        <text x="0" y="22" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.625em"
+        <text x="0" y="22" fontFamily="inherit" fontStyle="italic" fontSize="0.625em"
               fill="currentColor" textAnchor="middle" opacity={0.75}>VU</text>
 
         {/* Pivot + needle */}
@@ -80,7 +80,7 @@ export default function Ch0_4Hero() {
 
       {/* Fountain-pen "dB" marking — left as plain text/stroke: a hand
           Rough flourish would fight the italic serif cap. */}
-      <text x="340" y="34" fontFamily="Georgia, serif" fontStyle="italic" fontSize="1.375em"
+      <text x="340" y="34" fontFamily="inherit" fontStyle="italic" fontSize="1.375em"
             fill="currentColor">dB</text>
       <path d="M 338 42 Q 348 48, 368 42" stroke="currentColor" strokeWidth={0.9}
             fill="none" opacity={0.7} />

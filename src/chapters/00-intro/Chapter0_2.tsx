@@ -34,7 +34,7 @@ export default function Chapter0_2() {
             resistance: <G k="resistance" />,
             continuity: <G k="continuity" />,
             diode: <G k="diode testing" />,
-            capacitance: <G k="capacitance" />, }}
+            capacitance: <G k="capacitance" /> }}
         />
       </p>
 
@@ -115,7 +115,7 @@ export default function Chapter0_2() {
         <Trans i18nKey="ch0_2.vnaIntro" ns="ui"
           components={{ ...mathComponents, impedance: <G k="impedance" />,
             swr: <G k="swr" />,
-            lc: <G k="lc" />, }}
+            lc: <G k="lc" />, filt: <G k="filter" /> }}
         />
       </p>
 

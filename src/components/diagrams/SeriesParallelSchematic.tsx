@@ -86,7 +86,7 @@ export default function SeriesParallelSchematic() {
         {/* ── SERIES TITLE ───────────────────────────────────────── */}
         <text
           x={HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg}
           textAnchor="middle"
@@ -126,14 +126,14 @@ export default function SeriesParallelSchematic() {
         {/* Resistor labels */}
         <text
           x={S_R1_CX} y={WIRE_Y - 16}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.mutedFg} textAnchor="middle"
         >
           R₁
         </text>
         <text
           x={S_R2_CX} y={WIRE_Y - 16}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.mutedFg} textAnchor="middle"
         >
           R₂
@@ -142,7 +142,7 @@ export default function SeriesParallelSchematic() {
         {/* Formula */}
         <text
           x={HALF_W / 2} y={FORMULA_Y}
-          fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
           R = R₁ + R₂
@@ -151,7 +151,7 @@ export default function SeriesParallelSchematic() {
         {/* ── PARALLEL TITLE ─────────────────────────────────────── */}
         <text
           x={HALF_W + HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg}
           textAnchor="middle"
@@ -219,14 +219,14 @@ export default function SeriesParallelSchematic() {
         {/* Labels */}
         <text
           x={P_R1_CX} y={WIRE_Y - 16}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.mutedFg} textAnchor="middle"
         >
           R₁
         </text>
         <text
           x={P_R2_CX} y={PARALLEL_R2_WIRE_Y + 22}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.mutedFg} textAnchor="middle"
         >
           R₂
@@ -235,7 +235,7 @@ export default function SeriesParallelSchematic() {
         {/* Formula */}
         <text
           x={HALF_W + HALF_W / 2} y={FORMULA_Y}
-          fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
           R = R₁·R₂ / (R₁ + R₂)

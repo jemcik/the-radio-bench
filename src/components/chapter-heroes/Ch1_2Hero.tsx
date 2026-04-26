@@ -179,7 +179,7 @@ export default function Ch1_2Hero() {
       <text
         x={TANK_X + TANK_W / 2}
         y={14}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
@@ -200,7 +200,7 @@ export default function Ch1_2Hero() {
       <text
         x={TANK_X + TANK_W / 2}
         y={68}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
@@ -214,7 +214,7 @@ export default function Ch1_2Hero() {
       <text
         x={(PIPE_X_START + PIPE_X_END) / 2}
         y={48}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
@@ -233,7 +233,7 @@ export default function Ch1_2Hero() {
       <text
         x={(PIPE_X_START + PIPE_X_END) / 2}
         y={92}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
@@ -255,7 +255,7 @@ export default function Ch1_2Hero() {
       <text
         x={WHEEL_CX}
         y={48}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.531em"
         fontStyle="italic"
         fill="currentColor"
@@ -281,7 +281,7 @@ export default function Ch1_2Hero() {
       <text
         x={WHEEL_CX + WHEEL_R + 8}
         y={WHEEL_CY + 4}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
