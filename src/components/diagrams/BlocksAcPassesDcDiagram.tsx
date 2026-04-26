@@ -55,7 +55,7 @@ function Panel({
     <g>
       <text
         x={x0 + w / 2} y={22}
-        fontFamily="Georgia, serif" fontSize="0.875em"
+        fontFamily="inherit" fontSize="0.875em"
         fontStyle="italic" fontWeight="700"
         fill={svgTokens.fg} textAnchor="middle"
       >
@@ -85,7 +85,7 @@ function Panel({
       {/* Row labels: I (input current) on top, V (output voltage) on bottom. */}
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET} y={INPUT_MID_Y - INPUT_AMP - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >
@@ -94,7 +94,7 @@ function Panel({
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET}
         y={OUTPUT_MID_Y - OUTPUT_AMP_BASE * FAST_FACTOR - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >

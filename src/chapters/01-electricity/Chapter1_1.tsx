@@ -96,7 +96,7 @@ export default function Chapter1_1() {
       <ul>
         <li><Trans i18nKey="ch1_1.waterBullet1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
         <li><Trans i18nKey="ch1_1.waterBullet2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
-        <li><Trans i18nKey="ch1_1.waterBullet3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+        <li><Trans i18nKey="ch1_1.waterBullet3" ns="ui" components={{ ...mathComponents, strong: <strong />, res: <G k="resistor" /> }} /></li>
       </ul>
 
       <p>{t('ch1_1.waterPayoff')}</p>
@@ -237,7 +237,7 @@ export default function Chapter1_1() {
         </li>
         <li>
           <Trans i18nKey="ch1_1.resistanceCat2" ns="ui"
-            components={{ ...mathComponents, strong: <strong />, insulator: <G k="insulator" /> }}
+            components={{ ...mathComponents, strong: <strong />, insulator: <G k="insulator" />, cap: <G k="capacitor" /> }}
           />
         </li>
         <li>
@@ -385,7 +385,7 @@ export default function Chapter1_1() {
           t('ch1_1.labComp3'),
         ]}
         procedure={[
-          { text: <Trans i18nKey="ch1_1.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_1.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong />, dc: <G k="dc" /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_1.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },

@@ -147,7 +147,7 @@ export default function Ch1_1Hero() {
       {/* Material label above — y=12 so the top padding inside the SVG
           matches the bottom padding (drift label baseline at y=136,
           viewBox bottom at y=140, gives 4 units each side, symmetric). */}
-      <text x="235" y="12" fontFamily="Georgia, serif"
+      <text x="235" y="12" fontFamily="inherit"
             fontSize="0.531em" fill="currentColor" textAnchor="middle"
             letterSpacing="4" opacity={0.7}>{t('ch1_1.heroWaterLabel')}</text>
 
@@ -160,7 +160,7 @@ export default function Ch1_1Hero() {
       {/* Pressure arrow on the left */}
       <RoughPaths paths={s.pressureArrow.shaft} />
       <RoughPaths paths={s.pressureArrow.head} />
-      <text x="70" y="46" fontFamily="Georgia, serif" fontStyle="italic"
+      <text x="70" y="46" fontFamily="inherit" fontStyle="italic"
             fontSize="0.5em" fill="currentColor" textAnchor="middle"
             opacity={0.7}>{t('ch1_1.heroPressureLabel')}</text>
 
@@ -177,13 +177,13 @@ export default function Ch1_1Hero() {
         <RoughPaths paths={s.flowArrow.shaft} />
         <RoughPaths paths={s.flowArrow.head} />
       </g>
-      <text x="235" y="66" fontFamily="Georgia, serif" fontStyle="italic"
+      <text x="235" y="66" fontFamily="inherit" fontStyle="italic"
             fontSize="0.5em" fill="currentColor" textAnchor="middle"
             opacity={0.65}>{t('ch1_1.heroFlowLabel')}</text>
 
       {/* ─── Copper row (bottom) ──────────────────────── */}
       {/* Material label above */}
-      <text x="235" y="88" fontFamily="Georgia, serif"
+      <text x="235" y="88" fontFamily="inherit"
             fontSize="0.531em" fill="currentColor" textAnchor="middle"
             letterSpacing="4" opacity={0.7}>{t('ch1_1.heroCopperLabel')}</text>
 
@@ -196,7 +196,7 @@ export default function Ch1_1Hero() {
       {/* Voltage arrow on the left */}
       <RoughPaths paths={s.voltageArrow.shaft} />
       <RoughPaths paths={s.voltageArrow.head} />
-      <text x="70" y="122" fontFamily="Georgia, serif" fontStyle="italic"
+      <text x="70" y="122" fontFamily="inherit" fontStyle="italic"
             fontSize="0.5em" fill="currentColor" textAnchor="middle"
             opacity={0.7}>{t('ch1_1.heroVoltageLabel')}</text>
 
@@ -209,7 +209,7 @@ export default function Ch1_1Hero() {
           the visual analogy. Small "e⁻" label on one of them so the
           reader can anchor the symbol. */}
       <circle cx="140" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
-      <text x="140" y="91" fontFamily="Georgia, serif" fontStyle="italic"
+      <text x="140" y="91" fontFamily="inherit" fontStyle="italic"
             fontSize="0.468em" fill="currentColor" textAnchor="middle"
             opacity={0.75}>e⁻</text>
       <circle cx="205" cy={copperMidY} r="3.5" fill="currentColor" opacity={0.85} />
@@ -221,7 +221,7 @@ export default function Ch1_1Hero() {
         <RoughPaths paths={s.driftArrow.shaft} />
         <RoughPaths paths={s.driftArrow.head} />
       </g>
-      <text x="235" y="144" fontFamily="Georgia, serif" fontStyle="italic"
+      <text x="235" y="144" fontFamily="inherit" fontStyle="italic"
             fontSize="0.5em" fill="currentColor" textAnchor="middle"
             opacity={0.65}>{t('ch1_1.heroDriftLabel')}</text>
     </svg>

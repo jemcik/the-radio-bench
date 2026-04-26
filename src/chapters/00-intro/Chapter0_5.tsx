@@ -256,7 +256,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolVoltmeterName')}
           description={
-            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar /> }} />
+            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar />, imp: <G k="impedance" /> }} />
           }
           svgHeight={56}
         >

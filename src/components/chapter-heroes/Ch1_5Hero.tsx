@@ -173,7 +173,7 @@ export default function Ch1_5Hero() {
       <text
         x={VB_W / 2}
         y={(TOP_PLATE_Y + BOT_PLATE_Y + PLATE_H) / 2 + 4}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.95em"
         fontStyle="italic"
         fontWeight="700"
@@ -194,7 +194,7 @@ export default function Ch1_5Hero() {
       <text
         x={VB_W / 2}
         y={DIEL_Y + DIEL_H - 18}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.75em"
         fontStyle="italic"
         fill="currentColor"
@@ -258,7 +258,7 @@ export default function Ch1_5Hero() {
       <text
         x={PLATE_X - LEAD_LEN - 14}
         y={TOP_LEAD_Y + 5}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="1.1em"
         fontWeight="700"
         fill="currentColor"
@@ -269,7 +269,7 @@ export default function Ch1_5Hero() {
       <text
         x={PLATE_X + PLATE_W + LEAD_LEN + 14}
         y={BOT_LEAD_Y + 5}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="1.1em"
         fontWeight="700"
         fill="currentColor"
@@ -281,7 +281,7 @@ export default function Ch1_5Hero() {
       {/* ── Section label under the figure ─────────────────────── */}
       <text
         x={VB_W / 2} y={LABEL_Y}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"

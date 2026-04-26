@@ -277,7 +277,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   reactance: {
     tip: 'AC-only opposition — the frequency-dependent resistance of a capacitor or an inductor.',
     detail:
-      'Reactance is the opposition that capacitors and inductors present to AC, and only to AC. A capacitor blocks DC completely (after its initial charge-up) but passes AC more and more easily as frequency rises; an inductor does the opposite — passes DC freely but opposes AC more strongly at higher frequencies. Unlike resistance, which dissipates power as heat, reactance is lossless: energy goes into the capacitor\'s electric field or the inductor\'s magnetic field on one half of the cycle and returns to the circuit on the other. The two reactances have names: capacitive reactance X_C = 1 / (2πfC), inductive reactance X_L = 2πfL. We meet both properly in Chapters 1.5 and 1.6; in Chapter 1.3 «reactance» is used only to name the frequency-dependent AC opposition.',
+      'Reactance is the opposition that capacitors and inductors present to AC, and only to AC. A capacitor blocks DC completely (after its initial charge-up) but passes AC more and more easily as frequency rises; an inductor does the opposite — passes DC freely but opposes AC more strongly at higher frequencies. Unlike resistance, which dissipates power as heat, reactance is lossless: energy goes into the capacitor\'s electric field or the inductor\'s magnetic field on one half of the cycle and returns to the circuit on the other. The two reactances have names: capacitive reactance X_C = 1 / (2πfC), inductive reactance X_L = 2πfL. Both are covered in detail in the capacitor and inductor chapters.',
     unit: 'Ohm (Ω)',
     formula: 'X_C = 1 / (2πfC)  •  X_L = 2πfL',
     see: ['capacitor', 'inductor', 'impedance', 'frequency'],
@@ -453,7 +453,15 @@ export const glossary: Record<string, GlossaryEntry> = {
       'When a capacitor C charges through a resistor R toward a supply voltage, its voltage follows the curve V(t) = V∞·(1 − e^(−t/RC)). One time constant later (t = RC), the voltage has reached 63 % of its final value; at 2RC, 86 %; at 3RC, 95 %; at 5RC, 99.3 % — considered "fully charged" for most engineering purposes. Discharge follows the mirror image. The units work out neatly: ohms × farads = seconds. A useful mnemonic — megohms × microfarads = seconds, kilohms × microfarads = milliseconds. Time constants govern everything from 555-timer delays and debouncing networks to power-supply smoothing and audio high-pass filters.',
     unit: 'Seconds (s)',
     formula: 'τ = R · C  •  V(t) = V∞ · (1 − e^(−t/RC))',
-    see: ['capacitor', 'rc circuit', 'capacitance'],
+    see: ['capacitor', 'rc circuit', 'capacitance', 'rl time constant'],
+  },
+  'rl time constant': {
+    tip: 'The ratio τ = L / R fully determines how fast the current in an inductor builds up or decays through a resistor — same exponential shape as RC, but with R in the denominator (so doubling R halves τ instead of doubling it).',
+    detail:
+      'When a series RL circuit is connected to a supply, the current rises along I(t) = I∞·(1 − e^(−t/τ)) where τ = L / R and I∞ = V/R. One time constant later, the current has reached 63 % of its steady-state value; at 2τ, 86 %; at 3τ, 95 %; at 5τ, 99.3 % — considered "fully established" for most engineering purposes. Open the switch and the current decays along the mirror image, I(t) = I₀ · e^(−t/τ), provided a discharge path (a parallel resistor or a flyback diode) is available. The units work out: henries / ohms = seconds. Useful mnemonics — millihenries / ohms = milliseconds, microhenries / kilohms = nanoseconds. Note the inversion vs RC: in RC, R is in the numerator (R·C), so a larger R makes the curve slower; in RL, R is in the denominator (L/R), so a larger R makes the curve faster. RL time constants govern flyback transients, RF choke settling, switching-supply ramp times, and snubber design.',
+    unit: 'Seconds (s)',
+    formula: 'τ = L / R  •  I(t) = I∞ · (1 − e^(−t/τ))',
+    see: ['inductor', 'inductance', 'time constant', 'back-emf'],
   },
   debouncing: {
     tip: 'Filtering out the burst of spurious pulses a mechanical switch emits when its springs bounce open-and-closed after being pressed.',
@@ -493,7 +501,98 @@ export const glossary: Record<string, GlossaryEntry> = {
       'An inductor opposes changes in current by generating a back-EMF. Its reactance increases with frequency — the opposite behaviour to a capacitor. Combined with a capacitor, it forms an LC circuit that resonates at a specific frequency. Inductors are essential in RF filters, matching networks, and power supplies.',
     unit: 'Henry (H)',
     formula: 'XL = 2πfL',
-    see: ['impedance', 'frequency'],
+    see: ['inductance', 'henry', 'impedance', 'frequency'],
+  },
+  inductance: {
+    tip: 'The property of a coil that opposes changes in the current through it — quantified as the voltage induced per rate of change of current.',
+    detail:
+      'Inductance L is the property of any wire (especially when wound into a coil) that develops a back-EMF whenever the current through it changes. Its defining equation is V = L · dI/dt — the voltage across the coil equals L times the rate of change of current. Inductance depends on geometry (number of turns squared, cross-sectional area, length) and the magnetic permeability of the core material. The unit is the henry (H). Don\'t confuse the property with the component — an inductor is the physical coil; inductance is the quantity it has.',
+    unit: 'Henry (H)',
+    formula: 'V = L · dI/dt',
+    see: ['inductor', 'henry', 'self-inductance'],
+  },
+  henry: {
+    tip: 'The SI unit of inductance — one volt of induced opposition per ampere-per-second of current change.',
+    detail:
+      'One henry (H) means a coil that produces one volt of induced voltage when its current changes at one ampere per second. A henry is a large unit — most real inductors are measured in millihenries (mH = 10⁻³ H), microhenries (µH = 10⁻⁶ H), or nanohenries (nH = 10⁻⁹ H). A 1 H choke is a fist-sized iron-cored part used in mains-frequency power supplies; a 100 nH coil is a few turns of wire on a small RF former. Named after Joseph Henry (1797–1878), one of the discoverers of electromagnetic induction.',
+    unit: 'Henry (H)',
+    see: ['inductance', 'inductor', 'si'],
+  },
+  solenoid: {
+    tip: 'A long, evenly wound coil of wire — the standard idealised inductor in physics calculations.',
+    detail:
+      'A solenoid is a coil where the length is comparable to or longer than its diameter, with turns wound uniformly side by side. Inside a long solenoid the magnetic field is nearly uniform and parallel to the axis; outside it is weak and looks like the field of a bar magnet. The standard inductance formula for an idealised solenoid is L = µ₀·µᵣ·n²·A/l, where n is the number of turns, A the cross-sectional area, l the length, and µᵣ the relative permeability of the core. Most air-core RF coils you wind by hand are solenoids in this sense.',
+    formula: 'L = µ₀·µᵣ·n²·A/l',
+    see: ['inductor', 'inductance', 'toroid'],
+  },
+  ferrite: {
+    tip: 'A non-conductive ceramic of iron oxide used as a high-permeability core material for RF inductors and transformers.',
+    detail:
+      'Ferrite is a sintered ceramic made from iron oxide mixed with manganese, zinc, or nickel. It has high relative permeability (1000–10000), which means a few turns on a small ferrite core can give you millihenries of inductance. Crucially, ferrite is a non-conductor — eddy-current losses are tiny even at MHz frequencies — making it the standard core material for RF transformers, switching power supplies, and EMI suppression chokes (the cylindrical lump on USB cables and PC monitor leads is a ferrite bead). Ferrites do saturate at moderate flux densities, so they are not used for high-DC-bias applications.',
+    see: ['inductor', 'saturation', 'choke', 'toroid'],
+  },
+  choke: {
+    tip: 'An inductor used specifically to block AC (or RF) while passing DC.',
+    detail:
+      'A choke is an inductor wired in series with a power-supply path or signal path with the specific job of blocking changing currents while letting steady current through. RF chokes (a few hundred µH to a few mH) keep RF energy from leaking back into supply rails through power lines feeding RF amplifiers. Filter chokes (mH to H, often iron-cored) sit between rectifiers and loads in linear power supplies, opposing AC ripple while passing DC. The choke and a parallel filter capacitor together form the classic LC low-pass filter found in every linear and switching supply.',
+    see: ['inductor', 'reactance', 'filter'],
+  },
+  'back-emf': {
+    tip: 'The voltage an inductor induces in itself when the current through it changes — opposes that change by Lenz\'s law.',
+    detail:
+      'When the current through an inductor changes, a magnetic flux change cuts the wire and induces a voltage in it (Faraday\'s law). Lenz\'s law says the polarity of that voltage always opposes the change in current. This self-induced voltage is called back-EMF — it is what makes an inductor "oppose AC". In practical terms: try to interrupt 1 A through a 1 mH coil in 1 µs and the back-EMF reaches 1000 V — enough to arc across mechanical contacts or destroy a transistor switch. This is why every coil-driven circuit needs a flyback diode or snubber across the coil to dissipate the stored energy safely.',
+    formula: 'V = -L · dI/dt',
+    see: ['inductor', 'self-inductance', 'inductance'],
+  },
+  'self-inductance': {
+    tip: 'The induction effect a coil produces on itself by its own changing current — distinct from mutual inductance between two separate coils.',
+    detail:
+      'Self-inductance is the inductance L of an isolated coil — the voltage it induces in itself when its own current changes, V = L · dI/dt. It contrasts with mutual inductance M, which describes the voltage one coil induces in a second nearby coil through magnetic coupling. In Chapter 1.6 we work entirely with self-inductance; mutual inductance is the key concept behind transformers (Chapter 1.9). Every wire has some self-inductance, even straight pieces — a 10 cm length of bare wire has roughly 100 nH, which becomes important above 100 MHz.',
+    see: ['inductance', 'inductor', 'transformer', 'back-emf'],
+  },
+  transformer: {
+    tip: 'Two coils sharing a magnetic core — energy passes between circuits through the magnetic field, with voltage stepped up or down by the turns ratio.',
+    detail:
+      'A transformer is two inductors wound on the same magnetic core so their fields are tightly coupled. AC current in the primary winding produces a changing flux in the core; that flux induces a voltage in the secondary winding. The voltage ratio equals the turns ratio (Vsec/Vpri = Nsec/Npri); the current ratio is its inverse. Transformers transfer power between circuits at different impedance levels, isolate them galvanically, and step voltages up or down — they are the workhorse of mains power distribution and RF impedance matching. We cover them in detail in Chapter 1.9.',
+    formula: 'V₂/V₁ = N₂/N₁',
+    see: ['inductor', 'inductance', 'self-inductance'],
+  },
+  toroid: {
+    tip: 'A doughnut-shaped magnetic core; coils wound on it have very low external field leakage.',
+    detail:
+      'A toroid is a ring-shaped core (most often ferrite or iron powder) with the wire wound around the entire ring. The closed magnetic loop means almost all the flux stays inside the core — a toroidal coil radiates very little magnetic field externally and is itself very hard to disturb with external fields. This makes toroids the preferred form factor for RF transformers, common-mode chokes, and switching-supply inductors where stray field is a problem. Iron-powder toroids in radio amateur work are colour-coded by mix (T-50-2 «red» for HF, T-50-6 «yellow» for upper HF / VHF) to identify their permeability and frequency range.',
+    see: ['inductor', 'ferrite', 'choke'],
+  },
+  balun: {
+    tip: 'BALanced–UNbalanced — a transformer or choke that matches a balanced antenna feed (like a dipole) to an unbalanced coaxial cable, also blocking common-mode current from running on the outside of the coax shield.',
+    detail:
+      'A balun sits between an antenna whose feed point is balanced — both feed wires carry equal currents 180° out of phase, like a dipole\'s two legs — and a coaxial transmission line, where the inner conductor and the grounded shield are not symmetric. Without one, common-mode current flows on the outside of the coax shield: the cable becomes part of the antenna, the radiation pattern distorts, RF appears in the shack (causing computer glitches and «RF in the audio»), and SWR readings become inconsistent. Two functional types are common in amateur radio. (1) **Current / choke baluns (1:1)** — pass the differential signal but choke off common-mode current with high impedance; built as a few turns of coax through a ferrite toroid, or as a stack of ferrite beads on the cable. (2) **Voltage baluns (typically 4:1)** — true transformers with a turns ratio that also transforms impedance, used for folded dipoles (≈ 200 Ω feed) and OCF (off-centre-fed) dipoles. Mix #43 ferrite is the standard below 30 MHz for 100 W-class work; #61 above. SWR alone does NOT detect a missing balun — even a perfectly matched antenna will radiate from the cable.',
+    see: ['transformer', 'toroid', 'ferrite', 'antenna', 'coax'],
+  },
+  unun: {
+    tip: 'UNbalanced–UNbalanced — an impedance-matching transformer between two unbalanced lines, most often between 50 Ω coax and a high-impedance random-wire or end-fed-half-wave antenna.',
+    detail:
+      'An unun is the impedance-matching cousin of the balun: both sides of the line are unbalanced, so there is no symmetry-balancing role — only impedance transformation. Three ratios dominate amateur use. (1) **9:1 unun** — converts 50 Ω to ≈ 450 Ω, used at the feed point of a random-wire antenna (the «9:1 long wire»); the high-impedance side connects to the radiator with a counterpoise as the return. (2) **49:1 unun** — converts 50 Ω to ≈ 2450 Ω, used at the feed point of an end-fed-half-wave (EFHW) antenna, where a half-wavelength wire presents a very high impedance at its end. (3) **4:1 unun** — converts 50 Ω to 200 Ω for some long-wire and shortened-vertical variants. Ununs are wound on ferrite or iron-powder toroids (FT-140-43 is a common 100 W EFHW choice) with bifilar or trifilar windings depending on the ratio. Unlike a balun, an unun does NOT block common-mode current — if the load is asymmetric (and most random-wire and EFHW antennas are), the coax shield will still radiate unless you add a separate 1:1 current choke a quarter-wavelength down the coax.',
+    see: ['transformer', 'toroid', 'antenna', 'coax'],
+  },
+  saturation: {
+    tip: 'When the magnetic core of an inductor reaches its maximum flux; further current produces almost no extra flux, so the inductance collapses.',
+    detail:
+      'Magnetic cores have a finite limit on the flux density they can support. As current rises and flux density approaches the saturation level (typically 0.3–0.5 T for ferrite, 1–2 T for iron), the core stops responding to further current and the effective inductance drops sharply — sometimes by a factor of 10 or more. In a power supply this means the inductor is no longer doing its job, and the current can spike to dangerous levels. Iron-powder cores have a soft, gradual saturation curve and tolerate large DC bias; ferrites have a sharp saturation knee and require careful design when DC currents are present.',
+    see: ['inductor', 'ferrite'],
+  },
+  'right-hand rule': {
+    tip: 'A mnemonic for finding the direction of the magnetic field around a current-carrying wire — curl your right hand\'s fingers in the direction of the current and your thumb points along the field.',
+    detail:
+      'The right-hand rule is the standard mnemonic that links the direction of an electric current to the direction of the magnetic field it produces. There are two common forms. (1) STRAIGHT WIRE: point your right thumb in the direction the current flows; your curled fingers show the direction the magnetic field circles around the wire. (2) COIL: curl your right hand\'s fingers in the direction the current goes around the loops of the coil; your thumb then points along the axis in the direction of the magnetic field inside the coil (the «north» end). The rule works because of the convention that current flows from + to − through the external circuit (conventional current). Use it any time you need to know which way the field points without doing a cross-product by hand.',
+    see: ['inductor', 'inductance'],
+  },
+  'faradays law': {
+    tip: 'A changing magnetic flux through any closed loop of wire induces a voltage in that loop, proportional to how fast the flux is changing.',
+    detail:
+      'Faraday\'s law of induction is the rule that ties magnetic and electric phenomena together: any change in the magnetic flux through a loop of wire produces a voltage (an «electromotive force», EMF) in that loop. The faster the flux changes, the larger the induced voltage; the formula is V = −dΦ/dt, where Φ is the flux through the loop. The minus sign is Lenz\'s law — the induced voltage always opposes the change that produced it. Faraday\'s law explains why a coil resists changes in its own current (self-inductance), why two nearby coils can transfer energy through the magnetic field (mutual inductance, transformers), and why moving a magnet near a coil generates a voltage (every electric generator and dynamic microphone). Together with Ampère\'s law it forms the magnetic half of Maxwell\'s equations.',
+    formula: 'V = -dΦ/dt',
+    see: ['inductor', 'self-inductance', 'back-emf', 'transformer'],
   },
   diode: {
     tip: 'Semiconductor that allows current in one direction only.',

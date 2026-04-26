@@ -82,10 +82,10 @@ export default function Ch0_3Hero() {
 
       {/* Hand-written equations */}
       <RoughPaths paths={s.eqZigzag1} />
-      <text x="128" y="66" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.562em"
+      <text x="128" y="66" fontFamily="inherit" fontStyle="italic" fontSize="0.562em"
             fill="currentColor">= 10³</text>
       <RoughPaths paths={s.eqZigzag2} />
-      <text x="130" y="82" fontFamily="Georgia, serif" fontStyle="italic" fontSize="0.562em"
+      <text x="130" y="82" fontFamily="inherit" fontStyle="italic" fontSize="0.562em"
             fill="currentColor">µ = 10⁻⁶</text>
       <RoughPaths paths={s.eqUnderline} />
 

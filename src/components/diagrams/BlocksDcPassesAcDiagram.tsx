@@ -64,7 +64,7 @@ function Panel({
       {/* Title */}
       <text
         x={x0 + w / 2} y={22}
-        fontFamily="Georgia, serif" fontSize="0.875em"
+        fontFamily="inherit" fontSize="0.875em"
         fontStyle="italic" fontWeight="700"
         fill={svgTokens.fg} textAnchor="middle"
       >
@@ -98,7 +98,7 @@ function Panel({
        *  how HTML <sub> renders in the prose. */}
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET} y={inputBaselineY - INPUT_AMP - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >
@@ -106,7 +106,7 @@ function Panel({
       </text>
       <text
         x={x0 + PANEL_PAD_X - AXIS_LABEL_X_OFFSET} y={outputBaselineY - OUTPUT_AMP - 4}
-        fontFamily="Georgia, serif" fontSize="0.72em"
+        fontFamily="inherit" fontSize="0.72em"
         fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end" dominantBaseline="central"
       >

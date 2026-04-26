@@ -43,8 +43,7 @@ export default function Chapter1_4() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            divider: <G k="voltage divider" />,
-          }}
+            divider: <G k="voltage divider" />, res: <G k="resistor" /> }}
         />
       </p>
 
@@ -103,7 +102,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesTypes"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, ind: <G k="inductor" /> }}
         />
       </p>
 
@@ -473,7 +472,7 @@ export default function Chapter1_4() {
         goal={t('ch1_4.labGoal')}
         equipment={[
           t('ch1_4.labEquip1'),
-          <Trans key="e2" i18nKey="ch1_4.labEquip2" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} />,
+          <Trans key="e2" i18nKey="ch1_4.labEquip2" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" />, dc: <G k="dc" /> }} />,
           <Trans key="e3" i18nKey="ch1_4.labEquip3" ns="ui" components={{ ...mathComponents, breadboard: <G k="breadboard" /> }} />,
           t('ch1_4.labEquip4'),
         ]}
@@ -487,7 +486,7 @@ export default function Chapter1_4() {
           { text: <Trans i18nKey="ch1_4.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_4.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }} /> },
           { text: <Trans i18nKey="ch1_4.labStep4" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} /> },
-          { text: <Trans i18nKey="ch1_4.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: nowrap }} /> },
+          { text: <Trans i18nKey="ch1_4.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: nowrap, imp: <G k="impedance" /> }} /> },
           { text: <Trans i18nKey="ch1_4.labStep6" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} /> },
         ]}
         expectedResult={t('ch1_4.labExpected')}

@@ -340,7 +340,7 @@ export default function Chapter1_2() {
         ]}
         procedure={[
           { text: <Trans i18nKey="ch1_2.labStep1" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
-          { text: <Trans i18nKey="ch1_2.labStep2" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
+          { text: <Trans i18nKey="ch1_2.labStep2" ns="ui" components={{ strong: <strong />, var: <MathVar />, dc: <G k="dc" /> }} /> },
           { text: <Trans i18nKey="ch1_2.labStep3" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
           { text: <Trans i18nKey="ch1_2.labStep4" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },
           { text: <Trans i18nKey="ch1_2.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar /> }} /> },

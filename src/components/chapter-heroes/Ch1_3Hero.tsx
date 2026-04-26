@@ -194,7 +194,7 @@ export default function Ch1_3Hero() {
       <text
         x={PLOT_X0 + 6}
         y={DC_Y - 5}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
@@ -216,7 +216,7 @@ export default function Ch1_3Hero() {
       <text
         x={PLOT_X0 + 6}
         y={AC_CY - AC_AMP - 4}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
@@ -230,7 +230,7 @@ export default function Ch1_3Hero() {
       <text
         x={T_HINT_X}
         y={T_HINT_Y}
-        fontFamily="Georgia, serif"
+        fontFamily="inherit"
         fontSize="0.625em"
         fontStyle="italic"
         fill="currentColor"

@@ -16,6 +16,9 @@ import RfChokeSchematic from '@/components/diagrams/RfChokeSchematic'
 import LcFilterSchematic from '@/components/diagrams/LcFilterSchematic'
 import BlocksAcPassesDcDiagram from '@/components/diagrams/BlocksAcPassesDcDiagram'
 import InductorTypeGallery from '@/components/diagrams/InductorTypeGallery'
+import RightHandRuleDiagram from '@/components/diagrams/RightHandRuleDiagram'
+import FaradayDemoDiagram from '@/components/diagrams/FaradayDemoDiagram'
+import SolenoidGeometryDiagram from '@/components/diagrams/SolenoidGeometryDiagram'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
 
@@ -50,6 +53,10 @@ export default function Chapter1_6() {
           components={{
             strong: <strong />,
             var: <MathVar />,
+            ind: <G k="inductor" />,
+            cap: <G k="capacitor" />,
+            ac: <G k="ac" />,
+            dc: <G k="dc" />,
           }}
         />
       </p>
@@ -60,8 +67,14 @@ export default function Chapter1_6() {
           ns="ui"
           components={{
             strong: <strong />,
+            em: <em />,
             var: <MathVar />,
             nowrap: nowrap,
+            hen: <G k="henry" />,
+            fer: <G k="ferrite" />,
+            choke: <G k="choke" />,
+            tc: <G k="rl time constant" />,
+            reac: <G k="reactance" />,
           }}
         />
       </p>
@@ -76,9 +89,18 @@ export default function Chapter1_6() {
           components={{
             strong: <strong />,
             var: <MathVar />,
+            em: <em />,
+            inductance: <G k="inductance" />,
+            si: <G k="self-inductance" />,
+            rhr: <G k="right-hand rule" />,
+            faraday: <G k="faradays law" />,
           }}
         />
       </p>
+
+      <RightHandRuleDiagram />
+
+      <FaradayDemoDiagram />
 
       <p>{t('ch1_6.whatItIsVdIdt')}</p>
 
@@ -91,6 +113,7 @@ export default function Chapter1_6() {
           components={{
             strong: <strong />,
             var: <MathVar />,
+            choke: <G k="choke" />,
           }}
         />
       </p>
@@ -122,7 +145,15 @@ export default function Chapter1_6() {
       {/* ── Section 2: Geometry ─────────────────────────────────── */}
       <Section id="geometry" labelKey="ch1_6.sectionGeometry" />
 
-      <p>{t('ch1_6.geometryIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_6.geometryIntro"
+          ns="ui"
+          components={{ sol: <G k="solenoid" /> }}
+        />
+      </p>
+
+      <SolenoidGeometryDiagram />
 
       <MBlock tex="L = \mu_0 \cdot \mu_r \cdot \dfrac{n^2 \cdot A}{l}" />
 
@@ -134,6 +165,7 @@ export default function Chapter1_6() {
             var: <MathVar />,
             sub: <sub />,
             strong: <strong />,
+            em: <em />,
           }}
         />
       </p>
@@ -163,7 +195,16 @@ export default function Chapter1_6() {
       {/* ── Section 3: Types ──────────────────────────────────── */}
       <Section id="types" labelKey="ch1_6.sectionTypes" />
 
-      <p>{t('ch1_6.typesIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_6.typesIntro"
+          ns="ui"
+          components={{
+            balun: <G k="balun" />,
+            unun: <G k="unun" />,
+          }}
+        />
+      </p>
 
       <InductorTypeGallery />
 
@@ -171,7 +212,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesAirCoreIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, sat: <G k="saturation" /> }}
         />
       </p>
 
@@ -179,7 +220,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesAirCoreCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, var: <MathVar /> }}
         />
       </Callout>
 
@@ -187,7 +228,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesFerriteIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, tor: <G k="toroid" /> }}
         />
       </p>
 
@@ -203,7 +244,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesChokesIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, em: <em /> }}
+          components={{ ...mathComponents, strong: <strong />, em: <em />, res: <G k="resistor" /> }}
         />
       </p>
 
@@ -239,7 +280,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.energySparkCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap, bemf: <G k="back-emf" /> }}
         />
       </Callout>
 
@@ -302,6 +343,7 @@ export default function Chapter1_6() {
             strong: <strong />,
             var: <MathVar />,
             nowrap: nowrap,
+            diode: <G k="diode" />,
           }}
         />
       </p>
@@ -397,6 +439,7 @@ export default function Chapter1_6() {
             strong: <strong />,
             em: <em />,
             var: <MathVar />,
+            xfm: <G k="transformer" />,
           }}
         />
       </Callout>
@@ -436,6 +479,7 @@ export default function Chapter1_6() {
             sub: <sub />,
             em: <em />,
             nowrap: nowrap,
+            imp: <G k="impedance" />,
           }}
         />
       </p>
@@ -448,7 +492,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.blocksRfChoke"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, bypass: <G k="bypass capacitor" /> }}
         />
       </p>
 
@@ -458,7 +502,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.blocksFilterChoke"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, lc: <G k="lc" />, filt: <G k="filter" />, rip: <G k="ripple" /> }}
         />
       </p>
 
@@ -504,7 +548,7 @@ export default function Chapter1_6() {
           <Trans
             i18nKey="ch1_6.keyTakeaway5"
             ns="ui"
-            components={{ ...mathComponents }}
+            components={{ ...mathComponents, nowrap: nowrap }}
           />
         </p>
       </Callout>
@@ -537,7 +581,7 @@ export default function Chapter1_6() {
           { text: <Trans i18nKey="ch1_6.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_6.labStep2" ns="ui" components={{ strong: <strong />, var: <MathVar />, nowrap: nowrap }} /> },
           { text: <Trans i18nKey="ch1_6.labStep3" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: nowrap }} /> },
-          { text: <Trans i18nKey="ch1_6.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch1_6.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong />, code: <code /> }} /> },
           { text: <Trans i18nKey="ch1_6.labStep5" ns="ui" components={{ strong: <strong />, var: <MathVar />, sub: <sub /> }} /> },
           { text: <Trans i18nKey="ch1_6.labStep6" ns="ui" components={{ strong: <strong />, var: <MathVar />, nowrap: nowrap }} /> },
         ]}

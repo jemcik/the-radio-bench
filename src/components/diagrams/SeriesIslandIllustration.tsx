@@ -185,7 +185,7 @@ export default function SeriesIslandIllustration() {
 
         {/* Battery terminal labels («+» and «−»). */}
         <g
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontSize="1.15em"
           fontWeight="700"
           textAnchor="middle"
@@ -201,7 +201,7 @@ export default function SeriesIslandIllustration() {
 
         {/* Cap name labels C₁ / C₂ — above the two plate pairs. */}
         <g
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontSize="1em"
           fontStyle="italic"
           textAnchor="middle"
@@ -217,7 +217,7 @@ export default function SeriesIslandIllustration() {
 
         {/* Charge labels under each plate. */}
         <g
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontSize="0.95em"
           fontWeight="600"
           textAnchor="middle"
@@ -233,7 +233,7 @@ export default function SeriesIslandIllustration() {
         <text
           x={ISLAND_X + ISLAND_W / 2}
           y={ISLAND_CAPTION_Y}
-          fontFamily="Georgia, serif"
+          fontFamily="inherit"
           fontSize="0.9em"
           fontStyle="italic"
           textAnchor="middle"

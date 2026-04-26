@@ -117,7 +117,7 @@ export default function InductanceBuilder() {
 
         <label className="flex flex-wrap items-center gap-3 text-sm">
           <span className="text-foreground font-medium shrink-0 w-40">
-            {t('ch1_6.widget.builder.diameterLabel')}
+            {t('ch1_6.widget.builder.areaLabel')}
           </span>
           <input
             type="range"
@@ -125,7 +125,7 @@ export default function InductanceBuilder() {
             value={tA}
             onChange={e => setTA(Number(e.target.value))}
             className="flex-1 min-w-[140px]"
-            aria-label={t('ch1_6.widget.builder.diameterLabel')}
+            aria-label={t('ch1_6.widget.builder.areaLabel')}
           />
           <span className="font-mono text-foreground w-32 text-right">
             {num(Number(aCm2.toPrecision(3)))} cm²

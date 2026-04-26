@@ -321,7 +321,7 @@ export default function RLChargeDischarge() {
 
         <text
           x={PAD_L + PLOT_W} y={PAD_T + PLOT_H + 14}
-          fontFamily="Georgia, serif" fontStyle="italic" fontSize="11"
+          fontFamily="inherit" fontStyle="italic" fontSize="11"
           fill="currentColor" textAnchor="end" opacity={0.7}
         >
           {t('ch1_6.widget.rl.timeAxisLabel')}

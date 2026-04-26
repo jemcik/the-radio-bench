@@ -234,7 +234,7 @@ export default function RmsSelector() {
             fill={svgTokens.fg}
             textAnchor="middle"
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">t</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">t</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('ms')}{')'}
             </tspan>
@@ -247,7 +247,7 @@ export default function RmsSelector() {
             textAnchor="middle"
             transform={`rotate(-90 16 ${PLOT_Y0 + PLOT_H / 2})`}
           >
-            <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
+            <tspan fontStyle="italic" fontFamily="inherit">V</tspan>
             <tspan fontFamily="ui-sans-serif, system-ui, sans-serif">
               {'\u00a0('}{tUnit('v')}{')'}
             </tspan>
@@ -283,7 +283,7 @@ export default function RmsSelector() {
                 y={vToY(V_PEAK) + 4}
                 fontSize="0.875em"
                 fill={svgTokens.key}
-                fontFamily="Georgia, serif"
+                fontFamily="inherit"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">pk</tspan>
@@ -331,7 +331,7 @@ export default function RmsSelector() {
                 y={vToY(0) + 4}
                 fontSize="0.875em"
                 fill={svgTokens.key}
-                fontFamily="Georgia, serif"
+                fontFamily="inherit"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">pp</tspan>
@@ -355,7 +355,7 @@ export default function RmsSelector() {
                 y={vToY(V_AVG) + 4}
                 fontSize="0.875em"
                 fill={svgTokens.key}
-                fontFamily="Georgia, serif"
+                fontFamily="inherit"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">avg</tspan>
@@ -379,7 +379,7 @@ export default function RmsSelector() {
                 y={vToY(V_RMS) + 4}
                 fontSize="0.875em"
                 fill={svgTokens.key}
-                fontFamily="Georgia, serif"
+                fontFamily="inherit"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">rms</tspan>

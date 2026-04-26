@@ -61,7 +61,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.fractionsExample" ns="ui"
-          components={{ ...mathComponents, voltageDivider: <G k="voltage divider" /> }}
+          components={{ ...mathComponents, voltageDivider: <G k="voltage divider" />, res: <G k="resistor" /> }}
         />
       </p>
 
@@ -76,7 +76,7 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.powersIntro" ns="ui"
-          components={{ ...mathComponents, fm: <G k="fm" />, sciNotation: <G k="scientific notation" /> }}
+          components={{ ...mathComponents, strong: <strong />, fm: <G k="fm" />, sciNotation: <G k="scientific notation" /> }}
         />
       </p>
 

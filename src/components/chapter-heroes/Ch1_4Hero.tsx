@@ -212,7 +212,7 @@ export default function Ch1_4Hero() {
 
       <text
         x={AX_CENTRE_X} y={LABEL_BASELINE_Y}
-        fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic" fontWeight="700"
+        fontFamily="inherit" fontSize="0.812em" fontStyle="italic" fontWeight="700"
         fill="currentColor" textAnchor="middle"
       >
         {t('ch1_4.heroThroughHole')}
@@ -240,7 +240,7 @@ export default function Ch1_4Hero() {
 
       <text
         x={SMD_CENTRE_X} y={LABEL_BASELINE_Y}
-        fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic" fontWeight="700"
+        fontFamily="inherit" fontSize="0.812em" fontStyle="italic" fontWeight="700"
         fill="currentColor" textAnchor="middle"
       >
         {t('ch1_4.heroSMT')}
@@ -258,7 +258,7 @@ export default function Ch1_4Hero() {
 
       <text
         x={POT_CENTRE_X} y={LABEL_BASELINE_Y}
-        fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic" fontWeight="700"
+        fontFamily="inherit" fontSize="0.812em" fontStyle="italic" fontWeight="700"
         fill="currentColor" textAnchor="middle"
       >
         {t('ch1_4.heroPot')}

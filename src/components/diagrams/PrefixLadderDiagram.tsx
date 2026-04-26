@@ -7,10 +7,47 @@ import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
 /**
  * Chapter 0.3 — SI Prefixes logarithmic scale
  *
- * Each segment between ticks has its own arrow:
- *   ← ÷1000 for segments left of 10⁰
- *   ×1000 → for segments right of 10⁰
+ * The SVG holds the AXIS content only: per-segment ÷1000 / ×1000
+ * arrows, the axis line with coloured rainbow segments, ticks, the
+ * prefix symbol (p, n, µ, m, …, T) above each tick, and the power-of-
+ * ten label (10⁻¹², …, 10¹²) below each tick. None of those strings
+ * translate.
+ *
+ * The TRANSLATABLE example text under each tick («ємність конденсатора»
+ * etc.) lives in an HTML row BELOW the SVG, in a 9-column grid whose
+ * column centres line up exactly with the tick centres. Auto-wrapping
+ * inside HTML replaces the previous `wrapLabel(text, 12)` hack that
+ * manually split EN/UA strings at fixed character counts. Same pattern
+ * as InductorTypeGallery / MaterialsComparison.
  */
+
+// ── Geometry ────────────────────────────────────────────────────
+// Sized to fit 9 ticks comfortably AND keep the labels at a readable
+// font size (17/12.5/11 px). The SVG itself is responsive (width="100%").
+// Vertical budget (top → bottom):
+//   arrowY−6   = 24   arrow labels (×1000 / ÷1000)
+//   axisY−14   = 40   prefix symbol (fontSize 17)
+//   axisY      = 54   axis line
+//   axisY+24   = 78   power label (10ⁿ)
+//   axisY+34   = 88   ≈ descender of the power label → SVG ends here.
+// Example text used to live at axisY+40..+53; now it's HTML below the
+// SVG, freeing this vertical budget down to 90 px.
+const W = 820, H = 90
+const axisY = 54
+const axisStartX = 50
+const axisEndX = 770
+
+// HTML columns must align with the SVG ticks at every render width.
+// Express padding and gap in percentages of W so the alignment holds
+// when the wrapper scales down on narrow viewports.
+//   tick 0 sits at viewBox x = axisStartX = 50.
+//   Each tick is `step` apart (= 90 at full width).
+//   Col 0 should span [tick0 - step/2, tick0 + step/2] = [5, 95]
+//     → padding-left = 5; col_w = step; gap = 0; 9 cols of width step.
+const STEP = (axisEndX - axisStartX) / 8  // 90
+const HTML_PAD_X = axisStartX - STEP / 2   // 5
+const paddingPct = `${(HTML_PAD_X / W) * 100}%`  // ≈ 0.609756%
+
 export default function PrefixLadderDiagram() {
   const { t } = useTranslation('ui')
   // Ladder shows the full 9-prefix range that radio actually uses: pico → tera.
@@ -24,24 +61,7 @@ export default function PrefixLadderDiagram() {
   // because prefixes[] is the same array.
   const centerIndex = UNITY_PREFIX_INDEX
 
-  // Sized to fit 9 ticks comfortably AND keep the labels at a readable
-  // font size (17/12.5/11 px). The SVG itself is responsive (width="100%").
-  // Vertical budget (top → bottom):
-  //   arrowY−6   = 24   arrow labels (×1000 / ÷1000)
-  //   axisY−14   = 40   prefix symbol (fontSize 17)
-  //   axisY      = 54   axis line
-  //   axisY+24   = 78   power label (10ⁿ)
-  //   axisY+40   = 94   example line 1
-  //   axisY+53   = 107  example line 2 (when wrapped)
-  // ≈ 3 px descender → content reaches y ≈ 110, leave a small margin.
-  const W = 820, H = 116
-  const axisY = 54
-  const axisStartX = 50
-  const axisEndX = 770
-  const axisLength = axisEndX - axisStartX
-
-  const step = axisLength / (prefixes.length - 1)
-  const positions = prefixes.map((_, i) => axisStartX + step * i)
+  const positions = prefixes.map((_, i) => axisStartX + STEP * i)
 
   // 8 colours — one per segment between the 9 ticks.
   // DECORATIVE EXCEPTION (per CLAUDE.md): this is the prefix-segment
@@ -67,95 +87,88 @@ export default function PrefixLadderDiagram() {
     return `${x + dx},${arrowY - 3.5} ${x},${arrowY} ${x + dx},${arrowY + 3.5}`
   }
 
-  /**
-   * Split a short label into one or two roughly balanced lines so each line
-   * fits inside the per-tick budget (~85 px at 11 px font). Single-word or
-   * very short labels stay on one line.
-   */
-  const wrapLabel = (text: string): string[] => {
-    if (text.length <= 12) return [text]
-    const words = text.split(' ')
-    if (words.length < 2) return [text]
-    // Pick the split point that minimises the longer line.
-    let best = { i: 1, diff: Infinity }
-    for (let i = 1; i < words.length; i++) {
-      const a = words.slice(0, i).join(' ').length
-      const b = words.slice(i).join(' ').length
-      const diff = Math.abs(a - b)
-      if (diff < best.diff) best = { i, diff }
-    }
-    return [words.slice(0, best.i).join(' '), words.slice(best.i).join(' ')]
-  }
-
   return (
     <DiagramFigure caption={t('ch0_3.prefixesDiagramCaption')}>
-      <SVGDiagram
-        width={W} height={H}
-        style={{ maxWidth: W, margin: '0 auto' }}
-        fontFamily="inherit"
-        aria-label={t('ch0_3.prefixLadderAria')}
-      >
-        {/* ── Per-segment arrows ── */}
-        {positions.slice(0, -1).map((x, i) => {
-          const nextX = positions[i + 1]
-          const midX = (x + nextX) / 2
-          const isLeftOfCenter = i < centerIndex
+      <div className="mx-auto" style={{ maxWidth: W }}>
+        <SVGDiagram
+          width={W} height={H}
+          style={{ maxWidth: W, margin: '0 auto' }}
+          fontFamily="inherit"
+          aria-label={t('ch0_3.prefixLadderAria')}
+        >
+          {/* ── Per-segment arrows ── */}
+          {positions.slice(0, -1).map((x, i) => {
+            const nextX = positions[i + 1]
+            const midX = (x + nextX) / 2
+            const isLeftOfCenter = i < centerIndex
 
-          // Left of center: ← ÷1000 ; right of center: ×1000 →
-          const arrowTipX  = isLeftOfCenter ? x + 10     : nextX - 10
-          const arrowTailX = isLeftOfCenter ? nextX - 6  : x + 6
-          const label      = isLeftOfCenter ? '÷1000'    : '×1000'
-          const dir        = isLeftOfCenter ? 'left'     : 'right'
+            // Left of center: ← ÷1000 ; right of center: ×1000 →
+            const arrowTipX  = isLeftOfCenter ? x + 10     : nextX - 10
+            const arrowTailX = isLeftOfCenter ? nextX - 6  : x + 6
+            const label      = isLeftOfCenter ? '÷1000'    : '×1000'
+            const dir        = isLeftOfCenter ? 'left'     : 'right'
 
-          return (
-            <g key={`arr-${i}`}>
-              <line x1={arrowTailX} y1={arrowY} x2={arrowTipX} y2={arrowY}
-                stroke={arrowC} strokeWidth="0.8" />
-              <polyline points={chevron(arrowTipX, dir)}
-                fill="none" stroke={arrowC} strokeWidth="0.8" />
-              <text x={midX} y={arrowY - 6}
-                textAnchor="middle" fontSize="0.625em" fill={arrowC}>{label}</text>
-            </g>
-          )
-        })}
+            return (
+              <g key={`arr-${i}`}>
+                <line x1={arrowTailX} y1={arrowY} x2={arrowTipX} y2={arrowY}
+                  stroke={arrowC} strokeWidth="0.8" />
+                <polyline points={chevron(arrowTipX, dir)}
+                  fill="none" stroke={arrowC} strokeWidth="0.8" />
+                <text x={midX} y={arrowY - 6}
+                  textAnchor="middle" fontSize="0.625em" fill={arrowC}>{label}</text>
+              </g>
+            )
+          })}
 
-        {/* ── Axis line ── */}
-        <line x1={axisStartX} y1={axisY} x2={axisEndX} y2={axisY}
-          stroke={axisC} strokeWidth="1.5" />
+          {/* ── Axis line ── */}
+          <line x1={axisStartX} y1={axisY} x2={axisEndX} y2={axisY}
+            stroke={axisC} strokeWidth="1.5" />
 
-        {/* ── Colored segments ── */}
-        {positions.slice(0, -1).map((x, i) => (
-          <rect key={`seg-${i}`}
-            x={x} y={axisY - 2.5}
-            width={positions[i + 1] - x} height={5} rx={2}
-            fill={segmentColors[i]} opacity={0.3} />
-        ))}
+          {/* ── Colored segments ── */}
+          {positions.slice(0, -1).map((x, i) => (
+            <rect key={`seg-${i}`}
+              x={x} y={axisY - 2.5}
+              width={positions[i + 1] - x} height={5} rx={2}
+              fill={segmentColors[i]} opacity={0.3} />
+          ))}
 
-        {/* ── Ticks + labels ── */}
-        {prefixes.map((p, i) => {
-          const x = positions[i]
-          const exampleLines = wrapLabel(t(`ch0_3.${p.exampleKey}`))
-          return (
-            <g key={i}>
-              <line x1={x} y1={axisY - 7} x2={x} y2={axisY + 7}
-                stroke={labelC} strokeWidth="1.2" />
-              <text x={x} y={axisY - 14}
-                textAnchor="middle" fontSize="1.062em" fontWeight="700"
-                fill="hsl(var(--foreground))">{p.symbol}</text>
-              <text x={x} y={axisY + 24}
-                textAnchor="middle" fontSize="0.781em"
-                fill={labelC}>{p.power}</text>
-              <text x={x} y={axisY + 40}
-                textAnchor="middle" fontSize="0.687em"
-                fill={labelC} fontStyle="italic" opacity="0.85">
-                {exampleLines.map((line, li) => (
-                  <tspan key={li} x={x} dy={li === 0 ? 0 : 13}>{line}</tspan>
-                ))}
-              </text>
-            </g>
-          )
-        })}
-      </SVGDiagram>
+          {/* ── Ticks + symbol + power (no translatable text in SVG) ── */}
+          {prefixes.map((p, i) => {
+            const x = positions[i]
+            return (
+              <g key={i}>
+                <line x1={x} y1={axisY - 7} x2={x} y2={axisY + 7}
+                  stroke={labelC} strokeWidth="1.2" />
+                <text x={x} y={axisY - 14}
+                  textAnchor="middle" fontSize="1.062em" fontWeight="700"
+                  fill="hsl(var(--foreground))">{p.symbol}</text>
+                <text x={x} y={axisY + 24}
+                  textAnchor="middle" fontSize="0.781em"
+                  fill={labelC}>{p.power}</text>
+              </g>
+            )
+          })}
+        </SVGDiagram>
+
+        {/* Translatable example text — one column per tick, column centres
+            aligned with tick positions via percentage padding. Auto-wraps
+            inside its column when UA strings exceed the slot width. */}
+        <div
+          className="grid grid-cols-9 mt-1 text-center italic leading-snug"
+          style={{
+            paddingLeft: paddingPct,
+            paddingRight: paddingPct,
+            fontSize: 11,
+            color: svgTokens.mutedFg,
+          }}
+        >
+          {prefixes.map((p, i) => (
+            <span key={i} className="px-0.5">
+              {t(`ch0_3.${p.exampleKey}`)}
+            </span>
+          ))}
+        </div>
+      </div>
     </DiagramFigure>
   )
 }

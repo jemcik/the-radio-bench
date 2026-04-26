@@ -84,7 +84,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       <circle cx={RAIL_L} cy={RAIL_TOP_Y} r={3} fill={svgTokens.fg} />
       <text
         x={RAIL_L - 6} y={RAIL_TOP_Y - 6}
-        fontFamily="Georgia, serif" fontSize="0.687em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.687em" fontStyle="italic"
         fill={svgTokens.fg} textAnchor="end"
       >
         {renderLabelContent(t('ch1_4.loadingVinLabel'))}
@@ -93,7 +93,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       {/* Ground terminal label */}
       <text
         x={RAIL_L - 6} y={RAIL_BOTTOM_Y + 4}
-        fontFamily="Georgia, serif" fontSize="0.687em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.687em" fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end"
       >
         {t('ch1_4.loadingGroundLabel')}
@@ -107,7 +107,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       />
       <text
         x={R_CX + 12} y={R1_CENTRE + 4}
-        fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="start"
       >
         R₁
@@ -121,7 +121,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       />
       <text
         x={R_CX + 12} y={R2_CENTRE + 4}
-        fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="start"
       >
         R₂
@@ -141,7 +141,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
           <circle cx={R_CX + 50} cy={JUNCTION_Y} r={3} fill="none" stroke={svgTokens.fg} strokeWidth={1.2} />
           <text
             x={R_CX + 60} y={JUNCTION_Y + 4}
-            fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+            fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.fg} textAnchor="start"
           >
             {renderLabelContent(t('ch1_4.loadingVoutLabel'))}
@@ -156,7 +156,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
           <circle cx={RL_CX} cy={JUNCTION_Y} r={2.5} fill={svgTokens.fg} />
           <text
             x={RL_CX + 18} y={JUNCTION_Y + 4}
-            fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+            fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.fg} textAnchor="start"
           >
             {renderLabelContent(t('ch1_4.loadingVoutLabel'))}
@@ -169,7 +169,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
           />
           <text
             x={RL_CX + 12} y={RL_CENTRE + 4}
-            fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+            fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.caution} textAnchor="start"
           >
             R_L
@@ -203,7 +203,7 @@ export default function DividerLoadingDiagram() {
         {/* Titles */}
         <text
           x={HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -211,7 +211,7 @@ export default function DividerLoadingDiagram() {
         </text>
         <text
           x={HALF_W + HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -224,14 +224,14 @@ export default function DividerLoadingDiagram() {
         {/* Formulas */}
         <text
           x={HALF_W / 2} y={FORMULA_Y}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
           {renderSvgInlineMath(t('ch1_4.loadingNoLoadFormula'))}
         </text>
         <text
           x={HALF_W + HALF_W / 2} y={FORMULA_Y}
-          fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+          fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
           fill={svgTokens.fg} textAnchor="middle"
         >
           {renderSvgInlineMath(t('ch1_4.loadingLoadedFormula'))}

@@ -88,7 +88,7 @@ export default function IndSeriesParallelSchematic() {
         {/* ── SERIES TITLE ──────────────────────────────────────── */}
         <text
           x={HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -108,18 +108,18 @@ export default function IndSeriesParallelSchematic() {
               stroke={svgTokens.fg} strokeWidth={1.4} strokeLinecap="round" />
 
         <text x={S_L1_CX} y={WIRE_Y - 16}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           L₁
         </text>
         <text x={S_L2_CX} y={WIRE_Y - 16}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           L₂
         </text>
 
         <text x={HALF_W / 2} y={FORMULA_Y}
-              fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
               fill={svgTokens.fg} textAnchor="middle">
           L = L₁ + L₂
         </text>
@@ -127,7 +127,7 @@ export default function IndSeriesParallelSchematic() {
         {/* ── PARALLEL TITLE ────────────────────────────────────── */}
         <text
           x={HALF_W + HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -161,18 +161,18 @@ export default function IndSeriesParallelSchematic() {
               stroke={svgTokens.fg} strokeWidth={1.4} strokeLinecap="round" />
 
         <text x={P_L1_CX} y={WIRE_Y - 16}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           L₁
         </text>
         <text x={P_L2_CX} y={PARALLEL_L2_WIRE_Y + 22}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           L₂
         </text>
 
         <text x={HALF_W + HALF_W / 2} y={FORMULA_Y}
-              fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
               fill={svgTokens.fg} textAnchor="middle">
           L = L₁·L₂ / (L₁ + L₂)
         </text>

@@ -93,7 +93,7 @@ export default function CapSeriesParallelSchematic() {
         {/* ── PARALLEL TITLE ─────────────────────────────────────── */}
         <text
           x={HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -129,19 +129,19 @@ export default function CapSeriesParallelSchematic() {
 
         {/* Component labels */}
         <text x={P_C1_CX} y={WIRE_Y - 20}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           C₁
         </text>
         <text x={P_C2_CX} y={PARALLEL_C2_WIRE_Y + 26}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           C₂
         </text>
 
         {/* Parallel formula */}
         <text x={HALF_W / 2} y={FORMULA_Y}
-              fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
               fill={svgTokens.fg} textAnchor="middle">
           C = C₁ + C₂
         </text>
@@ -149,7 +149,7 @@ export default function CapSeriesParallelSchematic() {
         {/* ── SERIES TITLE ───────────────────────────────────────── */}
         <text
           x={HALF_W + HALF_W / 2} y={TITLE_Y}
-          fontFamily="Georgia, serif" fontSize="0.875em"
+          fontFamily="inherit" fontSize="0.875em"
           fontStyle="italic" fontWeight="700"
           fill={svgTokens.fg} textAnchor="middle"
         >
@@ -169,18 +169,18 @@ export default function CapSeriesParallelSchematic() {
               stroke={svgTokens.fg} strokeWidth={1.4} strokeLinecap="round" />
 
         <text x={S_C1_CX} y={WIRE_Y - 20}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           C₁
         </text>
         <text x={S_C2_CX} y={WIRE_Y - 20}
-              fontFamily="Georgia, serif" fontSize="0.75em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
               fill={svgTokens.mutedFg} textAnchor="middle">
           C₂
         </text>
 
         <text x={HALF_W + HALF_W / 2} y={FORMULA_Y}
-              fontFamily="Georgia, serif" fontSize="0.812em" fontStyle="italic"
+              fontFamily="inherit" fontSize="0.812em" fontStyle="italic"
               fill={svgTokens.fg} textAnchor="middle">
           C = C₁·C₂ / (C₁ + C₂)
         </text>

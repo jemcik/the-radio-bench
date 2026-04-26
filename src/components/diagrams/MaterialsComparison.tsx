@@ -41,65 +41,102 @@ import {
  * electrons sit at their original positions — which already compose
  * a valid static snapshot of the idea.
  *
- * Sizing (per feedback_svg_font_minimum_on_screen): viewBox 620 × 300
- * rendered 1:1 — `maxWidth` equals the viewBox width, so every
- * fontSize in source is the fontSize on screen. Primary labels at 15;
- * sub-labels at 13 (the project's floor). The bottom note row and the
- * legend row are separated by 44 px of vertical gap to prevent the
- * collision where a reader reads "many free electrons / + ion core"
- * as a single caption stack.
+ * LAYOUT — the SVG holds only the GRAPHIC content (panel frames,
+ * atoms, electrons). Every translatable label — the panel title, the
+ * example formula (Cu / SiO₂ / Si), the bottom one-line note, and the
+ * legend item under each panel — lives in HTML, in three column-grid
+ * rows that wrap the SVG. Two reasons:
+ *   1. SVG `<text>` does not auto-wrap. The previous version had a
+ *      hardcoded `textWidth = isIon ? 48 : p.i === 1 ? 92 : 84` table
+ *      to position legend pairs — those numbers were guessed pixel
+ *      widths of the EN / UA strings, and any rewording broke layout.
+ *   2. Ukrainian translations run ~30–60% wider than English. With
+ *      HTML, each column auto-wraps to two lines if needed instead of
+ *      clipping. Same pattern as InductorTypeGallery / WaveformGallery.
+ *
+ * The HTML grid columns line up exactly with the SVG panels because
+ * both use percentage-based positioning over the same `maxWidth: W`
+ * wrapper: padding = panelStartX / W, columnGap = gutter / W.
  */
 
 const CONDUCTOR_PERIOD_MS = 5000
 const SEMI_PERIOD_MS = 14000
+
+// ── Geometry ────────────────────────────────────────────────────
+const W = 620
+
+const panelW = 180
+const panelH = 160
+const gutter = 10
+const panelStartX = (W - (panelW * 3 + gutter * 2)) / 2  // 30
+// Panel sits 10 px below the top of the SVG — enough breathing room
+// without leaving a wide blank band (titles used to occupy y=0..62).
+const panelY = 10
+const H = panelY + panelH + 10  // 180 — small bottom margin
+
+// HTML grid columns must align with SVG panels at every render width.
+// Express padding and gap as percentages of W so they scale together
+// when the wrapper shrinks on narrow viewports.
+const paddingPct = `${(panelStartX / W) * 100}%`  // ≈ 4.838710%
+const gapPct = `${(gutter / W) * 100}%`           // ≈ 1.612903%
+
+// Atoms per panel — 3 in a horizontal row, centred vertically.
+const atomRadius = 16
+const atomY = panelY + panelH / 2 + 6
+
+// Electron positions relative to atom centre for bound electrons
+// (NE / SW on the orbit circle for visibility).
+const BOUND_OFFSET = atomRadius
+const boundOffsets: [number, number][] = [
+  [BOUND_OFFSET * 0.7, -BOUND_OFFSET * 0.7],
+  [-BOUND_OFFSET * 0.7, BOUND_OFFSET * 0.7],
+]
+
+// Free electron positions relative to panel (x offset from panelX,
+// y offset from atomY).  Hand-placed so dots sprinkle between
+// atoms without touching orbits.
+const conductorFreeOffsets: [number, number][] = [
+  [panelW * 0.12, -48], [panelW * 0.38, -38], [panelW * 0.60, -52],
+  [panelW * 0.86, -40], [panelW * 0.22, 40],  [panelW * 0.48, 50],
+  [panelW * 0.72, 38],  [panelW * 0.92, 46],
+]
+const semiFreeOffsets: [number, number][] = [
+  [panelW * 0.38, -44], [panelW * 0.78, 46],
+]
+
+const panels = [0, 1, 2].map((i) => ({
+  i,
+  x: panelStartX + i * (panelW + gutter),
+}))
+
+const atomXs = (panelX: number) => [
+  panelX + panelW * 0.22,
+  panelX + panelW * 0.5,
+  panelX + panelW * 0.78,
+]
+
+/** Small inline SVG dot used in the HTML legend row — visually identical
+ *  to the per-electron / ion glyphs rendered inside the panels. */
+function LegendDot({ kind }: { kind: 'ion' | 'electron' }) {
+  if (kind === 'ion') {
+    return (
+      <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden="true" className="inline-block flex-shrink-0">
+        <circle cx={7} cy={7} r={5} fill="hsl(var(--callout-caution) / 0.85)" />
+        <text x={7} y={9.5} textAnchor="middle" fontSize={9} fontWeight={700} fill="hsl(var(--background))">+</text>
+      </svg>
+    )
+  }
+  return (
+    <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden="true" className="inline-block flex-shrink-0">
+      <circle cx={7} cy={7} r={3.5} fill="hsl(var(--callout-note))" />
+    </svg>
+  )
+}
+
 export default function MaterialsComparison() {
   const { t } = useTranslation('ui')
   const conductorRefs = useRef<(SVGCircleElement | null)[]>([])
   const semiRefs = useRef<(SVGCircleElement | null)[]>([])
-
-  // ── Geometry ────────────────────────────────────────────────────
-  const W = 620
-  const H = 300
-
-  const panelW = 180
-  const panelH = 160
-  const gutter = 10
-  const panelY = 62
-  const panelStartX = (W - (panelW * 3 + gutter * 2)) / 2
-
-  const panels = [0, 1, 2].map((i) => ({
-    i,
-    x: panelStartX + i * (panelW + gutter),
-  }))
-
-  // Atoms per panel — 3 in a horizontal row, centred vertically.
-  const atomRadius = 16
-  const atomY = panelY + panelH / 2 + 6
-  const atomXs = (panelX: number) => [
-    panelX + panelW * 0.22,
-    panelX + panelW * 0.5,
-    panelX + panelW * 0.78,
-  ]
-
-  // Electron positions relative to atom centre for bound electrons
-  // (NE / SW on the orbit circle for visibility).
-  const BOUND_OFFSET = atomRadius
-  const boundOffsets: [number, number][] = [
-    [BOUND_OFFSET * 0.7, -BOUND_OFFSET * 0.7],
-    [-BOUND_OFFSET * 0.7, BOUND_OFFSET * 0.7],
-  ]
-
-  // Free electron positions relative to panel (x offset from panelX,
-  // y offset from atomY).  Hand-placed so dots sprinkle between
-  // atoms without touching orbits.
-  const conductorFreeOffsets: [number, number][] = [
-    [panelW * 0.12, -48], [panelW * 0.38, -38], [panelW * 0.60, -52],
-    [panelW * 0.86, -40], [panelW * 0.22, 40],  [panelW * 0.48, 50],
-    [panelW * 0.72, 38],  [panelW * 0.92, 46],
-  ]
-  const semiFreeOffsets: [number, number][] = [
-    [panelW * 0.38, -44], [panelW * 0.78, 46],
-  ]
 
   // ── Drift animation ─────────────────────────────────────────────
   const conductorPanelX = panelStartX
@@ -136,7 +173,6 @@ export default function MaterialsComparison() {
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conductorPanelX, semiPanelX])
 
   // ── Rough.js geometry ──────────────────────────────────────────
@@ -156,194 +192,190 @@ export default function MaterialsComparison() {
         ),
       }
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ── Per-panel translation keys ──────────────────────────────────
+  const titleKey = (i: number) =>
+    i === 0 ? 'ch1_1.materialsConductorTitle'
+    : i === 1 ? 'ch1_1.materialsInsulatorTitle'
+    : 'ch1_1.materialsSemiTitle'
+
+  const exampleKey = (i: number) =>
+    i === 0 ? 'ch1_1.materialsConductorExample'
+    : i === 1 ? 'ch1_1.materialsInsulatorExample'
+    : 'ch1_1.materialsSemiExample'
+
+  const noteKey = (i: number) =>
+    i === 0 ? 'ch1_1.materialsConductorNote'
+    : i === 1 ? 'ch1_1.materialsInsulatorNote'
+    : 'ch1_1.materialsSemiNote'
+
+  const legendKey = (i: number) =>
+    i === 0 ? 'ch1_1.materialsLegendIon'
+    : i === 1 ? 'ch1_1.materialsLegendBound'
+    : 'ch1_1.materialsLegendFree'
+
+  const titleColor = (i: number) =>
+    i === 0 ? svgTokens.note
+    : i === 1 ? svgTokens.mutedFg
+    : svgTokens.caution
 
   return (
     <DiagramFigure caption={t('ch1_1.materialsCaption')}>
-      <SVGDiagram
-        width={W}
-        height={H}
-        aria-label={t('ch1_1.materialsAriaLabel')}
-        style={{ maxWidth: W, margin: '0 auto' }}
-      >
-        {panels.map((p) => {
-          const titleKey = p.i === 0
-            ? 'ch1_1.materialsConductorTitle'
-            : p.i === 1
-              ? 'ch1_1.materialsInsulatorTitle'
-              : 'ch1_1.materialsSemiTitle'
-          const exampleKey = p.i === 0
-            ? 'ch1_1.materialsConductorExample'
-            : p.i === 1
-              ? 'ch1_1.materialsInsulatorExample'
-              : 'ch1_1.materialsSemiExample'
-          const noteKey = p.i === 0
-            ? 'ch1_1.materialsConductorNote'
-            : p.i === 1
-              ? 'ch1_1.materialsInsulatorNote'
-              : 'ch1_1.materialsSemiNote'
-          const titleColor = p.i === 0
-            ? svgTokens.note
-            : p.i === 1
-              ? svgTokens.mutedFg
-              : svgTokens.caution
-
-          const freeOffsets =
-            p.i === 0 ? conductorFreeOffsets
-              : p.i === 2 ? semiFreeOffsets
-                : []
-          const boundPerAtom = p.i === 0 ? 0 : 2
-
-          return (
-            <g key={p.i}>
-              {/* Panel frame */}
-              <g style={{ color: svgTokens.border }}>
-                <RoughPaths paths={sketch[p.i].frame} />
-              </g>
-
-              {/* Title */}
-              <text
-                x={p.x + panelW / 2}
-                y={26}
-                textAnchor="middle"
-                fontSize="0.937em"
-                fontWeight={700}
-                fill={titleColor}
+      <div className="mx-auto" style={{ maxWidth: W }}>
+        {/* Title + example row — one column per panel, padded and gapped
+            in percentages so the column centres line up with the SVG
+            panel centres at any render width. */}
+        <div
+          className="grid grid-cols-3 mb-2 text-center"
+          style={{
+            paddingLeft: paddingPct,
+            paddingRight: paddingPct,
+            columnGap: gapPct,
+          }}
+        >
+          {panels.map((p) => (
+            <div key={p.i}>
+              <div
+                className="font-bold leading-tight"
+                style={{ fontSize: 15, color: titleColor(p.i) }}
               >
-                {t(titleKey)}
-              </text>
-              <text
-                x={p.x + panelW / 2}
-                y={48}
-                textAnchor="middle"
-                fontSize="0.812em"
-                fill={svgTokens.mutedFg}
-                fontStyle="italic"
+                {t(titleKey(p.i))}
+              </div>
+              <div
+                className="italic leading-tight mt-0.5"
+                style={{ fontSize: 13, color: svgTokens.mutedFg }}
               >
-                {t(exampleKey)}
-              </text>
+                {t(exampleKey(p.i))}
+              </div>
+            </div>
+          ))}
+        </div>
 
-              {/* Atom orbits */}
-              <g style={{ color: svgTokens.mutedFg }} opacity={0.7}>
-                {sketch[p.i].orbits.map((o, j) => (
-                  <RoughPaths key={j} paths={o} />
+        {/* SVG: panel frames, atoms, electrons — graphic content only. */}
+        <SVGDiagram
+          width={W}
+          height={H}
+          aria-label={t('ch1_1.materialsAriaLabel')}
+          style={{ maxWidth: W, margin: '0 auto' }}
+        >
+          {panels.map((p) => {
+            const freeOffsets =
+              p.i === 0 ? conductorFreeOffsets
+                : p.i === 2 ? semiFreeOffsets
+                  : []
+            const boundPerAtom = p.i === 0 ? 0 : 2
+
+            return (
+              <g key={p.i}>
+                {/* Panel frame */}
+                <g style={{ color: svgTokens.border }}>
+                  <RoughPaths paths={sketch[p.i].frame} />
+                </g>
+
+                {/* Atom orbits */}
+                <g style={{ color: svgTokens.mutedFg }} opacity={0.7}>
+                  {sketch[p.i].orbits.map((o, j) => (
+                    <RoughPaths key={j} paths={o} />
+                  ))}
+                </g>
+
+                {/* Ion cores */}
+                {atomXs(p.x).map((ax, j) => (
+                  <g key={`ion-${j}`}>
+                    <circle cx={ax} cy={atomY} r={5}
+                      fill="hsl(var(--callout-caution) / 0.85)" />
+                    <text
+                      x={ax} y={atomY + 3}
+                      textAnchor="middle"
+                      fontSize="0.562em"
+                      fontWeight={700}
+                      fill="hsl(var(--background))"
+                    >+</text>
+                  </g>
+                ))}
+
+                {/* Bound electrons */}
+                {atomXs(p.x).flatMap((ax, j) =>
+                  Array.from({ length: boundPerAtom }, (_, k) => {
+                    const off = boundOffsets[k]
+                    return (
+                      <circle
+                        key={`bound-${j}-${k}`}
+                        cx={ax + off[0]}
+                        cy={atomY + off[1]}
+                        r={3.5}
+                        fill="hsl(var(--callout-note))"
+                      />
+                    )
+                  }),
+                )}
+
+                {/* Free electrons — animated: conductor drifts quickly,
+                    semi drifts slowly, insulator has none at all.
+                    Initial cx doubles as the prefers-reduced-motion
+                    snapshot. */}
+                {freeOffsets.map((off, k) => (
+                  <circle
+                    key={`free-${k}`}
+                    ref={el => {
+                      if (p.i === 0) conductorRefs.current[k] = el
+                      else if (p.i === 2) semiRefs.current[k] = el
+                    }}
+                    cx={p.x + off[0]}
+                    cy={atomY + off[1]}
+                    r={3.5}
+                    fill="hsl(var(--callout-note))"
+                  />
                 ))}
               </g>
+            )
+          })}
+        </SVGDiagram>
 
-              {/* Ion cores */}
-              {atomXs(p.x).map((ax, j) => (
-                <g key={`ion-${j}`}>
-                  <circle cx={ax} cy={atomY} r={5}
-                    fill="hsl(var(--callout-caution) / 0.85)" />
-                  <text
-                    x={ax} y={atomY + 3}
-                    textAnchor="middle"
-                    fontSize="0.562em"
-                    fontWeight={700}
-                    fill="hsl(var(--background))"
-                  >+</text>
-                </g>
-              ))}
+        {/* Note row — one short take-away sentence per panel. */}
+        <div
+          className="grid grid-cols-3 mt-2 text-center"
+          style={{
+            paddingLeft: paddingPct,
+            paddingRight: paddingPct,
+            columnGap: gapPct,
+          }}
+        >
+          {panels.map((p) => (
+            <div
+              key={p.i}
+              className="font-semibold leading-tight"
+              style={{ fontSize: 14, color: svgTokens.fg }}
+            >
+              {t(noteKey(p.i))}
+            </div>
+          ))}
+        </div>
 
-              {/* Bound electrons */}
-              {atomXs(p.x).flatMap((ax, j) =>
-                Array.from({ length: boundPerAtom }, (_, k) => {
-                  const off = boundOffsets[k]
-                  return (
-                    <circle
-                      key={`bound-${j}-${k}`}
-                      cx={ax + off[0]}
-                      cy={atomY + off[1]}
-                      r={3.5}
-                      fill="hsl(var(--callout-note))"
-                    />
-                  )
-                }),
-              )}
-
-              {/* Free electrons — animated: conductor drifts quickly,
-                  semi drifts slowly, insulator has none at all.
-                  Initial cx doubles as the prefers-reduced-motion
-                  snapshot. */}
-              {freeOffsets.map((off, k) => (
-                <circle
-                  key={`free-${k}`}
-                  ref={el => {
-                    if (p.i === 0) conductorRefs.current[k] = el
-                    else if (p.i === 2) semiRefs.current[k] = el
-                  }}
-                  cx={p.x + off[0]}
-                  cy={atomY + off[1]}
-                  r={3.5}
-                  fill="hsl(var(--callout-note))"
-                />
-              ))}
-
-              {/* Per-panel note — OUTSIDE the frame, clear gap from
-                  the legend row so the reader doesn't stack-read them
-                  as one caption.  Note row at y=244; legend at y=282. */}
-              <text
-                x={p.x + panelW / 2}
-                y={244}
-                textAnchor="middle"
-                fontSize="0.875em"
-                fontWeight={600}
-                fill={svgTokens.fg}
-              >
-                {t(noteKey)}
-              </text>
-            </g>
-          )
-        })}
-
-        {/* Legend row — each item is column-aligned with its panel
-            above, so the reader's eye tracks [title → frame → note →
-            legend] as one clean vertical stack per category.
-            Previous version spaced circle-centres at a constant 130 px
-            regardless of text width, which left a wide gap between
-            item 1 ("ion core") and item 2 ("bound electron") and a
-            cramped gap between items 2 and 3. Column-alignment makes
-            both gaps a function of panel spacing instead of text
-            width, which is what the eye expects. */}
-        {panels.map((p) => {
-          const centreX = p.x + panelW / 2
-          const isIon = p.i === 0
-          const circleR = isIon ? 5 : 3.5
-          const circleFill = isIon
-            ? 'hsl(var(--callout-caution) / 0.85)'
-            : 'hsl(var(--callout-note))'
-          const labelKey = isIon
-            ? 'ch1_1.materialsLegendIon'
-            : p.i === 1
-              ? 'ch1_1.materialsLegendBound'
-              : 'ch1_1.materialsLegendFree'
-          // Rough text widths at fontSize 13 (sans). Only used to
-          // position the circle/text pair so the pair reads as
-          // visually centred under the panel. Real rendered width
-          // may differ by a few px — fine, we're aligning pairs to
-          // columns, not text edges to a grid.
-          const textWidth = isIon ? 48 : p.i === 1 ? 92 : 84
-          const gap = 7
-          const itemW = circleR * 2 + gap + textWidth
-          const startX = centreX - itemW / 2
-          const circleCx = startX + circleR
-          const textX = startX + circleR * 2 + gap
-          return (
-            <g key={`legend-${p.i}`}>
-              <circle cx={circleCx} cy={282} r={circleR} fill={circleFill} />
-              {isIon && (
-                <text x={circleCx} y={285} textAnchor="middle"
-                  fontSize="0.562em" fontWeight={700}
-                  fill="hsl(var(--background))">+</text>
-              )}
-              <text x={textX} y={286} fontSize="0.812em" fill={svgTokens.mutedFg}>
-                {t(labelKey)}
-              </text>
-            </g>
-          )
-        })}
-      </SVGDiagram>
+        {/* Legend row — one icon-and-label pair per panel, column-aligned
+            with the panel above so the eye reads
+            [title → frame → note → legend] as one stack per category. */}
+        <div
+          className="grid grid-cols-3 mt-3 text-center"
+          style={{
+            paddingLeft: paddingPct,
+            paddingRight: paddingPct,
+            columnGap: gapPct,
+          }}
+        >
+          {panels.map((p) => (
+            <div
+              key={p.i}
+              className="flex items-center justify-center gap-1.5 leading-tight"
+              style={{ fontSize: 13, color: svgTokens.mutedFg }}
+            >
+              <LegendDot kind={p.i === 0 ? 'ion' : 'electron'} />
+              <span>{t(legendKey(p.i))}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </DiagramFigure>
   )
 }

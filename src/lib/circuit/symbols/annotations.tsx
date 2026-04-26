@@ -124,7 +124,7 @@ export function TerminalLabel({
   return (
     <text
       x={x} y={y}
-      fontFamily="Georgia, serif"
+      fontFamily="inherit"
       fontSize="14"
       fontStyle="italic"
       fontWeight={weight}
