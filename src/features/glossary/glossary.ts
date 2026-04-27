@@ -594,6 +594,77 @@ export const glossary: Record<string, GlossaryEntry> = {
     formula: 'V = -dΦ/dt',
     see: ['inductor', 'self-inductance', 'back-emf', 'transformer'],
   },
+
+  // ── Resonance ──────────────────────────────────────────────────
+  resonance: {
+    tip: 'The state of an LC circuit when X_L = X_C — energy sloshes back and forth between inductor and capacitor at one specific frequency.',
+    detail:
+      'Resonance is the condition where the inductive reactance X_L = 2πfL exactly equals the capacitive reactance X_C = 1/(2πfC) — the two reactances cancel each other out. Below resonance the capacitor dominates (the circuit looks capacitive); above resonance the inductor dominates. Exactly at resonance, energy oscillates freely between the inductor\'s magnetic field and the capacitor\'s electric field, transferring back and forth at the natural frequency f = 1/(2π√(LC)). Every radio receiver and transmitter relies on resonance to select a single frequency (or narrow band) out of the noise on the antenna. The behaviour is dramatically different in series versus parallel LC: series resonance gives minimum impedance (a notch / trap); parallel resonance gives maximum impedance (a tank).',
+    formula: 'f = 1 / (2π√(LC))',
+    see: ['lc', 'reactance', 'tank', 'q-factor', 'bandwidth'],
+  },
+  'resonant frequency': {
+    tip: 'The natural oscillation frequency of an LC circuit — where X_L = X_C and energy passes freely between L and C.',
+    detail:
+      'The resonant frequency f₀ of an LC circuit is given by f₀ = 1/(2π√(LC)). At this frequency the inductive and capacitive reactances are equal and opposite, so they cancel — leaving only the resistive losses. f₀ scales with the inverse square root of both L and C: quadrupling either component halves the frequency. A handy check: at 1 MHz, 1 µH × 25 nF ≈ resonance; for the 7 MHz amateur band (40 m), 4 µH × 130 pF lands close. The same f₀ applies to series and parallel LC alike — what differs is what happens AT that frequency (current peak vs impedance peak).',
+    formula: 'f₀ = 1 / (2π√(LC))',
+    see: ['resonance', 'lc', 'reactance'],
+  },
+  'tank': {
+    tip: 'A parallel LC circuit — energy «sloshes» between the inductor and capacitor like fluid in a tank, and the impedance peaks at the resonant frequency.',
+    detail:
+      'A tank circuit is an inductor and a capacitor wired in parallel. The name comes from the way energy is stored: like fluid moving back and forth in a tank, charge oscillates between the capacitor (electric-field storage) and the inductor (magnetic-field storage). At the resonant frequency f₀ = 1/(2π√(LC)), the parallel combination presents its maximum impedance — only the loss resistance limits how high. Above and below f₀ the impedance falls. Tank circuits are the most common form of LC in radio: every traditional receiver front-end, every transmitter output stage, and most antenna matching networks contain at least one. The «circulating current» inside the tank can be many times larger than the line current feeding it (multiplied by Q), which is why the tank capacitor must handle several times the current the rest of the circuit sees.',
+    formula: 'Z_max = Q · X_L (at resonance)',
+    see: ['resonance', 'lc', 'q-factor', 'reactance'],
+  },
+  'tuned circuit': {
+    tip: 'A general name for any LC circuit used to select or reject a specific frequency — series-tuned (notch) or parallel-tuned (tank).',
+    detail:
+      'Tuned circuit is the umbrella term for any LC circuit deliberately built to act on one frequency more strongly than its neighbours. Series-tuned circuits present a low impedance at f₀ and a high impedance off-resonance — used as a band-pass element in series with the signal path or as a «trap» that shorts unwanted frequencies to ground. Parallel-tuned (tank) circuits do the opposite: high impedance at f₀, low impedance off-resonance — the workhorse of receiver front-ends and transmitter output networks. Adjustable tuned circuits use a variable capacitor or a slug-tuned inductor (a screwdriver-adjustable ferrite core) to set the operating frequency. The selectivity of a tuned circuit — how cleanly it picks out f₀ from neighbouring frequencies — is set by its Q.',
+    see: ['resonance', 'lc', 'tank', 'q-factor', 'selectivity'],
+  },
+  'q-factor': {
+    tip: 'Quality factor — figure of merit for an LC tank: stored energy divided by energy lost per cycle. Higher Q means a sharper, more selective response.',
+    detail:
+      'The quality factor Q (also called Q-factor or just Q) tells you how «good» a resonant circuit is at storing energy compared to losing it. Three exactly equivalent definitions: (1) Q = 2π × (energy stored) / (energy lost per cycle) — the fundamental definition; (2) Q = X / R — the ratio of reactance to series loss resistance, useful for components; (3) Q = f₀ / BW — the resonant frequency divided by the −3 dB bandwidth, useful when you can sweep the response on a VNA. In a real LC tank, the inductor\'s winding resistance (and skin-effect losses at HF and above) almost always dominate; capacitors of decent quality have Q in the thousands. Typical numbers: a hand-wound air-core RF coil might give Q ≈ 100–300; a toroid on the right ferrite mix Q ≈ 50–200; a high-end mechanical filter or quartz crystal Q ≈ 10 000–100 000. Loaded Q (Q_L) is what you actually measure once the source and load impedances are connected — it is always lower than the unloaded Q (Q_U) of the bare tank.',
+    formula: 'Q = X_L / R_loss = f₀ / BW',
+    see: ['resonance', 'tank', 'bandwidth', 'selectivity'],
+  },
+  bandwidth: {
+    tip: 'The width in frequency between the two −3 dB (half-power) points of a resonant response — bandwidth = f₀ / Q.',
+    detail:
+      'Bandwidth (BW) of a resonant circuit is the frequency span between the two points where the response has fallen to half its peak power (−3 dB on a log scale, 0.707 of peak amplitude on a linear scale). For a parallel tank the response is the impedance versus frequency curve; for a series-LC the response is the current versus frequency curve. The bandwidth-Q relationship BW = f₀ / Q is universal: a 1 MHz tank with Q = 100 has a bandwidth of 10 kHz. Wider radio applications use deliberately low-Q (broad) tuned circuits — an FM broadcast stage needs ≈ 200 kHz bandwidth at 100 MHz, so Q ≈ 500 is plenty. Narrow applications (CW filters, crystal filters) demand Q in the thousands or tens of thousands. The same word «bandwidth» is also used in entirely different contexts (signal occupied bandwidth, oscilloscope analogue bandwidth, data-transmission bandwidth) — always check what the speaker actually means.',
+    formula: 'BW = f₀ / Q',
+    unit: 'Hertz (Hz)',
+    see: ['q-factor', 'resonance', 'selectivity'],
+  },
+  selectivity: {
+    tip: 'A receiver or filter\'s ability to separate a wanted frequency from a nearby unwanted one — driven by the Q of its tuned circuits.',
+    detail:
+      'Selectivity is the qualitative term for how cleanly a circuit picks out one frequency from its neighbours. A highly selective receiver can hear a 14.250 MHz signal while ignoring a much stronger station 5 kHz away on 14.245 MHz; a poorly selective one cannot. Selectivity is not a single number — it depends on the shape of the response curve, not just one bandwidth value. A common quantitative measure is «shape factor»: the ratio of the −60 dB bandwidth to the −6 dB bandwidth. A perfect rectangular filter has a shape factor of 1; cheap LC filters land around 5–10; multi-pole crystal and mechanical filters approach 1.5–2. In practice, a single LC tank gives modest selectivity; cascading several tanks (with the right coupling between them) sharpens the skirts dramatically and is the basis of the IF filter chain in every superhet receiver.',
+    see: ['q-factor', 'bandwidth', 'resonance', 'filter'],
+  },
+  'characteristic impedance': {
+    tip: 'For an LC tank, Z₀ = √(L/C) — the impedance that appears at the inductor and capacitor at resonance. (The same name and formula reappear for transmission lines.)',
+    detail:
+      'The characteristic impedance of an LC tank, Z₀ = √(L/C), is the magnitude of the reactance of either L or C at the resonant frequency (because at f₀ they are equal). It is the «impedance scale» of the tank: a 1 µH × 100 pF tank has Z₀ = 100 Ω; a 100 µH × 100 pF tank has Z₀ = 1 kΩ. For matching purposes Z₀ is what the tank looks like to the source at resonance once its losses are factored in, and the value drives how easily the tank can be coupled to a 50 Ω feedline. The same name and formula appear later in the course for transmission lines (the impedance ratio between the surge voltage and current of a wave travelling down a coax cable) — same maths, different physical context.',
+    formula: 'Z₀ = √(L/C)',
+    unit: 'Ohm (Ω)',
+    see: ['lc', 'reactance', 'impedance'],
+  },
+  trap: {
+    tip: 'A series LC circuit placed across a signal path to short-circuit one specific frequency to ground (or block it on a wire) — the standard tool for notching out a single unwanted carrier.',
+    detail:
+      'A trap is a series LC circuit deliberately tuned to one frequency and inserted into a signal path. Because a series LC has minimum impedance at its resonant frequency, the trap looks like a near-short to that one frequency and almost ignores everything else. Two common topologies: SHUNT TRAP — series LC wired from signal line to ground, drains the unwanted frequency to ground; SERIES TRAP — parallel LC wired in series with the signal path, blocks the unwanted frequency. Multi-band antennas use traps to make a single radiator behave as different lengths on different bands (a typical trap dipole has 7 MHz traps that disconnect the outer wire sections at 14 MHz). TVI and RFI fixes also routinely use traps — a series LC across the input of a stereo to drain the 28 MHz signal a nearby ham\'s amplifier injects into the speaker leads.',
+    see: ['resonance', 'lc', 'filter'],
+  },
+  'antenna tuner': {
+    tip: 'An adjustable LC matching network between the transceiver and the feedline that brings whatever the antenna presents back to a 50 Ω match.',
+    detail:
+      'An antenna tuner (also called an «ATU», antenna tuning unit, or sometimes a «transmatch») is the adjustable LC network that matches a transmitter\'s 50 Ω output to whatever impedance the antenna actually presents at the operating frequency. Most antennas are only well-matched on their design band — on a different band, or at a slightly off frequency, the SWR can be 3:1 or worse. Many transmitters fold back power above 1.5:1 SWR to protect the output stage; the tuner solves this by inserting a variable LC matching network that brings the feedline-side impedance back to 50 Ω, regardless of what is going on the other side. Common topologies: T-network (two series capacitors with a shunt inductor between them), L-network (one series inductor + one shunt capacitor, four possible arrangements), and Pi-network (one series inductor with two shunt capacitors). All three are LC structures whose adjustability lets the operator move resonance and impedance level around. A tuner does NOT make a bad antenna a good radiator — it just protects the transmitter and lets it deliver full power into whatever the feedline shows.',
+    see: ['lc', 'resonance', 'impedance', 'swr'],
+  },
+
   diode: {
     tip: 'Semiconductor that allows current in one direction only.',
     detail:
