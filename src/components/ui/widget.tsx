@@ -4,10 +4,16 @@ import { Separator } from './separator'
 import { cn } from '@/lib/utils'
 
 interface WidgetProps {
-  /** Widget title shown in the header */
-  title: string
-  /** Optional subtitle / description */
-  description?: string
+  /**
+   * Widget title shown in the header. Pre-rendered ReactNode — caller is
+   * responsible for any subscript / formatting wrapping (e.g.,
+   * `withSubscripts(t('...'))` for strings that contain `X_L`-style
+   * subscripts). This contract is enforced by
+   * `scripts/check-bare-subscript-renders.mjs`.
+   */
+  title: ReactNode
+  /** Optional subtitle / description. Same wrapping contract as `title`. */
+  description?: ReactNode
   /** Widget body */
   children: ReactNode
   className?: string

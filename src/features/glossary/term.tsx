@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
+import { withSubscripts } from '@/lib/text-with-subscripts'
 import type { GlossaryEntry } from './glossary'
 
 /**
@@ -276,7 +277,7 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
           className="fixed z-50 max-w-[240px] -translate-x-1/2 px-3 py-2 bg-popover/95 border border-border/60 shadow-md rounded-md text-[11px] leading-relaxed text-popover-foreground/80 font-normal not-prose pointer-events-none"
           style={{ top: tipPos.top, left: tipPos.left }}
         >
-          {entry.tip}
+          {withSubscripts(entry.tip)}
         </div>,
         document.body,
       )}
@@ -310,7 +311,7 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
 
         {/* Detail body */}
         <p className="text-[13px] leading-[1.6]">
-          {entry.detail}
+          {withSubscripts(entry.detail)}
         </p>
 
         {/* Unit & Formula row */}
@@ -319,13 +320,13 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
             {entry.unit && (
               <p className="text-[11px] text-muted-foreground">
                 <span className="font-semibold text-foreground/70">{t('glossary._ui.unit')}</span>{' '}
-                {entry.unit}
+                {withSubscripts(entry.unit)}
               </p>
             )}
             {entry.formula && (
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 <span className="font-semibold text-foreground/70">{t('glossary._ui.formula')}</span>{' '}
-                <span className="font-mono">{entry.formula}</span>
+                <span className="font-mono">{withSubscripts(entry.formula)}</span>
               </p>
             )}
           </div>

@@ -4,6 +4,7 @@ import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { svgTokens } from '@/components/diagrams/svgTokens'
+import { withSubscriptsSvg } from '@/lib/text-with-subscripts'
 
 /**
  * Chapter 1.7 — universal LC resonance response curve.
@@ -332,15 +333,15 @@ export default function LcResponseCurve() {
 
             <text x={xF0} y={PLOT_TOP - 6} fontSize="0.812em" textAnchor="middle"
                   fill={svgTokens.primary} fontStyle="italic" fontWeight="700">
-              {t('ch1_7.widget.response.markerF0')}
+              {withSubscriptsSvg(t('ch1_7.widget.response.markerF0'))}
             </text>
             <text x={xFL} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="middle"
                   fill={svgTokens.note} fontStyle="italic">
-              {t('ch1_7.widget.response.markerFL')}
+              {withSubscriptsSvg(t('ch1_7.widget.response.markerFL'))}
             </text>
             <text x={xFH} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="middle"
                   fill={svgTokens.note} fontStyle="italic">
-              {t('ch1_7.widget.response.markerFH')}
+              {withSubscriptsSvg(t('ch1_7.widget.response.markerFH'))}
             </text>
           </g>
         )}

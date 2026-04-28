@@ -4,6 +4,7 @@ import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { svgTokens } from '@/components/diagrams/svgTokens'
+import { withSubscripts, withSubscriptsSvg } from '@/lib/text-with-subscripts'
 
 /**
  * Chapter 1.7 §7 — simulated NanoVNA screen showing an S11 sweep
@@ -162,8 +163,8 @@ export default function VnaResonanceMock() {
 
   return (
     <Widget
-      title={t('ch1_7.widget.vna.title')}
-      description={t('ch1_7.widget.vna.description')}
+      title={withSubscripts(t('ch1_7.widget.vna.title'))}
+      description={withSubscripts(t('ch1_7.widget.vna.description'))}
     >
       {/* ── Controls ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-3">
@@ -292,18 +293,18 @@ export default function VnaResonanceMock() {
 
             <text x={xF0} y={PLOT_TOP - 6} fontSize="0.812em" textAnchor="middle"
                   fill={svgTokens.primary} fontStyle="italic" fontWeight="700">
-              {t('ch1_7.widget.vna.markerF0')}
+              {withSubscriptsSvg(t('ch1_7.widget.vna.markerF0'))}
             </text>
             {fL >= fStart && fL <= fEnd && (
               <text x={xFL} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="middle"
                     fill={svgTokens.note} fontStyle="italic">
-                {t('ch1_7.widget.vna.markerFL')}
+                {withSubscriptsSvg(t('ch1_7.widget.vna.markerFL'))}
               </text>
             )}
             {fH >= fStart && fH <= fEnd && (
               <text x={xFH} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="middle"
                     fill={svgTokens.note} fontStyle="italic">
-                {t('ch1_7.widget.vna.markerFH')}
+                {withSubscriptsSvg(t('ch1_7.widget.vna.markerFH'))}
               </text>
             )}
           </g>

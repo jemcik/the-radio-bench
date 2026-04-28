@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { withSubscripts } from '@/lib/text-with-subscripts'
 
 /**
  * Chapter 1.7 — Resonance frequency calculator.
@@ -140,8 +141,8 @@ export default function ResonanceCalculator() {
 
   return (
     <Widget
-      title={t('ch1_7.widget.calc.title')}
-      description={t('ch1_7.widget.calc.description')}
+      title={withSubscripts(t('ch1_7.widget.calc.title'))}
+      description={withSubscripts(t('ch1_7.widget.calc.description'))}
     >
       <div className="grid grid-cols-1 gap-3">
         <InputRow

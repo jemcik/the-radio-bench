@@ -125,6 +125,14 @@ export default function Chapter1_7() {
 
       <p>
         <Trans
+          i18nKey="ch1_7.sloshStep2Aside"
+          ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+
+      <p>
+        <Trans
           i18nKey="ch1_7.sloshStep3"
           ns="ui"
           components={{ strong: <strong />, em: <em /> }}
