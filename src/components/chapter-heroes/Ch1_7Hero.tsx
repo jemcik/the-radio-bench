@@ -1,16 +1,18 @@
 /**
- * Chapter 1.7 hero — pen-and-ink sketch of an LC tank as a pendulum.
+ * Chapter 1.7 hero — pen-and-ink sketch of a parallel LC tank.
  *
- * Left:   capacitor (two plates with field lines between).
- * Right:  inductor (coil with field lines along its axis).
- * Joined by a top wire and a bottom wire (the loop).
- * Above: a curved double-headed arrow showing energy sloshing
- *         between the electric and magnetic stores.
- * Below: the resonance formula f₀ = 1 / (2π√LC) as a caption.
+ * Layout: a four-sided loop. The top branch carries the capacitor
+ * (drawn pictorially as two parallel plates with E-field hairlines
+ * between them). The bottom branch carries the inductor (drawn as a
+ * 3D solenoid in side view — same back-pass / cylinder-occluder /
+ * front-pass layering as the ch 1.6 hero, scaled down). Two vertical
+ * terminal wires close the loop on the left and right.
  *
- * All structural strokes use `currentColor` so the sketch adapts to
- * the active theme. No animation — the arrow makes the dynamic
- * narrative obvious without it.
+ * Caption underneath: f₀ = 1 / (2π√LC).
+ *
+ * Theme-adaptive: every stroke uses `currentColor`; the cylinder
+ * occluder fills with `hsl(var(--background))` so the back passes
+ * are hidden behind it in both light and dark themes.
  */
 import { useTranslation } from 'react-i18next'
 
@@ -27,69 +29,78 @@ export default function Ch1_7Hero() {
       role="img"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* ── Top wire of the loop ─────────────────────────────── */}
-      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M 130,90 L 410,90" />
-        {/* ── Bottom wire of the loop ──────────────────────── */}
-        <path d="M 130,150 L 410,150" />
+      {/* ── Loop wires (top + bottom branches split around C / L, plus vertical terminals) ── */}
+      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        {/* Top branch — split around the capacitor plates */}
+        <path d="M 80,80 L 242,80" />
+        <path d="M 298,80 L 460,80" />
+        {/* Bottom branch — split around the inductor coil */}
+        <path d="M 80,170 L 225,170" />
+        <path d="M 315,170 L 460,170" />
+        {/* Vertical terminals */}
+        <path d="M 80,80 L 80,170" />
+        <path d="M 460,80 L 460,170" />
       </g>
 
-      {/* ── Left side: capacitor (vertical parallel plates) ─ */}
-      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        {/* Down-leads from the top wire and up-leads from the bottom wire */}
-        <path d="M 130,90 L 130,112" />
-        <path d="M 130,128 L 130,150" />
-        {/* Two horizontal plates */}
-        <path d="M 110,112 L 150,112" />
-        <path d="M 110,128 L 150,128" />
+      {/* ── CAPACITOR (top branch) — two parallel plates ── */}
+      <g stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+        <path d="M 245,60 L 245,100" />
+        <path d="M 295,60 L 295,100" />
       </g>
-      {/* Electric-field hairlines between the plates (dashed) */}
-      <g stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.45">
-        <path d="M 118,112 L 118,128" />
-        <path d="M 130,112 L 130,128" />
-        <path d="M 142,112 L 142,128" />
+      {/* E-field — three horizontal hairlines between plates */}
+      <g stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" opacity="0.5">
+        <path d="M 251,68 L 289,68" />
+        <path d="M 251,80 L 289,80" />
+        <path d="M 251,92 L 289,92" />
       </g>
-      {/* Capacitor label «C» — italic, just below the plates */}
-      <text x="130" y="172" fontSize="16" textAnchor="middle" fontStyle="italic" fontWeight="700" fill="currentColor">
+      {/* + / − polarity, just outside the plates at top-rail height */}
+      <g fontFamily="inherit" fill="currentColor" fontSize="12" fontWeight="700" opacity="0.7">
+        <text x="241" y="55" textAnchor="end">+</text>
+        <text x="299" y="55" textAnchor="start">−</text>
+      </g>
+      {/* C designator */}
+      <text x="270" y="42" fontSize="17" textAnchor="middle" fontStyle="italic" fontWeight="700" fill="currentColor">
         C
       </text>
 
-      {/* ── Right side: inductor (horizontal coil with bumps) */}
-      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {/* Lead from top wire down to coil top, lead from coil bottom to bottom wire */}
-        <path d="M 410,90 L 410,108" />
-        <path d="M 410,132 L 410,150" />
-        {/* Vertical coil drawn as a column of arcs (5 bumps) on the right side */}
-        <path d="M 410,108 a 5 4.8 0 0 1 0 9.6" />
-        <path d="M 410,117.6 a 5 4.8 0 0 1 0 9.6" />
-        <path d="M 410,127.2 a 5 4.8 0 0 1 0 4.8" />
-        {/* Filling out the coil with a smoother stylised shape — three larger bumps */}
-        <path d="M 380,108 q 12,0 12,12 t 12,12" />
-        <path d="M 380,116 q 12,0 12,8 t 12,8" />
+      {/* ── INDUCTOR (bottom branch) — side-view solenoid ── */}
+      {/* Layer 1: BACK passes (drawn first, sit behind the cylinder) */}
+      <g stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" opacity="0.65">
+        <path d="M 240,130 C 250,130 245,170 255,170" />
+        <path d="M 270,130 C 280,130 275,170 285,170" />
+        <path d="M 300,130 C 310,130 305,170 315,170" />
       </g>
-      {/* Magnetic-field axial line (dashed) inside the coil */}
-      <g stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.45">
-        <path d="M 395,98 L 395,142" />
+      {/* Layer 2: Cylinder body — solid occluder so back passes are hidden behind */}
+      <g>
+        <path
+          d="M 215,140 L 325,140 A 5 10 0 0 1 325,160 L 215,160 Z"
+          fill="hsl(var(--background))"
+        />
+        <path
+          d="M 215,140 L 325,140 A 5 10 0 0 1 325,160 L 215,160 Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        {/* Left end-cap ellipse (the visible "near" face of the cylinder) */}
+        <ellipse cx="215" cy="150" rx="5" ry="10" fill="hsl(var(--background))" stroke="currentColor" strokeWidth="1.5" />
       </g>
-      {/* Inductor label «L» — italic, just below the coil */}
-      <text x="395" y="172" fontSize="16" textAnchor="middle" fontStyle="italic" fontWeight="700" fill="currentColor">
+      {/* Layer 3: FRONT passes (drawn after cylinder, in front of it) */}
+      <g stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M 225,170 C 235,170 230,130 240,130" />
+        <path d="M 255,170 C 265,170 260,130 270,130" />
+        <path d="M 285,170 C 295,170 290,130 300,130" />
+      </g>
+      {/* L designator */}
+      <text x="270" y="200" fontSize="17" textAnchor="middle" fontStyle="italic" fontWeight="700" fill="currentColor">
         L
       </text>
 
-      {/* ── Energy-sloshing arrow above the loop ─────────────── */}
-      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* Curved arc spanning from the cap side to the inductor side */}
-        <path d="M 145,55 C 220,15 320,15 395,55" opacity="0.7" />
-        {/* Right-pointing arrowhead at the inductor end */}
-        <path d="M 387,49 L 397,55 L 388,62" opacity="0.8" />
-        {/* Left-pointing arrowhead at the capacitor end */}
-        <path d="M 153,49 L 143,55 L 152,62" opacity="0.8" />
-      </g>
-
-      {/* ── Caption: the resonance formula ─────────────────── */}
-      <text x="270" y="205" fontSize="16" textAnchor="middle" fill="currentColor">
+      {/* ── Caption: resonance formula ── */}
+      <text x="270" y="217" fontSize="14" textAnchor="middle" fill="currentColor">
         <tspan fontStyle="italic" fontWeight="700">f</tspan>
-        <tspan baselineShift="sub" fontSize="11">0</tspan>
+        <tspan baselineShift="sub" fontSize="10">0</tspan>
         {' = 1 / (2π√'}
         <tspan fontStyle="italic" fontWeight="700">L</tspan>
         <tspan fontStyle="italic" fontWeight="700">C</tspan>
