@@ -12,6 +12,7 @@
     "check:trans": "node scripts/check-trans-components.mjs",
     "check:glossary-coverage": "node scripts/check-glossary-coverage.mjs",
     "check:bare-subscripts": "node scripts/check-bare-subscript-renders.mjs",
+    "check:hardcoded-units": "node scripts/check-hardcoded-units.mjs",
     "check:all": "npm run check:i18n && npm run check:i18n-usage && npm run check:uk && npm run check:trans && npm run check:bare-subscripts && npm run check:gitignore",
     "check:gitignore": "sh -c '! git ls-files | git check-ignore --no-index --stdin -q || (echo \"Tracked paths match .gitignore (remove with git rm --cached):\"; git ls-files | git check-ignore --no-index --stdin -v; exit 1)'",
     "dev": "vite",
