@@ -166,7 +166,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Tuned Circuits and Resonance',
         subtitle: 'LC resonance, Q factor, series vs parallel — measured with the VNA',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.7'],

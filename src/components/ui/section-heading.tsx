@@ -1,6 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BookmarkButton } from '@/features/bookmarks/bookmark-button'
+import { withSubscripts } from '@/lib/text-with-subscripts'
 
 /* ── Chapter scope ──────────────────────────────────────────────────────────
  * ChapterPage wraps each chapter's body in <ChapterScope chapterId={...}>
@@ -73,7 +74,7 @@ export function Section({ id, labelKey, chapterId: chapterIdProp, children }: Se
       id={id}
       className="group flex items-center gap-1 scroll-mt-20"
     >
-      <span>{display}</span>
+      <span>{typeof display === 'string' ? withSubscripts(display) : display}</span>
       {chapterId && (
         <BookmarkButton
           chapterId={chapterId}

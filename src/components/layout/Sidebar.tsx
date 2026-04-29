@@ -8,6 +8,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import { withSubscripts } from '@/lib/text-with-subscripts'
 import { type ChapterMeta, type Part, getChapterById } from '@/data/chapters'
 import { useTranslatedParts } from '@/data/useTranslatedChapters'
 import { useBookmarks, type Bookmark as BookmarkType } from '@/features/bookmarks/BookmarkContext'
@@ -232,7 +233,7 @@ function BookmarkRow({
         onClick={handleClick}
         className="flex-1 text-left text-xs text-sidebar-foreground leading-tight truncate hover:text-foreground transition-colors"
       >
-        {displayLabel}
+        {withSubscripts(displayLabel)}
       </button>
       <button
         data-tour="bookmark-remove"
