@@ -653,15 +653,15 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['lc', 'reactance', 'impedance'],
   },
   trap: {
-    tip: 'A series LC circuit placed across a signal path to short-circuit one specific frequency to ground (or block it on a wire) — the standard tool for notching out a single unwanted carrier.',
+    tip: 'An LC circuit placed in a signal path to block or shunt one specific frequency — the standard tool for notching out a single unwanted carrier.',
     detail:
-      'A trap is a series LC circuit deliberately tuned to one frequency and inserted into a signal path. Because a series LC has minimum impedance at its resonant frequency, the trap looks like a near-short to that one frequency and almost ignores everything else. Two common topologies: SHUNT TRAP — series LC wired from signal line to ground, drains the unwanted frequency to ground; SERIES TRAP — parallel LC wired in series with the signal path, blocks the unwanted frequency. Multi-band antennas use traps to make a single radiator behave as different lengths on different bands (a typical trap dipole has 7 MHz traps that disconnect the outer wire sections at 14 MHz). TVI and RFI fixes also routinely use traps — a series LC across the input of a stereo to drain the 28 MHz signal a nearby ham\'s amplifier injects into the speaker leads.',
+      'A trap is an LC circuit deliberately tuned to one frequency and inserted into a signal path to reject it. Two common topologies, named by how the trap is connected to the signal path: SHUNT TRAP — series LC wired from signal line to ground; series LC has near-zero impedance at f₀, so the unwanted frequency is drained to ground while everything else passes. SERIES TRAP — parallel LC wired in series with the signal path; parallel LC has near-infinite impedance at f₀, so the unwanted frequency is blocked in the line while everything else passes through the residual reactance. Multi-band antennas use series traps to make a single radiator behave as different lengths on different bands (a typical trap dipole has 7 MHz parallel-LC traps that go high-Z at 14 MHz and disconnect the outer wire sections). TVI and RFI fixes routinely use shunt traps — a series LC across the input of a stereo to drain the 28 MHz signal a nearby ham\'s amplifier injects into the speaker leads.',
     see: ['resonance', 'lc', 'filter'],
   },
   'antenna tuner': {
     tip: 'An adjustable LC matching network between the transceiver and the feedline that brings whatever the antenna presents back to a 50 Ω match.',
     detail:
-      'An antenna tuner (also called an «ATU», antenna tuning unit, or sometimes a «transmatch») is the adjustable LC network that matches a transmitter\'s 50 Ω output to whatever impedance the antenna actually presents at the operating frequency. Most antennas are only well-matched on their design band — on a different band, or at a slightly off frequency, the SWR can be 3:1 or worse. Many transmitters fold back power above 1.5:1 SWR to protect the output stage; the tuner solves this by inserting a variable LC matching network that brings the feedline-side impedance back to 50 Ω, regardless of what is going on the other side. Common topologies: T-network (two series capacitors with a shunt inductor between them), L-network (one series inductor + one shunt capacitor, four possible arrangements), and Pi-network (one series inductor with two shunt capacitors). All three are LC structures whose adjustability lets the operator move resonance and impedance level around. A tuner does NOT make a bad antenna a good radiator — it just protects the transmitter and lets it deliver full power into whatever the feedline shows.',
+      'An antenna tuner (also called an «ATU», antenna tuning unit, or sometimes a «transmatch») is the adjustable LC network that matches a transmitter\'s 50 Ω output to whatever impedance the antenna actually presents at the operating frequency. Most antennas are only well-matched on their design band — on a different band, or at a slightly off frequency, the SWR can be 3:1 or worse. Many transmitters fold back power above 1.5:1 SWR to protect the output stage; the tuner solves this by inserting a variable LC matching network that brings the feedline-side impedance back to 50 Ω, regardless of what is going on the other side. Common topologies: T-network (two series capacitors with a shunt inductor between them), L-network (one series inductor + one shunt capacitor, four possible arrangements), and Pi-network (one series inductor with two shunt capacitors). All three are LC structures whose adjustability lets the operator move resonance and impedance level around. A tuner does NOT make a bad antenna a good radiator — it just protects the transmitter: by presenting it with a matched 50 Ω load, the tuner lets it deliver full power regardless of what the antenna\'s actual impedance is.',
     see: ['lc', 'resonance', 'impedance', 'swr'],
   },
 
@@ -750,6 +750,24 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'Skywave (also called skip propagation) occurs when HF signals travel upward at an angle, refract off the ionosphere, and return to earth hundreds or thousands of kilometres away. The signal can then bounce off the ground and repeat the process (multi-hop), reaching the other side of the planet. The skip zone is the area between the end of ground wave coverage and where the first skywave hop lands.',
     see: ['ionosphere', 'hf', 'ground wave'],
+  },
+  cw: {
+    tip: 'Continuous Wave — Morse-code transmission, an unmodulated carrier keyed on and off.',
+    detail:
+      'CW (Continuous Wave) is the original radio mode: the transmitter emits an unmodulated carrier on the operating frequency, and the operator keys it on and off in Morse code (dots and dashes). Because the signal is just one frequency, CW occupies extremely narrow bandwidth — typically 100–500 Hz, set by the keying speed and the receiver filter. The narrow bandwidth is why CW «punches through» weak signals: a 50 Hz CW filter has 100× more SNR advantage than a 5 kHz SSB filter on the same noise floor. CW is the most efficient mode in human-operated amateur radio for long-distance, low-power (QRP) work, and the simplest to build a transmitter for — a switched oscillator and a key are enough.',
+    see: ['ssb', 'qrp', 'bandwidth'],
+  },
+  ssb: {
+    tip: 'Single Sideband — voice modulation that uses half the bandwidth of full AM by removing one sideband and the carrier.',
+    detail:
+      'SSB (Single Sideband) is the dominant voice mode on HF amateur and commercial radio. Full AM produces a carrier and two sidebands carrying the same audio; SSB filters out the carrier and one sideband, transmitting only the other (USB — upper sideband, or LSB — lower sideband). Bandwidth drops from ~6 kHz (AM) to ~3 kHz (SSB), and all transmitter power goes into useful information rather than the redundant carrier. The trade-off is receiver complexity: SSB needs a stable beat-frequency oscillator (BFO) to reinsert the missing carrier on demodulation. By convention, USB is used above 10 MHz and on VHF/UHF, LSB below 10 MHz on HF amateur bands.',
+    see: ['am', 'cw', 'bandwidth'],
+  },
+  sdr: {
+    tip: 'Software-Defined Radio — a receiver or transmitter where signal processing happens in software instead of analogue circuits.',
+    detail:
+      'Software-Defined Radio replaces most of the analogue signal-processing chain (IF amplifiers, mixers, filters, demodulators) with an analogue-to-digital converter and a CPU/DSP/FPGA running signal-processing code. The hardware front-end shrinks to a low-noise amplifier, a quadrature mixer, and an ADC; everything else — filtering, demodulation, audio output — happens in software. A single radio can receive any mode (AM, FM, SSB, CW, digital protocols) by reloading software, and visual «waterfall» displays of the spectrum become trivial to implement. Hobbyist receivers like the RTL-SDR (~$30) cover 24 MHz to 1.7 GHz; transmit-capable SDRs like the HackRF or PlutoSDR support both directions. The direct-conversion architectures most SDRs use still need front-end LC filters to reject out-of-band signals.',
+    see: ['am', 'fm', 'ssb', 'cw'],
   },
 
   // ── Decibels (Chapter 0.4) ───────────────────────────────────────

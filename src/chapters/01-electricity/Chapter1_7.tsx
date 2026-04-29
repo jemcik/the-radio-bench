@@ -334,6 +334,7 @@ export default function Chapter1_7() {
             strong: <strong />,
             var: <MathVar />,
             bw: <G k="bandwidth" />,
+            nowrap: nowrap,
           }}
         />
       </p>
@@ -344,7 +345,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.qBwExample"
           ns="ui"
-          components={{ ...mathComponents, nowrap: nowrap }}
+          components={{ ...mathComponents, nowrap: nowrap, ssb: <G k="ssb" /> }}
         />
       </p>
 
@@ -385,7 +386,11 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.scaleNotes"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{
+            strong: <strong />,
+            var: <MathVar />,
+            decade: <G k="decade" />,
+          }}
         />
       </p>
 
@@ -400,6 +405,7 @@ export default function Chapter1_7() {
             strong: <strong />,
             vna: <G k="vna" />,
             db: <G k="decibel" />,
+            rf: <G k="rf" />,
           }}
         />
       </p>
@@ -439,7 +445,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.appsReceivers"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, sdr: <G k="sdr" /> }}
         />
       </p>
 
@@ -447,7 +453,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.appsTransmitters"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, cw: <G k="cw" />, ssb: <G k="ssb" /> }}
         />
       </p>
 
@@ -467,7 +473,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.appsFilters"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, trap: <G k="trap" />, tank: <G k="tank" /> }}
         />
       </p>
 

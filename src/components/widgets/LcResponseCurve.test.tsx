@@ -5,11 +5,11 @@ import LcResponseCurve from './LcResponseCurve'
 
 /* LcResponseCurve smoke tests.
  *
- * Default state: L = 4 µH, C = 130 pF, R = 5 Ω.
+ * Default state: L = 4 µH, C = 130 pF, R = 18 Ω.
  *   Z₀ = √(L/C) = √(30 769) ≈ 175 Ω
- *   Q  = Z₀ / R = 175 / 5 ≈ 35.1
+ *   Q  = Z₀ / R = 175 / 18 ≈ 9.74
  *   f₀ ≈ 6.98 MHz
- *   BW = f₀ / Q ≈ 199 kHz
+ *   BW = f₀ / Q ≈ 717 kHz
  *
  * These map straight onto the three readouts (f₀, Q, BW) and a
  * curve path under the SVG. We only check the readouts here — the
@@ -26,25 +26,38 @@ describe('LcResponseCurve', () => {
     expect(container.textContent).toMatch(/6\.98\s*MHz/)
   })
 
-  it('renders the default Q ≈ 35', () => {
+  it('renders the default Q ≈ 9.7', () => {
     const { container } = setup()
     // Q text smushes against the next readout label (no whitespace), so
-    // we anchor only on the leading word-boundary and accept the value
-    // with or without a one-decimal suffix.
-    expect(container.textContent).toMatch(/Q35(?:\.[0-9])?/)
+    // we anchor only on the leading word-boundary.
+    expect(container.textContent).toMatch(/Q9\.[78]/)
   })
 
-  it('renders the default BW ≈ 199 kHz', () => {
+  it('renders the default BW ≈ 717 kHz', () => {
     const { container } = setup()
-    expect(container.textContent).toMatch(/19[89]\s*kHz/)
+    expect(container.textContent).toMatch(/71[567]\s*kHz/)
+  })
+
+  it('renders Z at f₀ ≈ 1.71 kΩ in parallel mode (R_P = Q·X_L)', () => {
+    const { container } = setup()
+    // Parallel default: R_P = Q × 2π·f₀·L = 9.74 × 175 Ω ≈ 1.71 kΩ.
+    expect(container.textContent).toMatch(/1\.7[01]\s*kΩ/)
+  })
+
+  it('Z at f₀ drops to R_loss = 18 Ω in series mode', () => {
+    const { container } = setup()
+    const seriesButton = screen.getByRole('button', { name: /Series LC/i })
+    fireEvent.click(seriesButton)
+    // Series at f₀: |Z|_min = R_loss = 18 Ω (the input value).
+    expect(container.textContent).toMatch(/18\s*Ω/)
   })
 
   it('toggling to series mode changes the Y-axis label', () => {
     const { container } = setup()
     // Default is parallel — so the parallel y-axis label should appear.
-    expect(container.textContent).toContain('|Z| (Ω)')
-    const seriesRadio = screen.getByRole('radio', { name: /Series LC/i })
-    fireEvent.click(seriesRadio)
+    expect(container.textContent).toContain('|Z| (relative)')
+    const seriesButton = screen.getByRole('button', { name: /Series LC/i })
+    fireEvent.click(seriesButton)
     expect(container.textContent).toContain('current (relative)')
   })
 

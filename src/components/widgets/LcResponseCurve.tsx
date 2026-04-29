@@ -66,13 +66,32 @@ function formatFreq(hz: number, num: (n: number) => string, tUnit: (k: string) =
   return `${num(Math.round(value * Math.pow(10, places)) / Math.pow(10, places))} ${tUnit(unitKey)}`
 }
 
+function pickImpedance(ohm: number): { value: number; unitKey: string } {
+  if (ohm >= 1e6) return { value: ohm / 1e6, unitKey: 'mohm' }
+  if (ohm >= 1e3) return { value: ohm / 1e3, unitKey: 'kohm' }
+  return { value: ohm, unitKey: 'ohm' }
+}
+
+function formatImpedance(ohm: number, num: (n: number) => string, tUnit: (k: string) => string): string {
+  if (!Number.isFinite(ohm) || ohm <= 0) return `${num(0)} ${tUnit('ohm')}`
+  const { value, unitKey } = pickImpedance(ohm)
+  const abs = Math.abs(value)
+  const places = abs < 1 ? 3 : abs < 10 ? 2 : abs < 100 ? 1 : 0
+  return `${num(Math.round(value * Math.pow(10, places)) / Math.pow(10, places))} ${tUnit(unitKey)}`
+}
+
 // ── Plot geometry ──────────────────────────────────────────────────
-const VB_W = 540
-const VB_H = 240
-const PAD_L = 60
-const PAD_R = 30
-const PAD_T = 26
-const PAD_B = 44
+// 720×300 viewBox — comfortable on a chapter column up to ~960 px wide
+// (the SVG renders at 1:1 on desktop, scales DOWN on mobile via the
+// fixed-width pattern). 540×240 felt cramped — the curve and the −3 dB
+// markers need lateral room for high-Q peaks to read as «sharp» rather
+// than «pinched».
+const VB_W = 720
+const VB_H = 300
+const PAD_L = 64
+const PAD_R = 32
+const PAD_T = 28
+const PAD_B = 52
 const PLOT_W = VB_W - PAD_L - PAD_R
 const PLOT_H = VB_H - PAD_T - PAD_B
 const PLOT_LEFT = PAD_L
@@ -167,12 +186,17 @@ export default function LcResponseCurve() {
   const tUnit = useUnitFormatter()
   const clipId = useId()
 
-  // Defaults: 4 µH × 130 pF × 5 Ω → ~7 MHz, Q ≈ 35 — readable curve.
+  // Defaults: 4 µH × 130 pF × 18 Ω → ~7 MHz, Q ≈ 10. We deliberately
+  // start at moderate Q (not the very high Q ≈ 35 we used before) so
+  // the curve at first sight reads as a bell, not a vertical spike —
+  // the «drop R toward 1 Ω to sharpen» hint then has somewhere to go.
+  // 18 Ω is on the high end of realistic copper-coil loss at HF, but
+  // sits within the typical 5–30 Ω range for hand-wound HF tanks.
   const [lDisp, setLDisp] = useState('4')
   const [lUnit, setLUnit] = useState('uh')
   const [cDisp, setCDisp] = useState('130')
   const [cUnit, setCUnit] = useState('pf')
-  const [rDisp, setRDisp] = useState('5')
+  const [rDisp, setRDisp] = useState('18')
   const [rUnit, setRUnit] = useState('ohm')
   const [mode, setMode] = useState<Mode>('parallel')
 
@@ -196,6 +220,12 @@ export default function LcResponseCurve() {
     }
   }, [lH, cF, rOhm])
 
+  // |Z| at f₀ — the dual the chapter teaches: parallel LC pumps to a
+  // peak at R_P = Q·X_L (kΩ-class), series LC collapses to a minimum at
+  // just R_loss (Ω-class). Same components, opposite extremes.
+  const xLAtF0 = 2 * Math.PI * f0 * lH
+  const zAtF0 = mode === 'parallel' ? Q * xLAtF0 : rOhm
+
   const curvePath = buildCurvePath(f0, Q)
 
   // Marker positions on the plot
@@ -203,6 +233,15 @@ export default function LcResponseCurve() {
   const xFL = fL > 0 ? fToX(fL, f0) : PLOT_LEFT
   const xFH = fH > 0 ? fToX(fH, f0) : PLOT_RIGHT
   const yMinus3dB = rToY(1 / Math.sqrt(2))
+
+  // For high Q the −3 dB markers cluster within a few user units of f₀
+  // on the log axis (Q=35 → fL/fH within ±0.1% of f₀ → ~4 user units
+  // separation in the viewBox). To keep the labels readable at any Q
+  // we anchor them OUTWARD from the cluster: fL with textAnchor="end"
+  // just left of xFL, fH with textAnchor="start" just right of xFH.
+  // The marker lines stay between them, and the labels never overlap
+  // each other regardless of Q.
+  const F_LH_OFFSET = 3
 
   return (
     <Widget
@@ -233,41 +272,51 @@ export default function LcResponseCurve() {
           idSuffix="r" t={t} tUnit={tUnit}
         />
 
-        {/* Topology toggle */}
-        <fieldset className="flex flex-wrap items-center gap-2 text-sm">
-          <legend className="text-foreground font-medium shrink-0 w-32 inline">
+        {/* Topology toggle — button-based segmented control. Plain
+            <button> avoids the focus-scroll bug we hit with the
+            previous <label>+sr-only-radio pattern: clicking the label
+            transferred focus to a 1×1 absolutely-positioned input,
+            which Chrome scrolled into view and bounced the page
+            downward. aria-pressed gives assistive tech the toggle
+            state. */}
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-foreground font-medium shrink-0 w-32">
             {t('ch1_7.widget.response.modeLabel')}
-          </legend>
+          </span>
           {(['series', 'parallel'] as const).map(m => (
-            <label
+            <button
               key={m}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded border cursor-pointer ${
+              type="button"
+              aria-pressed={mode === m}
+              onClick={() => setMode(m)}
+              className={`px-3 py-1 rounded border cursor-pointer transition-colors ${
                 mode === m
                   ? 'border-primary bg-primary/10 text-foreground'
                   : 'border-border text-muted-foreground hover:text-foreground'
               }`}
             >
-              <input
-                type="radio"
-                name="lcr-mode"
-                value={m}
-                checked={mode === m}
-                onChange={() => setMode(m)}
-                className="sr-only"
-              />
               {t(`ch1_7.widget.response.mode${m.charAt(0).toUpperCase()}${m.slice(1)}`)}
-            </label>
+            </button>
           ))}
-        </fieldset>
+        </div>
       </div>
 
       {/* ── Plot ──────────────────────────────────────────────── */}
+      {/* Fixed pixel `width`/`height` (not width="100%") so the SVG
+          renders at viewBox size on desktop and only scales DOWN on
+          narrow screens via maxWidth/height-auto. With a `width="100%"`
+          inside ~960 px chapter columns we were upscaling 540 px → 960 px
+          (×1.78), inflating every em-sized label to ~25 px and the
+          stroke to ~4 px on screen. The 1rem fontSize baseline anchors
+          em units to the html-root size so the user's font-size setting
+          flows through (matches MagnitudeLadder pattern). */}
       <svg
+        width={VB_W}
+        height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}
-        width="100%"
-        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
         role="img"
         aria-label={t('ch1_7.widget.response.title')}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto', fontSize: '1rem' }}
       >
         <defs>
           <clipPath id={clipId}>
@@ -335,11 +384,11 @@ export default function LcResponseCurve() {
                   fill={svgTokens.primary} fontStyle="italic" fontWeight="700">
               {withSubscriptsSvg(t('ch1_7.widget.response.markerF0'))}
             </text>
-            <text x={xFL} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="middle"
+            <text x={xFL - F_LH_OFFSET} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="end"
                   fill={svgTokens.note} fontStyle="italic">
               {withSubscriptsSvg(t('ch1_7.widget.response.markerFL'))}
             </text>
-            <text x={xFH} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="middle"
+            <text x={xFH + F_LH_OFFSET} y={PLOT_BOTTOM + 14} fontSize="0.75em" textAnchor="start"
                   fill={svgTokens.note} fontStyle="italic">
               {withSubscriptsSvg(t('ch1_7.widget.response.markerFH'))}
             </text>
@@ -375,7 +424,7 @@ export default function LcResponseCurve() {
       </svg>
 
       {/* ── Readouts ──────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <ResultBox tone="info" label={t('ch1_7.widget.response.f0Readout')}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {formatFreq(f0, num, tUnit)}
@@ -389,6 +438,11 @@ export default function LcResponseCurve() {
         <ResultBox tone="warn" label={t('ch1_7.widget.response.bwReadout')}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {formatFreq(bw, num, tUnit)}
+          </p>
+        </ResultBox>
+        <ResultBox tone="primary" label={t('ch1_7.widget.response.zPeakReadout')}>
+          <p className="text-xl font-mono font-semibold text-foreground">
+            {formatImpedance(zAtF0, num, tUnit)}
           </p>
         </ResultBox>
       </div>

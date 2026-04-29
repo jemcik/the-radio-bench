@@ -25,18 +25,28 @@ import { withSubscripts, withSubscriptsSvg } from '@/lib/text-with-subscripts'
 const Y_MIN_DB = -40
 const Y_MAX_DB = 0
 
-const VB_W = 540
-const VB_H = 240
-const PAD_L = 60
-const PAD_R = 30
-const PAD_T = 26
-const PAD_B = 44
+// Geometry mirrors LcResponseCurve: 720×300 viewBox rendered at 1:1
+// on desktop (no `width="100%"` upscaling) so em-sized labels render
+// at their declared sizes and the trace doesn't bloat to 4-px-wide.
+const VB_W = 720
+const VB_H = 300
+const PAD_L = 64
+const PAD_R = 32
+const PAD_T = 28
+const PAD_B = 52
 const PLOT_W = VB_W - PAD_L - PAD_R
 const PLOT_H = VB_H - PAD_T - PAD_B
 const PLOT_LEFT = PAD_L
 const PLOT_RIGHT = PAD_L + PLOT_W
 const PLOT_TOP = PAD_T
 const PLOT_BOTTOM = PAD_T + PLOT_H
+
+// Outward-anchor offset for fL/fH labels — at high Q the three
+// markers (fL, f₀, fH) cluster within a few user units on the linear
+// axis. Anchoring fL to the END of its text just left of xFL, and fH
+// to the START just right of xFH, prevents overlap with f₀ (which
+// stays centred on xF0) regardless of Q.
+const F_LH_OFFSET = 3
 
 function dbToY(db: number): number {
   const clamped = Math.max(Y_MIN_DB, Math.min(Y_MAX_DB, db))
@@ -193,11 +203,12 @@ export default function VnaResonanceMock() {
 
       {/* ── VNA-screen plot ────────────────────────────────────── */}
       <svg
+        width={VB_W}
+        height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}
-        width="100%"
-        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
         role="img"
         aria-label={t('ch1_7.widget.vna.title')}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto', fontSize: '1rem' }}
       >
         <defs>
           <clipPath id={clipId}>
@@ -264,7 +275,7 @@ export default function VnaResonanceMock() {
             d={curvePath}
             fill="none"
             stroke={svgTokens.primary}
-            strokeWidth={2.4}
+            strokeWidth={2.0}
             strokeLinejoin="round"
             strokeLinecap="round"
             clipPath={`url(#${clipId})`}
@@ -296,13 +307,13 @@ export default function VnaResonanceMock() {
               {withSubscriptsSvg(t('ch1_7.widget.vna.markerF0'))}
             </text>
             {fL >= fStart && fL <= fEnd && (
-              <text x={xFL} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="middle"
+              <text x={xFL - F_LH_OFFSET} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="end"
                     fill={svgTokens.note} fontStyle="italic">
                 {withSubscriptsSvg(t('ch1_7.widget.vna.markerFL'))}
               </text>
             )}
             {fH >= fStart && fH <= fEnd && (
-              <text x={xFH} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="middle"
+              <text x={xFH + F_LH_OFFSET} y={PLOT_TOP - 6} fontSize="0.75em" textAnchor="start"
                     fill={svgTokens.note} fontStyle="italic">
                 {withSubscriptsSvg(t('ch1_7.widget.vna.markerFH'))}
               </text>
