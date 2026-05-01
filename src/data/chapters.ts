@@ -177,7 +177,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Filters',
         subtitle: 'Low-pass, high-pass, band-pass, band-stop — plot the response on the VNA',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['3.1'],

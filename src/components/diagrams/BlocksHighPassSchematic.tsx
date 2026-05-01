@@ -76,9 +76,15 @@ export default function BlocksHighPassSchematic() {
           as a three-way connection. */}
       <Junction x={NODE_X} y={TOP_Y} />
 
-      {/* Terminal labels */}
+      {/* Terminal labels — V_in / V_out on top rail, GND on bottom rail.
+          GND was historically missing in this schematic; it was added so
+          paired LPF + HPF visualisations in ch1.8 stay consistent (and
+          ch1.5 reads as a complete schematic too). */}
       <TerminalLabel x={VIN_X - 6} y={TOP_Y} anchor="end">V_in</TerminalLabel>
       <TerminalLabel x={VOUT_LABEL_X} y={TOP_Y} anchor="start">V_out</TerminalLabel>
+      <TerminalLabel x={VOUT_LABEL_X} y={BOT_Y} anchor="start" tone="mutedFg">
+        {t('ch1_5.blocksHighPassSchematicGnd')}
+      </TerminalLabel>
     </Circuit>
   )
 }
