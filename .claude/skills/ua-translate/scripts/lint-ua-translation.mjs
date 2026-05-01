@@ -146,6 +146,14 @@ const RULES = [
   // ── Forbidden words from landmines.md ───────────────────────────────────
 
   {
+    id: 'forbidden.section-symbol',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /§/g,
+    hint: 'The «§» (section sign) is not used in this course — flagged by the user. Use «розділ X.Y» / «у попередньому розділі» / «Chapter X.Y» instead. Source-code header comments are fine; this rule scans i18n values only.',
+  },
+
+  {
     id: 'forbidden.domovlenist',
     category: 'FORBIDDEN',
     severity: 'ERROR',
@@ -485,6 +493,60 @@ const RULES = [
     // (`dividerFormulaSubstLead`, `labStep4`).
     pattern: /—\s*(?:\S{1,4}\s+)?(?:<var>|<nowrap>\s*<var>)/gi,
     hint: 'Em-dash directly before a math variable (or with only a short word between) reads as a minus sign — the italic letter + the em-dash collapse into a signed quantity. Use a period + new sentence, a colon, or restructure so no math variable follows the em-dash within ~10 characters. Never `— <var>X</var>` or `— word <var>X</var>` (short word).',
+  },
+
+  {
+    id: 'forbidden.carrier-wave-wrong-root',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Canonical UA term for «carrier wave» is «несуча» (Wikipedia UA:
+    // «Несуча хвиля»). Two wrong roots that Gemini and other UA writers
+    // sometimes produce:
+    //   – «несівна» (нести-active-participle) — wrong root form
+    //   – «носійна» (носій + adjective suffix) — wrong morphology
+    // Both have shipped in ch1.8 (orderRule, glossary.power amplifier,
+    // appsHarmonicLpf). Caught manually after the user spotted them
+    // separately on three different keys; this rule catches them all.
+    // Pattern matches all common case forms by stem.
+    pattern: /\b(?:носійн|несівн)[аоуиіе]\w*/gi,
+    hint: 'Wrong root for «carrier wave». Canonical UA form is «несуча» (per Wikipedia UA «Несуча хвиля»). Replace «носійна/носійної/носійну» and «несівна/несівної/несівну» with the matching case of «несуча».',
+  },
+
+  {
+    id: 'forbidden.open-circuit-signal-passes',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Self-contradicting framing: «розрив кола» implies the WHOLE
+    // signal path is broken; saying «сигнал проходить» right after
+    // reads as a logical contradiction. The actual mechanism (in
+    // LPF: capacitor in shunt to ground; in notch: parallel LC in
+    // shunt) is that one BRANCH is broken (the path to ground),
+    // while the signal continues through R or stays on the through
+    // path. Rewrite to name the specific branch and the mechanism:
+    // «опір С дуже великий — струм не стікає на землю, тому сигнал
+    // проходить через R». User-flagged ch1.8 glossary +
+    // rcLpfBehaviour + schematicRcLpfCaption + schematicLcNotchCaption.
+    // Pattern: «розрив кола» followed within ~80 chars by «сигнал
+    // проходить» / «проходить далі» / «проходить через».
+    pattern: /розрив кола[^.]{0,80}(?:сигнал\s+проходить|проходить\s+(?:далі|без|через))/g,
+    hint: 'Logical contradiction: «розрив кола» implies the whole circuit is broken, but the next clause says «сигнал проходить». Rewrite to specify WHICH branch is broken and WHY the signal still flows: e.g. «опір С дуже великий — струм не стікає на землю, тому сигнал проходить через R». For parallel-LC tanks at f_0, prefer «має дуже високий опір — не шунтує сигнал» over «розрив кола».',
+  },
+
+  {
+    id: 'forbidden.emdash-before-minus',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // An em-dash «—» followed by a literal minus sign «−» reads as
+    // two consecutive dashes — the em-dash and the unary minus
+    // visually collide. User-flagged on ch1.8 `keyTakeaway3` /
+    // `orderRule` / `glossary.order.detail` («2-го — −40 дБ/декаду»
+    // → reader sees what looks like two minus signs in a row).
+    // Fix: insert a noun (e.g. «спад», «крутість», «це»), restructure
+    // as a full sentence, or use a colon — anything that places a
+    // non-digit/non-minus character between the em-dash and the
+    // minus.
+    pattern: /—\s*−\s*\d/g,
+    hint: 'Em-dash directly before a minus sign reads as two consecutive dashes («— −40» visually mashes the em-dash and the minus). Insert a noun («— спад −40 дБ»), restructure to a full sentence, or use a colon. Never `— −digit`.',
   },
 
   {

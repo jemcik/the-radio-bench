@@ -100,7 +100,17 @@ const SAFE_FN_WRAPPERS = ['withSubscripts', 'withSubscriptsSvg']
 
 // JSX-element wrappers. If there's an unmatched opening tag of one of these
 // in the lookback, the t() sits inside it and is handled.
-const SAFE_JSX_WRAPPERS = ['MathText', 'Trans']
+//
+// IMPORTANT: <Trans> is NOT here. The script's regex flags only TRULY bare
+// `X_Y` patterns (preceded by `<`/`>` is excluded by the lookbehind). If a
+// key is flagged, its i18n value contains an unwrapped bare subscript, and
+// Trans does not auto-process those — Trans only maps HTML-like tags via
+// its `components={}` prop. So a bare subscript inside a <Trans> block
+// renders as literal `X_Y` in the UI. Caught by ch1.8 §2 prose where
+// `пік на f_0` shipped with a literal underscore. Use <MathText> if you
+// need bare-subscript rendering, or wrap as `<var>X_{Y}</var>` in the
+// i18n value (which won't trigger the flag in the first place).
+const SAFE_JSX_WRAPPERS = ['MathText']
 
 function isInsideFnWrapper(back) {
   for (const fn of SAFE_FN_WRAPPERS) {

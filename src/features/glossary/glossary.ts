@@ -944,4 +944,124 @@ export const glossary: Record<string, GlossaryEntry> = {
     unit: 'Volt (V)',
     see: ['voltage'],
   },
+
+  // ── Chapter 1.8 — Filters ────────────────────────────────────────
+  'low-pass': {
+    tip: 'A filter that lets low frequencies through and attenuates high ones — passes DC, blocks AC above its cutoff.',
+    detail:
+      'A low-pass filter passes signals at frequencies below its cutoff frequency f_c with little loss, and attenuates signals above f_c at a rate set by the filter\'s order (−20 dB per decade per pole). The simplest is a series resistor and a shunt capacitor to ground. R and C act as a voltage divider: at low frequency the capacitor\'s reactance is much larger than R, so almost all of V_in drops across the capacitor — and the output, taken across the capacitor, is practically equal to V_in. At high frequency the reactance shrinks to a near-short to ground, the voltage drops across R instead, and the output collapses. Low-pass filters appear everywhere — at every transmitter\'s output (the harmonic LPF that keeps harmonics off the air), in every audio crossover (feeding the woofer), and ahead of every analogue-to-digital converter (the anti-alias filter).',
+    formula: 'f_c = 1 / (2π·R·C)   (first-order RC)',
+    see: ['filter', 'high-pass', 'cutoff frequency', 'roll-off'],
+  },
+  'high-pass': {
+    tip: 'A filter that lets high frequencies through and attenuates low ones — blocks DC, passes AC above its cutoff.',
+    detail:
+      'A high-pass filter is the dual of the low-pass: it passes signals above its cutoff frequency f_c and attenuates signals below f_c. The first-order topology is a series capacitor and shunt resistor — opposite arrangement to the low-pass, but exactly the same parts. At DC the capacitor blocks everything; well above f_c the capacitor looks like a short and the signal passes through. The same circuit is called a "coupling capacitor" when its job is to block DC supply voltage from a downstream stage while letting the audio or RF signal through unaffected.',
+    formula: 'f_c = 1 / (2π·R·C)   (first-order RC)',
+    see: ['filter', 'low-pass', 'cutoff frequency', 'coupling capacitor'],
+  },
+  'band-pass': {
+    tip: 'A filter that lets one band of frequencies through and attenuates everything outside it.',
+    detail:
+      'A band-pass filter has two cutoffs — a lower one and an upper one — and passes signals between them while attenuating signals on either side. The simplest LC band-pass is a series-LC pair: at the resonant frequency f_0 = 1 / (2π√(LC)) the series LC looks like a near-short, so the signal at f_0 passes; off-resonance the impedance climbs and signals are blocked. Band-pass filters are the core of every receiver\'s IF strip — the IF filter sets the receiver\'s selectivity, with bandwidth matched to the mode (≈ 2.4 kHz for SSB, ≈ 500 Hz for CW). The bandwidth is set by the loaded Q: BW = f_0 / Q.',
+    formula: 'BW = f_0 / Q',
+    see: ['filter', 'band-stop', 'resonance', 'q-factor', 'bandwidth'],
+  },
+  'band-stop': {
+    tip: 'A filter that blocks one band of frequencies and lets everything else through — also called a notch.',
+    detail:
+      'A band-stop filter (also called a notch) is the dual of the band-pass: it attenuates signals inside one frequency band and passes everything outside. A typical LC implementation is a parallel-LC tank shunted to ground in the signal path — at f_0 the tank has very high impedance, so it draws no current from the signal path and the signal at f_0 passes through unaffected; off-resonance the tank impedance drops and forms a divider with the source impedance that crushes those frequencies. Notch filters are used to remove specific unwanted carriers — broadcast-band rejection at the front of an HF receiver, mains-hum traps in audio, and the RF-trap that keeps a strong nearby station from desensing your receiver.',
+    see: ['filter', 'band-pass', 'notch', 'resonance'],
+  },
+  notch: {
+    tip: 'Another name for a band-stop filter; in English usage often specifically the narrow-stopband variant designed to remove one frequency.',
+    detail:
+      'A notch filter is essentially a band-stop filter — same circuit class, same behaviour. In English engineering literature the two terms diverge slightly: "band-stop" is the general class, while "notch" often refers specifically to a band-stop with a very narrow stopband, designed to remove one specific frequency or a narrow range without affecting the rest of the spectrum. Hams use notch filters to suppress an unwanted local carrier (a broadcast station, a noise source, or a strong adjacent ham), to remove mains hum from audio, or as a "trap" tuned to a specific harmonic. The depth and width of the rejection are set by the Q of the resonant element: a low-Q notch is broad and shallow, a high-Q notch is narrow and deep.',
+    see: ['band-stop', 'filter', 'trap'],
+  },
+  'cutoff frequency': {
+    tip: 'The frequency at which a filter\'s output has dropped to −3 dB — half the input power, 0.707 of the input voltage.',
+    detail:
+      'The cutoff frequency f_c is the canonical descriptor of any filter: the frequency at which the response has dropped to −3 dB (half the input power, equivalent to 1 / √2 ≈ 0.707 of the input voltage). For a first-order RC filter, f_c = 1 / (2π·R·C); for an LC band-pass it is the resonant frequency f_0 = 1 / (2π√(LC)). The cutoff is also the hinge of the Bode plot — far above (or below, depending on filter type) f_c the magnitude follows a straight-line roll-off; far on the passband side it stays flat; the corner is centred on f_c.',
+    formula: 'f_c = 1 / (2π·R·C)   (first-order RC)',
+    see: ['filter', 'roll-off', 'bode plot', 'reactance'],
+  },
+  passband: {
+    tip: 'The range of frequencies a filter lets through with little or no attenuation.',
+    detail:
+      'The passband of a filter is the range of frequencies where the output is approximately equal to the input. Conventionally the edge of the passband is taken as the −3 dB point — the cutoff frequency. A low-pass filter\'s passband runs from DC up to f_c; a high-pass\'s passband runs from f_c upward; a band-pass\'s passband is the slice between its two cutoffs. The flatness of the passband is a quality metric: Butterworth filters give a maximally-flat passband, while Chebyshev Type I trades flatness for a steeper transition and shows visible ripple in the passband.',
+    see: ['filter', 'cutoff frequency', 'stopband'],
+  },
+  stopband: {
+    tip: 'The range of frequencies a filter heavily attenuates.',
+    detail:
+      'The stopband of a filter is the frequency range where the output is heavily attenuated — typically 40–80 dB or more below the input. The stopband is set by the filter\'s order (slope) and family (corner shape and any ripple). A first-order filter does not really have a sharp stopband edge — it just slopes down forever at −20 dB/decade. Higher-order filters reach a defined stopband floor more quickly. Filter datasheets specify the stopband by giving a frequency at which the attenuation reaches some required value (e.g. "60 dB rejection at 2× cutoff").',
+    see: ['filter', 'cutoff frequency', 'passband'],
+  },
+  order: {
+    tip: 'How many independent storage elements a filter has — sets the steepness of its roll-off.',
+    detail:
+      'The order of a filter counts the number of independent reactive elements (capacitors and inductors) that contribute to its frequency response. A single RC pair is first-order; a single LC pair is second-order; cascaded sections add up. The roll-off in the stopband is −20 dB per decade per pole, so a 1st-order is −20 dB/decade, a 2nd-order is −40 dB/decade, a 5th-order is −100 dB/decade. Higher orders give sharper transitions at the cost of more parts, more passband loss, and worse transient response (ringing on a fast edge).',
+    see: ['filter', 'roll-off', 'bode plot'],
+  },
+  'roll-off': {
+    tip: 'How steeply a filter\'s response falls in the stopband — measured in dB per decade or dB per octave.',
+    detail:
+      'Roll-off is the slope of the filter\'s magnitude response far from the cutoff, in dB per decade (a ×10 step in frequency) or dB per octave (a ×2 step). The fundamental rule is −20 dB per decade per pole: every additional reactive element doubles the slope. A 1st-order RC rolls off at −20 dB/decade (or equivalently −6 dB/octave); a 5-pole LC harmonic LPF rolls off at −100 dB/decade. On a Bode plot (log-log axes), the roll-off appears as a straight line — which is the main reason filter designers use log-log axes.',
+    see: ['filter', 'order', 'bode plot', 'decade', 'decibel'],
+  },
+  'bode plot': {
+    tip: 'A plot of filter (or amplifier) gain versus frequency, on logarithmic axes — the standard way to show frequency response.',
+    detail:
+      'A Bode plot, named after Hendrik Bode (Bell Labs, 1945), shows the magnitude (in decibels) of a circuit\'s transfer function versus frequency on a logarithmic horizontal axis. Two facts dominate filter Bode plots: at the cutoff frequency the response is −3 dB, and far from cutoff the response is a straight line with slope −20 dB per decade per pole. The straight-line behaviour is the whole reason for log-log axes — on linear axes, filter responses spend most of their range hugging zero or hugging unity, and the corner is hard to read. The phase plot is sometimes drawn alongside the magnitude (a separate set of axes); each pole adds 90° of phase lag.',
+    see: ['filter', 'roll-off', 'decibel', 'decade'],
+  },
+  butterworth: {
+    tip: 'The default filter family — gives a maximally-flat passband at the cost of a moderately steep transition.',
+    detail:
+      'A Butterworth filter, named after Stephen Butterworth (1930), optimises for the flattest possible passband — the magnitude response in the passband is monotonic with no ripple. The transition into the stopband is moderate (steeper than Bessel, gentler than Chebyshev or elliptic), and the transient response is well-behaved. Butterworth is the default filter family — almost every textbook filter response you have seen is one. Use Butterworth unless you have a strong reason to pick something else (Chebyshev for selectivity, Bessel for fast transients, elliptic for the steepest possible).',
+    see: ['filter', 'family', 'chebyshev', 'bessel', 'elliptic'],
+  },
+  chebyshev: {
+    tip: 'A filter family that trades passband flatness for a steeper transition — comes in Type I (passband ripple) and Type II (stopband ripple).',
+    detail:
+      'A Chebyshev filter, named after Pafnuty Chebyshev (1854), accepts a chosen amount of ripple — Type I in the passband, Type II in the stopband — and uses that freedom to sharpen the transition between passband and stopband. At the same order, a Chebyshev gives a noticeably steeper skirt than a Butterworth. Use Chebyshev when selectivity matters more than flatness — IF filters in receivers, narrow LPFs after a transmitter PA, and audio crossovers in PA systems. The ripple amplitude is a design parameter; 0.1 dB and 0.5 dB are common choices.',
+    see: ['filter', 'family', 'butterworth', 'elliptic'],
+  },
+  bessel: {
+    tip: 'A filter family that optimises for flat group delay — best transient response (least ringing) of any family.',
+    detail:
+      'A Bessel filter, named after the Bessel functions used in its design, is optimised for maximally flat group delay across the passband — meaning all frequencies pass through with the same time delay, so a fast edge is not smeared by the filter. The cost is the gentlest transition of any common family — at the same order a Bessel\'s skirt is much shallower than a Butterworth. Use Bessel anywhere the time-domain shape of the signal matters: digital-mode anti-alias filters, oscilloscope-front-end filters, audio applications where phase distortion would smear transients.',
+    see: ['filter', 'family', 'butterworth'],
+  },
+  elliptic: {
+    tip: 'The steepest filter family — allows ripple in both passband and stopband, gets the sharpest possible transition in return.',
+    detail:
+      'An elliptic filter (also called a Cauer filter, after Wilhelm Cauer who derived its design equations) is the steepest filter family possible at a given order. It allows ripple in both the passband and the stopband and uses that freedom to push the transition between them as steep as theory permits — a 2nd-order elliptic skirt can be sharper than a 4th-order Butterworth. Used wherever nothing gentler is steep enough: narrow IF crystal filters, low-order harmonic-suppression LPFs, anti-alias filters ahead of band-edge ADCs. The price is more ringing on transients than any other family — you cannot have steep skirts and a clean step response at the same time.',
+    see: ['filter', 'family', 'butterworth', 'chebyshev'],
+  },
+  family: {
+    tip: 'The mathematical recipe that picks the shape of a filter\'s response corner — Butterworth, Chebyshev, Bessel, or elliptic.',
+    detail:
+      'A filter\'s family is the mathematical pattern used to choose the values of its inductors, capacitors, and resistors. At a given order and cutoff, infinitely many parameter sets give the same nominal cutoff — the family picks one based on what to optimise: passband flatness (Butterworth), transition steepness (Chebyshev, elliptic), or transient response (Bessel). The four common families are Butterworth, Chebyshev, Bessel, and elliptic, listed roughly in increasing order of skirt steepness and decreasing order of transient quality.',
+    see: ['filter', 'butterworth', 'chebyshev', 'bessel', 'elliptic'],
+  },
+  'if filter': {
+    tip: 'The narrow filter at a receiver\'s intermediate-frequency stage — sets the receiver\'s selectivity and matches its bandwidth to the mode.',
+    detail:
+      'In a superheterodyne receiver, the mixer translates the antenna signal down to a fixed intermediate frequency (IF), and the IF filter sitting between the mixer and the demodulator selects only the bandwidth of the wanted signal — rejecting strong adjacent stations. Modern transceivers carry several IF filters selectable from the front panel: ≈ 2.4 kHz for SSB, ≈ 500 Hz for CW, ≈ 250 Hz for narrow data modes, ≈ 6 kHz for AM. The IF filter is the receiver\'s most important selectivity component — its skirts determine how close in frequency a strong unwanted station can sit without bleeding into the wanted one. IF filters are typically built from quartz crystals or mechanical resonators for very high Q.',
+    see: ['filter', 'band-pass', 'q-factor'],
+  },
+  adc: {
+    tip: 'Analogue-to-Digital Converter — turns a continuous voltage into a stream of numbers a computer can process.',
+    detail:
+      'An ADC samples an analogue voltage at a fixed rate (the sample rate, e.g. 100 kSPS = 100 000 samples per second) and turns each sample into a binary number with some resolution (e.g. 12-bit = 4096 levels). The Nyquist rule says an ADC at sample rate f_s can represent frequencies up to f_s / 2; signals above that fold back into the baseband as aliases that cannot be undone. For this reason every ADC needs an analogue anti-alias filter (a low-pass with cutoff just below f_s / 2) ahead of it. Modern SDR receivers digitise the entire HF spectrum at once with a fast ADC and use digital filters from there.',
+    see: ['filter', 'low-pass', 'sdr'],
+  },
+  'power amplifier': {
+    tip: 'The final amplifier stage in a transmitter that boosts the signal to the watts radiated by the antenna.',
+    detail:
+      'A power amplifier (PA) is the high-power final stage of a transmitter, taking a low-power modulated signal and amplifying it to the level radiated by the antenna — typically tens to hundreds of watts in amateur service. Class-AB and class-C PAs are non-linear and generate strong harmonics of the carrier (2nd, 3rd, 5th…); a harmonic low-pass filter immediately after the PA suppresses them by 50 dB or more before they reach the antenna. Without that filter your 14 MHz transmission would also radiate on 28 MHz, 42 MHz, 70 MHz, and so on — straight into other amateur and broadcast bands.',
+    see: ['filter', 'low-pass', 'harmonic'],
+  },
 }
