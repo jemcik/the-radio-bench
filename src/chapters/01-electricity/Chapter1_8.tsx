@@ -12,6 +12,7 @@ import BodePlotter from '@/components/widgets/BodePlotter'
 import VnaFilterSweepMock from '@/components/widgets/VnaFilterSweepMock'
 import FilterTypeGallery from '@/components/diagrams/FilterTypeGallery'
 import RcLowPassSchematic from '@/components/diagrams/RcLowPassSchematic'
+import RcLpfLabSchematic from '@/components/diagrams/RcLpfLabSchematic'
 import RcHighPassSchematic from '@/components/diagrams/RcHighPassSchematic'
 import LcLowPassSchematic from '@/components/diagrams/LcLowPassSchematic'
 import CascadedRcSchematic from '@/components/diagrams/CascadedRcSchematic'
@@ -39,6 +40,11 @@ export default function Chapter1_8() {
       sub: <sub />,
       strong: <strong />,
       em: <em />,
+      // Glossary tags used in quiz prose. Without these mappings,
+      // <Trans> renders «&lt;pa&gt;…&lt;/pa&gt;» as visible escaped
+      // text instead of resolving to a tooltip.
+      adc: <G k="adc" />,
+      pa: <G k="power amplifier" />,
     }),
     [t],
   )
@@ -421,7 +427,25 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.familiesCallout"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{
+            strong: <strong />,
+            elsie: (
+              <a
+                href="https://tonnesoftware.com/elsie2.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:no-underline"
+              />
+            ),
+            changpuak: (
+              <a
+                href="https://www.changpuak.ch/electronics/butterworth_lowpass.php"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:no-underline"
+              />
+            ),
+          }}
         />
       </Callout>
 
@@ -587,7 +611,10 @@ export default function Chapter1_8() {
         ]}
         procedure={[
           { text: <Trans i18nKey="ch1_8.labStep1" ns="ui" components={{ ...mathComponents, nowrap: nowrap }} /> },
-          { text: <Trans i18nKey="ch1_8.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          {
+            text: <Trans i18nKey="ch1_8.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />,
+            diagram: <RcLpfLabSchematic />,
+          },
           { text: <Trans i18nKey="ch1_8.labStep3" ns="ui" components={{ ...mathComponents }} /> },
           { text: t('ch1_8.labStep4') },
           { text: <Trans i18nKey="ch1_8.labStep5" ns="ui" components={{ ...mathComponents }} /> },

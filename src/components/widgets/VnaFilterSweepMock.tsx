@@ -55,6 +55,13 @@ function dbToY(db: number): number {
   // Clamping creates a false-plateau horizontal line along the
   // Y_MIN_DB edge when the curve dives way below (e.g. HPF at f ≪ f_c
   // with high order). See plotted-curves.md.
+  //
+  // BUT: non-finite db (e.g. log10(0) at the exact notch centre) maps
+  // to non-finite y, which `.toFixed()` renders as «Infinity» — an
+  // invalid SVG path coord that aborts the rest of the trace.
+  // Coerce non-finite values to a finite y far below the plot; clipPath
+  // hides it the same as any other off-frame point.
+  if (!Number.isFinite(db)) return PLOT_BOTTOM + 10000
   const t = (Y_MAX_DB - db) / (Y_MAX_DB - Y_MIN_DB)
   return PLOT_TOP + t * PLOT_H
 }
@@ -85,12 +92,49 @@ function magDb(shape: Shape, fHz: number, fcHz: number, n: number, q: number): n
 
 function buildPath(shape: Shape, fcHz: number, n: number, q: number): string {
   const STEPS = 280
-  const parts: string[] = []
+  const samples: number[] = []
+
+  // Base log-spaced grid spans 4 decades. Step ≈ 0.014 decades per
+  // sample — fine enough for LPF/HPF, but too coarse for high-Q
+  // resonances/notches whose 3-dB bandwidth is f_0 / Q (e.g. Q = 50,
+  // f_0 = 1 kHz → BW = 20 Hz ≈ 0.009 decades). Without enrichment the
+  // adjacent samples skim across the notch and only register a few
+  // dB of dip. So for BPF/BSF we additionally sample on a fine log
+  // grid centred on f_0, plus the exact f_0 itself.
   for (let i = 0; i <= STEPS; i++) {
     const t = i / STEPS
     const fHz = Math.pow(10, Math.log10(F_MIN_HZ) + t * (Math.log10(F_MAX_HZ) - Math.log10(F_MIN_HZ)))
-    const x = fToX(fHz)
-    const y = dbToY(magDb(shape, fHz, fcHz, n, q))
+    samples.push(fHz)
+  }
+
+  if (shape === 'bpf' || shape === 'bsf') {
+    // ±1 octave around f_0, 200 log-spaced extras → ≈ 0.01 oct/step
+    // so the closest neighbour to f_0 is ≈ 0.7 % away. At Q = 50
+    // that lands around −10 dB on the BSF skirt — close enough to
+    // make the V look genuinely deep when paired with the f_0 sample.
+    const FINE_STEPS = 200
+    const OCTAVE_HALF_RANGE = 1
+    for (let i = 0; i <= FINE_STEPS; i++) {
+      const t = i / FINE_STEPS
+      const octaveOffset = (t - 0.5) * 2 * OCTAVE_HALF_RANGE
+      const fHz = fcHz * Math.pow(2, octaveOffset)
+      if (fHz > F_MIN_HZ && fHz < F_MAX_HZ) samples.push(fHz)
+    }
+    // Guaranteed sample exactly at f_0. For BSF this hits log10(0) =
+    // −Infinity, the dbToY guard maps it to a far-below-plot y, and
+    // clipPath renders the resulting line segments as a sharp
+    // vertical drop into the bottom of the plot — visually a clean
+    // deep notch. For BPF the sample lands at 0 dB (the peak),
+    // harmless.
+    if (fcHz > F_MIN_HZ && fcHz < F_MAX_HZ) samples.push(fcHz)
+  }
+
+  samples.sort((a, b) => a - b)
+
+  const parts: string[] = []
+  for (let i = 0; i < samples.length; i++) {
+    const x = fToX(samples[i])
+    const y = dbToY(magDb(shape, samples[i], fcHz, n, q))
     parts.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
   }
   return parts.join(' ')

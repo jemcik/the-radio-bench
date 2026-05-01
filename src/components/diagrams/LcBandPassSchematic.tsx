@@ -1,18 +1,28 @@
 /**
- * Chapter 1.8 §7 — series-LC band-pass filter.
+ * Chapter 1.8 — series-LC band-pass filter.
  *
  * Topology (left → right):
- *   V_in → L in series → C in series → V_out node → R_load down to GND
+ *   V_in → L in series → C in series → V_out node → R_L down to GND
  *
  * The series LC pair sits in the signal path. At its resonant frequency
  * f_0 = 1 / (2π√(LC)) the pair looks like a near-short, so the signal
- * at f_0 sails through to the load resistor. Off-resonance the series
- * impedance climbs and very little reaches the load.
+ * at f_0 sails through and develops across R_L. Off-resonance, the
+ * series impedance climbs and less and less voltage develops across
+ * R_L.
  *
- * The load resistor R is drawn explicitly because the LC's bandwidth
- * is set by the loaded Q, which depends on R — without it the «open»
- * output would have an undefined response. Same convention as the
- * VnaSweep widget assumes a 50 Ω load.
+ * R_L is the LOAD — the next stage's input impedance or the antenna —
+ * NOT part of the filter itself. Drawn explicitly because without ANY
+ * load the open-circuit output has zero current, zero drop across L+C,
+ * and V_out = V_in at every frequency: no band-pass shape at all. The
+ * label «R_L» (TeX subscript) is parsed by SymbolLabel into «R» with
+ * subscript «L» so the reader can tell the load apart from a generic
+ * resistor. The bandwidth follows the loaded-Q rule from Chapter 1.7:
+ * smaller R_L → lower loaded Q → wider passband.
+ *
+ * Other LC schematics in this chapter (LPF, notch) don't show a load
+ * because their topologies still produce a divider without one (the
+ * shunt cap or shunt LC tank does the dividing). Only the series-LC
+ * band-pass needs an external return path to ground.
  *
  * Uses `@/lib/circuit` primitives only.
  */
@@ -85,7 +95,7 @@ export default function LcBandPassSchematic() {
       {/* Components */}
       <Inductor x={L_X} y={TOP_Y} label="L" />
       <Capacitor x={C_X} y={TOP_Y} label="C" />
-      <Resistor x={R_X} y={(TOP_Y + BOT_Y) / 2} orient="down" label="R" />
+      <Resistor x={R_X} y={(TOP_Y + BOT_Y) / 2} orient="down" label="R_L" />
 
       {/* Junction where R taps off the signal rail */}
       <Junction x={NODE_X} y={TOP_Y} />

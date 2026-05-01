@@ -146,6 +146,14 @@ const RULES = [
   // ── Forbidden words from landmines.md ───────────────────────────────────
 
   {
+    id: 'forbidden.section-symbol',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /§/g,
+    hint: 'The «§» (section sign) is not used in this course — flagged by the user. Use «розділ X.Y» / «у попередньому розділі» / «Chapter X.Y» instead. Source-code header comments are fine; this rule scans i18n values only.',
+  },
+
+  {
     id: 'forbidden.domovlenist',
     category: 'FORBIDDEN',
     severity: 'ERROR',

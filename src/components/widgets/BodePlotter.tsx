@@ -58,6 +58,13 @@ function dbToY(db: number): number {
   // computes to e.g. −150 dB (HPF at f ≪ f_c, 5th order). Spelled
   // out in `.claude/skills/diagram-quality/references/plotted-curves.md`
   // — and shipped wrong in this widget anyway, caught visually.
+  //
+  // Defensive: non-finite db (e.g. log10(0) at a notch zero — not
+  // possible in this widget's LPF/HPF, but kept for consistency with
+  // VnaFilterSweepMock) maps to non-finite y, which `.toFixed()`
+  // renders as «Infinity» — an invalid SVG path coord that aborts the
+  // rest of the trace. Coerce to a finite far-off-frame y instead.
+  if (!Number.isFinite(db)) return PLOT_BOTTOM + 10000
   const t = (Y_MAX_DB - db) / (Y_MAX_DB - Y_MIN_DB)
   return PLOT_TOP + t * PLOT_H
 }

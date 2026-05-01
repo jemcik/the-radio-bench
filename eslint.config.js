@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', '**/vite.config.ts.timestamp-*.mjs'] },
+  { ignores: ['dist', 'node_modules', '**/vite.config.ts.timestamp-*.mjs', '.claude/worktrees/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

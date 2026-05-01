@@ -10,6 +10,13 @@ import { cn } from '@/lib/utils'
 export interface LabStep {
   text: React.ReactNode
   note?: React.ReactNode
+  /**
+   * Optional block-level content rendered BELOW step.text — schematic,
+   * photo, magnitude scale, etc. Not nested inside the inline `<span>`
+   * that holds `text`, so block elements (`<figure>`, `<svg>`) are HTML-
+   * legal here.
+   */
+  diagram?: React.ReactNode
 }
 
 export interface LabActivityProps {
@@ -119,6 +126,9 @@ export default function LabActivity({
                     </span>
                     <div className="flex-1 min-w-0">
                       <span className="text-card-foreground">{step.text}</span>
+                      {step.diagram && (
+                        <div className="mt-3">{step.diagram}</div>
+                      )}
                       {step.note && (
                         <p className="text-muted-foreground italic text-xs mt-1">{step.note}</p>
                       )}
