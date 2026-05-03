@@ -188,7 +188,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Transformers',
         subtitle: 'Turns ratio, impedance transformation, coupling',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.4'],

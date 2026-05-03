@@ -57,7 +57,7 @@ export {
 export { Resistor, Capacitor, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
-export { Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
+export { AcSource, Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
 
 // Symbols — semiconductors
 export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, OpAmp } from './symbols'

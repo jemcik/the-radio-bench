@@ -575,6 +575,18 @@ export const glossary: Record<string, GlossaryEntry> = {
       'An unun is the impedance-matching cousin of the balun: both sides of the line are unbalanced, so there is no symmetry-balancing role — only impedance transformation. Three ratios dominate amateur use. (1) **9:1 unun** — converts 50 Ω to ≈ 450 Ω, used at the feed point of a random-wire antenna (the «9:1 long wire»); the high-impedance side connects to the radiator with a counterpoise as the return. (2) **49:1 unun** — converts 50 Ω to ≈ 2450 Ω, used at the feed point of an end-fed-half-wave (EFHW) antenna, where a half-wavelength wire presents a very high impedance at its end. (3) **4:1 unun** — converts 50 Ω to 200 Ω for some long-wire and shortened-vertical variants. Ununs are wound on ferrite or iron-powder toroids (FT-140-43 is a common 100 W EFHW choice) with bifilar or trifilar windings depending on the ratio. Unlike a balun, an unun does NOT block common-mode current — if the load is asymmetric (and most random-wire and EFHW antennas are), the coax shield will still radiate unless you add a separate 1:1 current choke a quarter-wavelength down the coax.',
     see: ['transformer', 'toroid', 'antenna', 'coax'],
   },
+  hysteresis: {
+    tip: 'A magnetic core\'s resistance to changing direction — the core «remembers» its previous flux, so reversing the field costs energy each cycle, dissipated as heat.',
+    detail:
+      'Hysteresis is the lag between cause and effect in any magnetic material. Magnetise an iron core in one direction, then reverse the field — the core does not flip cleanly to follow; it resists, and only changes once the new field is strong enough to overcome the existing alignment of its magnetic domains. The energy spent forcing each flip is dissipated as heat. On a B-vs-H plot the relationship traces out a closed loop (the «hysteresis loop») whose enclosed area equals the energy lost per cycle. Hysteresis loss is one of the four loss mechanisms in a real transformer, alongside leakage inductance, copper I²R heating, and eddy-current loss. Materials with narrow hysteresis loops (silicon steel, ferrites) are preferred for transformer cores because they waste the least energy per AC cycle.',
+    see: ['transformer', 'ferrite', 'saturation'],
+  },
+  'eddy current': {
+    tip: 'Circulating currents induced inside the body of a conductor by a changing magnetic field — they dissipate as heat and limit how thick a transformer\'s core can be at high frequencies.',
+    detail:
+      'Whenever a changing magnetic flux passes through a conductor, it induces voltages — and where there are voltages, current flows. In a solid metal core, those induced currents form little circular loops inside the metal itself, perpendicular to the field direction. Each loop dissipates energy as I²R heating. The loss rises with the square of the frequency and the square of the core\'s thickness, which is why low-frequency iron-core transformers use thin laminated sheets (each lamination is a much smaller loop than a solid block) and why high-frequency cores are made of insulating ferrite (no metallic conduction path = no eddy currents). Eddy currents have constructive uses too: induction heating, eddy-current brakes, metal detectors, and the velocity-feedback damping in some moving-coil meters all depend on them.',
+    see: ['transformer', 'ferrite', 'hysteresis'],
+  },
   saturation: {
     tip: 'When the magnetic core of an inductor reaches its maximum flux; further current produces almost no extra flux, so the inductance collapses.',
     detail:
