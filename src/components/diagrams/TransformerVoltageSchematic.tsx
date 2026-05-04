@@ -49,12 +49,16 @@ const X_TX = 290
 const X_LOAD = 440
 const RIGHT_EDGE_X = 525
 
-// Transformer primary pin offsets (the primitive's leads end at ±30
-// from center on the X axis, ±12 on the Y axis).
-const TX_PRI_X = X_TX - 30
-const TX_SEC_X = X_TX + 30
-const TX_TOP_Y = MID_Y - 12
-const TX_BOT_Y = MID_Y + 12
+// Transformer used in orient='up' so primary appears on the LEFT
+// (matching the schematic flow). After rotation:
+//   primary.p2 (top-left)    = (X_TX-12, MID_Y-30)
+//   primary.p1 (bottom-left) = (X_TX-12, MID_Y+30)
+//   secondary.p2 (top-right) = (X_TX+12, MID_Y-30)
+//   secondary.p1 (bot-right) = (X_TX+12, MID_Y+30)
+const TX_PRI_X = X_TX - 12
+const TX_SEC_X = X_TX + 12
+const TX_TOP_Y = MID_Y - 30
+const TX_BOT_Y = MID_Y + 30
 
 export default function TransformerVoltageSchematic() {
   const { t } = useTranslation('ui')
@@ -101,7 +105,12 @@ export default function TransformerVoltageSchematic() {
 
       {/* ── COMPONENTS ───────────────────────────────────────────────── */}
       <AcSource x={X_AC} y={TOP_Y} />
-      <Transformer x={X_TX} y={MID_Y} />
+      <Transformer
+        x={X_TX}
+        y={MID_Y}
+        orient="up"
+        ratio={t('ch1_9.schematicVoltageDemoRatio')}
+      />
       <Resistor x={X_LOAD} y={TOP_Y} />
 
       {/* Junction dots where stubs meet rails (T-joints) */}
@@ -121,10 +130,6 @@ export default function TransformerVoltageSchematic() {
         {t('ch1_9.schematicVoltageDemoLoad')}
       </TerminalLabel>
 
-      {/* Ratio label below the transformer */}
-      <TerminalLabel x={X_TX} y={BOT_Y + 22} anchor="middle">
-        {t('ch1_9.schematicVoltageDemoRatio')}
-      </TerminalLabel>
     </Circuit>
   )
 }

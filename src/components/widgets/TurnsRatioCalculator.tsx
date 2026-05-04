@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
-import { withSubscripts } from '@/lib/text-with-subscripts'
+import { MathText } from '@/components/ui/math-text'
 
 /**
  * Chapter 1.9 — Turns ratio calculator.
@@ -90,7 +90,7 @@ function InputRow({ labelKey, disp, setDisp, idSuffix, unit, t }: InputRowProps)
         htmlFor={`turns-val-${idSuffix}`}
         className="text-foreground font-medium shrink-0 w-44"
       >
-        {withSubscripts(t(labelKey))}
+        <MathText>{t(labelKey)}</MathText>
       </label>
       <input
         id={`turns-val-${idSuffix}`}
@@ -147,8 +147,8 @@ export default function TurnsRatioCalculator() {
 
   return (
     <Widget
-      title={withSubscripts(t('ch1_9.widget.turnsRatio.title'))}
-      description={withSubscripts(t('ch1_9.widget.turnsRatio.description'))}
+      title={t('ch1_9.widget.turnsRatio.title')}
+      description={t('ch1_9.widget.turnsRatio.description')}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputRow
@@ -184,12 +184,12 @@ export default function TurnsRatioCalculator() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <ResultBox tone="success" label={withSubscripts(t('ch1_9.widget.turnsRatio.vsReadout'))}>
+        <ResultBox tone="success" label={<MathText>{t('ch1_9.widget.turnsRatio.vsReadout')}</MathText>}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {vsOut.display} {tUnit(vsOut.unitKey)}
           </p>
         </ResultBox>
-        <ResultBox tone="success" label={withSubscripts(t('ch1_9.widget.turnsRatio.isReadout'))}>
+        <ResultBox tone="success" label={<MathText>{t('ch1_9.widget.turnsRatio.isReadout')}</MathText>}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {isOut.display} {tUnit(isOut.unitKey)}
           </p>

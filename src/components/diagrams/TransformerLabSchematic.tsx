@@ -39,10 +39,11 @@ const LEFT_EDGE_X = 80
 const X_TX = 330
 const X_METER = 540
 
-const TX_PRI_X = X_TX - 30
-const TX_SEC_X = X_TX + 30
-const TX_TOP_Y = MID_Y - 12
-const TX_BOT_Y = MID_Y + 12
+// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
+const TX_PRI_X = X_TX - 12
+const TX_SEC_X = X_TX + 12
+const TX_TOP_Y = MID_Y - 30
+const TX_BOT_Y = MID_Y + 30
 
 // Meter — vertical orientation so its two probes sit on the secondary
 // rails; meterPins helper gives the absolute lead positions.
@@ -81,7 +82,7 @@ export default function TransformerLabSchematic() {
       <Wire points={[{ x: TX_SEC_X, y: TX_BOT_Y }, { x: TX_SEC_X, y: BOT_Y }, { x: meter.p2.x, y: BOT_Y }, meter.p2]} />
 
       {/* ── COMPONENTS ──────────────────────────────────────────────── */}
-      <Transformer x={X_TX} y={MID_Y} ratio="1 : 4" />
+      <Transformer x={X_TX} y={MID_Y} orient="up" ratio="1 : 4" />
       <Meter
         x={X_METER}
         y={MID_Y}

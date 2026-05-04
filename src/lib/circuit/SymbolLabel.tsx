@@ -75,6 +75,16 @@ function parseLabelSubscript(s: string): { base: string; sub: string } | null {
  */
 export function renderLabelContent(children: React.ReactNode): React.ReactNode {
   if (typeof children !== 'string') return children
+  // INLINE-MATH FALLBACK: if the string contains a <var> tag NOT at the
+  // outer position (e.g. «1 : <var>N</var>», «load = <var>R</var>»),
+  // parseLabelSubscript can't match — its regex anchors `^<var>...$`.
+  // Delegate to renderSvgInlineMath, which splits on every <var>…</var>
+  // fragment and renders each as italic with subscript handling. Keeps
+  // the simple outer-wrapped and plain-string cases on the cheap path
+  // below; only falls back when the canonical wrapper doesn't match.
+  if (children.includes('<var>') && !/^<var>.+<\/var>$/.test(children)) {
+    return renderSvgInlineMath(children)
+  }
   const parsed = parseLabelSubscript(children)
   if (!parsed) return children
   return (

@@ -38,10 +38,11 @@ const X_TX = 290
 const X_LOAD = 440
 const RIGHT_EDGE_X = 525
 
-const TX_PRI_X = X_TX - 30
-const TX_SEC_X = X_TX + 30
-const TX_TOP_Y = MID_Y - 12
-const TX_BOT_Y = MID_Y + 12
+// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
+const TX_PRI_X = X_TX - 12
+const TX_SEC_X = X_TX + 12
+const TX_TOP_Y = MID_Y - 30
+const TX_BOT_Y = MID_Y + 30
 
 export default function TransformerImpedanceSchematic() {
   const { t } = useTranslation('ui')
@@ -75,7 +76,12 @@ export default function TransformerImpedanceSchematic() {
 
       {/* Components */}
       <AcSource x={X_SRC} y={TOP_Y} />
-      <Transformer x={X_TX} y={MID_Y} />
+      <Transformer
+        x={X_TX}
+        y={MID_Y}
+        orient="up"
+        ratio={t('ch1_9.schematicImpedanceMatchRatio')}
+      />
       <Resistor x={X_LOAD} y={TOP_Y} />
 
       {/* T-joints */}
@@ -90,9 +96,6 @@ export default function TransformerImpedanceSchematic() {
       </TerminalLabel>
       <TerminalLabel x={X_LOAD} y={TOP_Y - 22} anchor="middle">
         {t('ch1_9.schematicImpedanceMatchLoad')}
-      </TerminalLabel>
-      <TerminalLabel x={X_TX} y={BOT_Y + 22} anchor="middle">
-        {t('ch1_9.schematicImpedanceMatchRatio')}
       </TerminalLabel>
     </Circuit>
   )

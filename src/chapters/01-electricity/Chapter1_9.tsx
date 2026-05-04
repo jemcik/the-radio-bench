@@ -157,7 +157,13 @@ export default function Chapter1_9() {
         />
       </p>
 
-      <p>{t('ch1_9.currentFormulaIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_9.currentFormulaIntro"
+          ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
 
       <MBlock tex="\dfrac{I_{p}}{I_{s}} = \dfrac{N_{s}}{N_{p}}" />
 
@@ -251,7 +257,13 @@ export default function Chapter1_9() {
       {/* ── Section 5: Real-world losses ───────────────────────── */}
       <Section id="losses" labelKey="ch1_9.sectionLosses" />
 
-      <p>{t('ch1_9.lossesIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_9.lossesIntro"
+          ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
 
       <p>
         <Trans

@@ -44,6 +44,7 @@ export {
   pins2,
   pinsBJT,
   pinsOpAmp,
+  pinsXfmr,
   pin1,
   orientAngle,
   isVertical,

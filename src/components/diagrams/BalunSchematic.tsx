@@ -42,10 +42,11 @@ const LEFT_EDGE_X = 60
 const X_TX = 290
 const RIGHT_EDGE_X = 525
 
-const TX_PRI_X = X_TX - 30
-const TX_SEC_X = X_TX + 30
-const TX_TOP_Y = MID_Y - 12
-const TX_BOT_Y = MID_Y + 12
+// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
+const TX_PRI_X = X_TX - 12
+const TX_SEC_X = X_TX + 12
+const TX_TOP_Y = MID_Y - 30
+const TX_BOT_Y = MID_Y + 30
 
 // Ground symbol on the primary's bottom terminal — sits between the
 // transformer and the left edge.
@@ -85,7 +86,7 @@ export default function BalunSchematic() {
       <Wire points={[{ x: TX_SEC_X, y: TX_BOT_Y }, { x: TX_SEC_X, y: BOT_Y }, { x: RIGHT_EDGE_X, y: BOT_Y }]} />
 
       {/* ── COMPONENTS ──────────────────────────────────────────────── */}
-      <Transformer x={X_TX} y={MID_Y} ratio="1 : 2" />
+      <Transformer x={X_TX} y={MID_Y} orient="up" ratio="1 : 2" />
       <Ground x={X_GND} y={BOT_Y + 7} orient="down" />
 
       {/* ── LABELS ──────────────────────────────────────────────────── */}

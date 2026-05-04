@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
-import { withSubscripts } from '@/lib/text-with-subscripts'
+import { MathText } from '@/components/ui/math-text'
 
 /**
  * Chapter 1.9 — Impedance transformer.
@@ -84,8 +84,8 @@ export default function ImpedanceTransformer() {
 
   return (
     <Widget
-      title={withSubscripts(t('ch1_9.widget.impedance.title'))}
-      description={withSubscripts(t('ch1_9.widget.impedance.description'))}
+      title={t('ch1_9.widget.impedance.title')}
+      description={t('ch1_9.widget.impedance.description')}
     >
       {/* Load impedance input */}
       <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -93,7 +93,7 @@ export default function ImpedanceTransformer() {
           htmlFor="impedance-zs"
           className="text-foreground font-medium shrink-0 w-44"
         >
-          {withSubscripts(t('ch1_9.widget.impedance.zsLabel'))}
+          <MathText>{t('ch1_9.widget.impedance.zsLabel')}</MathText>
         </label>
         <input
           id="impedance-zs"
@@ -111,7 +111,7 @@ export default function ImpedanceTransformer() {
       {/* Turns ratio preset selector */}
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <span className="text-foreground font-medium shrink-0 w-44">
-          {withSubscripts(t('ch1_9.widget.impedance.ratioLabel'))}
+          <MathText>{t('ch1_9.widget.impedance.ratioLabel')}</MathText>
         </span>
         {RATIO_PRESETS.map((p, i) => (
           <button
@@ -132,7 +132,7 @@ export default function ImpedanceTransformer() {
 
       {/* Outputs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <ResultBox tone="success" label={withSubscripts(t('ch1_9.widget.impedance.zpReadout'))}>
+        <ResultBox tone="success" label={<MathText>{t('ch1_9.widget.impedance.zpReadout')}</MathText>}>
           <p className="text-xl font-mono font-semibold text-foreground">
             {zpOut.display} {tUnit(zpOut.unitKey)}
           </p>

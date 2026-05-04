@@ -20,8 +20,10 @@ function setup(language: 'en' | 'uk' = 'en') {
 describe('TurnsRatioCalculator', () => {
   it('renders the default V_s ≈ 12 V', () => {
     const { container } = setup()
-    // Locale formatter strips trailing zeros, so we expect "12 V" not "12.0 V".
-    expect(container.textContent).toMatch(/Secondary V_\{s\}\s*12\s*V/)
+    // KaTeX-rendered <var>V_{s}</var> labels emit a noisy textContent
+    // (visible glyphs + MathML source + aria-label, all concatenated), so
+    // anchor on the unique numeric output instead of the label string.
+    expect(container.textContent).toContain('12 V')
   })
 
   it('shows step-down for the default state', () => {

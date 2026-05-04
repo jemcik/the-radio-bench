@@ -2150,7 +2150,9 @@
       "family": "family",
       "if filter": "IF filter",
       "adc": "ADC",
-      "power amplifier": "power amplifier"
+      "power amplifier": "power amplifier",
+      "hysteresis": "hysteresis",
+      "eddy current": "eddy current"
     }
   },
   "calloutLabels": {
@@ -2948,7 +2950,7 @@
     "voltageFormulaIntro": "The voltage on the secondary is the voltage on the primary multiplied by the turns ratio:",
     "voltageStepUpDown": "If the secondary has <strong>more</strong> turns than the primary, the voltage goes up — call it a <strong>step-up</strong> transformer. <strong>Fewer</strong> turns and the voltage goes down — a <strong>step-down</strong>. The same physical transformer can do either job: which winding you treat as the primary determines the direction. A 230 V → 12 V mains transformer used in reverse becomes a 12 V → 230 V step-up, with all the same windings — just driven from the other side.",
     "voltageExample": "<strong>Worked example.</strong> A small mains transformer has 920 turns on its primary and 48 turns on its secondary. Plug it into 230 V AC. The secondary voltage is <nowrap>230 × 48 / 920 = 12 V</nowrap> — exactly what the rig wants on its 12 V input.",
-    "voltageWidgetIntro": "Try it for yourself. Drag the turns sliders or type values directly; the voltage on the other side updates immediately, and the indicator tells you whether you've built a step-up or a step-down.",
+    "voltageWidgetIntro": "Try it for yourself. Type any pair of turn counts (or nudge them with the spinner arrows); the voltage on the other side updates immediately, and the indicator tells you whether you've built a step-up or a step-down.",
     "voltageGotcha": "Step-up doesn't mean «free voltage». A 1:10 transformer hands you ten times the voltage with one tenth the current — power balances. We turn to that next.",
     "sectionCurrent": "The current ratio",
     "currentConservation": "A transformer cannot create energy. Whatever power flows in on the primary side has to flow out on the secondary side (minus losses, which we'll get to). Power is voltage times current — <nowrap><var>P</var> = <var>V</var><var>I</var></nowrap> — so if the secondary's voltage is ten times higher, its current must be one tenth, otherwise the books don't balance.",
@@ -3122,12 +3124,12 @@
       "turnsRatio": {
         "title": "Turns ratio calculator",
         "description": "Set the primary and secondary turn counts and the primary voltage. The widget gives the secondary voltage and current, and tells you whether you've built a step-up or a step-down.",
-        "npLabel": "Primary turns N_{p}",
-        "nsLabel": "Secondary turns N_{s}",
-        "vpLabel": "Primary voltage V_{p}",
-        "ipLabel": "Primary current I_{p}",
-        "vsReadout": "Secondary V_{s}",
-        "isReadout": "Secondary I_{s}",
+        "npLabel": "Primary turns <var>N_{p}</var>",
+        "nsLabel": "Secondary turns <var>N_{s}</var>",
+        "vpLabel": "Primary voltage <var>V_{p}</var>",
+        "ipLabel": "Primary current <var>I_{p}</var>",
+        "vsReadout": "Secondary <var>V_{s}</var>",
+        "isReadout": "Secondary <var>I_{s}</var>",
         "ratioReadout": "Turns ratio",
         "kindReadout": "Type",
         "kindStepUp": "step-up",
@@ -3138,9 +3140,9 @@
       "impedance": {
         "title": "Impedance transformer",
         "description": "Set the load impedance on the secondary and the turns ratio. The widget gives the impedance the source on the primary side actually sees.",
-        "zsLabel": "Load impedance Z_{s}",
-        "ratioLabel": "Turns ratio N_{p} : N_{s}",
-        "zpReadout": "Source sees Z_{p}",
+        "zsLabel": "Load impedance <var>Z_{s}</var>",
+        "ratioLabel": "Turns ratio <var>N_{p}</var> : <var>N_{s}</var>",
+        "zpReadout": "Source sees <var>Z_{p}</var>",
         "ratioSquaredReadout": "Impedance ratio",
         "swrReadout": "SWR vs 50 Ω",
         "swrGood": "match (≤ 2:1)",
