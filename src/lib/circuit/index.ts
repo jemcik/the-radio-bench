@@ -73,4 +73,4 @@ export {
 export { Antenna, Crystal, Transformer } from './symbols'
 
 // Symbols — pedagogical annotations (named-node markers, terminal labels)
-export { NodePoint, TerminalLabel } from './symbols'
+export { NodePoint, TerminalLabel, Tap } from './symbols'

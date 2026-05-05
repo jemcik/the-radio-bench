@@ -33,6 +33,16 @@ const FIELDS = ['tip', 'detail', 'formula', 'unit']
 // Match any HTML-ish opening tag: <name…>, <name/>, </name>. Also catch
 // the legacy «<var>X_{...}</var>» that some entries still carry.
 const TAG_RE = /<\/?[a-zA-Z][a-zA-Z0-9]*\b[^>]*>/g
+// Markdown emphasis (`**bold**`, `__bold__`). withSubscripts does NOT
+// process Markdown either — these ship as literal asterisks/underscores
+// in the rendered glossary card. Caught after `**no galvanic isolation**`
+// shipped in `glossary.variac.detail` (ch1.9 review-pass, May 2026).
+const MD_EMPHASIS_RE = /\*\*[^*\n]+\*\*|__[^_\n]+__/g
+
+const MARKUP_PATTERNS = [
+  { name: 'HTML/JSX tag', re: TAG_RE },
+  { name: 'Markdown emphasis', re: MD_EMPHASIS_RE },
+]
 
 const issues = []
 
@@ -48,17 +58,19 @@ const issues = []
     const re = new RegExp(`(['"\`]?)(${field})\\1\\s*:\\s*('([^'\\\\]|\\\\.)*'|"([^"\\\\]|\\\\.)*"|\`([^\`\\\\]|\\\\.)*\`)`, 'gs')
     for (const m of src.matchAll(re)) {
       const literal = m[3]
-      const tagMatches = literal.matchAll(TAG_RE)
-      for (const tm of tagMatches) {
-        const ln = src.slice(0, m.index + m[0].indexOf(literal) + tm.index).split('\n').length
-        issues.push({
-          source: 'glossary.ts',
-          file: path.relative(ROOT, file),
-          line: ln,
-          field,
-          tag: tm[0],
-          excerpt: literal.slice(Math.max(0, tm.index - 30), tm.index + tm[0].length + 30).replace(/\s+/g, ' '),
-        })
+      for (const { name, re: pat } of MARKUP_PATTERNS) {
+        for (const tm of literal.matchAll(pat)) {
+          const ln = src.slice(0, m.index + m[0].indexOf(literal) + tm.index).split('\n').length
+          issues.push({
+            source: 'glossary.ts',
+            file: path.relative(ROOT, file),
+            line: ln,
+            field,
+            kind: name,
+            tag: tm[0],
+            excerpt: literal.slice(Math.max(0, tm.index - 30), tm.index + tm[0].length + 30).replace(/\s+/g, ' '),
+          })
+        }
       }
     }
   }
@@ -75,15 +87,18 @@ for (const locale of ['en', 'uk']) {
     for (const field of FIELDS) {
       const v = entry[field]
       if (typeof v !== 'string') continue
-      for (const tm of v.matchAll(TAG_RE)) {
-        issues.push({
-          source: `${locale}/ui.json`,
-          file: path.relative(ROOT, file),
-          term,
-          field,
-          tag: tm[0],
-          excerpt: v.slice(Math.max(0, tm.index - 30), tm.index + tm[0].length + 30).replace(/\s+/g, ' '),
-        })
+      for (const { name, re: pat } of MARKUP_PATTERNS) {
+        for (const tm of v.matchAll(pat)) {
+          issues.push({
+            source: `${locale}/ui.json`,
+            file: path.relative(ROOT, file),
+            term,
+            field,
+            kind: name,
+            tag: tm[0],
+            excerpt: v.slice(Math.max(0, tm.index - 30), tm.index + tm[0].length + 30).replace(/\s+/g, ' '),
+          })
+        }
       }
     }
   }
@@ -94,14 +109,16 @@ if (issues.length === 0) {
   process.exit(0)
 }
 
-console.error('check:glossary-markup FAIL — these glossary fields contain HTML/JSX tags. Glossary text is rendered as plain text via `withSubscripts()` (see src/features/glossary/term.tsx); HTML tags ship to readers as literal characters.')
+console.error('check:glossary-markup FAIL — these glossary fields contain markup that the renderer does NOT process. Glossary text is rendered as plain text via `withSubscripts()` (see src/features/glossary/term.tsx); HTML tags AND Markdown emphasis (`**bold**`, `__bold__`) both ship to readers as literal characters.')
 console.error('')
 for (const i of issues) {
   const where = i.term ? `glossary.${i.term}.${i.field}` : `${i.field} (line ${i.line})`
-  console.error(`  ${i.file}  ${where}  →  ${i.tag}`)
+  console.error(`  ${i.file}  ${where}  →  ${i.kind}: ${i.tag}`)
   console.error(`    …${i.excerpt}…`)
 }
 console.error('')
-console.error(`${issues.length} tag occurrence(s) in glossary fields.`)
-console.error('Fix: replace «<em>X</em>» / «<strong>X</strong>» with guillemets «X», and rewrite «<var>X_{Y}</var>» as bare «X_Y» (withSubscripts handles that automatically).')
+console.error(`${issues.length} markup occurrence(s) in glossary fields.`)
+console.error('Fix:')
+console.error('  • Replace «<em>X</em>» / «<strong>X</strong>» / «**X**» with guillemets «X».')
+console.error('  • Rewrite «<var>X_{Y}</var>» as bare «X_Y» (withSubscripts handles that automatically).')
 process.exit(1)

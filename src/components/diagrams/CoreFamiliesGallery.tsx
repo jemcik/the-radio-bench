@@ -31,58 +31,101 @@ const ILLUS_CY = 100
 const USE_Y = VB_H - 18
 
 function IronCore() {
-  // Stylised E-I lamination block: outer rectangle with horizontal
-  // stripes hinting at the laminations, plus a coil winding on a
-  // central leg.
-  const W = 130
-  const H = 80
-  const x0 = ILLUS_CX - W / 2
-  const y0 = ILLUS_CY - H / 2
-  const stripes = 5
+  // Front-view of a laminated E-I transformer (Gemini-designed after
+  // three hand-drawn attempts failed visual recognition). Layered
+  // build:
+  //   1. Faint-fill rectangle = whole iron block silhouette
+  //   2. Vertical lamination stripes across the entire block
+  //   3. Inner rectangle filled with the page background = the bobbin
+  //      «window» (the laminations behind it are occluded, creating
+  //      the visual of an E-I frame around a hollow centre)
+  //   4. Horizontal coil-turn lines that EXTEND past the bobbin's
+  //      left/right edges — each line is one turn of wire wrapping
+  //      around the hidden central leg behind the bobbin
+  //   5. Crisp outlines drawn last on top of everything
+  // The vertical-laminations / horizontal-windings contrast is what
+  // keeps iron and coil from visually merging into a picket fence.
+  const CORE_W = 120
+  const CORE_H = 96
+  const CORE_X = ILLUS_CX - CORE_W / 2
+  const CORE_Y = ILLUS_CY - CORE_H / 2
+
+  const COIL_W = 72
+  const COIL_H = 64
+  const COIL_X = ILLUS_CX - COIL_W / 2
+  const COIL_Y = ILLUS_CY - COIL_H / 2
+
+  const NUM_LAMINATIONS = 16
+  const NUM_WINDINGS = 14
 
   return (
-    <g stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round">
-      {/* Outer brick */}
-      <rect x={x0} y={y0} width={W} height={H} rx={3} />
-
-      {/* Lamination stripes */}
-      <g opacity={0.45}>
-        {Array.from({ length: stripes }).map((_, i) => (
-          <line
-            key={i}
-            x1={x0 + 4}
-            y1={y0 + (H * (i + 1)) / (stripes + 1)}
-            x2={x0 + W - 4}
-            y2={y0 + (H * (i + 1)) / (stripes + 1)}
-          />
-        ))}
-      </g>
-
-      {/* Central window — implies the E-I shape: an inner cutout where
-          the windings would sit on the centre leg */}
+    <g>
+      {/* Layer 1: Core body with faint fill */}
       <rect
-        x={x0 + 30}
-        y={y0 + 16}
-        width={W - 60}
-        height={H - 32}
-        fill="hsl(var(--card))"
-        opacity={0.7}
+        x={CORE_X}
+        y={CORE_Y}
+        width={CORE_W}
+        height={CORE_H}
+        rx={4}
+        ry={4}
+        fill="currentColor"
+        opacity={0.15}
       />
 
-      {/* Coil winding around the central leg — drawn as a stack of
-          horizontal bumps inside the inner window */}
-      <g strokeWidth={1.6}>
-        {Array.from({ length: 4 }).map((_, i) => {
-          const cy = y0 + 24 + i * 12
-          return (
-            <path
-              key={i}
-              d={`M ${x0 + 38} ${cy} a 6 4 0 0 1 ${W - 76} 0`}
-              fill="none"
-            />
-          )
+      {/* Layer 2: Vertical lamination lines across the whole core */}
+      <g stroke="currentColor" strokeWidth={1} opacity={0.4}>
+        {Array.from({ length: NUM_LAMINATIONS }).map((_, i) => {
+          const x = CORE_X + 4 + (i * (CORE_W - 8)) / (NUM_LAMINATIONS - 1)
+          return <line key={i} x1={x} y1={CORE_Y} x2={x} y2={CORE_Y + CORE_H} />
         })}
       </g>
+
+      {/* Layer 3: Coil area cutout. This is drawn on top of the laminations,
+          hiding the central parts and creating the E-I frame illusion. */}
+      <rect
+        x={COIL_X}
+        y={COIL_Y}
+        width={COIL_W}
+        height={COIL_H}
+        rx={2}
+        ry={2}
+        fill="hsl(var(--card))"
+      />
+
+      {/* Layer 4: Horizontal coil windings */}
+      <g stroke="currentColor" strokeWidth={1.6} fill="none" strokeLinecap="round">
+        {Array.from({ length: NUM_WINDINGS }).map((_, i) => {
+          const y = COIL_Y + 4 + (i * (COIL_H - 8)) / (NUM_WINDINGS - 1)
+          // Lines extend slightly past the cutout to imply wrapping around a central leg
+          const x1 = COIL_X - 5
+          const x2 = COIL_X + COIL_W + 5
+          return <line key={i} x1={x1} y1={y} x2={x2} y2={y} />
+        })}
+      </g>
+
+      {/* Layer 5: Final outlines, drawn on top for crispness */}
+      <rect
+        x={COIL_X}
+        y={COIL_Y}
+        width={COIL_W}
+        height={COIL_H}
+        rx={2}
+        ry={2}
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+      />
+      <rect
+        x={CORE_X}
+        y={CORE_Y}
+        width={CORE_W}
+        height={CORE_H}
+        rx={4}
+        ry={4}
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+      />
     </g>
   )
 }

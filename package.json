@@ -14,6 +14,7 @@
     "check:glossary-coverage": "node scripts/check-glossary-coverage.mjs",
     "check:bare-subscripts": "node scripts/check-bare-subscript-renders.mjs",
     "check:tag-renders": "node scripts/check-tag-renders.mjs",
+    "check:undefined-acronyms": "node scripts/check-undefined-acronyms.mjs",
     "check:hardcoded-units": "node scripts/check-hardcoded-units.mjs",
     "check:hardcoded-jsx": "node scripts/check-hardcoded-jsx-text.mjs",
     "check:glossary-markup": "node scripts/check-glossary-markup.mjs",

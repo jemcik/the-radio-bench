@@ -53,6 +53,8 @@ export default function Chapter1_9() {
           components={{
             strong: <strong />,
             xfmr: <G k="transformer" />,
+            feed: <G k="feeder" />,
+            fold: <G k="folded dipole" />,
           }}
         />
       </p>
@@ -70,6 +72,7 @@ export default function Chapter1_9() {
             toro: <G k="toroid" />,
             hyst: <G k="hysteresis" />,
             eddy: <G k="eddy current" />,
+            vrc: <G k="variac" />,
           }}
         />
       </p>
@@ -120,7 +123,7 @@ export default function Chapter1_9() {
 
       <p>{t('ch1_9.voltageFormulaIntro')}</p>
 
-      <MBlock tex="\dfrac{V_{s}}{V_{p}} = \dfrac{N_{s}}{N_{p}}" />
+      <MBlock tex="V_{s} = V_{p} \cdot \dfrac{N_{s}}{N_{p}}" />
 
       <p>
         <Trans
@@ -165,7 +168,7 @@ export default function Chapter1_9() {
         />
       </p>
 
-      <MBlock tex="\dfrac{I_{p}}{I_{s}} = \dfrac{N_{s}}{N_{p}}" />
+      <MBlock tex="I_{p} = I_{s} \cdot \dfrac{N_{s}}{N_{p}}" />
 
       <p>
         <Trans
@@ -208,7 +211,7 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.impedanceWhy"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, transceiver: <G k="transceiver" /> }}
         />
       </p>
 
@@ -222,7 +225,7 @@ export default function Chapter1_9() {
 
       <p>{t('ch1_9.impedanceFormulaIntro')}</p>
 
-      <MBlock tex="\dfrac{Z_{p}}{Z_{s}} = \left(\dfrac{N_{p}}{N_{s}}\right)^{2}" />
+      <MBlock tex="Z_{p} = Z_{s} \cdot \left(\dfrac{N_{p}}{N_{s}}\right)^{2}" />
 
       <TransformerImpedanceSchematic />
 
@@ -249,7 +252,7 @@ export default function Chapter1_9() {
           <Trans
             i18nKey="ch1_9.impedanceCallout"
             ns="ui"
-            components={{ strong: <strong /> }}
+            components={{ strong: <strong />, efhw: <G k="efhw" /> }}
           />
         </p>
       </Callout>
@@ -269,7 +272,13 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.lossesMagnetising"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{
+            ...mathComponents,
+            strong: <strong />,
+            nowrap: nowrap,
+            hyst: <G k="hysteresis" />,
+            eddy: <G k="eddy current" />,
+          }}
         />
       </p>
 

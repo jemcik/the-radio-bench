@@ -283,13 +283,22 @@ export function Term({ def, children, className = 'text-[hsl(var(--term-accent))
       )}
 
       {/* ── Pinned popover (full reference card) ──────────────────── */}
-      {/* `max-h-[70vh] overflow-y-auto` caps long entries; the
-          window-level wheel handler in the `useEffect` above forwards
-          wheel events to the page when the popup itself can't take them
-          (no overflow, or already at its scroll boundary). */}
+      {/* `max-h: var(--radix-popper-available-height)` clamps the popup to
+          the actual space between the anchor and the viewport edge on the
+          chosen side — minus `collisionPadding`. Radix populates this
+          variable via Floating UI's `size` middleware. A static cap like
+          `70vh` doesn't account for the anchor's position: when an anchor
+          sits high in the viewport (term in the first paragraph) and the
+          popper flips above it, the top of the popup ends up clipped above
+          the viewport top, and the user — already at the page top — has
+          no way to scroll back up to it. With the live var the popup
+          shrinks to whatever space exists, scrolling internally instead.
+          The `useEffect` wheel-forwarding above keeps page scroll working
+          when the popup is at its own scroll boundary. */}
       <PopoverContent
-        className="w-80 max-h-[70vh] overflow-y-auto px-4 py-3.5 text-xs leading-relaxed font-normal not-prose"
+        className="w-80 max-h-[var(--radix-popper-available-height)] overflow-y-auto px-4 py-3.5 text-xs leading-relaxed font-normal not-prose"
         sideOffset={8}
+        collisionPadding={16}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         {/* Header */}

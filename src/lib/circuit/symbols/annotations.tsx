@@ -136,3 +136,83 @@ export function TerminalLabel({
     </text>
   )
 }
+
+interface TapProps {
+  /** Tip of the arrow — the point that touches the winding. */
+  x: number
+  y: number
+  /** Direction the arrow flies FROM. `'right'` means the arrow comes
+   *  from the right side (tail on the right, tip pointing LEFT into
+   *  the winding); use this when the winding sits to the LEFT of the
+   *  external tap wire. */
+  from: 'left' | 'right' | 'up' | 'down'
+  /** Length of the arrow shaft (tail to tip). Default 10. */
+  length?: number
+  /** Width / height of the arrowhead triangle base. Default 5. */
+  headSize?: number
+}
+
+/**
+ * Tap arrow — a short arrowhead pointing INTO a winding to mark a tap
+ * connection point. Per ARRL Handbook 2023 Figure 4.31 (autotransformer
+ * schematic convention), a tap is shown as a wire branching off the
+ * winding at a specific position; this primitive provides the visual
+ * arrow indicator at the tap point so the reader's eye instantly
+ * locks onto «the wire connects to the winding HERE».
+ *
+ * Rendered as a short shaft + filled triangular arrowhead. The TIP of
+ * the arrow sits exactly at (x, y) — the caller positions it on the
+ * winding, then draws their tap wire from the SHAFT END outward.
+ *
+ * The shaft-end coordinate (where the external tap wire should
+ * connect) depends on `from`:
+ *   from='right'  → shaft end at (x + length, y)
+ *   from='left'   → shaft end at (x - length, y)
+ *   from='down'   → shaft end at (x, y + length)
+ *   from='up'     → shaft end at (x, y - length)
+ *
+ * @example
+ *   <Tap x={290} y={97} from="right" />
+ *   <Wire points={[{ x: 290 + 14, y: 97 }, { x: 410, y: 97 }]} />
+ */
+export function Tap({
+  x, y, from,
+  length = 10,
+  headSize = 5,
+}: TapProps) {
+  // Shaft endpoints. (x, y) is the tip; the tail sits `length` away in
+  // the direction the arrow comes FROM.
+  const dx = from === 'right' ? 1 : from === 'left' ? -1 : 0
+  const dy = from === 'down' ? 1 : from === 'up' ? -1 : 0
+  const tailX = x + dx * length
+  const tailY = y + dy * length
+
+  // Arrowhead — an isoceles triangle whose apex is at (x, y) and whose
+  // base sits `headSize` back along the shaft. The base width is also
+  // `headSize`. Built as a path for a clean filled shape.
+  // Base midpoint:
+  const baseX = x + dx * headSize
+  const baseY = y + dy * headSize
+  // Perpendicular unit vector for base width:
+  const px = -dy
+  const py = dx
+  const halfW = headSize / 2
+  const b1x = baseX + px * halfW
+  const b1y = baseY + py * halfW
+  const b2x = baseX - px * halfW
+  const b2y = baseY - py * halfW
+
+  return (
+    <g stroke="currentColor" fill="currentColor" strokeLinecap="round" strokeLinejoin="round">
+      {/* Shaft from tail to base of arrowhead */}
+      <line
+        x1={tailX} y1={tailY}
+        x2={baseX} y2={baseY}
+        strokeWidth={2}
+        fill="none"
+      />
+      {/* Filled arrowhead — apex at (x, y), base between (b1, b2). */}
+      <path d={`M ${x} ${y} L ${b1x} ${b1y} L ${b2x} ${b2y} Z`} strokeWidth={1} />
+    </g>
+  )
+}
