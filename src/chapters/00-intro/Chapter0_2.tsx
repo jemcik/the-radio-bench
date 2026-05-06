@@ -14,7 +14,13 @@ export default function Chapter0_2() {
 
   return (
     <>
-      <p>{t('ch0_2.intro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch0_2.intro"
+          ns="ui"
+          components={{ res: <G k="resistor" /> }}
+        />
+      </p>
 
       <p>
         <Trans i18nKey="ch0_2.coversInstruments" ns="ui"
@@ -87,7 +93,7 @@ export default function Chapter0_2() {
 
       <p>
         <Trans i18nKey="ch0_2.scopeSpecs" ns="ui"
-          components={{ ...mathComponents, strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" /> }}
+          components={{ ...mathComponents, strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" />, bw: <G k="bandwidth" /> }}
         />
       </p>
 

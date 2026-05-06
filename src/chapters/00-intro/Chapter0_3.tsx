@@ -38,6 +38,10 @@ export default function Chapter0_3() {
   const quizQuestions = useMemo(
     () => buildQuizFromI18n(t, 'ch0_3', QUIZ_QUESTION_COUNT, {
       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+      // `capacitor` (full word) avoids collision with the chapter's
+      // existing `cap` alias which maps to «capacitance» (the
+      // quantity/property), used in `intro` / `whatItIsIntro`.
+      capacitor: <G k="capacitor" />,
     }),
     [t],
   )
