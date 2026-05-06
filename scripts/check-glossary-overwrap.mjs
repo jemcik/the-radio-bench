@@ -52,6 +52,28 @@ const CHAPTERS_DIR = path.join(ROOT, 'src/chapters')
 // chapter that legitimately re-wraps a term once per section.
 const ADVISORY_THRESHOLD = 3
 
+// Key-prefix groups that share ONE logical section: every i18n key in
+// a group counts as one section for «wrap once per section» purposes.
+// Two wraps of the same glossary key across keys in the same group
+// is a strict failure even when neither key alone has duplicates.
+//
+// `lab*`  — the lab-activity block (goal, equipment, components,
+//           procedure steps, expected, troubleshooting). All read as
+//           one continuous lab walkthrough; wrapping «Arduino» in
+//           equipment AND again in step 2 is sprinkle, not section
+//           introduction.
+// `quiz_` — quiz items rendered as a flat list. The reader scans
+//           them all in one pass; double-wrapping the same term is
+//           the same kind of orange-soup as in lab.
+const SECTION_PREFIX_GROUPS = ['lab', 'quiz_']
+
+function sectionGroupOf(key) {
+  for (const prefix of SECTION_PREFIX_GROUPS) {
+    if (key.startsWith(prefix)) return prefix
+  }
+  return null
+}
+
 // Walk every Chapter*.tsx and extract alias→key bindings.
 function findChapterTsxFiles() {
   const out = []
@@ -130,7 +152,7 @@ function findWrapKeys(str, aliasMap) {
 const en = JSON.parse(fs.readFileSync(EN_PATH, 'utf-8'))
 const aliasMaps = buildAliasMaps()
 
-const strictHits = []         // [{chId, keyPath, gKey, count}]
+const strictHits = []         // [{chId, keyPath, gKey, count, kind}]
 const advisoryHits = []       // [{chId, gKey, total}]
 
 for (const [chId, block] of Object.entries(en)) {
@@ -138,8 +160,10 @@ for (const [chId, block] of Object.entries(en)) {
   if (typeof block !== 'object' || block === null) continue
   const aliasMap = aliasMaps.get(chId) ?? new Map()
 
-  // Per-string strict check
+  // Per-string strict check + per-section-group strict check
   const chapterTotals = new Map()  // gKey → total wraps in this chapter
+  // Map<sectionPrefix, Map<gKey, [{ key, count }]>> for section-group dupes
+  const sectionGroups = new Map()
   for (const { path: kp, value } of walkStrings(block)) {
     const keys = findWrapKeys(value, aliasMap)
     if (keys.length === 0) continue
@@ -148,7 +172,34 @@ for (const [chId, block] of Object.entries(en)) {
     for (const [gKey, count] of perString) {
       chapterTotals.set(gKey, (chapterTotals.get(gKey) ?? 0) + count)
       if (count >= 2) {
-        strictHits.push({ chId, keyPath: kp, gKey, count })
+        strictHits.push({ chId, keyPath: kp, gKey, count, kind: 'in-string' })
+      }
+    }
+    // Track wraps per (section-group, gKey) — but only count the i18n
+    // KEY once per term, not the per-string count, since a string
+    // already flagged as in-string-duplicate doesn't need to also
+    // light up the section-group check.
+    const topLevelKey = kp.split(/[.[]/)[0]
+    const grp = sectionGroupOf(topLevelKey)
+    if (grp !== null) {
+      if (!sectionGroups.has(grp)) sectionGroups.set(grp, new Map())
+      const groupMap = sectionGroups.get(grp)
+      for (const gKey of perString.keys()) {
+        if (!groupMap.has(gKey)) groupMap.set(gKey, [])
+        groupMap.get(gKey).push({ key: topLevelKey })
+      }
+    }
+  }
+  // Section-group strict failures: same gKey wrapped in 2+ different
+  // i18n keys within the same section-group prefix.
+  for (const [grp, groupMap] of sectionGroups) {
+    for (const [gKey, occs] of groupMap) {
+      const uniqueKeys = [...new Set(occs.map(o => o.key))]
+      if (uniqueKeys.length >= 2) {
+        strictHits.push({
+          chId, keyPath: `${grp}* (${uniqueKeys.join(', ')})`,
+          gKey, count: uniqueKeys.length, kind: 'section-group',
+        })
       }
     }
   }
@@ -163,11 +214,14 @@ for (const [chId, block] of Object.entries(en)) {
 
 let exitCode = 0
 
-if (strictHits.length > 0) {
+const inStringHits = strictHits.filter(h => h.kind === 'in-string')
+const sectionGroupHits = strictHits.filter(h => h.kind === 'section-group')
+
+if (inStringHits.length > 0) {
   console.log(
-    `check:glossary-overwrap FAIL — ${strictHits.length} i18n string(s) wrap the same glossary key 2+ times:\n`,
+    `check:glossary-overwrap FAIL — ${inStringHits.length} i18n string(s) wrap the same glossary key 2+ times:\n`,
   )
-  for (const { chId, keyPath, gKey, count } of strictHits) {
+  for (const { chId, keyPath, gKey, count } of inStringHits) {
     console.log(`  ${chId}.${keyPath} — «${gKey}» wrapped ${count}× in one string`)
   }
   console.log('')
@@ -175,6 +229,23 @@ if (strictHits.length > 0) {
   console.log('wraps in one i18n string is almost always a `<arduino2>`-style')
   console.log('alias-rename hack to bypass React/Trans\'s unique-alias-per-call')
   console.log('check. Pick the first occurrence to keep, drop the rest.')
+  console.log('')
+  exitCode = 1
+}
+
+if (sectionGroupHits.length > 0) {
+  console.log(
+    `check:glossary-overwrap FAIL — ${sectionGroupHits.length} glossary key(s) wrapped in 2+ i18n keys within the same section group:\n`,
+  )
+  for (const { chId, keyPath, gKey, count } of sectionGroupHits) {
+    console.log(`  ${chId}.${keyPath} — «${gKey}» wrapped in ${count} different keys`)
+  }
+  console.log('')
+  console.log('The `lab*` and `quiz_*` key prefixes each render as ONE logical')
+  console.log('section in the chapter (lab activity, quiz). Per the «once per')
+  console.log('section» rule, a glossary term should be wrapped in only ONE i18n')
+  console.log('key inside that group — keep the first narrative mention, drop')
+  console.log('the rest down to plain text.')
   console.log('')
   exitCode = 1
 }

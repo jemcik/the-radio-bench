@@ -225,7 +225,7 @@
     "labComp3": "Short jumper wires",
     "labStep1": "Set your multimeter to DC voltage (2V or 20V range). Touch the red probe to the AA battery positive terminal (+) and the black probe to negative (−). Read the voltage.",
     "labStep1Note": "A fresh AA battery reads about 1.5–1.6V. A partially used one might show 1.2–1.4V. This is normal.",
-    "labStep2": "Connect the Arduino to your computer with the <usb>USB</usb> cable. Open the <ide>Arduino IDE</ide>, load File → Examples → 01.Basics → Blink, and upload it. Pin 13 <led>LED</led> should blink once per second.",
+    "labStep2": "Connect the Arduino to your computer with the USB cable. Open the <ide>Arduino IDE</ide>, load File → Examples → 01.Basics → Blink, and upload it. Pin 13 <led>LED</led> should blink once per second.",
     "labStep3": "Open File → Examples → 01.Basics → AnalogReadSerial... actually, load this simple sketch instead:",
     "labStep3Note": "void setup() { pinMode(9, OUTPUT); } void loop() { tone(9, 1000); } — This outputs a 1 kHz <square>square wave</square> on pin 9 continuously.",
     "labStep4": "Connect the oscilloscope probe tip to Arduino pin 9. Clip the probe ground to Arduino <gnd>GND</gnd>. Set <timediv>time/div</timediv> to 0.5ms and <voltdiv>volt/div</voltdiv> to 2V.",
