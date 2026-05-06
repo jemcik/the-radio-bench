@@ -95,7 +95,7 @@ export default function BypassCapSchematic() {
         y={(TOP_Y + BOT_Y) / 2}
         orient="down"
         label="C"
-        value="100 nF"
+        value={`100 ${t('units.nf')}`}
       />
 
       {/* T-junctions: where the bypass branch taps each rail, and
