@@ -34,6 +34,7 @@ export default function Chapter1_7() {
       sub: <sub />,
       strong: <strong />,
       em: <em />,
+      sel: <G k="selectivity" />,
     }),
     [t],
   )
@@ -53,8 +54,7 @@ export default function Chapter1_7() {
             res: <G k="resonant frequency" />,
             reson: <G k="resonance" />,
             tank: <G k="tank" />,
-            nowrap: nowrap,
-          }}
+            nowrap: nowrap, lc: <G k="lc" /> }}
         />
       </p>
 
@@ -72,8 +72,7 @@ export default function Chapter1_7() {
             bw: <G k="bandwidth" />,
             reac: <G k="reactance" />,
             vna: <G k="vna" />,
-            ham: <G k="ham radio" />,
-          }}
+            ham: <G k="ham radio" />, filt: <G k="filter" /> }}
         />
       </p>
 
@@ -222,7 +221,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.seriesIntro"
           ns="ui"
-          components={{ var: <MathVar />, nowrap: nowrap }}
+          components={{ var: <MathVar />, nowrap: nowrap, imp: <G k="impedance" /> }}
         />
       </p>
 
@@ -233,8 +232,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            q: <G k="q-factor" />,
-          }}
+            q: <G k="q-factor" />, notch: <G k="notch" /> }}
         />
       </p>
 
@@ -294,8 +292,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            tuned: <G k="tuned circuit" />,
-          }}
+            tuned: <G k="tuned circuit" />, bpf: <G k="band-pass" /> }}
         />
       </p>
 
@@ -389,8 +386,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            decade: <G k="decade" />,
-          }}
+            decade: <G k="decade" />, capn: <G k="capacitance" /> }}
         />
       </p>
 
@@ -464,8 +460,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            atu: <G k="antenna tuner" />,
-          }}
+            atu: <G k="antenna tuner" />, swr: <G k="swr" />, inductance: <G k="inductance" /> }}
         />
       </p>
 
@@ -473,7 +468,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.appsFilters"
           ns="ui"
-          components={{ strong: <strong />, trap: <G k="trap" />, tank: <G k="tank" /> }}
+          components={{ strong: <strong />, trap: <G k="trap" />, tank: <G k="tank" />, hpf: <G k="high-pass" />, bsf: <G k="band-stop" /> }}
         />
       </p>
 
@@ -544,14 +539,14 @@ export default function Chapter1_7() {
         components={[
           <Trans key="c1" i18nKey="ch1_7.labComp1" ns="ui" components={{ strong: <strong /> }} />,
           <Trans key="c2" i18nKey="ch1_7.labComp2" ns="ui" components={{ strong: <strong /> }} />,
-          <Trans key="c3" i18nKey="ch1_7.labComp3" ns="ui" components={{ strong: <strong /> }} />,
+          <Trans key="c3" i18nKey="ch1_7.labComp3" ns="ui" components={{ strong: <strong />, resi: <G k="resistor" /> }} />,
         ]}
         procedure={[
           { text: <Trans i18nKey="ch1_7.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }} /> },
           { text: <Trans i18nKey="ch1_7.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em /> }} /> },
           { text: <Trans i18nKey="ch1_7.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_7.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em /> }} /> },
-          { text: <Trans i18nKey="ch1_7.labStep5" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, nowrap: nowrap }} /> },
+          { text: <Trans i18nKey="ch1_7.labStep5" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, nowrap: nowrap, dc: <G k="dc" /> }} /> },
           { text: <Trans i18nKey="ch1_7.labStep6" ns="ui" components={{ strong: <strong /> }} /> },
         ]}
         expectedResult={

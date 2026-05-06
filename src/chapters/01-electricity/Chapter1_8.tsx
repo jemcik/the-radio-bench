@@ -45,6 +45,8 @@ export default function Chapter1_8() {
       // text instead of resolving to a tooltip.
       adc: <G k="adc" />,
       pa: <G k="power amplifier" />,
+      swr: <G k="swr" />,
+      atu: <G k="antenna tuner" />,
     }),
     [t],
   )
@@ -97,8 +99,7 @@ export default function Chapter1_8() {
             pa: <G k="power amplifier" />,
             ro: <G k="roll-off" />,
             sdr: <G k="sdr" />,
-            vna: <G k="vna" />,
-          }}
+            vna: <G k="vna" />, lc: <G k="lc" />, res: <G k="resistor" />, cap: <G k="capacitor" />, sel: <G k="selectivity" /> }}
         />
       </p>
 
@@ -153,8 +154,7 @@ export default function Chapter1_8() {
             ...mathComponents,
             strong: <strong />,
             nowrap: nowrap,
-            reac: <G k="reactance" />,
-          }}
+            reac: <G k="reactance" />, vd: <G k="voltage divider" /> }}
         />
       </p>
 
@@ -296,7 +296,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.orderIntro"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, ind: <G k="inductor" /> }}
         />
       </p>
 
@@ -306,7 +306,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.orderBufferAside"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, imp: <G k="impedance" /> }}
         />
       </p>
 
@@ -341,7 +341,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.lcIntro"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, reso: <G k="resonance" /> }}
         />
       </p>
 
@@ -349,7 +349,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.lcLpfRecap"
           ns="ui"
-          components={{ strong: <strong />, pa: <G k="power amplifier" /> }}
+          components={{ strong: <strong />, pa: <G k="power amplifier" />, ac: <G k="ac" />, rip: <G k="ripple" /> }}
         />
       </p>
 
@@ -363,8 +363,7 @@ export default function Chapter1_8() {
             ...mathComponents,
             strong: <strong />,
             nowrap: nowrap,
-            q: <G k="q-factor" />,
-          }}
+            q: <G k="q-factor" />, resfreq: <G k="resonant frequency" />, bandwidth: <G k="bandwidth" /> }}
         />
       </p>
 
@@ -374,7 +373,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.lcNotchIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, tank: <G k="tank" />, tuned: <G k="tuned circuit" /> }}
         />
       </p>
 
@@ -629,7 +628,7 @@ export default function Chapter1_8() {
         }
         connectionToTheory={t('ch1_8.labConnection')}
         troubleshooting={[
-          <Trans key="t1" i18nKey="ch1_8.labTrouble1" ns="ui" components={{ strong: <strong /> }} />,
+          <Trans key="t1" i18nKey="ch1_8.labTrouble1" ns="ui" components={{ strong: <strong />, inductance: <G k="inductance" /> }} />,
           <Trans key="t2" i18nKey="ch1_8.labTrouble2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />,
           <Trans key="t3" i18nKey="ch1_8.labTrouble3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />,
         ]}
