@@ -107,6 +107,8 @@ const EXEMPT_PER_CHAPTER = {
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
+  // ch1_7 «solenoid» — only in heroAriaLabel (aria attribute).
+  ch1_7: new Set(['solenoid']),
   // ch0_5: «dc» and «inductor» each appear ONLY in non-prose contexts.
   // dc → symbolBatteryDesc (rendered via raw `t()` to a `description`
   // prop, not Trans, so JSX `<G>` won't render). inductor →

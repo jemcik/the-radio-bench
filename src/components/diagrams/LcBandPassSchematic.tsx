@@ -40,6 +40,7 @@ import {
 } from '@/lib/circuit'
 import { useTranslation, Trans } from 'react-i18next'
 import { MathVar } from '@/components/ui/math'
+import { G } from '@/features/glossary/glossary-term'
 
 const SCHEMATIC_W = 540
 
@@ -74,6 +75,7 @@ export default function LcBandPassSchematic() {
           components={{
             strong: <strong />,
             var: <MathVar />,
+            inputz: <G k="input impedance" />,
           }}
         />
       }
