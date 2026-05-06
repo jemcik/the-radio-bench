@@ -68,7 +68,46 @@ const EXEMPT_TERMS = new Set([
   'dielectric', 'electrolytic',
   'coupling capacitor', 'bypass capacitor',
   'switch debouncing', 'debouncing',
+  // Domain-shorthand glossary keys whose bare token («order», «family»,
+  // «trap») collides far more often with idiomatic English («reading
+  // order», «order of magnitude», «each family is tuned», «141 V is
+  // the trap») than with the technical concept. The technical mention
+  // (e.g. «filter order» / «filter family» / «trap dipole») in chapter
+  // prose tends to be a multi-word phrase that the gate's bare-word
+  // regex can't tell apart, so wrapping the bare word produces a wrong
+  // tooltip more often than not. Glossary entries still exist; chapters
+  // that genuinely need to point at them should wrap the qualified
+  // phrase explicitly.
+  'order', 'family', 'trap',
 ])
+
+// Per-chapter exemptions for terms that ARE in the glossary in general
+// but, in this specific chapter, occur only inside non-prose strings
+// (table examples, aria-labels, units-table cell labels) where a
+// `<G>` wrap would render as literal text or break aria semantics, OR
+// are alias-tag self-matches (the gate's bare-word regex catching the
+// alias name itself inside a `<diode>diode testing</diode>` span).
+const EXEMPT_PER_CHAPTER = {
+  // ch0_2 «diode» — the only mentions are inside `<diode>diode testing</diode>`
+  // alias spans (alias maps to the «diode testing» glossary key, not
+  // «diode»); the gate's bare-word regex catches the alias name itself.
+  ch0_2: new Set(['diode']),
+  // ch0_3: «impedance» and «inductance» occur ONLY in non-wrappable
+  // contexts — SI-prefix table examples («50 Ω impedance») driven by
+  // src/features/si/prefixes.ts and rendered via a raw t() call, or
+  // a units-quantity table cell label («Inductance»). «capacitor» is
+  // NOT exempt: it has a wrappable mention in `quiz_q2_explanation`
+  // («A 100 µF capacitor stores …»), and a single wrap satisfies the
+  // gate even with the additional non-wrappable table-example mention.
+  ch0_3: new Set(['impedance', 'inductance']),
+  // ch1_1 «tank» — water-tower analogy in waterPipeAriaLabel, NOT a
+  // tank-circuit reference. The gate's word-boundary regex can't tell
+  // them apart.
+  ch1_1: new Set(['tank']),
+  // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
+  // plain-string attribute and can't carry a `<G>` wrap.
+  ch1_4: new Set(['potentiometer']),
+}
 
 function readGlossaryKeys() {
   const src = fs.readFileSync(GLOSSARY_PATH, 'utf-8')
@@ -140,7 +179,10 @@ for (const chId of chapterIds) {
     keyToTags.get(key).add(tag)
   }
 
+  const chapterExempt = EXEMPT_PER_CHAPTER[chId] ?? new Set()
+
   for (const gKey of glossaryKeys) {
+    if (chapterExempt.has(gKey)) continue
     const displayName = names[gKey] ?? gKey
     const needles = [gKey, displayName].filter((v, i, a) => a.indexOf(v) === i)
 

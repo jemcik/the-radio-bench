@@ -101,7 +101,13 @@ export default function Chapter0_1() {
       <Section id="note-on-maths" labelKey="ch0_1.sectionMaths" />
 
       <p>{t('ch0_1.maths1')}</p>
-      <p>{t('ch0_1.maths2')}</p>
+      <p>
+        <Trans
+          i18nKey="ch0_1.maths2"
+          ns="ui"
+          components={{ sciNotation: <G k="scientific notation" /> }}
+        />
+      </p>
 
       <Section id="one-more-thing" labelKey="ch0_1.sectionOneMore" />
 
