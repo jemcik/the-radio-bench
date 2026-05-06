@@ -1,7 +1,8 @@
 {
   "site": {
     "title": "The Radio Bench",
-    "subtitle": "Radio & electronics from ground up"
+    "subtitle": "Radio & electronics from ground up",
+    "notificationsLabel": "Notifications"
   },
   "sidebar": {
     "homeBase": "Home Base",
@@ -723,6 +724,7 @@
   },
   "ch0_5": {
     "heroAriaLabel": "Pen-and-ink sketch of a schematic drawing on a sheet of paper — a battery connected through a resistor to an LED — with a pencil resting beside it.",
+    "heroFigCaption": "Fig. 0.5",
     "intro": "A schematic is a <strong>code</strong>, not a picture. It tells you how components are <i>connected</i> — how electricity flows from one to the next — without saying anything about how they are physically laid out on the bench. Geometry on the page does not matter; <topology>topology</topology> does. Two schematics that look completely different can describe the same circuit, and one that looks tidy can describe something impossible to build.",
     "introPreview": "This short chapter teaches you the visual grammar: three rules for wires and junctions, a tour of the standard symbols you will meet on almost every diagram, and one worked example you can read line by line.",
     "sectionWires": "Wires, junctions, and the three rules",
@@ -1647,6 +1649,7 @@
   },
   "ch1_5": {
     "heroAriaLabel": "A hand-drawn cross-section of a parallel-plate capacitor: two horizontal plates marked plus and minus, separated by a shaded dielectric layer between them, with electric-field arrows pointing from the positive plate to the negative one. Leads extend from each plate outward, labelled positive and negative, so the reader can see at a glance that charge sits on the plates and the electric field lives in the dielectric.",
+    "rcChargeDischargeAria": "RC charge / discharge plot",
     "heroPlatePos": "+",
     "heroPlateNeg": "−",
     "heroDielectric": "dielectric",
@@ -2219,6 +2222,7 @@
   },
   "ch1_6": {
     "heroAriaLabel": "A hand-drawn side view of an air-core inductor: a long horizontal cylinder of empty space (the core) with a row of bumps along its top edge representing the wire wraps. Inside the core, four horizontal arrows pointing right show the magnetic field B running along the solenoid's axis. Two leads exit at each end, with the left lead carrying a current arrow labelled I.",
+    "rlChargeDischargeAria": "RL charge / discharge plot",
     "heroCurrentLabel": "I",
     "heroFieldLabel": "B",
     "intro": "<strong>An <ind>inductor</ind> is a device that stores energy in a magnetic field around a coil of wire.</strong> In Chapter 1.5 you met the <cap>capacitor</cap>: charge on plates, energy in an electric field, blocks <dc>DC</dc> and passes <ac>AC</ac>. The inductor is its mirror image — current through a coil, energy in a magnetic field, and the AC/DC roles swapped: it <strong>passes DC</strong> (a steady current threads the coil with no opposition once the field is established), <strong>opposes AC</strong> (changing current means a changing field, which fights back), and <strong>integrates voltage over time</strong> (the longer you hold a voltage across it, the more current builds up). Almost every dual you learn for capacitors has an inductor counterpart in this chapter — and a few twists where the parallel breaks down.",

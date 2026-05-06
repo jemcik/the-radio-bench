@@ -292,7 +292,7 @@ export default function RLChargeDischarge() {
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
-        aria-label="RL charge / discharge plot"
+        aria-label={t('ch1_6.rlChargeDischargeAria')}
         style={{ display: 'block', maxWidth: 560, margin: '0 auto' }}
       >
         <line x1={PAD_L} y1={PAD_T} x2={PAD_L} y2={PAD_T + PLOT_H}

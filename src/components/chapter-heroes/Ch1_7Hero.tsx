@@ -13,6 +13,10 @@
  * Theme-adaptive: every stroke uses `currentColor`; the cylinder
  * occluder fills with `hsl(var(--background))` so the back passes
  * are hidden behind it in both light and dark themes.
+ *
+ * hardcoded-fontsize-file-ok: hero illustration — hand-tuned label
+ * sizes in user-space units. Converting to em would change visual
+ * proportions; no sibling diagrams in this file to be inconsistent with.
  */
 import { useTranslation } from 'react-i18next'
 

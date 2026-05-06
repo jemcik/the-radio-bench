@@ -358,6 +358,7 @@ export default function RmsSelector() {
                 fontFamily="inherit"
               >
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
+                {/* hardcoded-jsx-text-ok: math subscript «avg» — same convention across locales (cf. min/max/rms). */}
                 <tspan dy="4" fontSize="0.625em">avg</tspan>
               </text>
             </g>

@@ -12,6 +12,10 @@
  * The smooth-tangent (vertical-at-extremes) Bezier control points
  * mean adjacent half-periods join with no kinks at every leg-edge
  * contact point.
+ *
+ * hardcoded-fontsize-file-ok: hero illustration — hand-tuned label
+ * sizes in user-space units. Converting to em would change visual
+ * proportions; no sibling diagrams in this file to be inconsistent with.
  */
 import { useTranslation } from 'react-i18next'
 

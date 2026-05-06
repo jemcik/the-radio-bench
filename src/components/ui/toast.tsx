@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -88,6 +89,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 function ToastViewport({ toasts }: { toasts: Toast[] }) {
+  const { t } = useTranslation('ui')
   if (toasts.length === 0) return null
 
   return (
@@ -95,7 +97,7 @@ function ToastViewport({ toasts }: { toasts: Toast[] }) {
       className="fixed top-[4.5rem] left-4 z-[9990] flex flex-col gap-2 pointer-events-none"
       role="region"
       aria-live="polite"
-      aria-label="Notifications"
+      aria-label={t('site.notificationsLabel')}
     >
       {toasts.map(toast => (
         <div

@@ -390,6 +390,7 @@ export default function MagnetisingCurrentExplorer() {
               fill={svgTokens.fg}
             >
               <tspan fontStyle="italic">I</tspan>
+              {/* hardcoded-jsx-text-ok: math subscript «mag» — same convention across locales (cf. sin/cos/max/min). */}
               <tspan fontStyle="italic" baselineShift="sub" fontSize="0.75em">mag</tspan>
             </text>
           </g>

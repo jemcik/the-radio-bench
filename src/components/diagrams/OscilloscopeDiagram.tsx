@@ -235,6 +235,7 @@ export default function OscilloscopeDiagram() {
             fontSize="0.75em" fill={c.voltdiv} fontWeight="600">
             2.5 div
           </text>
+          {/* hardcoded-jsx-text-ok: oscilloscope-display verisimilitude — real scopes display these labels in English regardless of locale. */}
           <text x={scrX + scrW + 24} y={(yHigh + midY) / 2 + 18}
             fontSize="0.687em" fill={c.voltdiv} opacity="0.7">
             × 2V/div
@@ -271,6 +272,7 @@ export default function OscilloscopeDiagram() {
             fontWeight="600">
             VOLT/DIV 2V
           </text>
+          {/* hardcoded-jsx-text-ok: oscilloscope-display verisimilitude — real scopes display these labels in English regardless of locale. */}
           <text x={scrX + scrW - 4} y={scrY + scrH - 6}
             textAnchor="end" fontSize="0.625em" fill={c.timediv} opacity="0.8"
             fontWeight="600">

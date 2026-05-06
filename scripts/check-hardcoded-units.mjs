@@ -36,15 +36,57 @@ function walk(dir, out = []) {
 const files = walk(componentsRoot)
 const hits = []
 
+/**
+ * Strip every comment span from a single line, taking into account that
+ * a block comment (slash-star … star-slash) can SPAN multiple lines.
+ * Returns the stripped line plus the new in-block state. Without this,
+ * layout-calc comments such as «"1 µW" → ~31 px wide» (which document
+ * the worst-case label width inside a block comment) get reported as
+ * false-positive literals.
+ */
+function stripComments(line, inBlock) {
+  let out = ''
+  let pos = 0
+  while (pos < line.length) {
+    if (inBlock) {
+      const end = line.indexOf('*/', pos)
+      if (end === -1) return { stripped: out, inBlock: true }
+      pos = end + 2
+      inBlock = false
+      continue
+    }
+    const startBlock = line.indexOf('/*', pos)
+    const startLine = line.indexOf('//', pos)
+    const next = startBlock === -1
+      ? startLine
+      : startLine === -1
+        ? startBlock
+        : Math.min(startBlock, startLine)
+    if (next === -1) {
+      out += line.slice(pos)
+      break
+    }
+    out += line.slice(pos, next)
+    if (next === startLine) break // rest of line is `// …` — drop it
+    pos = next + 2
+    inBlock = true
+  }
+  return { stripped: out, inBlock }
+}
+
 for (const file of files) {
   const lines = fs.readFileSync(file, 'utf8').split('\n')
+  let inBlock = false
   lines.forEach((line, i) => {
-    const trimmed = line.trim()
-    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('import ')) return
-    if (/\bunits\.\w+/.test(line)) return
+    const { stripped, inBlock: nextInBlock } = stripComments(line, inBlock)
+    inBlock = nextInBlock
+    const trimmed = stripped.trim()
+    if (!trimmed) return
+    if (trimmed.startsWith('*') || trimmed.startsWith('import ')) return
+    if (/\bunits\.\w+/.test(stripped)) return
     UNIT_RE.lastIndex = 0
     let m
-    while ((m = UNIT_RE.exec(line)) !== null) {
+    while ((m = UNIT_RE.exec(stripped)) !== null) {
       hits.push({ file: path.relative(srcRoot, file), line: i + 1, snippet: m[0] })
     }
   })

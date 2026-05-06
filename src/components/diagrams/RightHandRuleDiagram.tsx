@@ -9,6 +9,10 @@
  * Source: /tmp/gemini-svg/right_hand_rule_v2_3.1_Pro.svg
  *
  * Labels (I, B, captions) wired through i18n.
+ *
+ * hardcoded-fontsize-file-ok: hero-style illustration — hand-tuned
+ * label sizes in user-space units. Converting to em would change
+ * visual proportions; this file is a chapter-specific one-off.
  */
 import { useTranslation } from 'react-i18next'
 

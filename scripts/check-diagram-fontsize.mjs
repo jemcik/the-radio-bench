@@ -20,11 +20,18 @@
  *
  * Scope: src/components/diagrams/, src/components/chapter-heroes/.
  *
- * Opt-out: place a comment `// hardcoded-fontsize-ok: <reason>` on the
- * line above the offending fontSize. Use sparingly — there are very
- * few legitimate cases (the Circuit primitives bake fixed pixel sizes
- * for terminal labels, but those primitives live under src/lib/circuit/
- * which is outside this check's scope).
+ * Opt-out (per line): place `// hardcoded-fontsize-ok: <reason>` on the
+ * line above the offending fontSize.
+ *
+ * Opt-out (whole file): place `// hardcoded-fontsize-file-ok: <reason>`
+ * anywhere in the file. Use this for hero-style illustrations where
+ * EVERY label is hand-tuned in user-space units by design and per-line
+ * opt-outs for 6+ labels would be pure boilerplate. Heroes don't have
+ * sibling diagrams to be inconsistent with, so the «consistent label
+ * sizes between siblings» concern doesn't apply.
+ *
+ * Both opt-outs should be sparing — most diagrams are sibling-comparable
+ * inside a chapter and the token convention catches real inconsistencies.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -65,6 +72,14 @@ for (const scanDir of SCAN_DIRS) {
   for (const f of walkTsx(path.join(ROOT, scanDir))) {
     scanned++
     const src = fs.readFileSync(f, 'utf-8')
+    // File-level opt-out: a `hardcoded-fontsize-file-ok` comment
+    // anywhere in the file exempts the entire file. Use for hero-style
+    // illustrations where every label is hand-tuned in user-space units
+    // by design (no sibling diagrams to be inconsistent with) and a
+    // per-line opt-out for every label would be pure boilerplate. The
+    // comment must record a SHORT reason so a future reader sees the
+    // rationale without having to re-derive it.
+    if (/\bhardcoded-fontsize-file-ok\b/.test(src)) continue
     const lines = src.split('\n')
     const optOut = new Set()
     lines.forEach((line, i) => {
