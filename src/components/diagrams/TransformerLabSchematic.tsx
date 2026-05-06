@@ -33,9 +33,19 @@ const TOP_Y = SCHEMATIC_PAD_TOP + 22
 const RAIL_SPAN = 110
 const BOT_Y = TOP_Y + RAIL_SPAN
 const MID_Y = (TOP_Y + BOT_Y) / 2
-const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 24
+// `+44` (vs the bare schematicHeight default) so the «10 витків» /
+// «40 витків» turn-count labels at y = BOT_Y + 22 fit fully inside
+// the SVG viewBox — schematicHeight only allots SCHEMATIC_PAD_BOT
+// (20 px) below BOT_Y, which puts the text baseline exactly at the
+// bottom edge and clips the descenders.
+const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 44
 
-const LEFT_EDGE_X = 80
+// `LEFT_EDGE_X = 110` so the end-anchored «ШІМ з Arduino» / «GND з
+// Arduino» labels at x = LEFT_EDGE_X − 6 (≈104) fit inside the SVG
+// viewBox. With LEFT_EDGE_X=80 the labels extended past x=0 and lost
+// their first 2-3 characters silently to the clipPath. Same fix
+// pattern as BalunSchematic.
+const LEFT_EDGE_X = 110
 const X_TX = 330
 const X_METER = 540
 
@@ -82,7 +92,14 @@ export default function TransformerLabSchematic() {
       <Wire points={[{ x: TX_SEC_X, y: TX_BOT_Y }, { x: TX_SEC_X, y: BOT_Y }, { x: meter.p2.x, y: BOT_Y }, meter.p2]} />
 
       {/* ── COMPONENTS ──────────────────────────────────────────────── */}
-      <Transformer x={X_TX} y={MID_Y} orient="up" ratio="1 : 4" />
+      {/* No `ratio` prop: for orient='up' the primitive places the
+          ratio label at (x+24, y) — i.e., to the RIGHT of the body
+          at vertical centre, where it visually attaches to the
+          secondary winding and reads as «secondary's label»
+          rather than «transformer's ratio». The «10 витків» /
+          «40 витків» labels under each winding already carry the
+          1:4 information without that ambiguity. */}
+      <Transformer x={X_TX} y={MID_Y} orient="up" />
       <Meter
         x={X_METER}
         y={MID_Y}
@@ -99,18 +116,25 @@ export default function TransformerLabSchematic() {
       <Junction x={TX_SEC_X} y={BOT_Y} />
 
       {/* ── TERMINAL LABELS ─────────────────────────────────────────── */}
-      <TerminalLabel x={LEFT_EDGE_X - 6} y={TOP_Y} anchor="end">
+      <TerminalLabel x={LEFT_EDGE_X - 6} y={TOP_Y} anchor="end" tone="mutedFg">
         {t('ch1_9.schematicLabPwm')}
       </TerminalLabel>
       <TerminalLabel x={LEFT_EDGE_X - 6} y={BOT_Y} anchor="end" tone="mutedFg">
         {t('ch1_9.schematicLabGnd')}
       </TerminalLabel>
 
-      {/* Winding-turn-count labels under the transformer */}
-      <TerminalLabel x={TX_PRI_X - 6} y={BOT_Y + 22} anchor="middle" tone="mutedFg">
+      {/* Winding-turn-count labels — centred under each half of the
+          schematic (primary half = LEFT_EDGE_X..X_TX, secondary half
+          = X_TX..X_METER). This reads as «label OF the primary side»
+          and «label OF the secondary side» rather than crowding both
+          into the transformer's middle, which an anchor='middle' at
+          TX_PRI_X / TX_SEC_X would do (with the labels then either
+          overlapping each other or sitting tightly on either side
+          of the transformer body). */}
+      <TerminalLabel x={(LEFT_EDGE_X + X_TX) / 2} y={BOT_Y + 22} anchor="middle" tone="mutedFg">
         {t('ch1_9.schematicLabPri')}
       </TerminalLabel>
-      <TerminalLabel x={TX_SEC_X + 6} y={BOT_Y + 22} anchor="middle" tone="mutedFg">
+      <TerminalLabel x={(X_TX + X_METER) / 2} y={BOT_Y + 22} anchor="middle" tone="mutedFg">
         {t('ch1_9.schematicLabSec')}
       </TerminalLabel>
     </Circuit>

@@ -9,11 +9,13 @@ import LabActivity from '@/components/lab/LabActivity'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import TurnsRatioCalculator from '@/components/widgets/TurnsRatioCalculator'
 import ImpedanceTransformer from '@/components/widgets/ImpedanceTransformer'
+import MagnetisingCurrentExplorer from '@/components/widgets/MagnetisingCurrentExplorer'
 import TransformerVoltageSchematic from '@/components/diagrams/TransformerVoltageSchematic'
 import TransformerImpedanceSchematic from '@/components/diagrams/TransformerImpedanceSchematic'
 import AutotransformerSchematic from '@/components/diagrams/AutotransformerSchematic'
 import BalunSchematic from '@/components/diagrams/BalunSchematic'
 import TransformerLabSchematic from '@/components/diagrams/TransformerLabSchematic'
+import LeakageFluxDiagram from '@/components/diagrams/LeakageFluxDiagram'
 import CoreFamiliesGallery from '@/components/diagrams/CoreFamiliesGallery'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
@@ -272,15 +274,11 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.lossesMagnetising"
           ns="ui"
-          components={{
-            ...mathComponents,
-            strong: <strong />,
-            nowrap: nowrap,
-            hyst: <G k="hysteresis" />,
-            eddy: <G k="eddy current" />,
-          }}
+          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }}
         />
       </p>
+
+      <MagnetisingCurrentExplorer />
 
       <p>
         <Trans
@@ -289,6 +287,8 @@ export default function Chapter1_9() {
           components={{ strong: <strong /> }}
         />
       </p>
+
+      <LeakageFluxDiagram />
 
       <p>
         <Trans
@@ -504,7 +504,7 @@ export default function Chapter1_9() {
       {/* ── Lab ────────────────────────────────────────────────── */}
       <LabActivity
         label="1.9"
-        goal={t('ch1_9.labGoal')}
+        goal={<Trans i18nKey="ch1_9.labGoal" ns="ui" components={{ square: <G k="square wave" /> }} />}
         equipment={[
           t('ch1_9.labEquip1'),
           t('ch1_9.labEquip2'),
