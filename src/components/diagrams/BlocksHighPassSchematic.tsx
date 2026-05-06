@@ -23,8 +23,9 @@ import {
   SCHEMATIC_PAD_TOP,
   schematicHeight,
 } from '@/lib/circuit'
-import { useTranslation } from 'react-i18next'
-import { MathText } from '@/components/ui/math-text'
+import { useTranslation, Trans } from 'react-i18next'
+import { G } from '@/features/glossary/glossary-term'
+import { mathComponents } from '@/lib/trans-defaults'
 
 // Content extends from ~x=19 (left of V_in label) to ~x=320 (right of
 // V_out label). Previously SCHEMATIC_W was 440 — that left a ~120 px
@@ -53,7 +54,13 @@ export default function BlocksHighPassSchematic() {
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
       maxWidth={460}
-      caption={<MathText>{t('ch1_5.blocksHighPassSchematicCaption')}</MathText>}
+      caption={
+        <Trans
+          i18nKey="ch1_5.blocksHighPassSchematicCaption"
+          ns="ui"
+          components={{ ...mathComponents, hpf: <G k="high-pass" /> }}
+        />
+      }
     >
       {/* Top rail: V_in → C → node */}
       <Wire points={[{ x: VIN_X, y: TOP_Y }, c.p1]} />

@@ -43,6 +43,8 @@ export default function Chapter0_4() {
   const quizQuestions = useMemo(
     () => buildQuizFromI18n(t, 'ch0_4', QUIZ_QUESTION_COUNT, {
       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+      lpf: <G k="low-pass" />,
+      cf: <G k="cutoff frequency" />,
     }),
     [t],
   )
@@ -330,7 +332,7 @@ export default function Chapter0_4() {
         label="0.4"
         goal={t('ch0_4.labGoal')}
         equipment={[
-          t('ch0_4.labEquip1'),
+          <Trans key="e1" i18nKey="ch0_4.labEquip1" ns="ui" components={{ dc: <G k="dc" /> }} />,
           t('ch0_4.labEquip2'),
           t('ch0_4.labEquip3'),
         ]}

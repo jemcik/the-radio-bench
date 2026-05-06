@@ -557,7 +557,7 @@ export default function Chapter1_5() {
             strong: <strong />,
             var: <MathVar />,
             sub: <sub />,
-            nowrap: nowrap, imp: <G k="impedance" /> }}
+            nowrap: nowrap, imp: <G k="impedance" />, reso: <G k="resonance" /> }}
         />
       </p>
 
@@ -684,8 +684,7 @@ export default function Chapter1_5() {
             components={{
               var: <MathVar />,
               sub: <sub />,
-              nowrap: nowrap,
-            }}
+              nowrap: nowrap, cf: <G k="cutoff frequency" /> }}
           />
         }
         troubleshooting={[

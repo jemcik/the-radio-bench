@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
+import { G } from '@/features/glossary/glossary-term'
 import { scaleLinear, scaleLog } from '@visx/scale'
 import { AxisBottom, AxisLeft } from '@visx/axis'
 import { GridColumns, GridRows } from '@visx/grid'
@@ -174,7 +175,11 @@ export default function LogAxisToggle() {
         <p>
           <strong>{t('ch0_4.logAxisToggleAboutFilterTitle')}</strong>
           {' — '}
-          {t('ch0_4.logAxisToggleAboutFilterBody')}
+          <Trans
+            i18nKey="ch0_4.logAxisToggleAboutFilterBody"
+            ns="ui"
+            components={{ res: <G k="resistor" />, cap: <G k="capacitor" /> }}
+          />
         </p>
         <p>
           <strong>{t('ch0_4.logAxisToggleAboutCutoffTitle')}</strong>

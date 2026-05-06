@@ -115,7 +115,9 @@ function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[]
 export default function Chapter0_5() {
   const { t } = useTranslation('ui')
   const quizQuestions = useMemo(
-    () => buildQuizFromI18n(t, 'ch0_5', QUIZ_QUESTION_COUNT),
+    () => buildQuizFromI18n(t, 'ch0_5', QUIZ_QUESTION_COUNT, {
+      inputz: <G k="input impedance" />,
+    }),
     [t],
   )
 
@@ -190,7 +192,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolCapacitorName')}
           description={
-            <Trans i18nKey="ch0_5.symbolCapacitorDesc" ns="ui" components={{ var: <MathVar /> }} />
+            <Trans i18nKey="ch0_5.symbolCapacitorDesc" ns="ui" components={{ var: <MathVar />, cap: <G k="capacitor" /> }} />
           }
         >
           <Capacitor x={55} y={28} />
@@ -238,7 +240,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolLedName')}
           description={
-            <Trans i18nKey="ch0_5.symbolLedDesc" ns="ui" />
+            <Trans i18nKey="ch0_5.symbolLedDesc" ns="ui" components={{ diode: <G k="diode" /> }} />
           }
         >
           <LED x={55} y={28} />
@@ -278,7 +280,7 @@ export default function Chapter0_5() {
       <Section id="example" labelKey="ch0_5.sectionExample" />
 
       <p>
-        <Trans i18nKey="ch0_5.exampleIntro" ns="ui" />
+        <Trans i18nKey="ch0_5.exampleIntro" ns="ui" components={{ res: <G k="resistor" /> }} />
       </p>
 
       <LedCircuit

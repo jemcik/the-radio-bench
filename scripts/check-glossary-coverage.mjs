@@ -107,6 +107,23 @@ const EXEMPT_PER_CHAPTER = {
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
+  // ch0_5: «dc» and «inductor» each appear ONLY in non-prose contexts.
+  // dc → symbolBatteryDesc (rendered via raw `t()` to a `description`
+  // prop, not Trans, so JSX `<G>` won't render). inductor →
+  // symbolInductorName (one-word symbol-card heading «Inductor (coil)»;
+  // wrapping the entire heading would turn the whole title into a
+  // tooltip target and disrupt the symbol-card layout).
+  ch0_5: new Set(['dc', 'inductor']),
+  // ch1_6 «time constant» — chapter is exclusively about RL circuits,
+  // and every mention of «time constant» is inside the multi-word
+  // phrase «RL time constant» wrapped via the `tc` alias bound to
+  // glossary key «rl time constant». The bare-word regex sees the
+  // «time constant» substring inside the wrap and counts it as
+  // unwrapped, even though the surrounding phrase IS already a
+  // glossary tooltip — a wider concept («rl time constant») than
+  // the gate is checking for. Exempt to avoid asking authors to
+  // pick between the two adjacent glossary keys.
+  ch1_6: new Set(['time constant']),
 }
 
 function readGlossaryKeys() {
@@ -151,6 +168,41 @@ function findTsxForChapter(chId) {
   return null
 }
 
+/**
+ * Build a single global alias→glossary-key map by scanning every .tsx
+ * file under `src/components/widgets` and `src/components/diagrams`.
+ * Widgets that render chapter i18n keys via `<Trans>` define alias
+ * bindings in their own `components` props — those bindings ARE
+ * available to whichever chapter uses the widget, but the gate's
+ * per-chapter scan misses them because the binding lives outside
+ * `Chapter*.tsx`. Treat all widget/diagram bindings as globally
+ * available; per-chapter Chapter*.tsx bindings still take precedence
+ * on collision.
+ */
+function buildGlobalWidgetAliasMap() {
+  const map = new Map()
+  const stack = [
+    path.join(ROOT, 'src/components/widgets'),
+    path.join(ROOT, 'src/components/diagrams'),
+  ]
+  while (stack.length) {
+    const d = stack.pop()
+    if (!fs.existsSync(d)) continue
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name)
+      if (e.isDirectory()) stack.push(p)
+      else if (e.isFile() && /\.tsx$/.test(e.name) && !/\.test\.tsx$/.test(e.name)) {
+        const src = fs.readFileSync(p, 'utf-8')
+        for (const m of src.matchAll(/(\w+)\s*:\s*<G\s+k="([^"]+)"\s*\/>/g)) {
+          map.set(m[1], m[2])
+        }
+      }
+    }
+  }
+  return map
+}
+const globalWidgetAliases = buildGlobalWidgetAliasMap()
+
 // Strip HTML attribute contents from prose so a term that only appears
 // inside a `k="..."` doesn't count as a plain mention.
 function stripHtmlAttrs(s) {
@@ -166,7 +218,10 @@ for (const chId of chapterIds) {
   const proseText = stripHtmlAttrs(proseRaw)
 
   const tsxPath = findTsxForChapter(chId)
-  const tagToKey = new Map()
+  // Start from the global widget/diagram alias map (lower precedence),
+  // then layer the chapter's own bindings on top so per-chapter
+  // mappings still win on collision.
+  const tagToKey = new Map(globalWidgetAliases)
   if (tsxPath) {
     const src = fs.readFileSync(tsxPath, 'utf-8')
     for (const m of src.matchAll(/(\w+)\s*:\s*<G\s+k="([^"]+)"\s*\/>/g)) {

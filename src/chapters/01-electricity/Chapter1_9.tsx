@@ -74,8 +74,7 @@ export default function Chapter1_9() {
             toro: <G k="toroid" />,
             hyst: <G k="hysteresis" />,
             eddy: <G k="eddy current" />,
-            vrc: <G k="variac" />,
-          }}
+            vrc: <G k="variac" />, imp: <G k="impedance" />, inductance: <G k="inductance" /> }}
         />
       </p>
 
@@ -96,7 +95,7 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.coupledOnlyAc"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, ac: <G k="ac" />, dc: <G k="dc" /> }}
         />
       </p>
 
@@ -213,7 +212,7 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.impedanceWhy"
           ns="ui"
-          components={{ strong: <strong />, transceiver: <G k="transceiver" /> }}
+          components={{ strong: <strong />, transceiver: <G k="transceiver" />, swr: <G k="swr" /> }}
         />
       </p>
 
@@ -254,7 +253,7 @@ export default function Chapter1_9() {
           <Trans
             i18nKey="ch1_9.impedanceCallout"
             ns="ui"
-            components={{ strong: <strong />, efhw: <G k="efhw" /> }}
+            components={{ strong: <strong />, efhw: <G k="efhw" />, unun: <G k="unun" /> }}
           />
         </p>
       </Callout>
@@ -284,7 +283,7 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.lossesLeakage"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, ind: <G k="inductor" /> }}
         />
       </p>
 
@@ -351,7 +350,7 @@ export default function Chapter1_9() {
         <Trans
           i18nKey="ch1_9.coresPowderedIron"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, bw: <G k="bandwidth" /> }}
         />
       </p>
 
@@ -513,7 +512,7 @@ export default function Chapter1_9() {
         ]}
         components={[
           <Trans key="c1" i18nKey="ch1_9.labComp1" ns="ui" components={{ strong: <strong /> }} />,
-          <Trans key="c2" i18nKey="ch1_9.labComp2" ns="ui" components={{ strong: <strong /> }} />,
+          <Trans key="c2" i18nKey="ch1_9.labComp2" ns="ui" components={{ strong: <strong />, res: <G k="resistor" /> }} />,
           <Trans key="c3" i18nKey="ch1_9.labComp3" ns="ui" components={{ strong: <strong /> }} />,
         ]}
         procedure={[
