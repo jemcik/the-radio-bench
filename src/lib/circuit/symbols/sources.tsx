@@ -11,6 +11,55 @@
 import { type SymbolProps, type SinglePinProps, orientAngle, isVertical, STROKE } from '../types'
 import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
+// ─── AcSource ─────────────────────────────────────────────────────────────────
+
+/**
+ * AcSource — AC voltage source (ARRL standard).
+ * A circle with one full sine-wave cycle inside, two leads extending out.
+ * Used wherever a circuit needs an AC stimulus rather than a battery: mains
+ * supplies, signal generators, transformer primaries.
+ *
+ * Polarity is conventional (no plates): a `value` such as «230V» reads as
+ * the RMS amplitude. For radio-frequency contexts pass a frequency too,
+ * e.g. value="230V / 50Hz".
+ */
+export function AcSource({
+  x,
+  y,
+  orient = 'right',
+  label,
+  value,
+}: SymbolProps) {
+  return (
+    <g>
+      {/* Component body — circle + sine wave + leads */}
+      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
+        {/* Enclosing circle (radius 12 — pin span 60 means 18 px between
+            circle edge and pin) */}
+        <circle cx={0} cy={0} r={12} fill="none" stroke="currentColor" strokeWidth={STROKE} />
+
+        {/* Sine wave inside — one full cycle, fits inside r=12 with 2 px
+            margin so the curve doesn't graze the circle. Two cubic bezier
+            segments approximate sin from -7 to +7 with control points at
+            ±3.5 elevation. */}
+        <path
+          d="M -7 0 C -5 -5 -2 -5 0 0 C 2 5 5 5 7 0"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={STROKE}
+          strokeLinecap="round"
+        />
+
+        {/* Leads — same span as a battery (HALF on each side from centre) */}
+        <line x1={-30} y1={0} x2={-12} y2={0} stroke="currentColor" strokeWidth={STROKE} />
+        <line x1={12} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
+      </g>
+
+      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
+    </g>
+  )
+}
+
 // ─── Battery ──────────────────────────────────────────────────────────────────
 
 /**

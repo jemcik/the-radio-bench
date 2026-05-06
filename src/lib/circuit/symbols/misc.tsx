@@ -6,7 +6,7 @@
  */
 
 import { type SinglePinProps, type SymbolProps, orientAngle, STROKE } from '../types'
-import { CenteredLabel, SymbolText, LABEL_SIZE } from '../SymbolLabel'
+import { CenteredLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // SINGLE-TERMINAL SYMBOLS
@@ -86,42 +86,77 @@ export interface TransformerProps {
 }
 
 /**
- * Transformer — basic transformer with two coils facing each other.
- * Primary (left coil) and secondary (right coil) separated by core lines.
- * Four pins: p1_top, p1_bot (primary), p2_top, p2_bot (secondary).
+ * Transformer — ARRL Handbook style two-winding transformer.
+ *
+ * Primary winding on TOP (horizontal `⌒⌒⌒⌒` row, bumps going UP).
+ * Iron core: two parallel HORIZONTAL lines between the windings.
+ * Secondary winding on BOTTOM (horizontal row, bumps going DOWN).
+ *
+ * Pin layout (default orient='right'):
+ *   primary p1 (-30, -12) ──[bumps up]──── (+30, -12) primary p2
+ *                          ════════════
+ *                          ════════════  ← iron core
+ *   secondary p1 (-30, 12) ─[bumps down]── (+30, 12) secondary p2
+ *
+ * Each winding mirrors the horizontal Inductor primitive's proportions
+ * (4 bumps × 9 px wide × 6 px peak amplitude) so the two symbols read
+ * at the same visual weight.
  */
 export function Transformer({ x, y, orient = 'right', label, ratio }: TransformerProps) {
   return (
     <>
       <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* PRIMARY COIL (left) — 4 arcs going upward */}
-        <path d="M-22,-8 Q-18,-16 -14,-8" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M-22,-4 Q-18,-12 -14,-4" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M-22,4 Q-18,-4 -14,4" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M-22,8 Q-18,0 -14,8" fill="none" stroke="currentColor" strokeWidth={STROKE} />
+        {/* PRIMARY WINDING (top) — horizontal coil at y=-12 with leads
+            extending out to the corner pins. 4 semicircular bumps
+            going UP (away from the core in the centre).
+            Path: lead ─── bumps ─── lead.
+            sweep=0 going right ⇒ counter-clockwise ⇒ bulges UP. */}
+        <path
+          d="M -30 -12 L -18 -12 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 L 30 -12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={STROKE}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
 
-        {/* SECONDARY COIL (right) — 4 mirrored arcs */}
-        <path d="M14,-8 Q18,-16 22,-8" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M14,-4 Q18,-12 22,-4" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M14,4 Q18,-4 22,4" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-        <path d="M14,8 Q18,0 22,8" fill="none" stroke="currentColor" strokeWidth={STROKE} />
+        {/* SECONDARY WINDING (bottom) — mirror of primary at y=+12.
+            sweep=1 going right ⇒ clockwise ⇒ bulges DOWN. */}
+        <path
+          d="M -30 12 L -18 12 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 L 30 12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={STROKE}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
 
-        {/* CORE — two parallel vertical lines between coils */}
-        <line x1="-4" y1="-12" x2="-4" y2="12" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="4" y1="-12" x2="4" y2="12" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* PRIMARY LEADS */}
-        <line x1="-30" y1="-12" x2="-22" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="-30" y1="12" x2="-22" y2="12" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* SECONDARY LEADS */}
-        <line x1="22" y1="-12" x2="30" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="22" y1="12" x2="30" y2="12" stroke="currentColor" strokeWidth={STROKE} />
+        {/* IRON CORE — two parallel HORIZONTAL lines between windings */}
+        <line x1="-18" y1="-3" x2="18" y2="-3" stroke="currentColor" strokeWidth={STROKE} />
+        <line x1="-18" y1="3" x2="18" y2="3" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      {/* Transformer reuses the centered-with-larger-gap style; `ratio` slots
-          into the value position. */}
-      <CenteredLabel x={x} y={y} label={label} value={ratio} gap={25} />
+      {/* Designator label (`label` prop) always sits ABOVE the body via
+          CenteredLabel. The ratio label gets orient-aware positioning:
+          for the default horizontal body (orient='right'/'left') it
+          fits below; but for the vertical body (orient='up'/'down')
+          there are usually wire stubs going above and below the body
+          to a horizontal rail, so we place the ratio to the SIDE
+          instead — at x+24 with start-anchored text — where there's
+          empty schematic space. */}
+      {label && (
+        <CenteredLabel x={x} y={y} label={label} gap={orient === 'up' || orient === 'down' ? 38 : 26} />
+      )}
+      {ratio && (orient === 'up' || orient === 'down') && (
+        <SymbolText x={x + 24} y={y} size={VALUE_SIZE} anchor="start">
+          {ratio}
+        </SymbolText>
+      )}
+      {ratio && (orient === 'right' || orient === 'left') && (
+        <SymbolText x={x} y={y + 26} size={VALUE_SIZE}>
+          {ratio}
+        </SymbolText>
+      )}
     </>
   )
 }

@@ -253,7 +253,7 @@ npx vitest run src/components/diagrams
 node scripts/check-i18n.mjs   # if you touched locale files
 ```
 
-The dev server is the only place font metrics match production. jsdom can't catch visual overlap. Ask the user to verify in browser after you ship — don't start your own dev server.
+The dev server is the only place font metrics match production. jsdom can't catch visual overlap. Verify in browser via the `visual-verify` skill (Claude-in-Chrome MCP → `localhost:5173`) — don't start your own dev server (port conflict).
 
 ## When padding goes wrong — how to tell
 

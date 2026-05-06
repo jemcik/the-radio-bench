@@ -138,6 +138,47 @@ export function pinsOpAmp(
 }
 
 /**
+ * Compute absolute pin positions for a two-winding transformer
+ * (ARRL convention).
+ *
+ *   orient='right' (default) — body horizontal, primary winding on TOP,
+ *   secondary on BOTTOM, iron core in the middle:
+ *
+ *     primary.p1 (-30, -12) ────[bumps up]──── primary.p2 (+30, -12)
+ *                                ════════
+ *                                ════════  ← core
+ *     secondary.p1 (-30, +12) ──[bumps down]── secondary.p2 (+30, +12)
+ *
+ * Use this any time a schematic wires up the four corners of the
+ * Transformer symbol — never duplicate the offsets inline.
+ */
+export function pinsXfmr(
+  cx: number,
+  cy: number,
+  orient: Orientation = 'right',
+): { primary: { p1: Point; p2: Point }; secondary: { p1: Point; p2: Point } } {
+  // Local-frame pin offsets (body in default orient='right').
+  const PRI_P1 = { x: -30, y: -12 }
+  const PRI_P2 = { x: 30, y: -12 }
+  const SEC_P1 = { x: -30, y: 12 }
+  const SEC_P2 = { x: 30, y: 12 }
+
+  const rot = (o: { x: number; y: number }): Point => {
+    switch (orient) {
+      case 'right': return { x: cx + o.x, y: cy + o.y }
+      case 'down':  return { x: cx - o.y, y: cy + o.x }
+      case 'left':  return { x: cx - o.x, y: cy - o.y }
+      case 'up':    return { x: cx + o.y, y: cy - o.x }
+    }
+  }
+
+  return {
+    primary:   { p1: rot(PRI_P1), p2: rot(PRI_P2) },
+    secondary: { p1: rot(SEC_P1), p2: rot(SEC_P2) },
+  }
+}
+
+/**
  * Compute absolute pin position for a single-terminal symbol
  * (ground, antenna).
  */

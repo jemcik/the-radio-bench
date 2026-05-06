@@ -185,9 +185,13 @@ export function InductorCore({ x, y, orient = 'right', label, value }: SymbolPro
           strokeLinejoin="round"
         />
 
-        {/* Iron core — two horizontal parallel lines */}
-        <line x1="-16" y1="4" x2="16" y2="4" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-        <line x1="-16" y1="7" x2="16" y2="7" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
+        {/* Iron core — two horizontal parallel lines, separated from
+            the coil bumps so the «magnetic core» mark reads as a
+            distinct ARRL-style decorator rather than merging with the
+            bumps' outline (matches the ARRL Handbook «Magnetic-core»
+            inductor symbol with clear bumps↔core gap). */}
+        <line x1="-16" y1="10" x2="16" y2="10" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
+        <line x1="-16" y1="13" x2="16" y2="13" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
       </g>
 
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />

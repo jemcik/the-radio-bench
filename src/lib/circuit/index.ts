@@ -44,6 +44,7 @@ export {
   pins2,
   pinsBJT,
   pinsOpAmp,
+  pinsXfmr,
   pin1,
   orientAngle,
   isVertical,
@@ -57,7 +58,7 @@ export {
 export { Resistor, Capacitor, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
-export { Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
+export { AcSource, Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
 
 // Symbols — semiconductors
 export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, OpAmp } from './symbols'
@@ -72,4 +73,4 @@ export {
 export { Antenna, Crystal, Transformer } from './symbols'
 
 // Symbols — pedagogical annotations (named-node markers, terminal labels)
-export { NodePoint, TerminalLabel } from './symbols'
+export { NodePoint, TerminalLabel, Tap } from './symbols'

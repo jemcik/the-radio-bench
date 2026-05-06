@@ -243,7 +243,7 @@ node scripts/check-i18n-usage.mjs
 npm run check:uk
 ```
 
-Then ask the user to check in their browser (both themes, both locales). **Never run `preview_start` yourself** — user runs `npm run dev` locally and both servers fight for port 5173. See `feedback_local_dev_server.md`.
+Then verify visually via the `visual-verify` skill (Claude-in-Chrome MCP → user's running `npm run dev` on port 5173). Check both themes and both locales. **Never run `preview_start` yourself** — port conflict with the user's server.
 
 ### Stage 5 — Visual sanity pass (the under-appreciated step)
 
