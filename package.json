@@ -12,6 +12,7 @@
     "check:trans": "node scripts/check-trans-components.mjs",
     "check:quiz-trans": "node scripts/check-quiz-trans-components.mjs",
     "check:glossary-coverage": "node scripts/check-glossary-coverage.mjs",
+    "check:glossary-overwrap": "node scripts/check-glossary-overwrap.mjs",
     "check:bare-subscripts": "node scripts/check-bare-subscript-renders.mjs",
     "check:tag-renders": "node scripts/check-tag-renders.mjs",
     "check:undefined-acronyms": "node scripts/check-undefined-acronyms.mjs",
