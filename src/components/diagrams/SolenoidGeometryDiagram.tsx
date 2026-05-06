@@ -17,6 +17,10 @@
  * wrap because that made earlier coil diagrams unreadable. Project
  * convention applied: fontFamily="inherit" so labels match the page's
  * IBM Plex Sans.
+ *
+ * hardcoded-fontsize-file-ok: hero-style geometry diagram — A/l/n/µᵣ
+ * labels share a single 16-px size set on the parent group; converting
+ * to em would change visual proportions of this one-off illustration.
  */
 import { useTranslation } from 'react-i18next'
 

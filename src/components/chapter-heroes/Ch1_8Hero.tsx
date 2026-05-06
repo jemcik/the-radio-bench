@@ -12,6 +12,10 @@
  * Theme-adaptive: every stroke uses `currentColor`; the −3 dB and f_c
  * hairlines drop opacity so they read as guides rather than primary
  * data.
+ *
+ * hardcoded-fontsize-file-ok: hero illustration — hand-tuned label
+ * sizes in user-space units. Converting to em would change visual
+ * proportions; no sibling diagrams in this file to be inconsistent with.
  */
 import { useTranslation } from 'react-i18next'
 

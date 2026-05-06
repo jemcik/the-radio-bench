@@ -15,6 +15,11 @@
  * each topology appear later in the chapter via the Circuit-primitive
  * components (RcLowPassSchematic, BlocksHighPassSchematic,
  * LcBandPassSchematic, LcNotchSchematic).
+ *
+ * hardcoded-fontsize-file-ok: 4-panel gallery with hand-tuned label
+ * sizes (8/10/11 px) that all four panels share for visual consistency.
+ * Converting to em would either bloat the small annotations or shrink
+ * them below readable size at this panel scale.
  */
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'

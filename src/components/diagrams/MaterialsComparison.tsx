@@ -122,6 +122,7 @@ function LegendDot({ kind }: { kind: 'ion' | 'electron' }) {
     return (
       <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden="true" className="inline-block flex-shrink-0">
         <circle cx={7} cy={7} r={5} fill="hsl(var(--callout-caution) / 0.85)" />
+        {/* hardcoded-fontsize-ok: «+» glyph inside a 14×14 viewBox — sized in user-space units to the 10-px circle. */}
         <text x={7} y={9.5} textAnchor="middle" fontSize={9} fontWeight={700} fill="hsl(var(--background))">+</text>
       </svg>
     )

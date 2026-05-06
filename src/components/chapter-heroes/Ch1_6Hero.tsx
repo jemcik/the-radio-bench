@@ -10,6 +10,10 @@
  * The ONLY change from the raw SVG is wiring the aria-label, "I" and
  * "B" labels through i18n. Everything else — coil topology, magnetic
  * field lines, perspective cap, caption — is what Gemini chose.
+ *
+ * hardcoded-fontsize-file-ok: hero illustration — hand-tuned label
+ * sizes in user-space units. Converting to em would change visual
+ * proportions; no sibling diagrams in this file to be inconsistent with.
  */
 import { useTranslation } from 'react-i18next'
 

@@ -16,6 +16,11 @@
  *  Uses `@/lib/circuit` primitives for the passive elements and
  *  plain SVG for the IC body (no generic-IC primitive exists and
  *  this diagram is the only use-site, so adding one is overkill).
+ *
+ *  hardcoded-fontsize-file-ok: the custom IC-body SVG (V_cc / GND / chip
+ *  name labels) uses hand-tuned sizes that fit inside the 80-px-wide
+ *  body. The rest of the schematic uses Circuit primitives, which set
+ *  their own fixed-pixel terminal labels and are out of this gate's scope.
  */
 import {
   Circuit,
