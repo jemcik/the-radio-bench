@@ -31,11 +31,13 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const EN_PATH = path.join(ROOT, 'src/i18n/locales/en/ui.json')
+const UK_PATH = path.join(ROOT, 'src/i18n/locales/uk/ui.json')
 const CHAPTERS_DIR = path.join(ROOT, 'src/chapters')
 
 const MATH_SPREAD = new Set(['var', 'sub', 'sup'])
 
 const en = JSON.parse(fs.readFileSync(EN_PATH, 'utf-8'))
+const uk = JSON.parse(fs.readFileSync(UK_PATH, 'utf-8'))
 
 function walkTsx(dir) {
   const out = []
@@ -66,7 +68,15 @@ for (const tsx of walkTsx(CHAPTERS_DIR)) {
   for (const m of src.matchAll(transRe)) {
     const [, block, key, rawMap] = m
     if (!en[block] || typeof en[block][key] !== 'string') continue
-    const used = findTags(en[block][key])
+    // Union of EN and UA tags — translators sometimes wrap a different
+    // word/phrase than the EN author, and the alias used in UA must
+    // also be in the components map. Without this, a UA-only mismatch
+    // (e.g. `<cap>Конденсатор</cap>` in UA where EN has `<capt>capacitor</capt>`)
+    // ships to readers as literal `<cap>...</cap>` text — caught the
+    // hard way on chapter 1.5 intro.
+    const enTags = findTags(en[block][key])
+    const ukTags = findTags(uk?.[block]?.[key])
+    const used = new Set([...enTags, ...ukTags])
     const mapped = new Set(
       [...rawMap.matchAll(/\b([a-zA-Z][a-zA-Z0-9_-]*)\s*:/g)].map(x => x[1]),
     )
@@ -75,7 +85,11 @@ for (const tsx of walkTsx(CHAPTERS_DIR)) {
     }
     const missing = [...used].filter(t => !mapped.has(t)).sort()
     if (missing.length > 0) {
-      issues.push({ tsx: path.relative(ROOT, tsx), block, key, missing })
+      issues.push({
+        tsx: path.relative(ROOT, tsx), block, key, missing,
+        enOnly: missing.filter(t => enTags.has(t) && !ukTags.has(t)),
+        ukOnly: missing.filter(t => ukTags.has(t) && !enTags.has(t)),
+      })
     }
   }
 }

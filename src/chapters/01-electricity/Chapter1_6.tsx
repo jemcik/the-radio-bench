@@ -93,8 +93,7 @@ export default function Chapter1_6() {
             inductance: <G k="inductance" />,
             si: <G k="self-inductance" />,
             rhr: <G k="right-hand rule" />,
-            faraday: <G k="faradays law" />,
-          }}
+            faraday: <G k="faradays law" />, emf: <G k="emf" /> }}
         />
       </p>
 
@@ -212,7 +211,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesAirCoreIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, sat: <G k="saturation" /> }}
+          components={{ ...mathComponents, strong: <strong />, sat: <G k="saturation" />, tank: <G k="tank" /> }}
         />
       </p>
 
@@ -220,7 +219,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesAirCoreCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, var: <MathVar /> }}
+          components={{ ...mathComponents, strong: <strong />, var: <MathVar />, tank: <G k="tank" /> }}
         />
       </Callout>
 
@@ -488,8 +487,7 @@ export default function Chapter1_6() {
             sub: <sub />,
             em: <em />,
             nowrap: nowrap,
-            imp: <G k="impedance" />,
-          }}
+            imp: <G k="impedance" />, reso: <G k="resonance" /> }}
         />
       </p>
 

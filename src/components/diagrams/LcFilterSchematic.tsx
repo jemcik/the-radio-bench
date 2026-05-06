@@ -27,8 +27,9 @@ import {
   SCHEMATIC_PAD_TOP,
   schematicHeight,
 } from '@/lib/circuit'
-import { useTranslation } from 'react-i18next'
-import { MathText } from '@/components/ui/math-text'
+import { useTranslation, Trans } from 'react-i18next'
+import { G } from '@/features/glossary/glossary-term'
+import { mathComponents } from '@/lib/trans-defaults'
 
 const SCHEMATIC_W = 500
 
@@ -55,7 +56,13 @@ export default function LcFilterSchematic() {
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
       maxWidth={540}
-      caption={<MathText>{t('ch1_6.filterChokeSchematicCaption')}</MathText>}
+      caption={
+        <Trans
+          i18nKey="ch1_6.filterChokeSchematicCaption"
+          ns="ui"
+          components={{ ...mathComponents, lpf: <G k="low-pass" /> }}
+        />
+      }
     >
       {/* Signal rail: in → L → node → out */}
       <Wire points={[{ x: IN_X, y: TOP_Y }, l.p1]} />
