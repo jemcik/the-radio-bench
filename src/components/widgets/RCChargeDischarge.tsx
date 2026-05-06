@@ -360,7 +360,7 @@ export default function RCChargeDischarge() {
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
-        aria-label="RC charge / discharge plot"
+        aria-label={t('ch1_5.rcChargeDischargeAria')}
         style={{ display: 'block', maxWidth: 560, margin: '0 auto' }}
       >
         {/* Axes */}

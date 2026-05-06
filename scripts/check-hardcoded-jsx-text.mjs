@@ -104,6 +104,12 @@ function walkTsx(dir) {
 // The body must NOT contain `{` — that means it's a pure literal, not a
 // JSX expression. Allow attributes on the open tag. Multi-line bodies
 // are OK as long as they have no `{`.
+//
+// We expose BOTH `tagStart` (position of the opening `<`) and `start`
+// (position of the body inside the tag). The opt-out lookup uses
+// `tagStart` so a comment placed directly above the `<text>` line
+// works for multi-line tags too — otherwise `lineOf(start)` would
+// land on the body line, several lines below the tag.
 function findSvgTextBodies(src) {
   const tags = ['text', 'tspan', 'title']
   const out = []
@@ -112,7 +118,12 @@ function findSvgTextBodies(src) {
     for (const m of src.matchAll(re)) {
       const body = m[2]
       if (!body.trim()) continue
-      out.push({ start: m.index + m[0].lastIndexOf(body), text: body, tag })
+      out.push({
+        tagStart: m.index,
+        start: m.index + m[0].lastIndexOf(body),
+        text: body,
+        tag,
+      })
     }
   }
   return out
@@ -145,11 +156,15 @@ for (const scanDir of SCAN_DIRS) {
       return src.slice(0, pos).split('\n').length
     }
 
-    for (const { start, text, tag } of findSvgTextBodies(src)) {
-      const ln = lineOf(start)
-      if (optOut.has(ln)) continue
+    for (const { tagStart, start, text, tag } of findSvgTextBodies(src)) {
+      const tagLn = lineOf(tagStart)
+      const bodyLn = lineOf(start)
+      // Honour an opt-out comment whether it's above the open tag
+      // (works for multi-line `<text>` blocks) or directly above the
+      // body line (works for single-line `<text>literal</text>`).
+      if (optOut.has(tagLn) || optOut.has(bodyLn)) continue
       if (looksEnglish(text)) {
-        issues.push({ file: path.relative(ROOT, f), line: ln, text: text.trim(), kind: `<${tag}>` })
+        issues.push({ file: path.relative(ROOT, f), line: bodyLn, text: text.trim(), kind: `<${tag}>` })
       }
     }
 

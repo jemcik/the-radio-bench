@@ -9,9 +9,11 @@
  * `--sketch-stroke` token and adapts to every theme.
  */
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { RoughPaths, roughLine, roughPath, roughRect } from '@/lib/rough'
 
 export default function Ch0_5Hero() {
+  const { t } = useTranslation('ui')
   const desk = useMemo(() => ({
     line: roughLine(20, 118, 400, 118, { seed: 1, strokeWidth: 1.1 }),
     hatches: [[30, 60], [70, 100], [110, 140], [150, 180], [190, 220],
@@ -106,7 +108,7 @@ export default function Ch0_5Hero() {
 
         <text x="220" y="10" fontFamily="inherit" fontStyle="italic" fontSize="0.468em"
               fill="currentColor" textAnchor="end" opacity={0.75}>
-          Fig. 0.5
+          {t('ch0_5.heroFigCaption')}
         </text>
       </g>
 
