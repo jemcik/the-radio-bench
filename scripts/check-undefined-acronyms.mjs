@@ -77,9 +77,45 @@ const STOPLIST = new Set([
   'ALWAYS', 'WITH', 'INTO', 'UNDER', 'OVER', 'DIFFERENT', 'SAME',
   'SIMILAR', 'GOOD', 'BAD', 'FAST', 'SLOW', 'INDIVIDUALLY', 'MINIMUM',
   'MAXIMUM',
-  // Ukrainian Cyrillic words sometimes written ALL-CAPS for emphasis.
-  // Add as the lint surfaces real false positives in UA prose.
+  // Ukrainian Cyrillic words sometimes written ALL-CAPS for emphasis,
+  // and material-/diagram-label words that read as headings («МІДЬ»,
+  // «ВОДА» on the chapter-1 hero pipes; «ДІЕЛЕКТРИК», «ПРОВІДНИК» as
+  // material-category titles). Add as the lint surfaces real false
+  // positives in UA prose.
   'КВАДРАТА', 'КВАДРАТ', 'НЕ', 'ТАК', 'НІ',
+  'МІДЬ', 'ВОДА', 'ДІЕЛЕКТРИК', 'НАПІВПРОВІДНИК', 'ПРОВІДНИК',
+  'МІНІМАЛЬНИЙ', 'СУМА', 'ОДНОМУ', 'ОКРЕМО', 'ПОБАЧИТИ',
+  'КОЖНА', 'ВСЯ',
+  // Diagram cell labels (rendered inside SVG; the text is verisimilitude
+  // for an electret-microphone schematic, not a glossary candidate).
+  'МІК', 'ПДС',
+  // Acronym fragments that show up because the surrounding acronym IS
+  // glossed: MOS appears inside the inline expansion of MOSFET,
+  // «(MOS field-effect transistors)»; LC- / RC- / RC-ФНЧ are partial
+  // matches glued to a following JSX tag («LC-<lpf>...</lpf>») where
+  // the regex captures the trailing hyphen as part of the token.
+  'MOS',
+  'LC-', 'RC-', 'RC-ФНЧ',
+  // E-series catalogue designations (E12, E24, E48, E96, E192) — these
+  // are «preferred-value» series names from the IEC 60063 standard.
+  // The series concept lives in the «preferred value» glossary entry;
+  // each `EN` number is just a specific instance. Treating them as
+  // glossary candidates would require N entries for N values, which
+  // is overkill — the chapter prose explains the family inline.
+  'E12', 'E24', 'E48', 'E96', 'E192',
+  // Brand names — proper nouns rather than glossary candidates.
+  'UNI-T',
+  // Geographic abbreviation — already understood by readers;
+  // expanding inline would patronise.
+  'США',
+  // Scope-display verisimilitude labels, not glossary candidates.
+  'TRIG',
+  // Diagram label for the cylindrical part of a transformer's E-I
+  // laminated core («E-I shape» — descriptive, not glossable).
+  'E-I',
+  // Variable label in schematics — `R-L` is the LOAD resistor name in
+  // a divider diagram, not an acronym.
+  'R-L',
 ])
 
 // Component / part-number pattern. Things like `FT-37-43`, `T-50-2`,
@@ -101,12 +137,23 @@ function flatten(obj, prefix = '') {
 const en = JSON.parse(readFileSync(EN_PATH, 'utf8'))
 const uk = JSON.parse(readFileSync(UK_PATH, 'utf8'))
 
-const namesEn = new Set(
-  Object.keys(en.glossary?._names || {}).map(k => k.toUpperCase()),
-)
-const namesUk = new Set(
-  Object.keys(uk.glossary?._names || {}).map(k => k.toUpperCase()),
-)
+// Glossary-name lookup: include BOTH the keys and the locale-specific
+// display values from `glossary._names`. The keys are canonical English
+// (e.g. `pwm`, `adc`, `vhf`); the values carry the localised display
+// form («ШІМ», «АЦП», «УКХ»). Without the values, UA prose using «ШІМ»
+// gets flagged as undefined even though `<G k="pwm">` renders it as a
+// glossary tooltip with that exact label.
+function buildNameSet(jsonRoot) {
+  const names = jsonRoot.glossary?._names || {}
+  const set = new Set()
+  for (const [k, v] of Object.entries(names)) {
+    set.add(k.toUpperCase())
+    if (typeof v === 'string') set.add(v.toUpperCase())
+  }
+  return set
+}
+const namesEn = buildNameSet(en)
+const namesUk = buildNameSet(uk)
 
 const flatEn = flatten(en)
 const flatUk = flatten(uk)
@@ -115,25 +162,91 @@ const flatUk = flatten(uk)
 // expansion is one of:
 //   - `<full form> (EFHW)`        → e.g. «End-Fed Half-Wave (EFHW)»
 //   - `EFHW (<full form>)`        → e.g. «EFHW (End-Fed Half-Wave)»
-// Heuristic: look in a 120-char window around the acronym for a
-// `(` … `)` group containing at least 2 capitalised words OR the
-// acronym's letters spelled out hyphen-separated (E-F-H-W).
+//   - `<full form> (EFHW <extra>)` — full form precedes parens, ACRONYM
+//     is alone or with descriptor inside parens (e.g. «Kirchhoff's
+//     Current Law (KCL)»).
+//   - `(EFHW — <full form>)` — acronym at start of parens, full form
+//     follows after a dash inside same parens (e.g. «(IEC — International
+//     Electrotechnical Commission)»).
+//
+// «Full form» is detected as either:
+//   - 2+ Capitalised words (English title-case form), OR
+//   - 3+ space-separated tokens of any case (Ukrainian doesn't title-case
+//     definitions: «(метал-оксид-напівпровідникові польові транзистори)»
+//     is a perfectly good expansion of MOSFET but every word is
+//     lowercase).
 function hasInlineExpansion(value, acronym, idx) {
   const start = Math.max(0, idx - 120)
   const end = Math.min(value.length, idx + acronym.length + 120)
   const window = value.slice(start, end)
-  // (a) Acronym followed by «(...)» containing 2+ capitalised words.
+
+  // English title-case form: 2+ capitalised words in sequence.
+  const hasCapWords = (s) =>
+    /(?:[A-ZА-ЯІЇЄҐ][a-zа-яіїєґ-]+\s*){2,}/.test(s)
+  // Ukrainian/lowercase form: 3+ multi-letter tokens. Looser — accepts
+  // «метал-оксид-напівпровідникові польові транзистори» but rejects
+  // 2-token noise like «div abc». Uses an explicit Latin+Cyrillic
+  // letter class because JavaScript's default `\w` is ASCII-only and
+  // wouldn't match Cyrillic word chars at all.
+  const LETTER = '[A-Za-zА-ЯІЇЄҐа-яіїєґ]'
+  const SEP = '[\\s—–-]+'
+  const hasMultiWords = (s) =>
+    new RegExp(`${LETTER}{3,}${SEP}${LETTER}{3,}${SEP}${LETTER}{3,}`).test(s)
+  const looksLikeExpansion = (s) => hasCapWords(s) || hasMultiWords(s)
+
+  // (a) Acronym followed by «(...)» containing a plausible expansion.
   const after = new RegExp(
-    `\\b${acronym}\\b[^(]{0,5}\\(([^)]{4,80})\\)`,
+    `\\b${acronym}\\b[^(]{0,5}\\(([^)]{4,120})\\)`,
   )
   const am = after.exec(window)
-  if (am && /(?:[A-ZА-ЯІЇЄҐ][a-zа-яіїєґ-]+\s*){2,}/.test(am[1])) return true
-  // (b) `(...)` immediately before the acronym, containing 2+ caps.
+  if (am && looksLikeExpansion(am[1])) return true
+
+  // (b) `(...)` immediately before the acronym, containing a plausible
+  // expansion.
   const before = new RegExp(
-    `\\(([^)]{4,80})\\)[^(]{0,5}\\b${acronym}\\b`,
+    `\\(([^)]{4,120})\\)[^(]{0,5}\\b${acronym}\\b`,
   )
   const bm = before.exec(window)
-  if (bm && /(?:[A-ZА-ЯІЇЄҐ][a-zа-яіїєґ-]+\s*){2,}/.test(bm[1])) return true
+  if (bm && looksLikeExpansion(bm[1])) return true
+
+  // (c) `<full form> (ACRONYM[...])` — acronym is INSIDE parens (alone
+  // or with a short descriptor), full form precedes the open paren.
+  // Catches «Kirchhoff's Current Law (KCL)», «Kirchhoff's Voltage Law,
+  // KVL» (the «KVL» is sometimes preceded by a comma instead of paren).
+  const inParens = new RegExp(`\\(\\s*${acronym}\\b[^)]{0,40}\\)`)
+  const ipm = inParens.exec(window)
+  if (ipm && ipm.index >= 8) {
+    const preceding = window.slice(Math.max(0, ipm.index - 80), ipm.index)
+    if (looksLikeExpansion(preceding)) return true
+  }
+
+  // (d) `(<anything> ACRONYM <separator> <full form>)` — acronym
+  // mid-parens, full form follows after a dash/comma in same parens.
+  // Catches «(стиль IEC — Міжнародна електротехнічна комісія)».
+  const acrInParens = new RegExp(
+    `\\([^)]*?\\b${acronym}\\b[^)]*?[—–\\-,][^)]{4,120}\\)`,
+  )
+  const aim = acrInParens.exec(window)
+  if (aim) {
+    const after_acr = aim[0].slice(aim[0].indexOf(acronym) + acronym.length)
+    if (looksLikeExpansion(after_acr)) return true
+  }
+
+  // (e) `(<full form>, ACRONYM)` — full form first, then comma/dash,
+  // then ACRONYM, all inside same parens. Catches the «(англ. Kirchhoff's
+  // Current Law, KCL)» bilingual-definition pattern.
+  const acrTrailParens = new RegExp(
+    `\\(([^)]{8,200})[—–\\-,]\\s*${acronym}\\b[^)]*\\)`,
+  )
+  const atm = acrTrailParens.exec(window)
+  if (atm && looksLikeExpansion(atm[1])) return true
+
+  // (f) `ACRONYM: <full form>` — colon-introduced definition (common in
+  // quiz explanations and key-takeaway lines: «KCL: at any junction…»).
+  const colonForm = new RegExp(`\\b${acronym}\\b\\s*:\\s*([^.;\\n]{12,160})`)
+  const cm = colonForm.exec(window)
+  if (cm && looksLikeExpansion(cm[1])) return true
+
   return false
 }
 
@@ -167,6 +280,16 @@ function scan(flat, names, locale) {
       const tok = m[0]
       if (STOPLIST.has(tok)) continue
       if (PART_NUMBER_RE.test(tok)) continue
+      // Trailing-hyphen partial: when a Latin acronym is followed by a
+      // hyphen and then a JSX tag (e.g. `LC-<lpf>...`), the regex
+      // captures the hyphen as part of the token. That's a partial,
+      // not a real acronym worth glossing in itself.
+      if (tok.endsWith('-')) continue
+      // Mixed-script combos: Latin + hyphen + Cyrillic (e.g. `RC-ФНЧ`).
+      // These are concatenated terms, not single-acronym entries; their
+      // components (RC, ФНЧ) get scanned separately when they appear
+      // standalone. Skip the combo to avoid double-counting.
+      if (/[A-Z]/.test(tok) && /[А-ЯІЇЄҐ]/.test(tok)) continue
       if (names.has(tok.toUpperCase())) continue
       if (isGlossWrapped(value, tok, m.index)) continue
       if (hasInlineExpansion(value, tok, m.index)) continue
