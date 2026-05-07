@@ -183,7 +183,7 @@ export default function Chapter1_5() {
         <Trans
           i18nKey="ch1_5.typesCeramicIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, mlcc: <G k="mlcc" />, np0: <G k="np0" /> }}
         />
       </p>
 

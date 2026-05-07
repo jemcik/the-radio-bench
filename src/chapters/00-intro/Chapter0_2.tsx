@@ -141,7 +141,7 @@ export default function Chapter0_2() {
 
       <p>
         <Trans i18nKey="ch0_2.vnaSparams" ns="ui"
-          components={{ ...mathComponents, strong: <strong />, swr: <G k="swr" /> }}
+          components={{ ...mathComponents, strong: <strong />, swr: <G k="swr" />, s11: <G k="s11" /> }}
         />
       </p>
 
@@ -225,7 +225,7 @@ export default function Chapter0_2() {
         </li>
         <li>
           <Trans i18nKey="ch0_2.accessoriesPsu" ns="ui"
-            components={{ ...mathComponents, strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong />, psu: <G k="psu" /> }}
           />
         </li>
       </ul>
