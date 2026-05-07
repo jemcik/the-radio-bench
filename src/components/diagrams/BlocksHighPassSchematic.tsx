@@ -70,8 +70,13 @@ export default function BlocksHighPassSchematic() {
       <Wire points={[{ x: NODE_X, y: TOP_Y }, r.p1]} />
       <Wire points={[r.p2, { x: NODE_X, y: BOT_Y }]} />
 
-      {/* Bottom return rail back to the V_in reference terminal */}
-      <Wire points={[{ x: NODE_X, y: BOT_Y }, { x: VIN_X, y: BOT_Y }]} />
+      {/* Bottom rail. Goes from the V_in reference terminal at the LEFT,
+          past the R drop point (NODE_X), and on to a short tail that
+          ends just before the GND label on the RIGHT. Drawn as a single
+          continuous wire so the rail reads as one ground bus.
+          Previously the rail stopped at NODE_X and the GND label hung
+          past it in dead space — user-flagged. */}
+      <Wire points={[{ x: VIN_X, y: BOT_Y }, { x: VOUT_LABEL_X - 6, y: BOT_Y }]} />
 
       {/* Components */}
       <Capacitor x={C_X} y={TOP_Y} label="C" />
@@ -82,6 +87,9 @@ export default function BlocksHighPassSchematic() {
           / where we measure V_out). Draw the junction dot so it reads
           as a three-way connection. */}
       <Junction x={NODE_X} y={TOP_Y} />
+      {/* Bottom rail T-junction: R drop, return rail to V_in, and the
+          short tail to the GND label all meet here. */}
+      <Junction x={NODE_X} y={BOT_Y} />
 
       {/* Terminal labels — V_in / V_out on top rail, GND on bottom rail.
           GND was historically missing in this schematic; it was added so
