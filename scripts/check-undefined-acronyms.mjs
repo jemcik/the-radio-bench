@@ -137,12 +137,23 @@ function flatten(obj, prefix = '') {
 const en = JSON.parse(readFileSync(EN_PATH, 'utf8'))
 const uk = JSON.parse(readFileSync(UK_PATH, 'utf8'))
 
-const namesEn = new Set(
-  Object.keys(en.glossary?._names || {}).map(k => k.toUpperCase()),
-)
-const namesUk = new Set(
-  Object.keys(uk.glossary?._names || {}).map(k => k.toUpperCase()),
-)
+// Glossary-name lookup: include BOTH the keys and the locale-specific
+// display values from `glossary._names`. The keys are canonical English
+// (e.g. `pwm`, `adc`, `vhf`); the values carry the localised display
+// form («ШІМ», «АЦП», «УКХ»). Without the values, UA prose using «ШІМ»
+// gets flagged as undefined even though `<G k="pwm">` renders it as a
+// glossary tooltip with that exact label.
+function buildNameSet(jsonRoot) {
+  const names = jsonRoot.glossary?._names || {}
+  const set = new Set()
+  for (const [k, v] of Object.entries(names)) {
+    set.add(k.toUpperCase())
+    if (typeof v === 'string') set.add(v.toUpperCase())
+  }
+  return set
+}
+const namesEn = buildNameSet(en)
+const namesUk = buildNameSet(uk)
 
 const flatEn = flatten(en)
 const flatUk = flatten(uk)
