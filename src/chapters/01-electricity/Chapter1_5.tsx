@@ -41,6 +41,8 @@ export default function Chapter1_5() {
       sub: <sub />,
       strong: <strong />,
       cap: <G k="capacitance" />,
+      an: <G k="anode" />,
+      cat: <G k="cathode" />,
     }),
     [t],
   )

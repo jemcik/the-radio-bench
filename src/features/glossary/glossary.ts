@@ -767,7 +767,39 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Semiconductor that allows current in one direction only.',
     detail:
       'A diode has an anode (+) and cathode (−). Current flows easily from anode to cathode (forward biased) with a small voltage drop (0.6 V for silicon, 0.3 V for Schottky). In reverse, almost no current flows until the breakdown voltage is reached. Diodes are used for rectification (AC→DC), protection, and signal detection.',
-    see: ['diode testing'],
+    see: ['anode', 'cathode', 'rectification', 'diode testing'],
+  },
+  anode: {
+    tip: 'The terminal of a diode, LED, or battery on the «positive» side — where conventional current enters the device.',
+    detail:
+      'The anode is one of the two terminals of a diode, LED, or other polarised component. By convention, current enters the device through the anode and leaves through the cathode. In the diode schematic symbol, the anode sits at the flat side of the triangle (the wide end). On a real through-hole diode, the anode is the lead WITHOUT the band painted on the body. On an LED, the anode is the longer lead (and inside the bulb, the larger frame). Word origin: from Greek «ἄνοδος» — «way up», where positive current «enters».',
+    see: ['cathode', 'diode', 'led'],
+  },
+  cathode: {
+    tip: 'The terminal of a diode, LED, or battery on the «negative» side — where conventional current leaves the device.',
+    detail:
+      'The cathode is the second of the two terminals of a polarised component (the anode is the other). By convention, current leaves the device through the cathode. In the diode schematic symbol, the cathode is the bar at the tip of the triangle. On a real through-hole diode, the cathode is the lead with the painted BAND on the body — same end as the bar in the symbol. On an LED, the cathode is the shorter lead (and inside the bulb, the smaller frame next to the reflector). Get this end the wrong way round and the diode simply will not conduct in normal operation. Word origin: Greek «κάθοδος» — «way down».',
+    see: ['anode', 'diode', 'led'],
+  },
+  'forward voltage drop': {
+    tip: 'The voltage that develops across a conducting diode — roughly constant (≈ 0.6 V for silicon) over a wide range of currents.',
+    detail:
+      'The forward voltage drop V_F is the (almost) flat voltage that a diode pushes back when current flows through it in the conducting direction. It depends on the semiconductor material, not on the current level: small-signal silicon diodes (1N4148) sit at ≈ 0.6–0.7 V over the entire 1–100 mA range; Schottky diodes (1N5819) at ≈ 0.2–0.3 V; LEDs at ≈ 1.8 V (red), ≈ 2.1 V (green), ≈ 3.0 V (blue/white). For circuit design the rule is «treat the diode as a constant battery in series with the wire»: a 5 V supply driving a series silicon diode + load resistor only delivers 4.3 V to the resistor. The drop varies a little with current — about 60 mV per decade — which is the «slope of the I–V curve past the knee» you see in the chapter widget.',
+    formula: 'V_F ≈ 0.7 V (Si) | 0.3 V (Schottky) | 1.8–3.0 V (LED)',
+    see: ['diode', 'schottky diode', 'led'],
+  },
+  'pin diode': {
+    tip: 'A diode with an undoped intrinsic layer between the P and N regions — slow at DC but acts as a current-controlled resistor at RF.',
+    detail:
+      'A PIN diode is a three-layer structure: P-type → Intrinsic (undoped) → N-type. At DC and audio frequencies it behaves like an ordinary diode, but at RF the intrinsic region is too thick for normal rectification — instead, the device looks like a resistor whose value depends on the DC bias current. That makes PIN diodes the standard parts for RF switches, attenuators, and limiters: control the bias, control the resistance, control whether the RF signal passes or is shunted away. Common amateur-radio uses: the transmit/receive switch in handheld transceivers, electronically variable attenuators in front-end protection, and high-power RF protection circuits. Typical parts: BAR63, HSMP-3893, BAP-50.',
+    see: ['diode', 'rf'],
+  },
+  'schottky diode': {
+    tip: 'A diode built from a metal–semiconductor junction instead of two pieces of doped silicon — half the forward drop, and switches faster.',
+    detail:
+      'A Schottky diode replaces one of the two doped-silicon halves of an ordinary diode with a metal layer (often platinum or molybdenum). The metal-semiconductor interface conducts at a much lower voltage than a silicon-silicon junction: V_F ≈ 0.2–0.3 V instead of 0.6–0.7 V, halving the power wasted in a low-voltage rectifier. Schottky diodes also have negligible «reverse-recovery time» — they stop conducting almost instantly when the polarity reverses — which makes them the only practical choice in switching power supplies running at hundreds of kHz. The trade-offs: higher reverse leakage current (microamps instead of nanoamps) and lower reverse-breakdown voltage (40–60 V is typical; 100 V is rare). Common parts: 1N5819 (40 V, 1 A), BAT54 (SMD signal Schottky), MBRP40045 (high-current bridge for solar/automotive).',
+    formula: 'V_F ≈ 0.3 V at 1 mA',
+    see: ['diode', 'forward voltage drop', 'rectification'],
   },
   antenna: {
     tip: 'Converts electrical signals to radio waves and vice versa.',
