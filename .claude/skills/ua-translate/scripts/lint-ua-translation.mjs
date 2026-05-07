@@ -108,7 +108,40 @@ const RULES = [
     // <Trans>/<MathText>, or the render site uses <MathText> on raw
     // t() output. WARN (not ERROR) because some strings are ARIA-only
     // and never seen; check each case.
-    pattern: /(?<![<>\\{])\b[A-Za-z]_[A-Za-zА-ЯІЇЄа-яіїє0-9]+\b(?![<>}])/g,
+    //
+    // Skipped key patterns — these render paths handle bare X_Y
+    // correctly, so the warning is noise for them. The render gate
+    // `check:bare-subscript-renders` is the source of truth for correct
+    // wrapping at chapter call sites; this list mirrors known-safe
+    // patterns so the lint matches the render-gate verdict.
+    //
+    //   • glossary.*           — `withSubscripts()` (`<var>` is forbidden
+    //                            by `check:glossary-markup`).
+    //   • *.widget.*           — widget UI labels that go through
+    //                            `withSubscripts(t(labelKey))` /
+    //                            `withSubscriptsSvg(...)`.
+    //   • *.bodeGuide.*        — Bode plot guide labels via
+    //                            `withSubscriptsSvg`.
+    //   • *.blocksVisual*      — block diagram captions via `<MathText>`.
+    //   • *.section*           — `<Section labelKey="…">` wraps with
+    //                            `withSubscripts` internally.
+    match: (s, meta) => {
+      const key = meta?.key ?? ''
+      if (
+        key.startsWith('glossary.') ||
+        /\.widget\./.test(key) ||
+        /\.bodeGuide\./.test(key) ||
+        /\.blocksVisual/.test(key) ||
+        /\.section[A-Z]/.test(key)
+      ) return []
+      const re = /(?<![<>\\{])\b[A-Za-z]_[A-Za-zА-ЯІЇЄа-яіїє0-9]+\b(?![<>}])/g
+      const results = []
+      let mt
+      while ((mt = re.exec(s)) !== null) {
+        results.push({ index: mt.index, match: mt[0] })
+      }
+      return results
+    },
     hint: 'Bare X_Y pattern outside <var>…</var>. Wrap in <var>X_{\\mathrm{Y}}</var> (or X_{Y} for variable indices, X_{\\text{Y}} for Cyrillic).',
   },
 
@@ -165,7 +198,21 @@ const RULES = [
     id: 'forbidden.knyzhka',
     category: 'FORBIDDEN',
     severity: 'WARN',
-    pattern: wb('книг[аиоуіеою]|книжк[аиоуіеою]|книз[іе]|книжц[іе]'),
+    // Skip aria-labels — they describe physical objects in hero
+    // illustrations (a literal book may appear in a drawing). The
+    // hint says this case is fine, so suppressing it for ariaLabel
+    // keys avoids the recurring false positive.
+    match: (s, meta) => {
+      const key = meta?.key ?? ''
+      if (/AriaLabel(\b|$)/i.test(key)) return []
+      const re = wb('книг[аиоуіеою]|книжк[аиоуіеою]|книз[іе]|книжц[іе]')
+      const results = []
+      let mt
+      while ((mt = re.exec(s)) !== null) {
+        results.push({ index: mt.index, match: mt[0] })
+      }
+      return results
+    },
     hint: 'Possible forbidden: «книжка/книга». If this refers to the project itself, use «курс». If it refers to a physical book in a diagram, this is fine.',
   },
 

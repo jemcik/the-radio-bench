@@ -64,8 +64,17 @@ const BARE_SUB_RE   = /(?<![A-Za-z<>\\{])\b[A-Za-z]_[A-Za-zА-ЯІЇЄа-яії�
 const BRACED_SUB_RE = /(?<![A-Za-z<>])\b[A-Za-z]_\{[A-Za-z0-9]+\}/
 
 function classify(v) {
-  const bare = BARE_SUB_RE.test(v)
-  const braced = BRACED_SUB_RE.test(v)
+  // Strip <var>…</var> blocks before classifying. The lookbehinds in
+  // BARE_SUB_RE / BRACED_SUB_RE only exclude positions IMMEDIATELY after
+  // `<` or `>`, so a complex math block like `<var>V_{p} \approx N_{p}
+  // \cdot ...</var>` correctly exempts the FIRST subscript (after `>`)
+  // but flags the second `N_{p}` as «braced outside <var>» — its
+  // lookbehind sees plain text, not the enclosing <var> tag. Stripping
+  // the entire <var>…</var> block first removes that whole-block
+  // ambiguity: anything inside <var> is the responsibility of KaTeX.
+  const stripped = v.replace(/<var>[^<]*<\/var>/g, '')
+  const bare = BARE_SUB_RE.test(stripped)
+  const braced = BRACED_SUB_RE.test(stripped)
   if (!bare && !braced) return null
   return { bare, braced }
 }
@@ -255,6 +264,31 @@ for (const file of files) {
     const key = m[2]
     const classification = flaggedKeys.get(key)
     if (!classification) continue
+
+    // `<Trans i18nKey="…">` is a special case: Trans never wraps the value
+    // through a subscript-aware renderer — it only maps `<tag>` placeholders
+    // via `components={}`. Any flagged key (bare OR braced) used through
+    // i18nKey is unsafe unless the i18n value already uses `<var>X_{Y}</var>`
+    // markup AND a `var: <MathVar />` mapping is in components — but in that
+    // case the value wouldn't be flagged, because `<var>X_{Y}</var>` is
+    // exempt from the bare/braced classifier (see lookbehinds at the top).
+    // So: any flagged key reaching Trans = bug.
+    if (propName === 'i18nKey') {
+      const idx = m.index
+      const line = text.slice(0, idx).split('\n').length
+      const rel = path.relative(REPO, file)
+      findings.push({
+        file: rel,
+        line,
+        key,
+        value: flat[key],
+        classification,
+        kind: 'trans-i18nKey',
+        propName,
+      })
+      continue
+    }
+
     // Bare-only keys are handled fine by any wrapper that the consumer might
     // use — skip to avoid false positives.
     if (!classification.braced) continue
