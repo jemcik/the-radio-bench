@@ -215,7 +215,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.mainsIntro"
           ns="ui"
-          components={{ em: <em />, mains: <G k="mains" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
+          components={{ em: <em />, mains: <G k="mains" />, psu: <G k="psu" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
         />
       </p>
 
