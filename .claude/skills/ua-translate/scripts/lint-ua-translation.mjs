@@ -946,12 +946,12 @@ const RULES = [
         // term pattern (word-boundary), safeFromChapter, suggested paraphrase
         { term: /(?<!\p{L})атенюатор[ауиеіою]?(?!\p{L})/giu, safeFrom: 3.00, hint: 'атенюатор — canonical from ch3+; before that, use «ступінь послаблення сигналу» or describe directly.' },
         { term: /(?<!\p{L})адмітанс[ауі]?(?!\p{L})/giu,      safeFrom: 1.06, hint: 'адмітанс — canonical from ch1.6+; before that, use «провідність у колах змінного струму» or wrap in <G>.' },
-        { term: /(?<!\p{L})гістерезис[ауі]?(?!\p{L})/giu,    safeFrom: 2.00, hint: 'гістерезис — introduce with a gloss («поріг із запасом») or wrap in <G>.' },
-        { term: /(?<!\p{L})каскад[ауіиовх]?(?!\p{L})/giu,    safeFrom: 1.08, hint: 'каскад — electronics jargon; for beginner prose use «ступінь», «частина схеми», «блок схеми», or wrap in <G>.' },
+        { term: /(?<!\p{L})гістерезис[ауі]?(?!\p{L})/giu,    safeFrom: 1.09, hint: 'гістерезис — introduce with a gloss («поріг із запасом») or wrap in <G>.' },
+        { term: /(?<!\p{L})каскад[ауіиовх]?(?!\p{L})/giu,    safeFrom: 1.06, hint: 'каскад — electronics jargon; for beginner prose use «ступінь», «частина схеми», «блок схеми», or wrap in <G>.' },
         { term: /(?<!\p{L})трансивер[ауі]?(?!\p{L})/giu,     safeFrom: 2.00, hint: 'трансивер — introduce with a gloss or wrap in <G>.' },
         { term: /(?<!\p{L})гетеродин[ауі]?(?!\p{L})/giu,     safeFrom: 3.01, hint: 'гетеродин — introduce with a gloss or wrap in <G>.' },
-        { term: /(?<!\p{L})зміщенн[яіюеі]/giu,               safeFrom: 1.10, hint: 'зміщення (biasing) — canonical from ch1.10+; in earlier chapters prefer «задавання робочої точки».' },
-        { term: /(?<!\p{L})ВЧ(?!\p{L})/gu,                   safeFrom: 2.00, hint: 'ВЧ — abbreviation for «високі частоти»; in beginner prose expand the full form.' },
+        { term: /(?<!\p{L})зміщенн[яіюеі]/giu,               safeFrom: 1.05, hint: 'зміщення (biasing) — canonical from ch1.5+ (introduced via coupling caps and diode forward/reverse bias); before that, prefer «задавання робочої точки».' },
+        { term: /(?<!\p{L})ВЧ(?!\p{L})/gu,                   safeFrom: 1.06, hint: 'ВЧ — abbreviation for «високі частоти»; in beginner prose expand the full form.' },
         { term: /(?<!\p{L})КХ(?!\p{L})/gu,                   safeFrom: 4.01, hint: 'КХ (short waves) — ham-radio term; in earlier chapters expand to «діапазон коротких хвиль».' },
         { term: /(?<!\p{L})реактивн(?:ий|ого|ому|им|ій|ої|ою|е|і|их|ими)\s+опір/giu, safeFrom: 1.05, hint: 'реактивний опір — canonical from ch1.5+; before that, describe directly.' },
       ]

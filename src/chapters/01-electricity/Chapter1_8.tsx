@@ -484,7 +484,13 @@ export default function Chapter1_8() {
       {/* ── Section 10: Where filters live ─────────────────────── */}
       <Section id="applications" labelKey="ch1_8.sectionApplications" />
 
-      <p>{t('ch1_8.appsIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_8.appsIntro"
+          ns="ui"
+          components={{ transceiver: <G k="transceiver" /> }}
+        />
+      </p>
 
       <p>
         <Trans
@@ -494,6 +500,7 @@ export default function Chapter1_8() {
             strong: <strong />,
             lpf: <G k="low-pass" />,
             pa: <G k="power amplifier" />,
+            hf: <G k="hf" />,
           }}
         />
       </p>
@@ -507,6 +514,7 @@ export default function Chapter1_8() {
             cw: <G k="cw" />,
             iff: <G k="if filter" />,
             ssb: <G k="ssb" />,
+            transceiver: <G k="transceiver" />,
           }}
         />
       </p>

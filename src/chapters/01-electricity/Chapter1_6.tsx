@@ -236,7 +236,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.typesIronPowderIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, stage: <G k="amplifier stage" /> }}
         />
       </p>
 
@@ -500,7 +500,7 @@ export default function Chapter1_6() {
         <Trans
           i18nKey="ch1_6.blocksRfChoke"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, bypass: <G k="bypass capacitor" /> }}
+          components={{ ...mathComponents, strong: <strong />, bypass: <G k="bypass capacitor" />, stage: <G k="amplifier stage" /> }}
         />
       </p>
 

@@ -292,7 +292,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            tuned: <G k="tuned circuit" />, bpf: <G k="band-pass" /> }}
+            tuned: <G k="tuned circuit" />, bpf: <G k="band-pass" />, stage: <G k="amplifier stage" /> }}
         />
       </p>
 
@@ -300,7 +300,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.parallelDuality"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar /> }}
+          components={{ strong: <strong />, var: <MathVar />, stage: <G k="amplifier stage" /> }}
         />
       </Callout>
 
@@ -386,7 +386,7 @@ export default function Chapter1_7() {
           components={{
             strong: <strong />,
             var: <MathVar />,
-            decade: <G k="decade" />, capn: <G k="capacitance" /> }}
+            decade: <G k="decade" />, capn: <G k="capacitance" />, hf: <G k="hf" /> }}
         />
       </p>
 
@@ -450,7 +450,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.appsTransmitters"
           ns="ui"
-          components={{ strong: <strong />, cw: <G k="cw" />, ssb: <G k="ssb" /> }}
+          components={{ strong: <strong />, cw: <G k="cw" />, ssb: <G k="ssb" />, stage: <G k="amplifier stage" /> }}
         />
       </p>
 
