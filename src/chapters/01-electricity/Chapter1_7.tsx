@@ -350,7 +350,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.qComponents"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar /> }}
+          components={{ strong: <strong />, var: <MathVar />, np0: <G k="np0" /> }}
         />
       </p>
 
@@ -566,7 +566,7 @@ export default function Chapter1_7() {
         }
         troubleshooting={[
           <Trans key="t1" i18nKey="ch1_7.labTrouble1" ns="ui" components={{ strong: <strong /> }} />,
-          <Trans key="t2" i18nKey="ch1_7.labTrouble2" ns="ui" components={{ strong: <strong /> }} />,
+          <Trans key="t2" i18nKey="ch1_7.labTrouble2" ns="ui" components={{ strong: <strong />, pcb: <G k="pcb" /> }} />,
           <Trans key="t3" i18nKey="ch1_7.labTrouble3" ns="ui" components={{ strong: <strong /> }} />,
         ]}
       />

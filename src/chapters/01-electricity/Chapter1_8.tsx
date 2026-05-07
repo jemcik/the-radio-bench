@@ -607,7 +607,7 @@ export default function Chapter1_8() {
         goal={t('ch1_8.labGoal')}
         equipment={[
           <Trans key="e1" i18nKey="ch1_8.labEquip1" ns="ui" components={{ vna: <G k="vna" /> }} />,
-          <Trans key="e2" i18nKey="ch1_8.labEquip2" ns="ui" components={{ breadboard: <G k="breadboard" /> }} />,
+          <Trans key="e2" i18nKey="ch1_8.labEquip2" ns="ui" components={{ breadboard: <G k="breadboard" />, sma: <G k="sma" /> }} />,
           t('ch1_8.labEquip3'),
           t('ch1_8.labEquip4'),
         ]}

@@ -39,6 +39,7 @@ export default function Chapter1_6() {
       var: <MathVar />,
       sub: <sub />,
       strong: <strong />,
+      pcb: <G k="pcb" />,
     }),
     [t],
   )

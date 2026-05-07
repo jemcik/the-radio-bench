@@ -38,7 +38,7 @@ const CHAPTERS_DIR = path.join(ROOT, 'src/chapters')
 const EXEMPT_TERMS = new Set([
   'si',
   'gnd', 'usb', 'ide',
-  'hf', 'rf', 'vhf', 'fm', 'am', 'led',
+  'hf', 'rf', 'vhf', 'uhf', 'fm', 'am', 'led',
   'arrl', 'cept', 'erc',
   'qrp', 'qso',
   'rms', 'pwm', 'esr',
@@ -54,6 +54,7 @@ const EXEMPT_TERMS = new Set([
   'fourier', 'harmonic', 'logarithm', 'decade',
   'period', 'phase', 'amplitude', 'frequency',  // broad signal descriptors
   'voltage', 'current', 'resistance', 'power', 'watt', 'ampere', 'ohm', 'coulomb', 'charge',
+  'efficiency',  // generic engineering ratio mentioned in many chapters
   'conductor', 'insulator', 'semiconductor',
   'topology', 'tolerance',
   'antenna', 'dipole', 'yagi', 'isotropic', 'coax', 'transceiver',
@@ -107,6 +108,14 @@ const EXEMPT_PER_CHAPTER = {
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
+  // ch1_5: `mlcc` only appears in `typesGalleryAria` (aria-label) and
+  // `typeMLCC` (CapacitorTypeGallery silhouette label) — both rendered
+  // through raw `t()` to a plain string prop, so a `<G>` wrap would
+  // ship as literal angle brackets. `pcb` only in
+  // `bypassCapSchematicCaption`, rendered via `<MathText>` which
+  // doesn't process custom glossary tags. Glossary entries exist;
+  // the wraps can't be applied here without a render-path refactor.
+  ch1_5: new Set(['mlcc', 'pcb']),
   // ch1_7 «solenoid» — only in heroAriaLabel (aria attribute).
   ch1_7: new Set(['solenoid']),
   // ch0_5: «dc» and «inductor» each appear ONLY in non-prose contexts.

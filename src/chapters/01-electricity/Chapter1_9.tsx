@@ -342,6 +342,7 @@ export default function Chapter1_9() {
             strong: <strong />,
             ferr: <G k="ferrite" />,
             toro: <G k="toroid" />,
+            emi: <G k="emi" />,
           }}
         />
       </p>

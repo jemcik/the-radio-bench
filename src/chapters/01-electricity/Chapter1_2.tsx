@@ -25,6 +25,7 @@ export default function Chapter1_2() {
   const quizQuestions = useMemo(
     () => buildQuizFromI18n(t, 'ch1_2', QUIZ_QUESTION_COUNT, {
       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
+      psu: <G k="psu" />,
     }),
     [t],
   )

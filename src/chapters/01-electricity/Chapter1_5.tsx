@@ -175,7 +175,13 @@ export default function Chapter1_5() {
       {/* ── Section 3: Types ──────────────────────────────────── */}
       <Section id="types" labelKey="ch1_5.sectionTypes" />
 
-      <p>{t('ch1_5.typesIntro')}</p>
+      <p>
+        <Trans
+          i18nKey="ch1_5.typesIntro"
+          ns="ui"
+          components={{ freqresp: <G k="frequency response" /> }}
+        />
+      </p>
 
       <CapacitorTypeGallery />
 
