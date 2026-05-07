@@ -33,7 +33,7 @@
  *
  * Exit code: 0 on clean, 1 on findings.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -152,8 +152,43 @@ function buildNameSet(jsonRoot) {
   }
   return set
 }
-const namesEn = buildNameSet(en)
-const namesUk = buildNameSet(uk)
+
+// Chapter-local alias bindings act as glossary aliases. If any chapter
+// or widget TSX binds `lpf: <G k="low-pass" />`, then the i18n token
+// «LPF» means «the low-pass glossary entry» — `<G k="low-pass">` is
+// what `<lpf>...</lpf>` renders to. Add every such alias name to the
+// known-names set (case-insensitive) so the gate stops flagging the
+// acronym form even when it appears outside an explicit `<lpf>...`
+// wrap. (Same approach the glossary-coverage gate uses to recognise
+// widget-defined aliases.)
+function buildAliasNamesFromTsx() {
+  const set = new Set()
+  const stack = [
+    path.join(REPO, 'src/chapters'),
+    path.join(REPO, 'src/components/widgets'),
+    path.join(REPO, 'src/components/diagrams'),
+  ]
+  while (stack.length) {
+    const d = stack.pop()
+    let entries
+    try { entries = readdirSync(d, { withFileTypes: true }) }
+    catch { continue }
+    for (const e of entries) {
+      const p = path.join(d, e.name)
+      if (e.isDirectory()) stack.push(p)
+      else if (e.isFile() && /\.tsx$/.test(e.name) && !/\.test\.tsx$/.test(e.name)) {
+        const src = readFileSync(p, 'utf-8')
+        for (const m of src.matchAll(/(\w+)\s*:\s*<G\s+k="[^"]+"/g)) {
+          set.add(m[1].toUpperCase())
+        }
+      }
+    }
+  }
+  return set
+}
+const aliasNames = buildAliasNamesFromTsx()
+const namesEn = new Set([...buildNameSet(en), ...aliasNames])
+const namesUk = new Set([...buildNameSet(uk), ...aliasNames])
 
 const flatEn = flatten(en)
 const flatUk = flatten(uk)
@@ -195,8 +230,12 @@ function hasInlineExpansion(value, acronym, idx) {
   const looksLikeExpansion = (s) => hasCapWords(s) || hasMultiWords(s)
 
   // (a) Acronym followed by «(...)» containing a plausible expansion.
+  // Allow up to 12 characters between the acronym and the open paren —
+  // covers the common «SMD 0402 (surface-mount device)» / «KCL law (…)»
+  // pattern where a model number or short qualifier sits between the
+  // acronym and its expansion.
   const after = new RegExp(
-    `\\b${acronym}\\b[^(]{0,5}\\(([^)]{4,120})\\)`,
+    `\\b${acronym}\\b[^(]{0,12}\\(([^)]{4,120})\\)`,
   )
   const am = after.exec(window)
   if (am && looksLikeExpansion(am[1])) return true
@@ -204,7 +243,7 @@ function hasInlineExpansion(value, acronym, idx) {
   // (b) `(...)` immediately before the acronym, containing a plausible
   // expansion.
   const before = new RegExp(
-    `\\(([^)]{4,120})\\)[^(]{0,5}\\b${acronym}\\b`,
+    `\\(([^)]{4,120})\\)[^(]{0,12}\\b${acronym}\\b`,
   )
   const bm = before.exec(window)
   if (bm && looksLikeExpansion(bm[1])) return true

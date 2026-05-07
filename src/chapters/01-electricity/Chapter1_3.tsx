@@ -258,7 +258,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.nonSineGalleryIntro"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, formFactor: <G k="form factor" /> }}
+          components={{ ...mathComponents, strong: <strong />, formFactor: <G k="form factor" />, dmm: <G k="multimeter" /> }}
         />
       </p>
 
