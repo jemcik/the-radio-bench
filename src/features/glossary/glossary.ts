@@ -1168,4 +1168,10 @@ export const glossary: Record<string, GlossaryEntry> = {
       'A power amplifier (PA) is the high-power final stage of a transmitter, taking a low-power modulated signal and amplifying it to the level radiated by the antenna — typically tens to hundreds of watts in amateur service. Class-AB and class-C PAs are non-linear and generate strong harmonics of the carrier (2nd, 3rd, 5th…); a harmonic low-pass filter immediately after the PA suppresses them by 50 dB or more before they reach the antenna. Without that filter your 14 MHz transmission would also radiate on 28 MHz, 42 MHz, 70 MHz, and so on — straight into other amateur and broadcast bands.',
     see: ['filter', 'low-pass', 'harmonic'],
   },
+  'amplifier stage': {
+    tip: 'One self-contained block in a multi-stage amplifier — typically one transistor (or tube, or op-amp) plus its bias, gain-setting, and coupling components.',
+    detail:
+      'Real amplifiers almost always run as a chain of «stages»: a low-noise input stage extracts a tiny signal from the antenna, one or two intermediate stages add gain, and a final power stage drives the load. Each stage solves one problem — input impedance, gain, output impedance, linearity — and the chain composes them. The stages are decoupled from one another by coupling capacitors (which pass the AC signal but block each stage\'s DC bias point) and by separate bias networks; that decoupling is what lets you design and tune one stage at a time without the others drifting. The Ukrainian term «каскад» is used the same way and dates back to the tube era; «ступінь» is a more modern synonym preferred in beginner texts.',
+    see: ['power amplifier', 'coupling capacitor', 'bypass capacitor'],
+  },
 }
