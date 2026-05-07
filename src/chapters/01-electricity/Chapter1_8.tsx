@@ -134,8 +134,7 @@ export default function Chapter1_8() {
             db: <G k="decibel" />,
             ord: <G k="order" />,
             pb: <G k="passband" />,
-            sb: <G k="stopband" />,
-          }}
+            sb: <G k="stopband" />, lpf: <G k="low-pass" />, hpf: <G k="high-pass" /> }}
         />
       </p>
 

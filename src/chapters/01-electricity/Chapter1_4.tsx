@@ -84,7 +84,7 @@ export default function Chapter1_4() {
         <Trans
           i18nKey="ch1_4.packagesSMT"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, surface: <G k="surface mount" />, code: <code /> }}
+          components={{ ...mathComponents, strong: <strong />, surface: <G k="surface mount" />, code: <code />, smt: <G k="surface mount" />, smd: <G k="surface mount" /> }}
         />
       </p>
 
