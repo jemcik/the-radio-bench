@@ -116,6 +116,12 @@ const STOPLIST = new Set([
   // Variable label in schematics — `R-L` is the LOAD resistor name in
   // a divider diagram, not an acronym.
   'R-L',
+  // Component-designator label rendered inside an SVG schematic — the
+  // string IS the schematic label, not prose. Like `L` or `C` or `R`,
+  // `RFC` is a standard component identifier (Radio-Frequency Choke)
+  // that lives ONLY on the diagram. The actual concept is glossed via
+  // `choke` in the glossary; the diagram label is just a sticker.
+  'RFC',
 ])
 
 // Component / part-number pattern. Things like `FT-37-43`, `T-50-2`,

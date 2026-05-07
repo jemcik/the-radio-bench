@@ -458,6 +458,7 @@ export default function Chapter1_8() {
             strong: <strong />,
             db: <G k="decibel" />,
             vna: <G k="vna" />,
+            s21: <G k="s21" />,
           }}
         />
       </p>

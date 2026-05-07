@@ -83,7 +83,7 @@ export default function RfChokeSchematic() {
 
       {/* Components */}
       <Capacitor x={C_X} y={(TOP_Y + BOT_Y) / 2} orient="down" label="C" />
-      <Inductor x={RFC_X} y={(TOP_Y + SIG_Y) / 2} orient="down" label="RFC" />
+      <Inductor x={RFC_X} y={(TOP_Y + SIG_Y) / 2} orient="down" label={t('ch1_6.rfChokeRfc')} />
 
       {/* Junction at collector node where signal path meets RFC drop */}
       <Junction x={NODE_X} y={SIG_Y} />

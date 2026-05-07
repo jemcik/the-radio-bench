@@ -48,6 +48,24 @@ export const glossary: Record<string, GlossaryEntry> = {
       'An LED is a special type of diode that emits light when forward-biased. LEDs are polarised — the longer leg is positive (anode) and the shorter leg is negative (cathode). They always need a current-limiting resistor in series to avoid burning out. Different colours have different forward voltage drops (red ≈ 1.8V, blue/white ≈ 3.0V).',
     see: ['diode', 'resistor'],
   },
+  psu: {
+    tip: 'Power Supply Unit — converts wall AC (or a battery) into the regulated DC voltages a circuit needs.',
+    detail:
+      'A PSU is whatever stands between the wall socket and your circuit\'s "+5 V" rail: a transformer-rectifier-regulator chain in a linear bench supply, or a switching converter in a phone charger. The two numbers that matter are the output voltage range and the maximum output current; a 0–30 V / 0–3 A bench PSU with current-limit knobs is the standard tool for prototyping. Switching PSUs are smaller and more efficient but inject high-frequency noise into the rail; linear PSUs are cleaner but heavier and run hot. "PSU" is the everyday acronym in datasheets, schematics, and product blurbs.',
+    see: ['ac', 'dc', 'rectification'],
+  },
+  emi: {
+    tip: 'ElectroMagnetic Interference — unwanted electromagnetic energy that couples from one circuit into another.',
+    detail:
+      'EMI covers anything from the buzz a switch-mode power supply puts on a nearby radio to the spike that crashes a microcontroller when a relay opens. It travels both as conducted noise (along power and signal wires) and radiated noise (through space, like a tiny unintentional transmitter). The standard defences are filtering (ferrite beads, X/Y capacitors), shielding (metal cans, braided coax shields), and physical separation. In radio practice EMI is a two-sided problem: your equipment must not generate too much of it (regulatory limits), and it must keep working when surrounded by everyone else\'s.',
+    see: ['ferrite', 'choke', 'bypass capacitor'],
+  },
+  pcb: {
+    tip: 'Printed Circuit Board — the rigid fibreglass slab with copper traces that carries components in any modern circuit.',
+    detail:
+      'A PCB is a sandwich of insulating substrate (most often FR-4 fibreglass) with one or more copper layers etched into the wires of your schematic. Components solder to copper pads on the surface; for a multi-layer board, plated-through "vias" connect signals between layers. Hobbyists commission PCBs from online fabs (JLCPCB, OSH Park, PCBWay) for a few dollars per panel; the design files come from EDA tools like KiCad. Compared to a breadboard, a PCB has predictable parasitics, much shorter signal paths, and the mechanical robustness needed for anything that has to leave the bench.',
+    see: ['surface mount', 'breadboard'],
+  },
   usb: {
     tip: 'Universal Serial Bus — standard connector for data transfer and power.',
     detail:
@@ -141,6 +159,14 @@ export const glossary: Record<string, GlossaryEntry> = {
     unit: 'Watt (W)',
     see: ['power'],
   },
+  efficiency: {
+    tip: 'The fraction of input power that comes out the other side as useful output rather than heat — a transformer\'s most-quoted figure of merit.',
+    detail:
+      'Efficiency (η, the Greek letter eta) is output power divided by input power, usually expressed as a percentage. A small mains transformer for a hobby supply might run at 85–92 % efficient; a power transformer in a substation routinely exceeds 99 %; a Class-A audio amplifier struggles to reach 25 %. The «lost» fraction always comes out as heat — copper losses (I²R in the windings) and core losses (hysteresis and eddy currents in iron, dielectric losses in capacitors) are what get warm. Efficiency tells you how big a heat sink you need and how much of the wall-socket power is doing the actual job.',
+    unit: 'Percent (%)',
+    formula: 'η = P_{out} / P_{in}',
+    see: ['power', 'transformer'],
+  },
   impedance: {
     tip: 'Total opposition to AC current, combining resistance and reactance.',
     detail:
@@ -226,6 +252,24 @@ export const glossary: Record<string, GlossaryEntry> = {
       'When a transmitter\'s output impedance doesn\'t match the antenna\'s impedance, some power reflects back. SWR quantifies this mismatch: 1:1 means perfect match (zero reflection), 2:1 means about 11% of power is reflected, and 3:1 means 25% reflected. High SWR wastes power and can damage transmitters. Most radios want SWR below 2:1.',
     formula: 'SWR = (1 + |Γ|) / (1 − |Γ|)',
     see: ['impedance', 'vna'],
+  },
+  s11: {
+    tip: 'VNA reflection parameter — how much of the signal sent into a port comes back.',
+    detail:
+      'S11 is the first of the four S-parameters (S = "scattering") that a VNA measures. It is the ratio of the wave reflected from port 1 back to the source, expressed in decibels. A perfect match swallows everything: S11 plunges to −∞ dB. A short or open reflects everything: S11 ≈ 0 dB. In practice, an antenna or filter input is "good enough" when S11 sits below −10 dB across the band of interest (about 10 % of the power reflected, equivalent to SWR ≈ 2:1). On a Smith chart S11 is the dot itself; on a magnitude-vs-frequency plot it is the curve filter designers stare at.',
+    see: ['vna', 'swr', 'impedance', 's21'],
+  },
+  s21: {
+    tip: 'VNA transmission parameter — how much of the signal sent into port 1 makes it out of port 2.',
+    detail:
+      'S21 is the forward transmission gain (or, more often for passive parts, loss) measured by a VNA, expressed in dB. A lossless wire gives S21 = 0 dB; a 3 dB attenuator gives S21 = −3 dB; a filter\'s stopband can drop S21 below −60 dB. The S21 vs frequency trace is the textbook "frequency response" of a filter or amplifier — passband shape, cut-off, roll-off, and ripple are all read directly off it. S11 and S21 together fully describe a two-port network from port 1\'s side; S22 and S12 cover the reverse direction.',
+    see: ['vna', 's11', 'decibel', 'low-pass'],
+  },
+  sma: {
+    tip: 'SMA — a small threaded RF connector rated to ~18 GHz, the workhorse on VNAs and most hobbyist test gear.',
+    detail:
+      'SMA (SubMiniature version A) is a 50 Ω coaxial connector with a 1/4-inch threaded coupling. It is small (the body is about the diameter of a pencil), reasonably cheap, and good to about 18 GHz, which is why nearly every VNA, NanoVNA, signal generator, and SDR uses it. The male centre pin sits inside the female barrel; you tighten the outer nut to mate them — finger-tight is fine for bench work, 5 in-lb (0.6 N·m) for a torque-controlled lab. RP-SMA ("reverse-polarity SMA") swaps the genders and is common on Wi-Fi gear; the two are not interchangeable, so check the photo before you buy adapters.',
+    see: ['coax', 'vna', 'impedance'],
   },
 
   arduino: {
@@ -447,6 +491,18 @@ export const glossary: Record<string, GlossaryEntry> = {
       'In an electrolytic capacitor, the dielectric is a very thin oxide layer (aluminium oxide or tantalum pentoxide) grown on one metal foil; the "other plate" is a conductive electrolyte (liquid or gel) in contact with the oxide. The oxide is thin and the effective plate area is enormous (foils are rolled up or made of porous pressed powder), so capacitance can reach hundreds of thousands of microfarads in a finger-sized can. The catch is polarity: the oxide is grown electrochemically in one direction, so reverse voltage breaks it down — an aluminium electrolytic then heats, swells, and vents; a tantalum electrolytic can literally explode. The longer lead (or the un-striped side of SMT tantalums) is positive; the stripe on an aluminium can marks the negative lead.',
     see: ['capacitor', 'dielectric'],
   },
+  mlcc: {
+    tip: 'Multi-Layer Ceramic Capacitor — the tiny rectangular chip caps that dominate modern PCBs.',
+    detail:
+      'An MLCC stacks dozens to hundreds of paper-thin ceramic dielectric layers with metal electrodes interleaved between them, so the effective plate area is large but the package stays tiny. They are unpolarised, cheap, available from picofarads up to tens of microfarads, and good to GHz frequencies — the reasons every modern PCB is dotted with little brown rectangles. The big caveat is that high-permittivity ceramic types (X7R, Y5V) lose a chunk of their capacitance as the applied DC voltage approaches the rating ("DC bias derating"); for stable values use Class 1 (C0G / NP0) ceramic instead.',
+    see: ['capacitor', 'np0', 'surface mount', 'dielectric'],
+  },
+  np0: {
+    tip: 'Class 1 ceramic dielectric (also called C0G) — the most stable, most predictable capacitor dielectric, used wherever the value must hold across temperature and voltage.',
+    detail:
+      'NP0 (sometimes written N P 0, "Negative-Positive 0 ppm/°C") and the equivalent EIA code C0G describe the same Class 1 ceramic dielectric: capacitance changes by no more than ±30 ppm/°C across the full −55 °C to +125 °C range, with negligible voltage coefficient and very low loss. The trade-off is permittivity — Class 1 ceramics give only picofarads to a few nanofarads in a sensible package, so you find C0G / NP0 in tuned circuits, oscillators, and RF filters where every percent of capacitance counts, but not in bulk decoupling where Class 2 (X7R, Y5V) wins on capacitance per millimetre.',
+    see: ['capacitor', 'mlcc', 'dielectric', 'tolerance'],
+  },
   'time constant': {
     tip: 'The product τ = R · C fully determines how fast a capacitor charges or discharges through a resistor.',
     detail:
@@ -665,6 +721,12 @@ export const glossary: Record<string, GlossaryEntry> = {
       'The quality factor Q (also called Q-factor or just Q) tells you how «good» a resonant circuit is at storing energy compared to losing it. Three exactly equivalent definitions: (1) Q = 2π × (energy stored) / (energy lost per cycle) — the fundamental definition; (2) Q = X / R — the ratio of reactance to series loss resistance, useful for components; (3) Q = f₀ / BW — the resonant frequency divided by the −3 dB bandwidth, useful when you can sweep the response on a VNA. In a real LC tank, the inductor\'s winding resistance (and skin-effect losses at HF and above) almost always dominate; capacitors of decent quality have Q in the thousands. Typical numbers: a hand-wound air-core RF coil might give Q ≈ 100–300; a toroid on the right ferrite mix Q ≈ 50–200; a high-end mechanical filter or quartz crystal Q ≈ 10 000–100 000. Loaded Q (Q_L) is what you actually measure once the source and load impedances are connected — it is always lower than the unloaded Q (Q_U) of the bare tank.',
     formula: 'Q = X_L / R_loss = f₀ / BW',
     see: ['resonance', 'tank', 'bandwidth', 'selectivity'],
+  },
+  'frequency response': {
+    tip: 'How a circuit\'s output amplitude (and phase) varies with frequency — the magnitude side is what you read off a Bode plot or a VNA S21 trace.',
+    detail:
+      'The frequency response is the gain (or attenuation) of a network plotted against frequency, and it is the single most useful description of any filter, amplifier, or transducer. The magnitude part — almost always plotted in dB on a log-frequency axis — tells you the passband, the cut-off, the roll-off slope, and the stopband rejection at a glance; the phase part tells you about group delay and time-domain behaviour. In English-language texts you will see it written as «frequency response» or «magnitude response»; Soviet-era and modern Ukrainian textbooks call the magnitude part the «амплітудно-частотна характеристика» (AЧХ) and the phase part the «фазочастотна характеристика» (ФЧХ). All three names refer to the same plot, generated the same way: drive the input with a swept sinewave (or a VNA), record output amplitude (and phase) at each frequency, and plot.',
+    see: ['decibel', 'bode plot', 's21', 'bandwidth'],
   },
   bandwidth: {
     tip: 'The width in frequency between the two −3 dB (half-power) points of a resonant response — bandwidth = f₀ / Q.',
@@ -886,7 +948,13 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Very High Frequency — the 30–300 MHz range, home of the 2-metre amateur band, FM broadcast, and most handheld radios.',
     detail:
       'VHF (Very High Frequency) covers 30–300 MHz. In amateur radio the headline VHF band is 2 metres (144–148 MHz in most countries), where handheld and mobile FM rigs operate through local repeaters. VHF signals travel mostly line-of-sight — they don\'t bounce off the ionosphere the way HF does — so typical range is 30–60 km on flat terrain, much further from a hilltop or with a directional antenna. Commercial FM broadcast radio (88–108 MHz) and old analogue TV channels also live in VHF.',
-    see: ['hf', 'fm'],
+    see: ['hf', 'fm', 'uhf'],
+  },
+  uhf: {
+    tip: 'Ultra-High Frequency — the 300–3000 MHz range, home of the 70 cm amateur band, mobile phones, Wi-Fi (2.4 GHz), and microwave ovens.',
+    detail:
+      'UHF (Ultra-High Frequency) covers 300–3000 MHz — wavelengths from one metre down to ten centimetres, which is where the spectrum starts to get crowded with everything modern: GSM/LTE mobile, Wi-Fi 2.4 GHz, Bluetooth, GPS, microwave ovens, and the amateur 70 cm band (430–440 MHz in most countries). Like VHF, UHF propagation is essentially line-of-sight; unlike VHF, the wavelengths are short enough that you can build a useful Yagi or dish in a backpack-sized package, and the antennas on a UHF handheld radio are stubby rather than the foot-long whips you see on 2 m gear. UHF also penetrates buildings less well than VHF, which is why VHF FM radios still rule for portable line-of-sight work.',
+    see: ['vhf', 'hf', 'antenna'],
   },
   yagi: {
     tip: 'Directional antenna with one driven element and several parasitic rods — focuses radiated power in one direction.',

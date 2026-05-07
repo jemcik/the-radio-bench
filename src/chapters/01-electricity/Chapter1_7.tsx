@@ -402,6 +402,7 @@ export default function Chapter1_7() {
             vna: <G k="vna" />,
             db: <G k="decibel" />,
             rf: <G k="rf" />,
+            s11: <G k="s11" />,
           }}
         />
       </p>
@@ -428,7 +429,7 @@ export default function Chapter1_7() {
         <Trans
           i18nKey="ch1_7.vnaPracticeNote"
           ns="ui"
-          components={{ strong: <strong /> }}
+          components={{ strong: <strong />, sma: <G k="sma" /> }}
         />
       </Callout>
 

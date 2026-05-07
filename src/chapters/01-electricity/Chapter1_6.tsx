@@ -177,6 +177,7 @@ export default function Chapter1_6() {
             strong: <strong />,
             var: <MathVar />,
             sub: <sub />,
+            emi: <G k="emi" />,
           }}
         />
       </p>
