@@ -141,6 +141,7 @@ export default function Chapter1_10() {
               ...mathComponents,
               strong: <strong />,
               unit: <span />,
+              nowrap: nowrap,
             }}
           />
         </p>
