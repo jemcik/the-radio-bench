@@ -2188,7 +2188,11 @@
       "hysteresis": "гістерезис",
       "eddy current": "вихровий струм",
       "pin diode": "PIN-діод",
-      "pin": "PIN"
+      "pin": "PIN",
+      "anode": "анод",
+      "cathode": "катод",
+      "forward voltage drop": "пряме падіння напруги",
+      "schottky diode": "діод Шотткі"
     },
     "ac": {
       "tip": "Змінний струм — електричний струм, що періодично змінює напрямок.",

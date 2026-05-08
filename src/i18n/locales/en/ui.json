@@ -2175,7 +2175,11 @@
       "hysteresis": "hysteresis",
       "eddy current": "eddy current",
       "pin diode": "PIN diode",
-      "pin": "PIN"
+      "pin": "PIN",
+      "anode": "anode",
+      "cathode": "cathode",
+      "forward voltage drop": "forward voltage drop",
+      "schottky diode": "Schottky diode"
     }
   },
   "calloutLabels": {
