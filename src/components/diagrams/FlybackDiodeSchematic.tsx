@@ -46,7 +46,17 @@ const GND_Y = 250
 const SUPPLY_X = 80
 const COIL_X = 240
 const DIODE_X = 340
-const TR_X = 240
+// Transistor centred 12 px LEFT of COIL_X so its collector / emitter
+// pins (which both sit at cx + 12 in pinsBJT for orient='right') land
+// at x = COIL_X. That puts the collector directly under the switching
+// node and the emitter directly above the bottom-rail-meets-ground
+// point — both wires become straight verticals with NO right-angle
+// stubs. Earlier revision had TR_X = COIL_X = 240, which forced 12-px
+// horizontal stubs (and before that, a single 31-px diagonal) out to
+// the pins. The Q1 designator above the body shifts left with the
+// body and leaves a clean 3-4 px gap from the collector wire passing
+// through x=COIL_X.
+const TR_X = COIL_X - 12   // 228
 
 const supply = pins2(SUPPLY_X, (TOP_Y + GND_Y) / 2, 'down')
 const coil = pins2(COIL_X, (COIL_TOP_Y + SW_Y) / 2, 'down')
@@ -73,27 +83,26 @@ export default function FlybackDiodeSchematic() {
       {/* +V branch into coil top */}
       <Wire points={[{ x: COIL_X, y: TOP_Y }, coil.p1]} />
       {/* Switching node: coil bottom — diode anode — collector.
-          Right-angle wiring throughout: from the switching node
-          (COIL_X, SW_Y) we drop straight DOWN to the collector's y
-          coordinate, THEN turn right to the collector pin. Earlier
-          revision routed `[(COIL_X, SW_Y), (TR_X, SW_Y), tr.collector]`
-          which collapsed to a single diagonal because COIL_X==TR_X —
-          a degenerate `M (240,150) L (240,150)` followed by a 31-px
-          diagonal to (252, 181). Schematic convention is right-angle
-          everywhere; same for the emitter wire below. */}
+          With TR_X = COIL_X − 12, the collector pin sits at exactly
+          (COIL_X, tr.collector.y), so the wire from the switching
+          node down to the collector is a single straight vertical
+          line — no corner, no diagonal, no horizontal stub. Same
+          for the emitter wire below. */}
       <Wire points={[coil.p2, { x: COIL_X, y: SW_Y }, { x: DIODE_X, y: SW_Y }, flyback.p1]} />
-      <Wire points={[{ x: COIL_X, y: SW_Y }, { x: TR_X, y: tr.collector.y }, tr.collector]} />
-      {/* Emitter to ground (right-angle: drop straight down from the
-          collector-pin x, then left to the bottom rail). */}
-      <Wire points={[tr.emitter, { x: tr.emitter.x, y: GND_Y }, { x: TR_X, y: GND_Y }]} />
+      <Wire points={[{ x: COIL_X, y: SW_Y }, tr.collector]} />
+      {/* Emitter straight down to the bottom rail (emitter.x ==
+          COIL_X by construction). */}
+      <Wire points={[tr.emitter, { x: tr.emitter.x, y: GND_Y }]} />
       {/* Base via resistor to «in» terminal. The terminal label lives
           at x=70 with anchor='end' — i.e. the visible right edge of
           the «in» glyph sits at x=70. Wire reaches that x so the line
           flushes against the label, no visual gap. */}
       <Wire points={[tr.base, baseR.p2]} />
       <Wire points={[baseR.p1, { x: 70, y: TR_Y }]} />
-      {/* Battery negative side back to ground rail */}
-      <Wire points={[supply.p2, { x: SUPPLY_X, y: GND_Y }, { x: TR_X, y: GND_Y }]} />
+      {/* Battery negative side back to ground rail. Rail extends to
+          x=COIL_X so it meets the emitter wire and the Ground stem
+          at the same point (the bottom-rail T-junction). */}
+      <Wire points={[supply.p2, { x: SUPPLY_X, y: GND_Y }, { x: COIL_X, y: GND_Y }]} />
 
       {/* ── Components ────────────────────────────────────────── */}
       <Battery x={SUPPLY_X} y={(TOP_Y + GND_Y) / 2} orient="down" value="+V" />
@@ -120,7 +129,7 @@ export default function FlybackDiodeSchematic() {
           to the same bottom rail; per ARRL textbook convention the
           emitter return is drawn as an explicit GND. Case (b) of
           circuit-schematics.md «Ground vs battery». */}
-      <Ground x={TR_X} y={GND_Y + 15} orient="right" />
+      <Ground x={COIL_X} y={GND_Y + 15} orient="right" />
 
       {/* «in» terminal label on the left of the base resistor */}
       <TerminalLabel x={70} y={TR_Y} anchor="end">in</TerminalLabel>
@@ -137,7 +146,7 @@ export default function FlybackDiodeSchematic() {
           — one wire, two segments, NOT a 3-way junction. Removed. */}
       <Junction x={COIL_X} y={TOP_Y} />
       <Junction x={COIL_X} y={SW_Y} />
-      <Junction x={TR_X} y={GND_Y} />
+      <Junction x={COIL_X} y={GND_Y} />
     </Circuit>
   )
 }
