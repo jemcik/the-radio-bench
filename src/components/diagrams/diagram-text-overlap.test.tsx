@@ -104,7 +104,9 @@ const SKIP_FILES = new Set([
   './CapacitorTypeGallery.tsx',    // «+» plate-sign labels abut electrolytic-cap symbol stroke
   './DividerSchematic.tsx',        // voltmeter «A» designator inside the meter circle
   './FilterTypeGallery.tsx',       // tiny in-cell waveform paths intentionally pass close to the «in» / «out» labels
-  './FlybackDiodeSchematic.tsx',   // «Q1» transistor designator sits inside the symbol circle by Circuit convention
+  // FlybackDiodeSchematic was previously skipped citing «Q1 inside the
+  // transistor circle» — that overlap was fixed at the primitive level
+  // (TransistorNPN gap=26). Skip removed so the file is checked again.
   './RfChokeSchematic.tsx',        // GND symbol's vertical wire ends at the GND text label by ARRL convention
   './SeriesIslandIllustration.tsx', // charge labels («C₁», «−Q», «+Q») sit on the cap-plate Bezier paths by design
 ])

@@ -93,12 +93,16 @@ export default function FlybackDiodeSchematic() {
       {/* Emitter straight down to the bottom rail (emitter.x ==
           COIL_X by construction). */}
       <Wire points={[tr.emitter, { x: tr.emitter.x, y: GND_Y }]} />
-      {/* Base via resistor to «in» terminal. The terminal label lives
-          at x=70 with anchor='end' — i.e. the visible right edge of
-          the «in» glyph sits at x=70. Wire reaches that x so the line
-          flushes against the label, no visual gap. */}
+      {/* Base via resistor to «in» terminal. The «in» TerminalLabel
+          renders at x=70 anchor='end' in italic; the italic «n»
+          glyph extends ~2 px past x=70 due to slant. Wire endpoint
+          at x=76 leaves a clean ~4 px gap between wire end and the
+          label's visible right edge — close enough to read as «label
+          names this wire end», not so close that the wire enters
+          the letterforms. Earlier «wire ends exactly at label
+          anchor x=70» put the wire INSIDE the «n» visually. */}
       <Wire points={[tr.base, baseR.p2]} />
-      <Wire points={[baseR.p1, { x: 70, y: TR_Y }]} />
+      <Wire points={[baseR.p1, { x: 76, y: TR_Y }]} />
       {/* Battery negative side back to ground rail. Rail extends to
           x=COIL_X so it meets the emitter wire and the Ground stem
           at the same point (the bottom-rail T-junction). */}
