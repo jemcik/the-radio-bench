@@ -177,6 +177,14 @@ The right rendering path is always one of:
 
 The two new gates are both wired into `check:all`, so they run before every PR. They WILL fire on attempted regressions — when one does, do NOT silence with an opt-out comment unless the literal has been visually verified to render correctly through some other path. The default action is «move it to i18n + wrap.»
 
+### Diagram text labels must not overlap chart shapes
+
+ZenerIVCurve shipped with FOUR overlap bugs at once (forward curve through «пряме», top clip through «I (mA)», breakdown curve through «−V_Z», dashed marker through «пробій — стабілізація»). All four were geometric, none were visible in the JSX source or i18n strings — they only appeared once you computed the actual coordinate of the label vs the actual coordinate of the curve.
+
+Now enforced by `src/components/diagrams/diagram-text-overlap.test.tsx` — a Vitest test that auto-discovers every diagram via `import.meta.glob`, renders it, computes an approximate bbox for each `<text>` (handles single-line and multi-tspan multi-line, and percent-form `font-size="70%"` for subscripts), then samples every foreground `<line>` and `<path>` in the same SVG to check for crossings. Background elements (gridlines, highlight bands — opacity < 0.7 or stroke-width < 1) are filtered out, as are elements inside `<g transform>` (Circuit primitives use local coordinate systems that aren't comparable to the global SVG frame). 95 of 103 diagrams currently pass; the 8 in `SKIP_FILES` are documented one-by-one with the specific intentional close-placement that caused the noise.
+
+When authoring a new chart-style diagram with manually-positioned axis labels, region labels, or marker labels: **always run `npx vitest run src/components/diagrams/diagram-text-overlap.test.tsx` after the first render**. The geometric bug class doesn't show up in code review and isn't always obvious on screen unless you know to look for it.
+
 ## Lab activity content
 
 - **Battery preference is AA (1.5 V), not 9 V.** AA cells are universally available and cheap; 9 V batteries are a niche format in many countries. Ratio-based experiments work just as well at 1.5 V — switch the multimeter to the 2 V range / autorange for three decimal places of resolution.
