@@ -28,6 +28,7 @@ import { Slider } from '@/components/ui/slider'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatDecimal } from '@/lib/format'
+import { withSubscripts } from '@/lib/text-with-subscripts'
 import { svgTokens } from '@/components/diagrams/svgTokens'
 
 /* ── Fixed circuit constants ─────────────────────────────────────── */
@@ -95,45 +96,53 @@ function buildBumpsPath(): string {
 }
 
 /**
- * Smoothed output — between peaks, V(t) = V_peak · exp(−Δt / (R·C)).
- * On each rising edge (sine ascending toward next peak), V follows the
- * sine if the sine is above the discharge curve. Returns the path AND
- * the min/max voltages in steady state for the read-out.
+ * Smoothed output — voltage on the cap / load when the bridge feeds an
+ * R-C smoothing filter. In steady state the cap recharges at every
+ * rectified peak (top of each |sin| bump) and discharges through R
+ * between peaks:
+ *
+ *     V_cap(t) = V_peak · exp(−Δt / (R·C))     when sine < cap voltage
+ *     V_cap(t) = sineV(t)                       when sine ≥ cap voltage
+ *
+ * KEY POINT — peak times are known analytically. The rectified peaks of
+ * `|sin(2π·F_mains·t)|` sit at t = T_period/2 + k·T_period (i.e. 5 ms,
+ * 15 ms, 25 ms, …). We compute «time since most recent peak» with a
+ * single modulo operation and base the discharge on V_PEAK at that
+ * peak. No state, no warm-up, no `lastPeakT` tracking.
+ *
+ * Why this matters: an earlier version of this widget tracked
+ * `lastPeakT` as «the most recent sample where sine ≥ discharge».
+ * That update fired on EVERY winning-sine sample — including samples
+ * mid-rising-edge where the sine value is far below V_PEAK. The
+ * discharge formula then started from V_PEAK at that mid-rising-edge
+ * t, producing a sharp jump UP from sineV to V_PEAK · exp(-dt/RC) and
+ * a follow-on jump DOWN. The visible artefact at each rectified zero-
+ * crossing was a near-vertical V-shape that the user flagged on small
+ * C. Rebuilding the algorithm around the analytic peak times removes
+ * the artefact entirely.
+ *
+ * Returns the SVG path AND vMin / vMax for the read-out.
  */
 function buildSmoothedPath(capUf: number): { path: string; vMin: number; vMax: number } {
   const RC = R_LOAD * (capUf * 1e-6) // seconds
   const N = 600
+  // First peak of |sin(2π·F·t)| is at t = T_period/2 (5 ms after origin).
+  // For any t, the time since the most recent peak is a modulo into
+  // [0, T_period). The double `% T_PERIOD + T_PERIOD) % T_PERIOD` form
+  // handles negative values correctly (JS `%` keeps sign of dividend).
+  const tSincePeak = (t: number): number => {
+    const shifted = t - T_PERIOD / 2
+    return ((shifted % T_PERIOD) + T_PERIOD) % T_PERIOD
+  }
+
   let d = ''
   let vMin = V_PEAK
   let vMax = 0
-  // After 2-3 ripple periods the output is in steady state. Sample a few
-  // periods of warm-up first so the displayed window starts in steady state.
-  let v = V_PEAK
-  let lastPeakT = 0
-  // Warm-up: simulate 4 ripple periods before t=0.
-  for (let warm = -4 * T_PERIOD; warm <= 0; warm += T_PERIOD / 200) {
-    const sineV = V_PEAK * Math.abs(Math.sin(2 * Math.PI * F_MAINS * warm))
-    const sinceLast = warm - lastPeakT
-    const dischargeV = V_PEAK * Math.exp(-sinceLast / RC)
-    if (sineV >= dischargeV) {
-      v = sineV
-      lastPeakT = warm
-    } else {
-      v = dischargeV
-    }
-  }
-  // Now plot the displayed window.
   for (let i = 0; i <= N; i++) {
     const t = (i / N) * T_TOTAL
     const sineV = V_PEAK * Math.abs(Math.sin(2 * Math.PI * F_MAINS * t))
-    const sinceLast = t - lastPeakT
-    const dischargeV = V_PEAK * Math.exp(-sinceLast / RC)
-    if (sineV >= dischargeV) {
-      v = sineV
-      lastPeakT = t
-    } else {
-      v = dischargeV
-    }
+    const dischargeV = V_PEAK * Math.exp(-tSincePeak(t) / RC)
+    const v = Math.max(sineV, dischargeV)
     if (v > vMax) vMax = v
     if (v < vMin) vMin = v
     const x = tMsToX(t * 1000)
@@ -305,8 +314,14 @@ export default function RippleSmoothingWidget() {
             avg: `${formatDecimal(vAvg, 2, locale)} ${tUnit('v')}`,
           })}
         </p>
+        {/* Formula stored in i18n with bare-subscript syntax (`I_load`,
+            `t_period`, …); withSubscripts() turns each `X_yyy` into a real
+            <X><sub>yyy</sub></X> at render time so the user never sees a
+            literal underscore. The text is identical in EN and UK because
+            the variables are Latin per project convention — but having
+            both locales declare the key keeps i18n parity gates honest. */}
         <p className="text-xs text-muted-foreground mt-1 font-mono">
-          ΔV ≈ I_load · t_period / C = (V_peak / R_load) · (1 / (2·f_mains)) / C
+          {withSubscripts(t('ch1_10.widget.ripple.readoutFormula'))}
         </p>
       </ResultBox>
     </Widget>

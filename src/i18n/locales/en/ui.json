@@ -3261,6 +3261,7 @@
         "ariaLabel": "Plot of the rectified bridge output (light grey bumps) with the smoothed capacitor output (orange) overlaid. As C increases, the orange trace flattens out toward peak voltage.",
         "capLabel": "Smoothing capacitor C",
         "readoutLead": "With C = {{cap}}, peak-to-peak ripple ΔV ≈ {{ripple}} and average DC ≈ {{avg}}.",
+        "readoutFormula": "ΔV ≈ I_load · t_period / C = (V_peak / R_load) · (1 / (2·f_mains)) / C",
         "timeAxis": "time (ms)",
         "voltageAxis": "V (V)"
       }

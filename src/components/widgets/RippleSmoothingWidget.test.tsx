@@ -51,4 +51,44 @@ describe('RippleSmoothingWidget', () => {
     expect(bumps).not.toBeNull()
     expect(smoothed).not.toBeNull()
   })
+
+  it('smoothed trace has no large sample-to-sample jumps (rendering-bug regression)', () => {
+    // Regression for the «mid-rising-edge V_PEAK reset» rendering bug.
+    //
+    // Symptom: at small C the smoothed curve had a near-vertical V-shape
+    // around each rectified zero-crossing — `sineV → ~V_PEAK · exp(-dt/RC)
+    // → V_PEAK` in two consecutive samples, jumping ~100+ px (most of
+    // the plot height) per sample. The user spotted it on a screenshot.
+    //
+    // Cause: the previous algorithm tracked `lastPeakT` and updated it
+    // on every sample where `sineV ≥ dischargeV`, including mid-rising-
+    // edge samples where the actual cap voltage was nowhere near
+    // V_PEAK. The discharge formula then started «from V_PEAK at this
+    // mid-rising-edge t» — producing a phantom jump up to ≈V_PEAK and a
+    // follow-on phantom drop back down.
+    //
+    // The fix uses analytic peak times (peaks of |sin(2π·F·t)| sit at
+    // t = T_period/2 + k·T_period) — no state, no `lastPeakT`. The
+    // resulting curve is mathematically continuous: the steepest part
+    // is the rising edge of |sin|, slope at zero-crossing = 2π·F·V_peak
+    // ≈ 3.77 V/ms ≈ 0.25 V per 40/600-ms sample ≈ 3.5 px per sample.
+    // With the bug, jumps of 100+ px appeared. We assert the max
+    // sample-to-sample y-jump stays well under 10 px — comfortably
+    // above the continuous bound, far below the buggy regime.
+    const { container } = setup()
+    const smoothed = container.querySelector('path[stroke-width="2.5"]')
+    expect(smoothed).not.toBeNull()
+    const d = smoothed!.getAttribute('d') ?? ''
+    const pts: Array<[number, number]> = []
+    for (const m of d.matchAll(/[ML]([\d.]+)\s+([\d.]+)/g)) {
+      pts.push([parseFloat(m[1]), parseFloat(m[2])])
+    }
+    expect(pts.length).toBeGreaterThan(100)
+    let maxJumpPx = 0
+    for (let i = 1; i < pts.length; i++) {
+      const dy = Math.abs(pts[i][1] - pts[i - 1][1])
+      if (dy > maxJumpPx) maxJumpPx = dy
+    }
+    expect(maxJumpPx).toBeLessThan(10)
+  })
 })
