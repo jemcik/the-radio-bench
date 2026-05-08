@@ -19,6 +19,7 @@
  * the *shape* of the Zener curve in the reader's head, alongside the
  * regulator schematic.
  */
+import { useId } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
@@ -106,14 +107,30 @@ function curvePath(): string {
     const iMa = -18 - t * 8 // from −18 to −26 mA over the cliff (clipped at chart bottom)
     samples.push({ v, iMa })
   }
-  // Build path; clip iMa to chart range so the line truncates cleanly.
+  // Build path. The curve is allowed to leave the plot area on the
+  // top (forward bias hits I_MAX, real diode current is unbounded) and
+  // bottom (reverse breakdown — current limited only by external R, not
+  // by the diode itself). Sample-time clamping was a long-standing bug:
+  // it pinned y to the chart edge so the curve LITERALLY rode the top
+  // / bottom border, looking like «current saturates at 20 mA», which
+  // is not how a diode behaves. The visible curve is now clipped via
+  // SVG `<clipPath>` on the plot rectangle, so the curve naturally
+  // exits the chart with its real slope and the reader sees «keeps
+  // going off-chart», not a false plateau.
+  //
+  // We still cap iMa to ±50 mA — a value well past the chart's ±20 mA
+  // window — to keep y inside ~3× plot height. Pure unbounded `exp`
+  // growth would push y to −10⁷ at V=1 and the path string would be
+  // unworkable.
+  const Y_SOFT_CAP_MA = 50
+
   const sorted = samples.slice().sort((a, b) => a.v - b.v) // left-to-right
   let d = ''
   let first = true
   for (const s of sorted) {
     const x = vToX(s.v)
-    const iClipped = Math.max(I_MIN, Math.min(I_MAX, s.iMa))
-    const y = iMaToY(iClipped)
+    const capped = Math.max(-Y_SOFT_CAP_MA, Math.min(Y_SOFT_CAP_MA, s.iMa))
+    const y = iMaToY(capped)
     d += first ? `M${x.toFixed(2)} ${y.toFixed(2)}` : ` L${x.toFixed(2)} ${y.toFixed(2)}`
     first = false
   }
@@ -130,6 +147,7 @@ const fmtTick = (n: number): string =>
 export default function ZenerIVCurve() {
   const { t } = useTranslation('ui')
   const tUnit = useUnitFormatter()
+  const clipId = useId()
   const path = curvePath()
   const xZero = vToX(0)
   const yZero = iMaToY(0)
@@ -154,6 +172,18 @@ export default function ZenerIVCurve() {
         style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto', fontSize: '1rem' }}
         xmlns="http://www.w3.org/2000/svg"
       >
+        {/* Plot-area clip. Used to truncate the I-V curve at the chart
+            boundary WITHOUT pinning y to the boundary at sample-time —
+            a curve that naturally leaves the chart should exit with
+            its real slope, not ride the top / bottom edge as a false
+            plateau. The `useId()` makes the id unique even if multiple
+            instances of this component render on the same page. */}
+        <defs>
+          <clipPath id={clipId}>
+            <rect x={PLOT_X0} y={PLOT_Y0} width={PLOT_W} height={PLOT_H} />
+          </clipPath>
+        </defs>
+
         {/* Gridlines (light) */}
         <g stroke={svgTokens.border} strokeWidth={0.5} opacity={0.5}>
           {X_TICKS.filter(v => v !== 0).map(v => (
@@ -246,7 +276,9 @@ export default function ZenerIVCurve() {
           {` (${tUnit('ma')})`}
         </text>
 
-        {/* Curve */}
+        {/* Curve — clipped to the plot rectangle so values past ±20 mA
+            disappear off-chart with their real slope rather than riding
+            the chart boundary as a false plateau. */}
         <path
           d={path}
           fill="none"
@@ -254,6 +286,7 @@ export default function ZenerIVCurve() {
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
+          clipPath={`url(#${clipId})`}
         />
 
         {/* Labelled marker at V = −V_Z

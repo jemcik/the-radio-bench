@@ -185,6 +185,23 @@ Now enforced by `src/components/diagrams/diagram-text-overlap.test.tsx` — a Vi
 
 When authoring a new chart-style diagram with manually-positioned axis labels, region labels, or marker labels: **always run `npx vitest run src/components/diagrams/diagram-text-overlap.test.tsx` after the first render**. The geometric bug class doesn't show up in code review and isn't always obvious on screen unless you know to look for it.
 
+### Curve-rides-chart-edge: never clamp y at sample-time
+
+Recurring class — has shipped in at least Zener I-V, half-wave waveform, filter response, and (almost) several others. Symptom in source:
+
+```js
+const yClipped = Math.max(yMin, Math.min(yMax, raw))
+```
+
+at sample-time, mapped to a path d-string. The visible result is a curve that LITERALLY follows the top or bottom border of the chart for the entire span past the clip point — a flat horizontal rail glued to the plot edge. Pedagogically reads as «the quantity saturates at this value» (it doesn't — real diodes don't saturate at 20 mA, real filters don't bottom out at −60 dB).
+
+**The fix is universally the same:**
+1. Stop clamping at the sample. Apply only a SOFT cap (~3× plot range) so y doesn't go to ±10⁷ for `exp` overflow.
+2. Wrap the curve `<path>` in an SVG `<clipPath>` whose rectangle matches the plot bounds. Use `useId()` so multiple instances on the same page don't collide.
+3. The visible curve now exits the chart with its real slope; anything past the bounds is hidden by the clip.
+
+Now enforced by `src/components/diagrams/diagram-curve-edge-rail.test.tsx`. The gate auto-discovers every diagram, parses each foreground `<path>`'s sample points, and flags ≥ 5 consecutive samples at the path's bbox extreme y. Paths with `clipPath` (any ancestor) are skipped — the author has explicitly handled the clip. Curves whose top/bottom plateaus are real signal (square waves, step functions, normalized-Bode 0-dB passband) are listed in `SKIP_FILES` with one-line notes.
+
 ## Lab activity content
 
 - **Battery preference is AA (1.5 V), not 9 V.** AA cells are universally available and cheap; 9 V batteries are a niche format in many countries. Ratio-based experiments work just as well at 1.5 V — switch the multimeter to the 2 V range / autorange for three decimal places of resolution.
