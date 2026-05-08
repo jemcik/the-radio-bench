@@ -100,9 +100,15 @@ const D3 = pins2(D3_X, D3_Y, 'up-right')
 const D4 = pins2(D4_X, D4_Y, 'up-left')
 
 // ── AC source: vertical, far left ───────────────────────────────
+// orient='up' so that pins2 returns p2 = TOP pin (y - h), p1 = BOTTOM
+// (y + h). The wires below assume p2 = top, p1 = bottom; using 'down'
+// instead reverses the pin convention and the source-bottom wire
+// would route from the top pin DOWNWARD, passing visibly THROUGH the
+// source's circle body — bug shipped in v3 first cut, reader caught
+// it on the close-up screenshot.
 const SRC_X = 60
 const SRC_Y = DCy
-const SRC = pins2(SRC_X, SRC_Y, 'down')
+const SRC = pins2(SRC_X, SRC_Y, 'up')
 
 // ── Load resistor: vertical, far right ──────────────────────────
 const LOAD_X = 470
