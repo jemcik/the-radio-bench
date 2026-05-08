@@ -57,9 +57,12 @@ const CYCLES = 2
 const SAMPLES = 360 // 180 per cycle
 
 // Diode forward drop, in normalised amplitude units (V_F / V_peak).
-// 0.1 means «if V_peak = 7 V, the diode drops 0.7 V» — visible without
-// being so big that it dominates the visual.
-const VF_NORM = 0.1
+// 0.15 means «if V_peak ≈ 5 V, the diode drops 0.7 V» — pedagogical
+// exaggeration of a real silicon-diode drop so the «output peak is
+// SLIGHTLY LOWER than input peak» story reads clearly at the diagram's
+// resolution. A truthful 10 % is hard to see; 15 % stays believable
+// while making the gap unambiguous.
+const VF_NORM = 0.15
 
 // Per-volt pixel scale, SHARED by both plots so V_in and V_out read on
 // the same vertical scale (a 1 V tick is the same height in both).
@@ -174,7 +177,7 @@ export default function HalfWaveRectifierWaveform() {
             d={inPath}
             fill="none"
             stroke={svgTokens.primary}
-            strokeWidth={1.6}
+            strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -183,7 +186,7 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0 - 10}
           y={TOP_Y0 + 8}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.fg}
           fillOpacity={0.85}
           textAnchor="end"
@@ -191,12 +194,12 @@ export default function HalfWaveRectifierWaveform() {
         >
           <tspan>+</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="10" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={TOP_Y0 + PLOT_H - 2}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.fg}
           fillOpacity={0.85}
           textAnchor="end"
@@ -204,12 +207,12 @@ export default function HalfWaveRectifierWaveform() {
         >
           <tspan>−</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="10" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={topZeroY + 4}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.mutedFg}
           textAnchor="end"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -221,14 +224,14 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0}
           y={TOP_Y0 - 4}
-          fontSize="12"
+          fontSize="14"
           fontWeight={600}
           fill={svgTokens.fg}
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
-          <tspan dy="3" fontSize="8" fontStyle="normal">in</tspan>
-          <tspan dy="-3" fontSize="12"> — {t('ch1_10.halfWaveLabelInput')}</tspan>
+          <tspan dy="3" fontSize="10" fontStyle="normal">in</tspan>
+          <tspan dy="-3" fontSize="14"> — {t('ch1_10.halfWaveLabelInput')}</tspan>
         </text>
 
         {/* BOTTOM plot: V_out zero line + half-wave */}
@@ -240,21 +243,36 @@ export default function HalfWaveRectifierWaveform() {
           stroke={svgTokens.fg}
           strokeWidth={0.8}
         />
+        {/* Dashed «+V_peak» reference line at the would-be peak height
+            (where the bumps would reach if there were no V_F drop) —
+            actual output peaks visibly sit BELOW this line. Makes the
+            «slightly lower» story read clearly. */}
+        <line
+          x1={PLOT_X0}
+          y1={botZeroY - AMP_PX}
+          x2={PLOT_X1}
+          y2={botZeroY - AMP_PX}
+          stroke={svgTokens.fg}
+          strokeWidth={0.6}
+          strokeDasharray="3 3"
+          opacity={0.45}
+        />
         <g clipPath={`url(#${clipId})`}>
           <path
             d={outPath}
             fill="none"
             stroke={svgTokens.experiment}
-            strokeWidth={1.6}
+            strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </g>
-        {/* +V_peak label on bottom plot — same vertical position as top */}
+        {/* +V_peak label on bottom plot — labels the dashed reference
+            line, NOT the actual peak. Output peak sits below by V_F. */}
         <text
           x={PLOT_X0 - 10}
           y={botZeroY - AMP_PX + 4}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.fg}
           fillOpacity={0.5}
           textAnchor="end"
@@ -262,12 +280,12 @@ export default function HalfWaveRectifierWaveform() {
         >
           <tspan>+</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="10" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={botZeroY + 4}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.mutedFg}
           textAnchor="end"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -279,21 +297,21 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0}
           y={BOT_Y0 - 4}
-          fontSize="12"
+          fontSize="14"
           fontWeight={600}
           fill={svgTokens.fg}
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
-          <tspan dy="3" fontSize="8" fontStyle="normal">out</tspan>
-          <tspan dy="-3" fontSize="12"> — {t('ch1_10.halfWaveLabelOutput')}</tspan>
+          <tspan dy="3" fontSize="10" fontStyle="normal">out</tspan>
+          <tspan dy="-3" fontSize="14"> — {t('ch1_10.halfWaveLabelOutput')}</tspan>
         </text>
 
         {/* Time-axis label below bottom plot */}
         <text
           x={PLOT_X0 + PLOT_W / 2}
           y={VB_H - 12}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.mutedFg}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"

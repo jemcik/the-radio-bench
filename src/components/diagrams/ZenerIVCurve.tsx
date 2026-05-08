@@ -166,7 +166,7 @@ export default function ZenerIVCurve() {
         {/* X-tick labels (skip 0) */}
         <g
           fill={svgTokens.mutedFg}
-          fontSize="11"
+          fontSize="13"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           {X_TICKS.filter(v => v !== 0).map(v => (
@@ -185,7 +185,7 @@ export default function ZenerIVCurve() {
         <text
           x={PLOT_X0 + PLOT_W - 4}
           y={yZero - 6}
-          fontSize="12"
+          fontSize="14"
           fontStyle="italic"
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -196,7 +196,7 @@ export default function ZenerIVCurve() {
         <text
           x={xZero + 8}
           y={PLOT_Y0 + 12}
-          fontSize="12"
+          fontSize="14"
           fontStyle="italic"
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -209,7 +209,7 @@ export default function ZenerIVCurve() {
           d={path}
           fill="none"
           stroke={svgTokens.primary}
-          strokeWidth={1.6}
+          strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -228,7 +228,7 @@ export default function ZenerIVCurve() {
         <text
           x={xVz}
           y={iMaToY(-18) - 4}
-          fontSize="11"
+          fontSize="13"
           fontWeight={600}
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -243,7 +243,7 @@ export default function ZenerIVCurve() {
         <text
           x={vToX(0.7)}
           y={iMaToY(15)}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.mutedFg}
           textAnchor="start"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -253,7 +253,7 @@ export default function ZenerIVCurve() {
         <text
           x={vToX(-2.5)}
           y={iMaToY(2.5)}
-          fontSize="11"
+          fontSize="13"
           fill={svgTokens.mutedFg}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -263,7 +263,7 @@ export default function ZenerIVCurve() {
         <text
           x={vToX(-V_Z - 0.7)}
           y={iMaToY(-7)}
-          fontSize="11"
+          fontSize="13"
           fontWeight={600}
           fill={svgTokens.experiment}
           textAnchor="middle"
