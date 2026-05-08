@@ -105,7 +105,7 @@ export default function FlybackDiodeSchematic() {
       <Wire points={[supply.p2, { x: SUPPLY_X, y: GND_Y }, { x: COIL_X, y: GND_Y }]} />
 
       {/* ── Components ────────────────────────────────────────── */}
-      <Battery x={SUPPLY_X} y={(TOP_Y + GND_Y) / 2} orient="down" value="+V" />
+      <Battery x={SUPPLY_X} y={(TOP_Y + GND_Y) / 2} orient="down" value="V_in" />
       <Inductor x={COIL_X} y={(COIL_TOP_Y + SW_Y) / 2} orient="down" label="coil" />
       <Diode x={DIODE_X} y={(COIL_TOP_Y + SW_Y) / 2} orient="up" label="D" />
       <Resistor x={150} y={TR_Y} label="R_b" />
