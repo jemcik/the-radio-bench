@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  isDiagonal,
   isVertical,
   orientAngle,
   pin1,
@@ -16,6 +17,10 @@ describe('orientAngle', () => {
     ['down', 90],
     ['left', 180],
     ['up', -90],
+    ['down-right', 45],
+    ['down-left', 135],
+    ['up-right', -45],
+    ['up-left', -135],
   ] as const)('%s → %s°', (orient, expected) => {
     expect(orientAngle(orient)).toBe(expected)
   })
@@ -29,6 +34,24 @@ describe('isVertical', () => {
   it('treats left/right as horizontal', () => {
     expect(isVertical('left')).toBe(false)
     expect(isVertical('right')).toBe(false)
+  })
+  it('treats diagonals as vertical (label-placement purposes)', () => {
+    expect(isVertical('up-right')).toBe(true)
+    expect(isVertical('up-left')).toBe(true)
+    expect(isVertical('down-right')).toBe(true)
+    expect(isVertical('down-left')).toBe(true)
+  })
+})
+
+describe('isDiagonal', () => {
+  it.each(['up-right', 'up-left', 'down-right', 'down-left'] as const)(
+    '%s is diagonal',
+    o => {
+      expect(isDiagonal(o)).toBe(true)
+    },
+  )
+  it.each(['right', 'left', 'up', 'down'] as const)('%s is NOT diagonal', o => {
+    expect(isDiagonal(o)).toBe(false)
   })
 })
 
@@ -68,6 +91,50 @@ describe('pins2', () => {
 
   it('defaults to right + standard span', () => {
     expect(pins2(0, 0)).toEqual(pins2(0, 0, 'right', SPAN))
+  })
+
+  describe('diagonal orientations', () => {
+    // dh = HALF / √2 ≈ 21.21 for the default span of 60
+    const dh = HALF * Math.SQRT1_2
+    const closeTo = (a: number, b: number) => Math.abs(a - b) < 0.001
+
+    it('up-right: p1 lower-left of centre, p2 upper-right', () => {
+      const { p1, p2 } = pins2(100, 50, 'up-right')
+      expect(closeTo(p1.x, 100 - dh)).toBe(true)
+      expect(closeTo(p1.y, 50 + dh)).toBe(true)
+      expect(closeTo(p2.x, 100 + dh)).toBe(true)
+      expect(closeTo(p2.y, 50 - dh)).toBe(true)
+    })
+
+    it('up-left: p1 lower-right, p2 upper-left', () => {
+      const { p1, p2 } = pins2(100, 50, 'up-left')
+      expect(closeTo(p1.x, 100 + dh)).toBe(true)
+      expect(closeTo(p1.y, 50 + dh)).toBe(true)
+      expect(closeTo(p2.x, 100 - dh)).toBe(true)
+      expect(closeTo(p2.y, 50 - dh)).toBe(true)
+    })
+
+    it('down-right: p1 upper-left, p2 lower-right', () => {
+      const { p1, p2 } = pins2(100, 50, 'down-right')
+      expect(closeTo(p1.x, 100 - dh)).toBe(true)
+      expect(closeTo(p1.y, 50 - dh)).toBe(true)
+      expect(closeTo(p2.x, 100 + dh)).toBe(true)
+      expect(closeTo(p2.y, 50 + dh)).toBe(true)
+    })
+
+    it('down-left: p1 upper-right, p2 lower-left', () => {
+      const { p1, p2 } = pins2(100, 50, 'down-left')
+      expect(closeTo(p1.x, 100 + dh)).toBe(true)
+      expect(closeTo(p1.y, 50 - dh)).toBe(true)
+      expect(closeTo(p2.x, 100 - dh)).toBe(true)
+      expect(closeTo(p2.y, 50 + dh)).toBe(true)
+    })
+
+    it('pin-to-pin distance equals span for diagonals (same as cardinals)', () => {
+      const { p1, p2 } = pins2(0, 0, 'up-right', 60)
+      const dx = p2.x - p1.x, dy = p2.y - p1.y
+      expect(closeTo(Math.sqrt(dx * dx + dy * dy), 60)).toBe(true)
+    })
   })
 })
 

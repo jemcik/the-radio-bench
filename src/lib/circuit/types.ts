@@ -19,17 +19,53 @@
 
 // ─── orientation ──────────────────────────────────────────────────────────────
 
-/** Cardinal direction the component "faces" (pin2 / output side). */
-export type Orientation = 'right' | 'down' | 'left' | 'up'
+/**
+ * Direction the component "faces" (pin2 / output side).
+ *
+ *  Cardinal: 'right' / 'down' / 'left' / 'up'
+ *  Diagonal: 'up-right' / 'up-left' / 'down-right' / 'down-left'
+ *
+ * Diagonals describe where pin2 (cathode for diodes, output for op-amps,
+ * etc.) ends up: 'up-right' means the symbol is rotated so pin2 points
+ * toward the upper-right (−45° in SVG's y-down coordinate system).
+ *
+ * Diagonal orientations were added for diamond-layout bridge rectifiers
+ * (ch 1.10) where the diodes sit on the four 45° edges of the diamond.
+ */
+export type Orientation =
+  | 'right' | 'down' | 'left' | 'up'
+  | 'up-right' | 'up-left' | 'down-right' | 'down-left'
 
 /** SVG rotation degrees for each orientation. */
 export function orientAngle(o: Orientation): number {
-  return o === 'right' ? 0 : o === 'down' ? 90 : o === 'left' ? 180 : -90
+  switch (o) {
+    case 'right':      return 0
+    case 'down':       return 90
+    case 'left':       return 180
+    case 'up':         return -90
+    case 'down-right': return 45
+    case 'down-left':  return 135
+    case 'up-right':   return -45
+    case 'up-left':    return -135
+  }
 }
 
-/** True when the component is vertical on screen. */
+/**
+ * True when the component is closer to vertical than horizontal on
+ * screen — used by label-placement helpers to choose between
+ * «above/below» (horizontal) and «to the side» (vertical or diagonal)
+ * placement. Diagonals are treated as vertical for label purposes
+ * because their leads occupy both horizontal AND vertical space — the
+ * symbol's «above» and «below» areas overlap with the lead path.
+ */
 export function isVertical(o: Orientation): boolean {
-  return o === 'down' || o === 'up'
+  return o !== 'right' && o !== 'left'
+}
+
+/** True when the orientation is a diagonal (45° / 135° / 225° / 315°). */
+export function isDiagonal(o: Orientation): boolean {
+  return o === 'up-right' || o === 'up-left'
+      || o === 'down-right' || o === 'down-left'
 }
 
 // ─── geometry ─────────────────────────────────────────────────────────────────
@@ -67,11 +103,19 @@ export function pins2(
   span = SPAN,
 ): { p1: Point; p2: Point } {
   const h = span / 2
+  // For diagonals, project the pin offset onto the rotated axis. Pin1
+  // sits at -h along the rotation axis (negative direction = «back» of
+  // the symbol = anode for a diode); pin2 at +h (cathode / output).
+  const dh = h * Math.SQRT1_2 // h / √2 — half-span projected onto each axis
   switch (orient) {
-    case 'right': return { p1: { x: cx - h, y: cy }, p2: { x: cx + h, y: cy } }
-    case 'left':  return { p1: { x: cx + h, y: cy }, p2: { x: cx - h, y: cy } }
-    case 'down':  return { p1: { x: cx, y: cy - h }, p2: { x: cx, y: cy + h } }
-    case 'up':    return { p1: { x: cx, y: cy + h }, p2: { x: cx, y: cy - h } }
+    case 'right':      return { p1: { x: cx - h,  y: cy      }, p2: { x: cx + h,  y: cy      } }
+    case 'left':       return { p1: { x: cx + h,  y: cy      }, p2: { x: cx - h,  y: cy      } }
+    case 'down':       return { p1: { x: cx,      y: cy - h  }, p2: { x: cx,      y: cy + h  } }
+    case 'up':         return { p1: { x: cx,      y: cy + h  }, p2: { x: cx,      y: cy - h  } }
+    case 'down-right': return { p1: { x: cx - dh, y: cy - dh }, p2: { x: cx + dh, y: cy + dh } }
+    case 'down-left':  return { p1: { x: cx + dh, y: cy - dh }, p2: { x: cx - dh, y: cy + dh } }
+    case 'up-right':   return { p1: { x: cx - dh, y: cy + dh }, p2: { x: cx + dh, y: cy - dh } }
+    case 'up-left':    return { p1: { x: cx + dh, y: cy + dh }, p2: { x: cx - dh, y: cy - dh } }
   }
 }
 

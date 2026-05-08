@@ -1,51 +1,59 @@
 /**
- * Chapter 1.10 §4 — Bridge (full-wave) rectifier schematic, v2.
+ * Chapter 1.10 §4 — Bridge (full-wave) rectifier schematic, v3.
  *
  * History
  * ───────
- * v1 (initial ch1.10 commit) had multiple readability/pedagogy issues
- * the reader caught on first review:
+ * v1 (initial ch1.10): square 2×2 layout with AC source inside the
+ * bridge, no DC labels, row-major numbering, label-on-lead bug,
+ * V_in-inside-circle bug. Reader-flagged.
  *
- *   • All four diodes drawn vertically with arrows pointing UP — no
- *     visual hint about which two conduct each half-cycle.
- *   • AC source sat INSIDE the bridge between the two AC nodes — no
- *     clear «here is the source feeding the bridge» anchor.
- *   • Load resistor 140 px to the right of the bridge with empty rails
- *     in between — visually disjointed.
- *   • No DC+ / DC− terminal labels — reader had to guess which rail
- *     was the positive output.
- *   • Diode numbering was row-major (D1, D2 top; D3, D4 bottom) instead
- *     of conventional clockwise — incompatible with most textbook
- *     diagrams.
- *   • No current-flow indication for either half-cycle.
- *   • PRIMITIVE-LEVEL bug: D1–D4 labels rendered ON the vertical leads,
- *     unreadable. (Fixed in CenteredLabel — orient-aware now.)
- *   • PRIMITIVE-LEVEL bug: V_in label sat INSIDE the AC-source circle,
- *     overlapping the sine wave. (Fixed in AcSource — custom label
- *     placement that clears the 12-radius body.)
+ * v2 (response 1): primitive-level fixes (CenteredLabel orient-aware,
+ * AcSource custom label placement) + clockwise numbering + DC+/DC−
+ * terminal labels + active-path teal highlight. Reader-flagged again
+ * — the green highlight read as «random colour», D4 was disconnected
+ * (I split AC+ vertical leg and forgot the lower half), and the user
+ * still wanted the two structural fixes I originally listed but did
+ * not implement: diamond layout, AC source outside the bridge.
  *
- * v2 (this file)
+ * v3 (this file)
  * ──────────────
- * Topology unchanged (electrically identical), but:
+ * Full diamond layout, AC source on the left:
  *
- *   • Clockwise diode numbering: D1=top-left, D2=top-right,
- *     D3=bottom-right, D4=bottom-left. This makes «opposite (diagonal)
- *     diodes conduct together» visible in the labels themselves — D1+D3
- *     conduct on positive half-cycle, D2+D4 on negative.
+ *                          DC+
+ *                           ●─────────────────●─────●
+ *                         ↗   ↖              │
+ *                       D1     D2            R_L
+ *                         ╲   ╱              │
+ *           AC1 ●─────────●─●─────────● AC2 │
+ *                         ╱   ╲              │
+ *                       D4     D3            │
+ *                         ↘   ↙              │
+ *                           ●─────────────────●─────●
+ *                          DC−
  *
- *   • Explicit DC+ / DC− terminal labels at the right ends of the top
- *     and bottom rails (next to where the load connects) — reader can
- *     see at a glance which rail is the positive output.
+ * Diamond vertices: DC+ (top), AC2 (right), DC− (bottom), AC1 (left).
+ * Diodes sit on the four 45° edges, all cathodes pointing toward DC+
+ * (D1 ↗, D2 ↖) at the top pair and all anodes at DC− (D3, D4) at the
+ * bottom pair.
  *
- *   • Active-path highlight: the wires that carry current on the
- *     positive half-cycle (AC+ → D1 → DC+ → load → DC− → D3 → AC−) are
- *     drawn in the «callout-experiment» teal accent, and a small caption
- *     under the schematic notes which pair this is. The other half-cycle
- *     uses D2+D4 along the symmetric mirror path.
+ * Clockwise numbering (D1 → D2 → D3 → D4) makes diagonal-pair
+ * conduction visible from the labels: D1+D3 on positive half-cycle,
+ * D2+D4 on negative — the two diodes that conduct together are the
+ * two opposite (diagonal) corners of the diamond.
  *
- *   • R_L moved closer to the bridge (LOAD_X 460 → 420) and the right
- *     column of diodes shifted slightly so the rails' empty stretch
- *     between bridge and load is visually balanced.
+ * AC source vertical on the LEFT, well outside the bridge. Top pin
+ * routes RIGHT and DOWN to AC1 (left vertex of diamond). Bottom pin
+ * routes DOWN, RIGHT, and UP to AC2 (right vertex), wrapping around
+ * the bottom of the schematic. The bottom-detour is the price of
+ * keeping the source visually outside the bridge — every textbook
+ * bridge schematic with «source on the left» pays this price.
+ *
+ * R_L vertical on the RIGHT, between DC+ and DC− output terminals.
+ *
+ * Uses the new diagonal Orientation values ('up-right', 'up-left')
+ * added to `@/lib/circuit/types`. Labels are rendered manually via
+ * SymbolText because CenteredLabel's vertical-fallback positioning
+ * doesn't account for the 45° rotation of diagonal symbols.
  */
 import { Trans } from 'react-i18next'
 import {
@@ -58,42 +66,56 @@ import {
   pins2,
 } from '@/lib/circuit'
 import { Diode } from '@/lib/circuit/symbols/semiconductors'
+import { SymbolText, LABEL_SIZE } from '@/lib/circuit/SymbolLabel'
 import { MathVar } from '@/components/ui/math'
 
 const SCHEMATIC_W = 540
-const SCHEMATIC_H = 250
+const SCHEMATIC_H = 290
 
-const TOP_Y = 35       // DC+ rail
-const AC_Y = 130       // horizontal axis where the AC source + AC nodes sit
-const BOT_Y = 220      // DC− rail
+// ── Diamond geometry ────────────────────────────────────────────
+// Centre of the diamond, half-diagonal length, vertex coordinates.
+const DCx = 270        // diamond centre x
+const DCy = 140        // diamond centre y
+const H = 80           // half-diagonal — distance from centre to each vertex
 
-// Bridge columns
-const ACPOS_X = 220    // left column — AC+ node (between D1 and D4)
-const ACNEG_X = 340    // right column — AC− node (between D2 and D3)
+const TOP_X = DCx, TOP_Y = DCy - H              // (270, 60)  — DC+ vertex
+const RIGHT_X = DCx + H, RIGHT_Y = DCy          // (350, 140) — AC2 vertex
+const BOT_X = DCx, BOT_Y = DCy + H              // (270, 220) — DC− vertex
+const LEFT_X = DCx - H, LEFT_Y = DCy            // (190, 140) — AC1 vertex
 
-// AC source between the AC columns (in-line with the AC node level).
-const SRC_X = (ACPOS_X + ACNEG_X) / 2 // 280
+// ── Diode centres — at the midpoint of each diamond edge ─────────
+// D1 (top-left edge):    AC1 → DC+, cathode points up-right ↗
+// D2 (top-right edge):   AC2 → DC+, cathode points up-left  ↖
+// D3 (bottom-right edge): DC− → AC2, cathode points up-right ↗
+// D4 (bottom-left edge):  DC− → AC1, cathode points up-left  ↖
+const D1_X = (LEFT_X + TOP_X) / 2,  D1_Y = (LEFT_Y + TOP_Y) / 2  // (230, 100)
+const D2_X = (RIGHT_X + TOP_X) / 2, D2_Y = (RIGHT_Y + TOP_Y) / 2 // (310, 100)
+const D3_X = (BOT_X + RIGHT_X) / 2, D3_Y = (BOT_Y + RIGHT_Y) / 2 // (310, 180)
+const D4_X = (BOT_X + LEFT_X) / 2,  D4_Y = (BOT_Y + LEFT_Y) / 2  // (230, 180)
 
-// Load on the right.
-const LOAD_X = 460
+// ── Diode pin positions (computed via the diagonal-aware pins2) ──
+const D1 = pins2(D1_X, D1_Y, 'up-right')
+const D2 = pins2(D2_X, D2_Y, 'up-left')
+const D3 = pins2(D3_X, D3_Y, 'up-right')
+const D4 = pins2(D4_X, D4_Y, 'up-left')
+
+// ── AC source: vertical, far left ───────────────────────────────
+const SRC_X = 60
+const SRC_Y = DCy
+const SRC = pins2(SRC_X, SRC_Y, 'down')
+
+// ── Load resistor: vertical, far right ──────────────────────────
+const LOAD_X = 470
+const LOAD_Y = DCy
+const RL = pins2(LOAD_X, LOAD_Y, 'down')
+
+// ── Routing waypoints ───────────────────────────────────────────
+// Bottom-detour for source bottom-pin → AC2: down to y=DETOUR_Y, right
+// across the schematic, up to AC2.
+const DETOUR_Y = 260
+
 // Terminal-label x position just past the load column.
 const TERM_X = LOAD_X + 22
-
-// Diode centres — each centred 30 px below TOP_Y or above BOT_Y so one
-// pin sits exactly on the rail it connects to.
-const D1 = pins2(ACPOS_X, TOP_Y + 30, 'up')   // top-left  — anode AC+, cathode DC+
-const D2 = pins2(ACNEG_X, TOP_Y + 30, 'up')   // top-right — anode AC−, cathode DC+
-const D3 = pins2(ACNEG_X, BOT_Y - 30, 'up')   // bottom-right — anode DC−, cathode AC−
-const D4 = pins2(ACPOS_X, BOT_Y - 30, 'up')   // bottom-left  — anode DC−, cathode AC+
-
-const SRC = pins2(SRC_X, AC_Y) // horizontal AC source
-const RL = pins2(LOAD_X, (TOP_Y + BOT_Y) / 2, 'down')
-
-// Active-path accent. The wires that conduct on the positive half-cycle
-// — AC+ → D1 → DC+ → load → DC− → D3 → AC− — are drawn in this colour
-// to highlight the conducting path. Off-cycle wires use the default
-// schematic stroke.
-const ACTIVE = 'hsl(var(--callout-experiment))'
 
 export default function BridgeRectifierSchematic() {
   return (
@@ -109,82 +131,75 @@ export default function BridgeRectifierSchematic() {
       }
       maxWidth={580}
     >
-      {/* ════════ INACTIVE-CYCLE WIRES (default stroke) ════════════
-          The rails serve both half-cycles, so they're drawn neutrally.
-          Only the diode-paths that conduct on the OFF-cycle (D2 cathode
-          tap on top rail, D4 anode tap on bottom rail) are drawn here. */}
+      {/* ════════ DIODE STUBS ──────────────────────────────────────
+          Each diode's pins land 26.6 px short of the diamond vertex
+          they connect to (because the standard 60 px diode span is
+          shorter than the 113 px diamond edge). Add a short wire stub
+          from each pin to its vertex. */}
+      <Wire points={[D1.p1, { x: LEFT_X, y: LEFT_Y }]} />
+      <Wire points={[D1.p2, { x: TOP_X, y: TOP_Y }]} />
+      <Wire points={[D2.p1, { x: RIGHT_X, y: RIGHT_Y }]} />
+      <Wire points={[D2.p2, { x: TOP_X, y: TOP_Y }]} />
+      <Wire points={[D3.p1, { x: BOT_X, y: BOT_Y }]} />
+      <Wire points={[D3.p2, { x: RIGHT_X, y: RIGHT_Y }]} />
+      <Wire points={[D4.p1, { x: BOT_X, y: BOT_Y }]} />
+      <Wire points={[D4.p2, { x: LEFT_X, y: LEFT_Y }]} />
 
-      {/* INACTIVE: D2 cathode meets the top rail at (ACNEG_X, TOP_Y).
-          Zero-length stub since they coincide — preserved for the
-          junction dot. */}
-      <Wire points={[D2.p2, { x: ACNEG_X, y: TOP_Y }]} />
+      {/* ════════ AC SOURCE → AC1 (top route) ───────────────────── */}
+      {/* Source top pin (60, 110) → AC1 (190, 140) via (190, 110) */}
+      <Wire points={[SRC.p2, { x: LEFT_X, y: SRC.p2.y }, { x: LEFT_X, y: LEFT_Y }]} />
 
-      {/* INACTIVE: D4 anode meets the bottom rail at (ACPOS_X, BOT_Y).
-          Same idea — zero-length, just the junction. */}
-      <Wire points={[D4.p1, { x: ACPOS_X, y: BOT_Y }]} />
+      {/* ════════ AC SOURCE → AC2 (bottom-detour route) ──────────
+          Source bottom pin → DOWN to y=DETOUR_Y → RIGHT across the
+          schematic → UP to AC2 vertex. Long path is the cost of
+          keeping the source visually outside the bridge. */}
+      <Wire
+        points={[
+          SRC.p1,
+          { x: SRC_X, y: DETOUR_Y },
+          { x: RIGHT_X, y: DETOUR_Y },
+          { x: RIGHT_X, y: RIGHT_Y },
+        ]}
+      />
 
-      {/* INACTIVE: AC− vertical leg from D2 anode (top) through AC source
-          right pin level to D3 cathode (bottom). The AC− portion of the
-          source-to-bridge connection is on the active path on the negative
-          half-cycle (and so D2 + D4 conduct), but on the positive half-cycle
-          shown here, only the lower part (AC source → D3 cathode) carries
-          current; the upper part (D2 anode → AC source) does not. So we
-          split the AC− vertical into two segments. */}
+      {/* ════════ DC+ rail → R_L top ───────────────────────────── */}
+      <Wire points={[{ x: TOP_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }, RL.p2]} />
 
-      {/* AC− upper leg (inactive on positive cycle): D2 anode → AC− node */}
-      <Wire points={[D2.p1, { x: ACNEG_X, y: AC_Y }]} />
+      {/* ════════ DC− rail → R_L bottom ────────────────────────── */}
+      <Wire points={[{ x: BOT_X, y: BOT_Y }, { x: LOAD_X, y: BOT_Y }, RL.p1]} />
 
-      {/* INACTIVE: bottom-rail LEFT half (between D4 anode and D3 anode).
-          On positive cycle no current flows here — D4 is off, so its anode
-          point is just connected to the bottom rail without driving current. */}
-      <Wire points={[D4.p1, D3.p1]} />
+      {/* ════════ COMPONENTS ─────────────────────────────────────── */}
+      <AcSource x={SRC_X} y={SRC_Y} orient="down" value="V_in" />
 
-      {/* ════════ ACTIVE-CYCLE WIRES (highlight) ════════════════════
-          Positive half-cycle current path, in clockwise order around
-          the loop:
-            AC source → AC+ node → D1 → DC+ rail → R_L → DC− rail
-            → D3 → AC− node → back to AC source
+      {/* Diodes rendered without auto-labels — labels placed manually
+          below so they sit on the OUTER side of each diode (away from
+          the diamond centre), upright, perpendicular to the 45° body. */}
+      <Diode x={D1_X} y={D1_Y} orient="up-right" />
+      <Diode x={D2_X} y={D2_Y} orient="up-left" />
+      <Diode x={D3_X} y={D3_Y} orient="up-right" />
+      <Diode x={D4_X} y={D4_Y} orient="up-left" />
 
-          Drawn in the experiment-callout teal so the reader sees the
-          conducting loop at a glance. */}
+      <Resistor x={LOAD_X} y={LOAD_Y} orient="down" label="R_L" />
 
-      {/* AC source LEFT pin → AC+ node (no inactive part — fully active) */}
-      <Wire color={ACTIVE} points={[{ x: ACPOS_X, y: AC_Y }, SRC.p1]} />
+      {/* ════════ MANUAL DIODE LABELS (outer side, upright) ────── */}
+      {/* D1 (top-left edge): label upper-left of body */}
+      <SymbolText x={D1_X - 22} y={D1_Y - 18} size={LABEL_SIZE} weight={600} anchor="end">
+        D1
+      </SymbolText>
+      {/* D2 (top-right edge): label upper-right of body */}
+      <SymbolText x={D2_X + 22} y={D2_Y - 18} size={LABEL_SIZE} weight={600} anchor="start">
+        D2
+      </SymbolText>
+      {/* D3 (bottom-right edge): label lower-right of body */}
+      <SymbolText x={D3_X + 22} y={D3_Y + 18} size={LABEL_SIZE} weight={600} anchor="start">
+        D3
+      </SymbolText>
+      {/* D4 (bottom-left edge): label lower-left of body */}
+      <SymbolText x={D4_X - 22} y={D4_Y + 18} size={LABEL_SIZE} weight={600} anchor="end">
+        D4
+      </SymbolText>
 
-      {/* AC+ vertical leg: AC+ node UP to D1 anode (only this part is active;
-          on positive cycle D4 is off so no current flows DOWN to D4). */}
-      <Wire color={ACTIVE} points={[{ x: ACPOS_X, y: AC_Y }, D1.p1]} />
-
-      {/* Top rail (DC+): D1 cathode → across the rail → load top.
-          Single straight wire, left-to-right. Passes through D2's
-          cathode tap at (ACNEG_X, TOP_Y) but D2 is off so no current
-          branches off there. */}
-      <Wire color={ACTIVE} points={[D1.p2, { x: ACNEG_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }]} />
-
-      {/* Load drops vertically between top and bottom rails */}
-      <Wire color={ACTIVE} points={[{ x: LOAD_X, y: TOP_Y }, RL.p2]} />
-      <Wire color={ACTIVE} points={[RL.p1, { x: LOAD_X, y: BOT_Y }]} />
-
-      {/* Bottom rail (DC−) RIGHT half: load bottom → D3 anode.
-          Single straight wire, right-to-left direction of current,
-          rendered left-to-right for normal SVG ordering. */}
-      <Wire color={ACTIVE} points={[D3.p1, { x: LOAD_X, y: BOT_Y }]} />
-
-      {/* AC− lower leg: D3 cathode → AC− node */}
-      <Wire color={ACTIVE} points={[D3.p2, { x: ACNEG_X, y: AC_Y }]} />
-
-      {/* AC source RIGHT pin → AC− node */}
-      <Wire color={ACTIVE} points={[SRC.p2, { x: ACNEG_X, y: AC_Y }]} />
-
-      {/* ════════ COMPONENTS ═══════════════════════════════════════ */}
-      <AcSource x={SRC_X} y={AC_Y} value="V_in" />
-      <Diode x={ACPOS_X} y={TOP_Y + 30} orient="up" label="D1" />
-      <Diode x={ACNEG_X} y={TOP_Y + 30} orient="up" label="D2" />
-      <Diode x={ACNEG_X} y={BOT_Y - 30} orient="up" label="D3" />
-      <Diode x={ACPOS_X} y={BOT_Y - 30} orient="up" label="D4" />
-      <Resistor x={LOAD_X} y={(TOP_Y + BOT_Y) / 2} orient="down" label="R_L" />
-
-      {/* ════════ DC OUTPUT TERMINAL LABELS ═══════════════════════ */}
+      {/* ════════ DC OUTPUT TERMINAL LABELS ───────────────────── */}
       <TerminalLabel x={TERM_X} y={TOP_Y} anchor="start" weight={600}>
         DC+
       </TerminalLabel>
@@ -192,15 +207,15 @@ export default function BridgeRectifierSchematic() {
         DC−
       </TerminalLabel>
 
-      {/* ════════ JUNCTIONS ═══════════════════════════════════════ */}
-      {/* AC+ node — 3-way: D1, D4, source-wire */}
-      <Junction x={ACPOS_X} y={AC_Y} />
-      {/* AC− node — 3-way: D2, D3, source-wire */}
-      <Junction x={ACNEG_X} y={AC_Y} />
-      {/* DC+ rail tap where D2 cathode meets the rail going right */}
-      <Junction x={ACNEG_X} y={TOP_Y} />
-      {/* DC− rail tap where D4 anode meets the rail going right */}
-      <Junction x={ACPOS_X} y={BOT_Y} />
+      {/* ════════ JUNCTIONS at the four diamond vertices ──────── */}
+      {/* DC+: top vertex — D1, D2, R_L wire all meet here */}
+      <Junction x={TOP_X} y={TOP_Y} />
+      {/* AC2: right vertex — D2, D3, AC source bottom-detour wire meet */}
+      <Junction x={RIGHT_X} y={RIGHT_Y} />
+      {/* DC−: bottom vertex — D3, D4, R_L wire all meet here */}
+      <Junction x={BOT_X} y={BOT_Y} />
+      {/* AC1: left vertex — D1, D4, AC source top wire meet */}
+      <Junction x={LEFT_X} y={LEFT_Y} />
     </Circuit>
   )
 }
