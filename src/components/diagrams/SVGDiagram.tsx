@@ -1,5 +1,38 @@
 /**
- * SVGDiagram — safe wrapper for all inline SVG illustrations.
+ * SVGDiagram — safe wrapper for inline SVG illustrations.
+ *
+ * ⚠️  IMPORTANT — SCALES TO CONTAINER WIDTH
+ * ─────────────────────────────────────────
+ * This wrapper passes `width="100%"` to its inner <svg>, which means the
+ * SVG renders at its container's full width — typically ~1024 px on a
+ * max-w-5xl chapter container. A 540 px viewBox is therefore inflated
+ * ~1.9× on screen, and **every numeric `fontSize="N"` (user-space units)
+ * scales by the same factor**: `fontSize="13"` becomes ~25 px on screen,
+ * far larger than body text.
+ *
+ * Use ONLY ONE of these patterns when SVGDiagram is in play:
+ *
+ *   1. **Em-based fontSize** — `fontSize="0.812em"`, `"0.75em"`. EM
+ *      inherits from the document root and stays at constant display-px
+ *      regardless of how the SVG is scaled. Safe with SVGDiagram.
+ *
+ *   2. **Bare <svg> with fixed width** (preferred for plots/charts):
+ *
+ *      <svg width={VB_W} height={VB_H} viewBox={`0 0 ${VB_W} ${VB_H}`}
+ *           role="img" aria-label="…"
+ *           style={{ display: 'block', margin: '0 auto',
+ *                    maxWidth: '100%', height: 'auto' }}>
+ *        {…}
+ *      </svg>
+ *
+ *      Native size on desktop, shrinks proportionally on narrow viewports.
+ *      Numeric fontSize values work as-written. See OhmsLawPlot,
+ *      SineOriginDiagram, HalfWaveRectifierWaveform for examples.
+ *
+ * ❌ NEVER combine SVGDiagram with numeric `fontSize="13"` style values.
+ *    The pairing is mechanically blocked by `check:svg-diagram-fontsize-units`
+ *    in the gate suite — added after this combination shipped in ch1.10
+ *    and the reader caught fonts ~2× the size of body text.
  *
  * OVERFLOW GUARD
  * ──────────────
@@ -7,16 +40,10 @@
  * (W, H) is cut off with no warning. This wrapper prevents partial renders
  * by applying a hard <clipPath> that matches the declared viewport.
  *
- * In development (import.meta.env.DEV) a dashed red border is rendered on
- * top of the diagram so you can immediately see when content is approaching
- * or crossing the boundary.
- *
  * USAGE
  * ──────
- * Replace bare <svg viewBox="0 0 W H"> with:
- *
  *   <SVGDiagram width={W} height={H} aria-label="…">
- *     {…your SVG content…}
+ *     {…your SVG content using EM-based fontSize values…}
  *   </SVGDiagram>
  *
  * COORDINATE BUDGET CHECKLIST (copy into each diagram file)
@@ -27,6 +54,7 @@
  *   //  • max y used:  ??? (must be < H — include font descenders ≈ fontSize*0.3)
  *   //  • textAnchor="end" at x=X means right edge = X (must be < W)
  *   //  • textAnchor="middle" at x=X means right edge = X + textWidth/2
+ *   //  • All fontSize values are em/rem/% — NEVER bare numeric.
  */
 
 import type { CSSProperties, ReactNode, SVGProps } from 'react'
