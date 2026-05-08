@@ -19,9 +19,8 @@
  * the *shape* of the Zener curve in the reader's head, alongside the
  * regulator schematic.
  */
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
-import SVGDiagram from './SVGDiagram'
 import { svgTokens } from './svgTokens'
 import { MathVar } from '@/components/ui/math'
 
@@ -107,6 +106,7 @@ function curvePath(): string {
 }
 
 export default function ZenerIVCurve() {
+  const { t } = useTranslation('ui')
   const path = curvePath()
   const xZero = vToX(0)
   const yZero = iMaToY(0)
@@ -122,10 +122,14 @@ export default function ZenerIVCurve() {
         />
       }
     >
-      <SVGDiagram
+      <svg
         width={VB_W}
         height={VB_H}
-        aria-label="Zener diode I–V curve. Forward bias rises steeply past 0.7 V; reverse bias is near zero until the breakdown voltage V_Z, where the curve drops near-vertically — the useful regulating region."
+        viewBox={`0 0 ${VB_W} ${VB_H}`}
+        role="img"
+        aria-label={t('ch1_10.zenerIvAria')}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
+        xmlns="http://www.w3.org/2000/svg"
       >
         {/* Gridlines (light) */}
         <g stroke={svgTokens.border} strokeWidth={0.5} opacity={0.5}>
@@ -162,7 +166,7 @@ export default function ZenerIVCurve() {
         {/* X-tick labels (skip 0) */}
         <g
           fill={svgTokens.mutedFg}
-          fontSize="13"
+          fontSize="11"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           {X_TICKS.filter(v => v !== 0).map(v => (
@@ -181,7 +185,7 @@ export default function ZenerIVCurve() {
         <text
           x={PLOT_X0 + PLOT_W - 4}
           y={yZero - 6}
-          fontSize="14"
+          fontSize="12"
           fontStyle="italic"
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -192,7 +196,7 @@ export default function ZenerIVCurve() {
         <text
           x={xZero + 8}
           y={PLOT_Y0 + 12}
-          fontSize="14"
+          fontSize="12"
           fontStyle="italic"
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -205,7 +209,7 @@ export default function ZenerIVCurve() {
           d={path}
           fill="none"
           stroke={svgTokens.primary}
-          strokeWidth={2.5}
+          strokeWidth={1.6}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -224,7 +228,7 @@ export default function ZenerIVCurve() {
         <text
           x={xVz}
           y={iMaToY(-18) - 4}
-          fontSize="13"
+          fontSize="11"
           fontWeight={600}
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
@@ -239,35 +243,35 @@ export default function ZenerIVCurve() {
         <text
           x={vToX(0.7)}
           y={iMaToY(15)}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.mutedFg}
           textAnchor="start"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
-          forward
+          {t('ch1_10.zenerIvForwardLabel')}
         </text>
         <text
           x={vToX(-2.5)}
           y={iMaToY(2.5)}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.mutedFg}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
-          off (reverse, no current)
+          {t('ch1_10.zenerIvOffLabel')}
         </text>
         <text
           x={vToX(-V_Z - 0.7)}
           y={iMaToY(-7)}
-          fontSize="13"
+          fontSize="11"
           fontWeight={600}
           fill={svgTokens.experiment}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
-          breakdown — regulating
+          {t('ch1_10.zenerIvBreakdownLabel')}
         </text>
-      </SVGDiagram>
+      </svg>
     </DiagramFigure>
   )
 }

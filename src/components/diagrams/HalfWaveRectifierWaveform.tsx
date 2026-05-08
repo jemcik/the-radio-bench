@@ -4,8 +4,22 @@
  * Two stacked plots over a shared time axis:
  *   Top:    V_in(t) — the AC source's sine, swinging ±V_peak.
  *   Bottom: V_out(t) — what the load sees: the positive halves of the
- *           sine (slightly smaller because the diode drops ~V_F across
- *           itself), and zero during the negative halves.
+ *           sine, dropped by V_F (visibly slightly lower than the input
+ *           peak), and zero during the negative halves.
+ *
+ * IMPORTANT for the layout. Both plots use the SAME vertical pixels-per-volt
+ * scale, so the «slightly smaller because of V_F» visual cue is honest:
+ * input peak reaches +AMP_PX above its zero line; output peak reaches
+ * (1 − V_F/V_peak) × AMP_PX above its zero line — a couple of pixels lower.
+ * Earlier revision used a different scale for the bottom plot (full plot
+ * height instead of half-height-equivalent), which made V_out look TALLER
+ * than V_in — physically backwards. Reader-flagged on first review.
+ *
+ * Sizing per the diagram-quality skill: bare `<svg>` with fixed
+ * width/height + maxWidth: 100% / height: auto. NOT the SVGDiagram
+ * wrapper — that one passes `width="100%"` and the chapter container
+ * (max-w-5xl ≈ 1024 px) inflates every fontSize ~2× and every
+ * strokeWidth proportionally. Reader-flagged on first review.
  *
  * Static (a snapshot, not an animation) — the lesson is the *shape* of
  * each waveform, which is best read as a complete picture rather than
@@ -15,7 +29,6 @@
 import { useId } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
-import SVGDiagram from './SVGDiagram'
 import { svgTokens } from './svgTokens'
 import { MathVar } from '@/components/ui/math'
 
@@ -48,32 +61,41 @@ const SAMPLES = 360 // 180 per cycle
 // being so big that it dominates the visual.
 const VF_NORM = 0.1
 
+// Per-volt pixel scale, SHARED by both plots so V_in and V_out read on
+// the same vertical scale (a 1 V tick is the same height in both).
+// Top plot uses ±AMP_PX about its centre; bottom plot uses 0..AMP_PX
+// above its zero line at the bottom of its band.
+const AMP_PX = PLOT_H / 2 - 4
+
 function vInPath(): string {
-  // Sine: y = sin(2π * cycles * t) where t ∈ [0, 1].
+  // Sine: y = sin(2π * cycles * t) where t ∈ [0, 1]. Centred on the
+  // top plot's mid-line.
+  const topZeroY = TOP_Y0 + PLOT_H / 2
   let path = ''
   for (let i = 0; i <= SAMPLES; i++) {
     const t = i / SAMPLES
     const x = PLOT_X0 + t * PLOT_W
-    const y = TOP_Y0 + PLOT_H / 2 - (PLOT_H / 2 - 4) * Math.sin(2 * Math.PI * CYCLES * t)
+    const y = topZeroY - AMP_PX * Math.sin(2 * Math.PI * CYCLES * t)
     path += i === 0 ? `M${x.toFixed(2)} ${y.toFixed(2)}` : ` L${x.toFixed(2)} ${y.toFixed(2)}`
   }
   return path
 }
 
 function vOutPath(): string {
-  // V_out = max(V_in - V_F, 0). Negative halves clamp to zero (the
-  // diode is reverse-biased — load sees nothing).
+  // V_out = max(V_in − V_F, 0). Negative halves clamp to zero (the
+  // diode is reverse-biased — load sees nothing). Same volts-per-pixel
+  // scale as the top plot, so the «slightly lower than V_in» drop reads
+  // honestly. Peak ampNorm = 1 − VF_NORM ≈ 0.9, so peak y sits a few
+  // pixels below where the V_in peak would land if mirrored down.
+  const botZeroY = BOT_Y0 + PLOT_H - 4
   let path = ''
-  let started = false
   for (let i = 0; i <= SAMPLES; i++) {
     const t = i / SAMPLES
     const sineVal = Math.sin(2 * Math.PI * CYCLES * t)
     const ampNorm = Math.max(0, sineVal - VF_NORM)
     const x = PLOT_X0 + t * PLOT_W
-    // Bottom plot: zero at the bottom of its band (V_out only goes positive)
-    const y = BOT_Y0 + PLOT_H - 4 - (PLOT_H - 8) * (ampNorm / (1 - VF_NORM))
-    path += !started ? `M${x.toFixed(2)} ${y.toFixed(2)}` : ` L${x.toFixed(2)} ${y.toFixed(2)}`
-    started = true
+    const y = botZeroY - AMP_PX * ampNorm
+    path += i === 0 ? `M${x.toFixed(2)} ${y.toFixed(2)}` : ` L${x.toFixed(2)} ${y.toFixed(2)}`
   }
   return path
 }
@@ -104,10 +126,14 @@ export default function HalfWaveRectifierWaveform() {
         />
       }
     >
-      <SVGDiagram
+      <svg
         width={VB_W}
         height={VB_H}
+        viewBox={`0 0 ${VB_W} ${VB_H}`}
+        role="img"
         aria-label={t('ch1_10.halfWaveWaveformAria')}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
+        xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <clipPath id={clipId}>
@@ -141,14 +167,14 @@ export default function HalfWaveRectifierWaveform() {
           x2={PLOT_X1}
           y2={topZeroY}
           stroke={svgTokens.fg}
-          strokeWidth={1}
+          strokeWidth={0.8}
         />
         <g clipPath={`url(#${clipId})`}>
           <path
             d={inPath}
             fill="none"
             stroke={svgTokens.primary}
-            strokeWidth={2.5}
+            strokeWidth={1.6}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -157,7 +183,7 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0 - 10}
           y={TOP_Y0 + 8}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.fg}
           fillOpacity={0.85}
           textAnchor="end"
@@ -165,12 +191,12 @@ export default function HalfWaveRectifierWaveform() {
         >
           <tspan>+</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="9" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={TOP_Y0 + PLOT_H - 2}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.fg}
           fillOpacity={0.85}
           textAnchor="end"
@@ -178,12 +204,12 @@ export default function HalfWaveRectifierWaveform() {
         >
           <tspan>−</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="9" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={topZeroY + 4}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.mutedFg}
           textAnchor="end"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -195,14 +221,14 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0}
           y={TOP_Y0 - 4}
-          fontSize="14"
+          fontSize="12"
           fontWeight={600}
           fill={svgTokens.fg}
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
-          <tspan dy="3" fontSize="10" fontStyle="normal">in</tspan>
-          <tspan dy="-3" fontSize="14"> — {t('ch1_10.halfWaveLabelInput')}</tspan>
+          <tspan dy="3" fontSize="8" fontStyle="normal">in</tspan>
+          <tspan dy="-3" fontSize="12"> — {t('ch1_10.halfWaveLabelInput')}</tspan>
         </text>
 
         {/* BOTTOM plot: V_out zero line + half-wave */}
@@ -212,36 +238,36 @@ export default function HalfWaveRectifierWaveform() {
           x2={PLOT_X1}
           y2={botZeroY}
           stroke={svgTokens.fg}
-          strokeWidth={1}
+          strokeWidth={0.8}
         />
         <g clipPath={`url(#${clipId})`}>
           <path
             d={outPath}
             fill="none"
             stroke={svgTokens.experiment}
-            strokeWidth={2.5}
+            strokeWidth={1.6}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </g>
-        {/* +V_peak label on bottom plot */}
+        {/* +V_peak label on bottom plot — same vertical position as top */}
         <text
           x={PLOT_X0 - 10}
-          y={BOT_Y0 + 8}
-          fontSize="13"
+          y={botZeroY - AMP_PX + 4}
+          fontSize="11"
           fill={svgTokens.fg}
-          fillOpacity={0.85}
+          fillOpacity={0.5}
           textAnchor="end"
           fontFamily="Georgia, serif"
         >
           <tspan>+</tspan>
           <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="9" fontStyle="normal">peak</tspan>
+          <tspan dy="3" fontSize="8" fontStyle="normal">peak</tspan>
         </text>
         <text
           x={PLOT_X0 - 10}
           y={botZeroY + 4}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.mutedFg}
           textAnchor="end"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -253,28 +279,28 @@ export default function HalfWaveRectifierWaveform() {
         <text
           x={PLOT_X0}
           y={BOT_Y0 - 4}
-          fontSize="14"
+          fontSize="12"
           fontWeight={600}
           fill={svgTokens.fg}
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
-          <tspan dy="3" fontSize="10" fontStyle="normal">out</tspan>
-          <tspan dy="-3" fontSize="14"> — {t('ch1_10.halfWaveLabelOutput')}</tspan>
+          <tspan dy="3" fontSize="8" fontStyle="normal">out</tspan>
+          <tspan dy="-3" fontSize="12"> — {t('ch1_10.halfWaveLabelOutput')}</tspan>
         </text>
 
         {/* Time-axis label below bottom plot */}
         <text
           x={PLOT_X0 + PLOT_W / 2}
           y={VB_H - 12}
-          fontSize="13"
+          fontSize="11"
           fill={svgTokens.mutedFg}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           {t('ch1_10.halfWaveTimeAxis')}
         </text>
-      </SVGDiagram>
+      </svg>
     </DiagramFigure>
   )
 }
