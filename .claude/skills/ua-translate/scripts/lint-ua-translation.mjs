@@ -176,6 +176,36 @@ const RULES = [
     hint: 'Cyrillic subscript inside <var>…</var>. Keep Latin: V_{\\mathrm{in}} not V_{\\text{вх}}, f_{\\mathrm{c}} not f_{\\text{зр}}. Known Gemini regression.',
   },
 
+  {
+    id: 'markup.cyrillic-base-subscript',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Cyrillic-letter base in a bare subscript (e.g. `В_pp`, `Р_loss`,
+    // `І_в`). The `withSubscripts()` renderer used by `<G>` glossary
+    // popovers, prose interpolation and SVG label helpers matches
+    // ONLY a Latin single-letter base — `[A-Za-z]` — so any Cyrillic-
+    // base subscript renders as a literal underscore in the UI
+    // («В_pp» instead of Vₚₚ). Caught in ch1.5 «ripple» glossary
+    // card where `Вольти розмаху (В_pp)` shipped with the underscore
+    // visible.
+    //
+    // Project convention is Latin variable names everywhere (V, R, I,
+    // P, f), even inside Ukrainian prose — only the unit symbol
+    // changes («В» for Volt is fine when it's a UNIT after a number,
+    // e.g. «5 В»; but the VARIABLE for voltage stays Latin V). So
+    // this rule is ERROR severity: there is no correct rendering
+    // path for a Cyrillic-base subscript.
+    //
+    // Match scope: anywhere outside a `<var>…</var>` block (lookbehind
+    // `(?<![<>\\{])` excludes the immediate-after-tag position;
+    // lookahead `(?![<>}])` excludes the immediate-before-closing-tag
+    // position — same shape as `markup.bare-subscript-pattern`).
+    // Cyrillic INSIDE <var> is a separate problem caught by
+    // `markup.cyrillic-subscript-in-var` above.
+    pattern: /(?<![<>\\{])[Ѐ-ӿ]_[A-Za-zЀ-ӿ0-9]+(?![<>}])/g,
+    hint: 'Cyrillic-letter base in subscript (e.g. «В_pp»). withSubscripts() matches Latin bases only — the underscore renders literally. Use the Latin equivalent: V_pp (not В_pp), R_loss (not Р_loss), I_C (not І_C). Latin variable names are the project convention everywhere, including inside Ukrainian prose.',
+  },
+
   // ── Forbidden words from landmines.md ───────────────────────────────────
 
   {

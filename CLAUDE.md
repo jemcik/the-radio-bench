@@ -162,6 +162,21 @@ Markup conventions (subscripts inside `<var>X_{…}</var>`, `<G>` vs `<strong>` 
 
 The recurring failure was fixing only what the user screenshot, then missing siblings in the same widget. After any unit-symbol fix, grep the file for `Hz` / `dB` / `mW` / `µ` and convert every occurrence in one pass; then check sibling widgets in the same chapter.
 
+### Bare subscripts (`X_yyy`) need a renderer — every single time
+
+Two recurring landmines in this class shipped to readers in ch 1.10 and required user-screenshot rescue:
+
+1. **Cyrillic-base in glossary unit field** — `Вольти розмаху (В_pp)` shipped because the renderer (`withSubscripts()`, used for `unit` / `formula` / popovers / SVG label helpers) only matches a Latin one-letter base. Cyrillic `В` slipped through and rendered the underscore literally. Project convention: variable names stay Latin everywhere — even inside Ukrainian prose — and only the unit symbol switches script (`5 В`, `100 кГц`). Now enforced by `markup.cyrillic-base-subscript` (ERROR) in the UA linter.
+2. **Hardcoded JSX literal with bare subscripts** — `<p>ΔV ≈ I_load · t_period / C = …</p>` shipped without going through `t()` or any renderer, so all five subscripts printed as literal underscores. The existing `check:bare-subscript-renders` only scans i18n keys → call sites; a hardcoded JSX literal is invisible to it. Now enforced by `check:hardcoded-jsx-subscript` (ERROR), which scans every `.tsx` under widgets / diagrams / chapter-heroes / chapters / features for multi-token JSX text literals containing `[A-Za-z]_[A-Za-z0-9]+`.
+
+The right rendering path is always one of:
+- `{withSubscripts(t('key'))}` for HTML / prose
+- `{withSubscriptsSvg(t('key'))}` for SVG `<text>` content
+- `<MathText>{t('key')}</MathText>` when the value uses LaTeX-braced form `X_{Y}` (KaTeX handles both)
+- Canonical `<var>X_{Y}</var>` markup in the i18n value rendered via `<Trans components={{ var: <MathVar /> }} />`
+
+The two new gates are both wired into `check:all`, so they run before every PR. They WILL fire on attempted regressions — when one does, do NOT silence with an opt-out comment unless the literal has been visually verified to render correctly through some other path. The default action is «move it to i18n + wrap.»
+
 ## Lab activity content
 
 - **Battery preference is AA (1.5 V), not 9 V.** AA cells are universally available and cheap; 9 V batteries are a niche format in many countries. Ratio-based experiments work just as well at 1.5 V — switch the multimeter to the 2 V range / autorange for three decimal places of resolution.
