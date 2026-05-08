@@ -137,6 +137,80 @@ export default function BridgeRectifierSchematic() {
       }
       maxWidth={580}
     >
+      {/* ════════ CURRENT-FLOW HIGHLIGHT (animated) ───────────────
+          Two coloured overlay segments, one per half-cycle, alternating
+          every 1 s (full period 2 s). Each segment traces only the
+          DELIVERY half of the conduction path: from whichever AC source
+          pin is currently positive, through the corresponding upper
+          diode, along the DC+ rail to the top of R_L. The return path
+          (lower diode + DC− rail + opposite AC return wire) is left
+          un-highlighted so the reader's eye lands on «where the +
+          terminal currently is» and «how it reaches the load» — the
+          part of the diagram that actually changes between half-cycles.
+
+          Phase A: positive half-cycle, source-top is the + pin, D1 conducts.
+            Source-top → AC1 → D1 → DC+ → top of R_L.
+          Phase B: negative half-cycle, source-bottom is the + pin, D2 conducts.
+            Source-bottom → bottom-detour → AC2 → D2 → DC+ → top of R_L.
+
+          Both phases share the DC+ rail → R_L top segment (current
+          through the load is unidirectional — the whole point of a
+          bridge rectifier). With phase A and phase B alternating, the
+          shared segment effectively stays lit continuously while the
+          AC-side path swings between the top route and the bottom-detour.
+
+          Implementation notes:
+            • Overlay paths are rendered FIRST so existing wires and
+              symbols draw on top — the red shows as a halo.
+            • Stroke width 5 (vs wire width 2) ⇒ ~1.5 px halo each side.
+            • Animation uses two keyframes with a 1 % sharp transition
+              (49 % → 50 %) so the cycle change reads as instantaneous,
+              matching real diode switching at the AC zero-crossing.
+            • prefers-reduced-motion: falls back to a dim static overlay
+              (both phases visible together) — readers who disable
+              animation still see WHICH paths conduct, just without
+              the timing.
+            • Pure CSS, no JS state — runs without re-renders. */}
+      <style>{`
+        .bridge-flow path {
+          fill: none;
+          stroke: #dc2626;
+          stroke-width: 5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          pointer-events: none;
+        }
+        .bridge-flow {
+          animation: bridge-flash 2s linear infinite;
+        }
+        .bridge-flow.bridge-phase-b {
+          animation-delay: -1s;
+        }
+        @keyframes bridge-flash {
+          0%, 49% { opacity: 0.6; }
+          50%, 100% { opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .bridge-flow,
+          .bridge-flow.bridge-phase-b {
+            animation: none;
+            opacity: 0.35;
+          }
+        }
+      `}</style>
+      <g className="bridge-flow bridge-phase-a">
+        {/* Source top (= + pin this half-cycle) → AC1 → D1 body → DC+ vertex */}
+        <path d={`M${SRC.p2.x},${SRC.p2.y} L${LEFT_X},${SRC.p2.y} L${LEFT_X},${LEFT_Y} L${D1.p1.x},${D1.p1.y} L${D1.p2.x},${D1.p2.y} L${TOP_X},${TOP_Y}`} />
+        {/* DC+ rail → top of R_L (delivery to load) */}
+        <path d={`M${TOP_X},${TOP_Y} L${LOAD_X},${TOP_Y} L${LOAD_X},${RL.p1.y}`} />
+      </g>
+      <g className="bridge-flow bridge-phase-b">
+        {/* Source bottom (= + pin this half-cycle) → bottom-detour → AC2 → D2 body → DC+ vertex */}
+        <path d={`M${SRC.p1.x},${SRC.p1.y} L${SRC_X},${DETOUR_Y} L${RIGHT_X},${DETOUR_Y} L${RIGHT_X},${RIGHT_Y} L${D2.p1.x},${D2.p1.y} L${D2.p2.x},${D2.p2.y} L${TOP_X},${TOP_Y}`} />
+        {/* DC+ rail → top of R_L (same shared segment as phase A) */}
+        <path d={`M${TOP_X},${TOP_Y} L${LOAD_X},${TOP_Y} L${LOAD_X},${RL.p1.y}`} />
+      </g>
+
       {/* ════════ DIODE STUBS ──────────────────────────────────────
           Each diode's pins land 26.6 px short of the diamond vertex
           they connect to (because the standard 60 px diode span is
@@ -168,11 +242,17 @@ export default function BridgeRectifierSchematic() {
         ]}
       />
 
-      {/* ════════ DC+ rail → R_L top ───────────────────────────── */}
-      <Wire points={[{ x: TOP_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }, RL.p2]} />
+      {/* ════════ DC+ rail → R_L top ─────────────────────────────
+          For Resistor at (LOAD_X, LOAD_Y) orient='down', pins2 returns
+          p1 = TOP pin (cy - h) and p2 = BOTTOM pin (cy + h). I swapped
+          these on first cut — the DC+ wire ended at p2 (BOTTOM) and
+          the DC− wire ended at p1 (TOP), so both wires ran THROUGH the
+          resistor body diagonally. Reader caught it on the close-up.
+          Same class of mistake as the AC source pin confusion. */}
+      <Wire points={[{ x: TOP_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }, RL.p1]} />
 
       {/* ════════ DC− rail → R_L bottom ────────────────────────── */}
-      <Wire points={[{ x: BOT_X, y: BOT_Y }, { x: LOAD_X, y: BOT_Y }, RL.p1]} />
+      <Wire points={[{ x: BOT_X, y: BOT_Y }, { x: LOAD_X, y: BOT_Y }, RL.p2]} />
 
       {/* ════════ COMPONENTS ─────────────────────────────────────── */}
       <AcSource x={SRC_X} y={SRC_Y} orient="down" value="V_in" />
@@ -196,8 +276,16 @@ export default function BridgeRectifierSchematic() {
       <SymbolText x={D2_X + 22} y={D2_Y - 18} size={LABEL_SIZE} weight={600} anchor="start">
         D2
       </SymbolText>
-      {/* D3 (bottom-right edge): label lower-right of body */}
-      <SymbolText x={D3_X + 22} y={D3_Y + 18} size={LABEL_SIZE} weight={600} anchor="start">
+      {/* D3 (bottom-right edge): label sits in the wedge BETWEEN the diode
+          body and the bottom-detour wire (the latter runs vertically at
+          x=RIGHT_X=350). With anchor='start' at x=D3_X+22=332 the label
+          extended rightward to x≈349 — 1 px from the wire. Reader caught
+          it on the close-up. anchor='end' at the same x flips the text
+          INWARD so it occupies x≈[318, 332]: clear of both the diode body
+          (≈ x=292 at this y) and the bottom-detour wire (x=350). D3 is
+          the only label that has to flip — the others sit on outer corners
+          with no nearby wire. */}
+      <SymbolText x={D3_X + 22} y={D3_Y + 18} size={LABEL_SIZE} weight={600} anchor="end">
         D3
       </SymbolText>
       {/* D4 (bottom-left edge): label lower-left of body */}
