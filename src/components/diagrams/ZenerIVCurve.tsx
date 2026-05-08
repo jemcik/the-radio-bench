@@ -23,6 +23,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
 import { MathVar } from '@/components/ui/math'
+import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { withSubscriptsSvg } from '@/lib/text-with-subscripts'
 
 const VB_W = 540
 const VB_H = 280
@@ -56,18 +58,25 @@ function iMaToY(i: number) {
   return PLOT_Y0 + PLOT_H - ((i - I_MIN) / (I_MAX - I_MIN)) * PLOT_H
 }
 
-const X_TICKS = [-7, -6, -5, -4, -3, -2, -1, 0, 1]
+// X_TICKS deliberately omits −5: that position is dominated by the
+// dashed V_Z marker at V = −V_Z = −5.1, and the tick label sat directly
+// in the path of both the marker line AND the cliff portion of the
+// curve. Letting V_Z own that x position keeps the chart readable.
+const X_TICKS = [-7, -6, -4, -3, -2, -1, 0, 1]
 const Y_TICKS_MA = [-20, -10, 0, 10, 20]
 
 /* Build a piecewise approximation: */
 function curvePath(): string {
   const samples: Array<{ v: number; iMa: number }> = []
-  // Forward: above 0.5 V the curve climbs quasi-exponentially (use a soft
-  // ramp so it leaves the chart cleanly).
+  // Forward: above 0.5 V the curve climbs quasi-exponentially (Shockley-
+  // like rise). The exponential is intentionally aggressive — at V=0.7
+  // it already evaluates well past the chart's I_MAX=20 mA, so the
+  // sample-and-clip pipeline below produces a clean vertical segment
+  // that exits the top of the chart at V≈0.6, exactly the visual we
+  // want for a forward-conducting diode knee.
   for (let v = V_MAX; v >= 0; v -= 0.05) {
     let iMa = 0
     if (v > 0.5) {
-      // Rough Shockley-like rise; calibrated so V=0.7 gives I≈3 mA, V=1.0 gives I≈20+ mA.
       iMa = 0.001 * Math.exp((v - 0) / 0.06)
     }
     samples.push({ v, iMa })
@@ -81,7 +90,7 @@ function curvePath(): string {
   for (let v = -V_Z + 0.3; v >= -V_Z - 0.05; v -= 0.05) {
     const t = (-V_Z + 0.3 - v) / 0.35 // 0..1
     const iMa = -t * t * 18 // quadratic ramp, hits ≈ −18 mA at the corner
-  samples.push({ v, iMa })
+    samples.push({ v, iMa })
   }
   // Past the corner: vertical-ish drop. Sample very fine V so the line
   // is steep but smooth.
@@ -105,8 +114,16 @@ function curvePath(): string {
   return d
 }
 
+/** Render a tick value as a string with a true Unicode minus (U+2212)
+ *  for negatives instead of an ASCII hyphen-minus. The rest of the
+ *  diagram (e.g. the −V_Z marker label) already uses U+2212; this keeps
+ *  axis ticks typographically consistent. */
+const fmtTick = (n: number): string =>
+  n < 0 ? `−${Math.abs(n)}` : `${n}`
+
 export default function ZenerIVCurve() {
   const { t } = useTranslation('ui')
+  const tUnit = useUnitFormatter()
   const path = curvePath()
   const xZero = vToX(0)
   const yZero = iMaToY(0)
@@ -128,7 +145,7 @@ export default function ZenerIVCurve() {
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
         aria-label={t('ch1_10.zenerIvAria')}
-        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto', fontSize: '1rem' }}
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* Gridlines (light) */}
@@ -163,45 +180,64 @@ export default function ZenerIVCurve() {
           stroke={svgTokens.fg} strokeWidth={1}
         />
 
-        {/* X-tick labels (skip 0) */}
+        {/* X-tick labels (skip 0). Use Unicode minus (U+2212) for
+            negatives instead of ASCII hyphen-minus so the typography
+            matches the −V_Z marker label below. */}
         <g
           fill={svgTokens.mutedFg}
-          fontSize="13"
+          fontSize={svgTokens.font.tickLabel}
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           {X_TICKS.filter(v => v !== 0).map(v => (
             <text key={`tx${v}`} x={vToX(v)} y={yZero + 16} textAnchor="middle">
-              {v}
+              {fmtTick(v)}
             </text>
           ))}
           {Y_TICKS_MA.filter(i => i !== 0).map(i => (
             <text key={`ty${i}`} x={xZero - 6} y={iMaToY(i) + 4} textAnchor="end">
-              {i}
+              {fmtTick(i)}
             </text>
           ))}
         </g>
 
-        {/* Axis titles */}
+        {/* Axis titles
+            ────────────
+            Variable name (V / I) is invariant across locales — italic
+            Latin-style letter, baked into JSX. The unit symbol comes
+            from `tUnit()` so UA readers see «(В)» / «(мА)» while EN
+            sees «(V)» / «(mA)».
+
+            Position:
+            • V-axis title sits at the right end of the V-axis line, just
+              above it. Forward curve at this x-range (V > 1) is clipped
+              at I_MAX and runs along y=PLOT_Y0 — about 100 px above the
+              V-axis. No overlap.
+            • I-axis title sits ABOVE the plot, centred on the I-axis,
+              within the PAD_T padding strip. Anchor='middle'. Putting it
+              inside the plot at the top would intersect the forward-
+              curve clip segment that runs along the top edge — the bug
+              the user flagged. */}
         <text
           x={PLOT_X0 + PLOT_W - 4}
           y={yZero - 6}
-          fontSize="14"
-          fontStyle="italic"
-          fontFamily="Georgia, serif"
+          fontSize={svgTokens.font.axisLabel}
+          fontFamily="ui-sans-serif, system-ui, sans-serif"
           fill={svgTokens.fg}
           textAnchor="end"
         >
-          V (V)
+          <tspan fontStyle="italic" fontFamily="Georgia, serif">V</tspan>
+          {` (${tUnit('v')})`}
         </text>
         <text
-          x={xZero + 8}
-          y={PLOT_Y0 + 12}
-          fontSize="14"
-          fontStyle="italic"
-          fontFamily="Georgia, serif"
+          x={xZero}
+          y={PLOT_Y0 - 6}
+          fontSize={svgTokens.font.axisLabel}
+          fontFamily="ui-sans-serif, system-ui, sans-serif"
           fill={svgTokens.fg}
+          textAnchor="middle"
         >
-          I (mA)
+          <tspan fontStyle="italic" fontFamily="Georgia, serif">I</tspan>
+          {` (${tUnit('ma')})`}
         </text>
 
         {/* Curve */}
@@ -214,7 +250,20 @@ export default function ZenerIVCurve() {
           strokeLinejoin="round"
         />
 
-        {/* Labelled marker at V = −V_Z */}
+        {/* Labelled marker at V = −V_Z
+            ───────────────────────────
+            Dashed line traces from V-axis (I=0) DOWN to the corner of
+            the cliff. Label sits to the RIGHT of the dashed line, in
+            the empty region between the V-axis (y=yZero) and the chart
+            bottom — the cliff itself runs at the SAME x as the dashed
+            line, so a centred label there would be skewered by both
+            the line and the curve (the bug the user flagged). Putting
+            the label start ~10 px right of xVz and below the V-axis
+            keeps it clear of every nearby graphical element.
+
+            Subscript uses withSubscriptsSvg so that V_Z renders with a
+            real <tspan baseline-shift="sub"> — same treatment we apply
+            elsewhere for `<var>X_y</var>`-style labels. */}
         <line
           x1={xVz}
           y1={iMaToY(0)}
@@ -226,24 +275,47 @@ export default function ZenerIVCurve() {
           opacity={0.7}
         />
         <text
-          x={xVz}
-          y={iMaToY(-18) - 4}
-          fontSize="13"
+          x={xVz + 8}
+          y={iMaToY(-16)}
+          fontSize={svgTokens.font.axisLabel}
           fontWeight={600}
+          fontStyle="italic"
           fontFamily="Georgia, serif"
           fill={svgTokens.fg}
-          textAnchor="middle"
+          textAnchor="start"
         >
-          <tspan>−</tspan>
-          <tspan fontStyle="italic">V</tspan>
-          <tspan dy="3" fontSize="10" fontStyle="normal">Z</tspan>
+          {withSubscriptsSvg(t('ch1_10.zenerIvVzMarker'))}
         </text>
 
-        {/* Region labels */}
+        {/* Region labels
+            ─────────────
+            Each label is positioned in the empty space of its region so
+            that no curve / axis / dashed-line passes through the text.
+
+            • «forward» (right side of plot, positive V): the forward
+              curve goes vertical at V≈0.6 then clips along the top edge.
+              Place label in quadrant 4 (positive V, NEGATIVE I) at
+              y=iMaToY(−5), to the right of the I-axis but well clear of
+              the vertical jump and the top-edge clip. Anchor='start' at
+              x=vToX(0.4) so the text reads left-to-right starting just
+              right of the I-axis.
+
+            • «off (reverse, no current)» — labels the wide flat region
+              along the V-axis between V=−V_Z and V=0 where the curve
+              sits at I≈0. Place label clearly above the V-axis (the
+              flat region), well clear of the dashed V_Z marker that
+              stands at xVz on the left side of this region.
+
+            • «breakdown — regulating» — the dashed V_Z marker stands at
+              xVz inside the breakdown region. A single-line label centred
+              on the highlight band would be skewered by the dashed line
+              (the bug the user flagged). Render as TWO LINES centred
+              well left of xVz so the label box stops before reaching
+              the dashed line. */}
         <text
-          x={vToX(0.7)}
-          y={iMaToY(15)}
-          fontSize="13"
+          x={vToX(0.4)}
+          y={iMaToY(-5)}
+          fontSize={svgTokens.font.axisLabel}
           fill={svgTokens.mutedFg}
           textAnchor="start"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -252,8 +324,8 @@ export default function ZenerIVCurve() {
         </text>
         <text
           x={vToX(-2.5)}
-          y={iMaToY(2.5)}
-          fontSize="13"
+          y={iMaToY(4)}
+          fontSize={svgTokens.font.axisLabel}
           fill={svgTokens.mutedFg}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
@@ -261,15 +333,16 @@ export default function ZenerIVCurve() {
           {t('ch1_10.zenerIvOffLabel')}
         </text>
         <text
-          x={vToX(-V_Z - 0.7)}
-          y={iMaToY(-7)}
-          fontSize="13"
+          x={vToX(-V_Z - 1.0)}
+          y={iMaToY(-4)}
+          fontSize={svgTokens.font.axisLabel}
           fontWeight={600}
           fill={svgTokens.experiment}
           textAnchor="middle"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
-          {t('ch1_10.zenerIvBreakdownLabel')}
+          <tspan x={vToX(-V_Z - 1.0)}>{t('ch1_10.zenerIvBreakdownLabel1')}</tspan>
+          <tspan x={vToX(-V_Z - 1.0)} dy="14">{t('ch1_10.zenerIvBreakdownLabel2')}</tspan>
         </text>
       </svg>
     </DiagramFigure>
