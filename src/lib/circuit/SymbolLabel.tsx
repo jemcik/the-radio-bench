@@ -87,10 +87,22 @@ export function renderLabelContent(children: React.ReactNode): React.ReactNode {
   }
   const parsed = parseLabelSubscript(children)
   if (!parsed) return children
+  // Subscripts with all-uppercase letters (V_Z, R_L, I_C, V_DD …) get
+  // a smaller font-size than mixed / lowercase ones (V_in, R_s, V_pp).
+  // Reason: a capital letter at 70% font-size renders at ~70 % of the
+  // base font's cap-height — roughly 1.4× the x-height of lowercase
+  // glyphs at the same 70%. Visually that makes «R_L» look taller in
+  // the subscript than «R_s», and reader sees it as inconsistent
+  // sizing. Dropping uppercase subscripts to 60% closes most of the
+  // gap so that capitals and lowercase subscripts read at similar
+  // visual heights. Mixed-case subscripts that include any lowercase
+  // letter (rms, in, out, pp …) keep the 70% default since x-height
+  // dominates their visual presence.
+  const subFontSize = /^[A-Z]+$/.test(parsed.sub) ? '60%' : '70%'
   return (
     <>
       {parsed.base}
-      <tspan fontSize="70%" dy="4" fontStyle="normal">
+      <tspan fontSize={subFontSize} dy="4" fontStyle="normal">
         {parsed.sub}
       </tspan>
     </>
