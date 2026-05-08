@@ -219,7 +219,7 @@ export function Battery({
       {isVertical(orient) ? (
         <>
           {label && (
-            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight="bold" anchor="end">
+            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight={600} anchor="end">
               {label}
             </SymbolText>
           )}

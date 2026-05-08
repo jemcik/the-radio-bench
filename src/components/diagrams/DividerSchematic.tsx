@@ -116,7 +116,6 @@ export default function DividerSchematic() {
         x={METER_X + 28} y={METER_Y}
         anchor="start"
         color={METER_ACCENT_V}
-        weight={700}
       >
         {t('ch1_4.loadingVoutLabel')}
       </TerminalLabel>

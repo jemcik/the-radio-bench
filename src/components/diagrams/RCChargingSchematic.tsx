@@ -139,7 +139,6 @@ export default function RCChargingSchematic() {
         y={VM_Y}
         anchor="start"
         color={METER_ACCENT_V}
-        weight={700}
       >
         V_C
       </TerminalLabel>

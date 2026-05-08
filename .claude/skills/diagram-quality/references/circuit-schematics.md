@@ -60,3 +60,15 @@ A `<Junction>` (filled dot) signals «three or more conductors are electrically 
 **Audit protocol when adding or moving a junction:** at the (x, y) it sits, count the wire segments that emanate from that point in distinct directions. Three or more → junction is correct. Two → it's a corner, remove the dot. The mirror failure mode is equally bad: a real T-joint with NO dot — every actual three-way connection in the schematic must have a `<Junction>`.
 
 Not yet mechanically gated (would require parsing every `<Wire points={…}>` and intersecting paths to identify real T-joints). Worth adding when someone re-violates and feels the pain. Past failure: `ZenerRegulatorSchematic.tsx` shipped with two spurious dots at simple R_L corners and one missing dot at a real source-bottom-rail-ground junction — caught by user review.
+
+## Designator labels share typography on one schematic
+
+All component-designator labels on a single schematic must render at the same `(fontSize, fontWeight)`. Specifically:
+
+- The R, C, L, Q1, Z, V_in, V_out, V_C, R_s, R_L letters that name components and node voltages all use **fontSize=14 / weight=600** by convention. The Circuit primitives (`Resistor.label`, `Capacitor.label`, `Inductor.label`, `Battery.value` when sole, `AcSource.value` when sole, `TerminalLabel`, `OrientedLabel`) all apply this default.
+- Numeric values like «1.5V», «470µF», «9V» are NOT designator labels and stay at VALUE_SIZE (regular weight) — that's the textbook designator-vs-value hierarchy and is intentional.
+- Symbol-internal glyphs (the «V» / «A» letter inside a Meter circle, the «A» / «B» letter inside a NodePoint, the «V» / «I» / «R» letters of the Ohm's-law triangle) are sized by their geometric container, not for label readability — they legitimately use different sizes. Primitive authors mark these with `data-uniform-typography-exempt="<glyph-class>"` so the gate skips them.
+
+**Mechanically enforced by `diagram-label-consistency.test.tsx`** (auto-discovered Vitest test). For every diagram, walks all `<text>` elements that look like designators (single uppercase letter optionally followed by digits, OR a tspan with `font-size` in percent — the marker for `parseLabelSubscript`/`withSubscriptsSvg` output), groups them by `(fontSize, fontWeight)`, and fails when more than one tuple appears within a single SVG. Past failure: ZenerRegulatorSchematic.tsx shipped with V_in at fs=13 / weight=null (Battery's old default `value` styling) sitting next to R_s and R_L at fs=14 / weight=600 — three primitives applied three different default rules to what is, semantically, the same slot. Fix was at the primitive level (Battery + AcSource adapt when `value` is the sole label; TerminalLabel defaults to weight=600; OrientedLabel weight normalised from "bold" to 600).
+
+If a primitive is added that introduces a new default style for designator labels, the gate fails. The fix is at the primitive level — not in any individual schematic — since the gate enforces a contract that all designator slots resolve to the same rendered styling.

@@ -99,7 +99,7 @@ describe('OrientedLabel', () => {
     const [labelEl, valueEl] = Array.from(container.querySelectorAll('text'))
     expect(labelEl?.getAttribute('y')).toBe('36')
     expect(labelEl?.getAttribute('text-anchor')).toBe('middle')
-    expect(labelEl?.getAttribute('font-weight')).toBe('bold')
+    expect(labelEl?.getAttribute('font-weight')).toBe('600')
     expect(valueEl?.getAttribute('y')).toBe('54')
     expect(valueEl?.getAttribute('opacity')).toBe('0.7')
   })

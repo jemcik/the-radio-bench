@@ -103,7 +103,6 @@ export default function RLChargingSchematic() {
         y={TOP_Y - 32}
         anchor="middle"
         color={METER_ACCENT_A}
-        weight={700}
       >
         I
       </TerminalLabel>

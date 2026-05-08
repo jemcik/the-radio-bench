@@ -361,7 +361,7 @@ export function OrientedLabel({
   return (
     <>
       {label && (
-        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight="bold" anchor={anchor}>
+        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight={600} anchor={anchor}>
           {label}
         </SymbolText>
       )}
