@@ -72,14 +72,26 @@ export default function FlybackDiodeSchematic() {
       <Wire points={[supply.p1, { x: SUPPLY_X, y: TOP_Y }, { x: DIODE_X, y: TOP_Y }, flyback.p2]} />
       {/* +V branch into coil top */}
       <Wire points={[{ x: COIL_X, y: TOP_Y }, coil.p1]} />
-      {/* Switching node: coil bottom — diode anode — collector */}
+      {/* Switching node: coil bottom — diode anode — collector.
+          Right-angle wiring throughout: from the switching node
+          (COIL_X, SW_Y) we drop straight DOWN to the collector's y
+          coordinate, THEN turn right to the collector pin. Earlier
+          revision routed `[(COIL_X, SW_Y), (TR_X, SW_Y), tr.collector]`
+          which collapsed to a single diagonal because COIL_X==TR_X —
+          a degenerate `M (240,150) L (240,150)` followed by a 31-px
+          diagonal to (252, 181). Schematic convention is right-angle
+          everywhere; same for the emitter wire below. */}
       <Wire points={[coil.p2, { x: COIL_X, y: SW_Y }, { x: DIODE_X, y: SW_Y }, flyback.p1]} />
-      <Wire points={[{ x: COIL_X, y: SW_Y }, { x: TR_X, y: SW_Y }, tr.collector]} />
-      {/* Emitter to ground */}
-      <Wire points={[tr.emitter, { x: TR_X, y: GND_Y }]} />
-      {/* Base via resistor to «in» terminal */}
+      <Wire points={[{ x: COIL_X, y: SW_Y }, { x: TR_X, y: tr.collector.y }, tr.collector]} />
+      {/* Emitter to ground (right-angle: drop straight down from the
+          collector-pin x, then left to the bottom rail). */}
+      <Wire points={[tr.emitter, { x: tr.emitter.x, y: GND_Y }, { x: TR_X, y: GND_Y }]} />
+      {/* Base via resistor to «in» terminal. The terminal label lives
+          at x=70 with anchor='end' — i.e. the visible right edge of
+          the «in» glyph sits at x=70. Wire reaches that x so the line
+          flushes against the label, no visual gap. */}
       <Wire points={[tr.base, baseR.p2]} />
-      <Wire points={[baseR.p1, { x: 80, y: TR_Y }]} />
+      <Wire points={[baseR.p1, { x: 70, y: TR_Y }]} />
       {/* Battery negative side back to ground rail */}
       <Wire points={[supply.p2, { x: SUPPLY_X, y: GND_Y }, { x: TR_X, y: GND_Y }]} />
 
@@ -90,22 +102,41 @@ export default function FlybackDiodeSchematic() {
       <Resistor x={150} y={TR_Y} label="R_b" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
-      {/* ground-with-battery-ok: transistor-stage convention. The +V
-          battery's «−» terminal and the NPN emitter both return to
-          the same bottom rail; per ARRL textbook convention the
-          emitter return is drawn as an explicit GND symbol so the
-          reader instantly parses «this is the 0 V reference for the
-          switching stage». Falls under case (b) of the «Ground vs
-          battery» rule in circuit-schematics.md. */}
-      <Ground x={TR_X} y={GND_Y} orient="down" />
+      {/* Placement: y = GND_Y + 15 puts Ground's PIN exactly on the
+          bottom rail at y=GND_Y, with the stem and bars hanging
+          BELOW the rail. Earlier revision had y=GND_Y, which put
+          Ground's CENTER on the rail and its first horizontal bar
+          drawn AT y=GND_Y — overlapping the rail wire.
+
+          orient="right" (NOT orient="down"). The Ground primitive's
+          local geometry is already drawn «pin up, bars below»; the
+          rotate(orientAngle(orient)) transform then rotates the
+          whole symbol. orient="right" → 0° rotation → keeps the
+          as-drawn orientation. orient="down" → 90° CW → bars become
+          vertical at x=TR_X. Same fix BalunSchematic.tsx documents
+          for itself. */}
+      {/* ground-with-battery-ok: transistor-stage convention — the
+          +V battery's «−» terminal and the NPN emitter both return
+          to the same bottom rail; per ARRL textbook convention the
+          emitter return is drawn as an explicit GND. Case (b) of
+          circuit-schematics.md «Ground vs battery». */}
+      <Ground x={TR_X} y={GND_Y + 15} orient="right" />
 
       {/* «in» terminal label on the left of the base resistor */}
       <TerminalLabel x={70} y={TR_Y} anchor="end">in</TerminalLabel>
 
-      {/* Junctions */}
+      {/* Junctions
+          ─────────
+          Two real T-joints at the top-rail tap into the coil and at
+          the switching node where coil-bottom / diode-anode-via-rail /
+          collector-stub all meet. The (TR_X, GND_Y) dot marks where
+          the bottom rail, the emitter return, and the Ground stem all
+          tie together. The earlier (DIODE_X, SW_Y) dot was a
+          convention violation: only the switching-node wire turns a
+          corner there (going right to (340,150) then up to flyback.p1)
+          — one wire, two segments, NOT a 3-way junction. Removed. */}
       <Junction x={COIL_X} y={TOP_Y} />
       <Junction x={COIL_X} y={SW_Y} />
-      <Junction x={DIODE_X} y={SW_Y} />
       <Junction x={TR_X} y={GND_Y} />
     </Circuit>
   )

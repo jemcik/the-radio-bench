@@ -145,7 +145,13 @@ export function TransistorNPN({ x, y, orient = 'right', circle = true, label, va
         <polygon points="4,12.5 -1.9,11.6 1.9,6.9" fill="currentColor" />
       </g>
 
-      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={22} />
+      {/* Label gap of 26 (was 22) clears the body circle (r=15) plus
+          the «central» dominant-baseline ascent of a 14-px label.
+          With gap=22 the label's bottom edge landed within ~1 px of
+          the circle's top stroke — flagged as «label touches the
+          symbol» on FlybackDiodeSchematic. The 4-px bump leaves a
+          comfortable ~5 px breathing room. */}
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={26} />
     </>
   )
 }
