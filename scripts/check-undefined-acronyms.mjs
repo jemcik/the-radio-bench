@@ -309,6 +309,13 @@ function isGlossWrapped(value, acronym, idx) {
 
 // Iterate every value under any `chN_M` block (skip glossary, _names,
 // _ui, etc. — they're not chapter prose).
+//
+// TODO (separate PR): also scan `glossary.<key>.tip|detail|formula`
+// fields. The popover is often the first place a reader meets a term,
+// so an unglossed acronym there has the same harm class as in chapter
+// prose (surfaced May 2026 on `forward voltage drop.detail` containing
+// «ВАХ»). Extending `isChapterKey` to include glossary fields raises
+// 44 pre-existing usages to triage — scoped out of the ch1.10 PR.
 function isChapterKey(k) {
   return /^ch\d+_\d+\./.test(k)
 }
