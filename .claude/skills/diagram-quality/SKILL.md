@@ -250,6 +250,33 @@ Then verify visually via the `visual-verify` skill (Claude-in-Chrome MCP → use
 
 Before saying "done", reread the chapter prose top-to-bottom with the diagram in mind. For each promise like `"The … diagram shows X"`, confirm the diagram actually shows X (not a near-miss). This is the step that catches dangling-prose-promise bugs (`feedback_orphan_i18n_and_prose.md`).
 
+### Stage 6 — Read every label (mandatory; «glance and ship» is not verification)
+
+Reader-flagged class on ch 1.10 bridge schematic (May 2026): I shipped a schematic with diode designators (D1, D2, D3, D4) drawn directly on top of the vertical leads connecting them into the circuit, AND with the AC-source value label («V_in») rendered inside the source's circle, overlapping the sine wave. **Both bugs were obvious on a close-up — invisible on a full-page screenshot.** I claimed «visual verification» based on a low-resolution overview and did not actually read the labels.
+
+The fix at the primitive level shipped (`CenteredLabel` orient-aware; `AcSource` custom label placement; unit test `symbol-label-overlap.test.tsx` locking the contract). The discipline fix at the *process* level lives here. Before saying a diagram is verified:
+
+1. **Get a close-up screenshot of the diagram alone**, NOT a full-page screenshot. With Claude-in-Chrome:
+   - `find` the diagram element by id/aria-label
+   - `scroll_to` it
+   - Take a screenshot with the diagram filling at least half the viewport
+   - If labels are still small, zoom the page (browser-level zoom or scroll a card into a wide viewport)
+
+2. **Read every text label letter by letter.** Confirm:
+   - You can see and read each label («D1», not «D」» or «1» alone or unreadable smudge)
+   - No label sits on top of a wire, lead, or other line
+   - No label sits inside a component body (the AC-source circle, the meter face, etc.)
+   - Subscripts are correctly positioned (V_F not V F)
+   - Translated labels read correctly (no «[UA TODO]» leakage, no English in UA mode)
+
+3. **Compare to a sibling schematic.** Density and label placement should match other diagrams in the same chapter. If your labels look bigger / smaller / oddly placed compared to a neighbour, something's wrong.
+
+4. **Toggle locale + theme.** UA mode, dark mode. Same checks. Translated labels often run wider than EN; dark mode can hide low-opacity text.
+
+If at step 2 you can't actually READ a label because the screenshot is too small — that's not a pass condition, that's a stop condition. Get a closer screenshot or open browser dev tools and read the rendered SVG text directly.
+
+**Never substitute «I see the diagram exists» for «I read the labels».** «Looks fine on the overview» fails this stage every time.
+
 ## References — fetched on demand
 
 The root-level checklist above is loaded every invocation. Dig into these when the task warrants it:

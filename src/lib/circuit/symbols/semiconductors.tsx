@@ -31,7 +31,7 @@ export function Diode({ x, y, orient = 'right', label, value }: SymbolProps) {
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
@@ -71,7 +71,7 @@ export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
       {/* Label sits BELOW the LED body — the emission arrows occupy the
           space above, so placing the label there would force an awkwardly
           large gap. Below the body it sits at the standard distance. */}
-      <CenteredLabel x={x} y={y} label={label} value={value} labelSide="below" />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} labelSide="below" />
     </>
   )
 }
@@ -98,7 +98,7 @@ export function DiodeZener({ x, y, orient = 'right', label, value }: SymbolProps
         <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
@@ -145,7 +145,7 @@ export function TransistorNPN({ x, y, orient = 'right', circle = true, label, va
         <polygon points="4,12.5 -1.9,11.6 1.9,6.9" fill="currentColor" />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} gap={22} />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={22} />
     </>
   )
 }
@@ -174,7 +174,7 @@ export function TransistorPNP({ x, y, orient = 'right', circle = true, label, va
         <polygon points="-4,6 -0.8,11.8 2.4,8" fill="currentColor" />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} gap={22} />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={22} />
     </>
   )
 }

@@ -215,7 +215,23 @@ interface OrientedLabelProps {
 /**
  * Pre-baked label + value pair for symbols that always render in a centred,
  * vertically-symmetric layout regardless of orient (diodes, BJTs, crystal,
- * transformer). Label sits above the body, value sits below — both centred.
+ * transformer).
+ *
+ * Behaviour by orient:
+ *
+ *   – Horizontal (orient = 'right' / 'left'): label sits ABOVE the body,
+ *     value sits BELOW — both centred horizontally on the symbol centre.
+ *     Leads run left-right so above/below is empty space.
+ *
+ *   – Vertical (orient = 'up' / 'down'): label sits to the RIGHT of the
+ *     body, value also on the right (slightly below). Leads run up-down,
+ *     so above/below is OCCUPIED by leads — placing labels there causes
+ *     them to crash into the wires connecting the symbol into a circuit.
+ *
+ * Reader-flagged on ch1.10 BridgeRectifierSchematic: vertical D1–D4 had
+ * their labels rendered on top of the connecting leads, unreadable. Fix
+ * was to make this primitive orient-aware so every chapter using
+ * CenteredLabel benefits.
  *
  * `gap` controls the distance from the symbol centre to each text. Diodes use
  * 20; transistors and the transformer use 25.
@@ -225,6 +241,13 @@ interface CenteredLabelProps {
   x: number
   /** Symbol centre y. */
   y: number
+  /**
+   * Symbol orientation. Determines whether the label/value pair sits
+   * above/below (horizontal) or to the right (vertical).
+   * Default 'right' for backward compatibility with callers that don't
+   * pass an orient (those symbols only render horizontally anyway).
+   */
+  orient?: Orientation
   label?: string
   value?: string
   /** Distance from centre to each text. Default 20. */
@@ -234,6 +257,9 @@ interface CenteredLabelProps {
    * for symbols that have decorations above the body (e.g. LED emission
    * arrows) where putting the label above would force an awkwardly large
    * gap. With 'below', the value (if any) flips above.
+   *
+   * NOTE: only applies to horizontal orient. For vertical orient, label
+   * is always to the right side (above-right) and value below-right.
    */
   labelSide?: 'above' | 'below'
 }
@@ -251,8 +277,41 @@ interface CenteredLabelProps {
 export const LABEL_SIZE = 14
 export const VALUE_SIZE = 13
 
-export function CenteredLabel({ x, y, label, value, gap = 20, labelSide = 'above' }: CenteredLabelProps) {
+export function CenteredLabel({
+  x,
+  y,
+  orient = 'right',
+  label,
+  value,
+  gap = 20,
+  labelSide = 'above',
+}: CenteredLabelProps) {
   if (!label && !value) return null
+
+  if (isVertical(orient)) {
+    // Vertical symbol: leads run up-down, so the symbol's «above» and «below»
+    // are occupied by wires. Place label/value to the RIGHT of the body
+    // instead, start-anchored so the text reads outward from the symbol.
+    // Vertical stagger of label vs value mirrors the horizontal layout's
+    // above/below pattern: label slightly above centre, value slightly below.
+    const sideX = x + gap
+    return (
+      <>
+        {label && (
+          <SymbolText x={sideX} y={y - 7} size={LABEL_SIZE} weight={600} anchor="start">
+            {label}
+          </SymbolText>
+        )}
+        {value && (
+          <SymbolText x={sideX} y={y + 9} size={VALUE_SIZE} anchor="start" opacity={0.7}>
+            {value}
+          </SymbolText>
+        )}
+      </>
+    )
+  }
+
+  // Horizontal symbol: leads run left-right, above/below the body is empty.
   const labelY = labelSide === 'above' ? y - gap : y + gap
   const valueY = labelSide === 'above' ? y + gap : y - gap
   return (

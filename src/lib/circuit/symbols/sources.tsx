@@ -8,7 +8,7 @@
  *   - GroundEarth: earth ground (single-terminal)
  */
 
-import { type SymbolProps, type SinglePinProps, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, type SinglePinProps, type Orientation, orientAngle, isVertical, STROKE } from '../types'
 import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 // ─── AcSource ─────────────────────────────────────────────────────────────────
@@ -55,8 +55,66 @@ export function AcSource({
         <line x1={12} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
+      {/* Custom label placement: AcSource has a 12-radius CIRCLE body,
+          so the standard OrientedLabel value offset (y + 4 for horizontal)
+          would put the value INSIDE the circle, overlapping the sine
+          wave. Instead, place label above the circle and value below
+          (or to the side for vertical orient), clearing the body by
+          ≥ 8 px. Reader-flagged on ch1.10 BridgeRectifierSchematic
+          where «V_in» landed on top of the sine wave. */}
+      <AcSourceLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
+  )
+}
+
+/* Internal helper — custom label/value placement for AcSource that
+   clears the 12-radius circle body. Not exported. */
+function AcSourceLabel({
+  x,
+  y,
+  orient,
+  label,
+  value,
+}: {
+  x: number
+  y: number
+  orient: Orientation
+  label?: string
+  value?: string
+}) {
+  if (!label && !value) return null
+  // Body radius (12) + clearance (10) = 22.
+  const G = 22
+  const vert = orient === 'up' || orient === 'down'
+  if (vert) {
+    return (
+      <>
+        {label && (
+          <SymbolText x={x + G} y={y - 7} size={LABEL_SIZE} weight={600} anchor="start">
+            {label}
+          </SymbolText>
+        )}
+        {value && (
+          <SymbolText x={x + G} y={y + 9} size={VALUE_SIZE} anchor="start" opacity={0.7}>
+            {value}
+          </SymbolText>
+        )}
+      </>
+    )
+  }
+  return (
+    <>
+      {label && (
+        <SymbolText x={x} y={y - G} size={LABEL_SIZE} weight={600}>
+          {label}
+        </SymbolText>
+      )}
+      {value && (
+        <SymbolText x={x} y={y + G} size={VALUE_SIZE} opacity={0.7}>
+          {value}
+        </SymbolText>
+      )}
+    </>
   )
 }
 
