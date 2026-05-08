@@ -63,7 +63,13 @@ function iMaToY(i: number) {
 // in the path of both the marker line AND the cliff portion of the
 // curve. Letting V_Z own that x position keeps the chart readable.
 const X_TICKS = [-7, -6, -4, -3, -2, -1, 0, 1]
-const Y_TICKS_MA = [-20, -10, 0, 10, 20]
+// Y_TICKS_MA omits the +20 mark: that label sat at y≈15..29, directly
+// in the path of the «I (mA)» axis title above the plot (real bbox
+// y=4..20). The scale is unambiguous from the −20 / −10 / +10 ticks,
+// and dropping the redundant top tick removes the only remaining
+// label-on-label overlap. Same trick as removing −5 below for the
+// V_Z marker.
+const Y_TICKS_MA = [-20, -10, 0, 10]
 
 /* Build a piecewise approximation: */
 function curvePath(): string {
@@ -312,9 +318,15 @@ export default function ZenerIVCurve() {
               (the bug the user flagged). Render as TWO LINES centred
               well left of xVz so the label box stops before reaching
               the dashed line. */}
+        {/* «forward» sits in quadrant 4 (positive V, negative I) at
+            iMaToY(-8) — far enough below the V-axis to clear the V=1
+            tick label above it. iMaToY(-5) put the label box top at
+            y=148, which overlapped the bottom of the V=1 tick label
+            at y=137..150 by 2 px. Caught by the text-vs-text check
+            in diagram-text-overlap.test.tsx. */}
         <text
           x={vToX(0.4)}
-          y={iMaToY(-5)}
+          y={iMaToY(-8)}
           fontSize={svgTokens.font.axisLabel}
           fill={svgTokens.mutedFg}
           textAnchor="start"
@@ -332,9 +344,18 @@ export default function ZenerIVCurve() {
         >
           {t('ch1_10.zenerIvOffLabel')}
         </text>
+        {/* Breakdown label: moved DOWN to iMaToY(-12) so the gap
+            between «пробій —» line 1 and «стабілізація» line 2 no
+            longer aligns with the V=−6 tick label at y=148.
+            iMaToY(-4)=142 put line 1 at the same y row as the −6 tick
+            (which sits at y≈137..150), and the «−6» glyph fell into
+            the inter-line gap at x=104..118 — visually overlapping
+            line 1 from x=66..145. Caught by the text-vs-text check.
+            iMaToY(-12)=198 keeps the label inside the highlight band
+            and clear of every other label / tick. */}
         <text
           x={vToX(-V_Z - 1.0)}
-          y={iMaToY(-4)}
+          y={iMaToY(-12)}
           fontSize={svgTokens.font.axisLabel}
           fontWeight={600}
           fill={svgTokens.experiment}

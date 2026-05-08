@@ -38,11 +38,17 @@
  *
  * Not covered
  * ───────────
- *   • Label-on-label overlap (two text elements crowding each other).
  *   • Path-on-path overlap (one curve crossing another curve).
  *   • <rect> / <circle> / <polygon> shapes — only <line> and <path>.
  *   • Animated transforms (CSS transforms) — bboxes are computed from
  *     authoring coordinates, not the visible animated state.
+ *
+ * Originally also out-of-scope: label-on-label overlap. Re-added after
+ * a real bug — the «−6» x-tick label sat between the two lines of the
+ * «пробій — / стабілізація» 2-line region label, visually overlapping
+ * the first line. Now flagged when two `<text>` bboxes (or two distinct
+ * tspan-derived bboxes from different `<text>` parents) overlap by
+ * more than 2 px in BOTH dimensions.
  *
  * If a flagged overlap is intentional (e.g. a dashed leader line that
  * is supposed to touch its label), move the label or the leader to
@@ -93,6 +99,7 @@ const SKIP_FILES = new Set([
   // 2. Requires props
   './MagnitudeLadder.tsx',         // takes `items` prop, no default render
   // 3. Intentional close-placement designs
+  './BreadboardDiagram.tsx',       // «+» / «−» power-rail labels stacked one above the other by breadboard convention
   './BodePlotReadingGuide.tsx',    // «−20 dB/decade» annotation sits ON the slope it labels
   './CapacitorTypeGallery.tsx',    // «+» plate-sign labels abut electrolytic-cap symbol stroke
   './DividerSchematic.tsx',        // voltmeter «A» designator inside the meter circle
@@ -159,12 +166,26 @@ function lineBBox(
 }
 
 /**
- * Yield one BBox per visual line. A `<text>` with no `<tspan>` is one
- * line; a `<text>` with multiple `<tspan>` separated by `dy=` (or
- * different `y=`) values is one line per tspan, EACH measured by its
- * own textContent length. This avoids the false positive where a
- * 2-line label («breakdown — / regulating») got measured as a single
- * 21-char-wide line that conservatively crossed every shape in its row.
+ * Yield one BBox per visual line. Two distinct cases:
+ *
+ *   • Multi-line label — a `<text>` whose tspans use `dy=` or different
+ *     `y=` to stack visually. Each tspan gets its own per-line bbox.
+ *     Example: `<text><tspan>пробій —</tspan><tspan dy="14">стабілі-
+ *     зація</tspan></text>` renders as two lines.
+ *
+ *   • Single-line label — anything else, including:
+ *       - plain `<text>some text</text>` with no tspans.
+ *       - `<text><tspan italic>V</tspan> (B)</text>` — italic-styled
+ *         variable plus literal unit text (mixed tspan + raw text).
+ *       - `<text>X<tspan baseline-shift="sub">Y</tspan></text>` — sub-
+ *         script via baseline-shift (X_y rendered through `withSubscripts-
+ *         Svg`). The «sub» glyph is part of the same visual line.
+ *     For all of these we use the WHOLE textContent as one bbox. An
+ *     earlier version yielded a bbox for each tspan only when tspans
+ *     existed, which silently dropped the raw-text portion of mixed
+ *     labels — caught when «I (мА)» under-measured to the «I» glyph
+ *     alone (7 px wide instead of ~43 px) and the gate missed the
+ *     overlap with the y=20 tick label.
  */
 function* textBBoxes(el: SVGTextElement): Iterable<BBox> {
   const fs = parseFontSize(el)
@@ -173,13 +194,22 @@ function* textBBoxes(el: SVGTextElement): Iterable<BBox> {
   const baseY = parseFloat(el.getAttribute('y') ?? '0')
 
   const tspans = Array.from(el.querySelectorAll(':scope > tspan'))
-  if (tspans.length === 0) {
+  // A tspan is a LINE BREAK only when it carries an explicit dy or a
+  // y= different from the parent's. tspans that exist purely to apply
+  // style (italic, baseline-shift, font-family) are part of the same
+  // visual line as the surrounding text.
+  const isMultiLine = tspans.some(
+    t => t.hasAttribute('dy') || t.hasAttribute('y'),
+  )
+
+  if (!isMultiLine) {
     const content = (el.textContent ?? '').trim()
     if (content) yield lineBBox(content, fs, baseX, baseY, baseAnchor)
     return
   }
 
-  // One line per tspan. Track running x/y so dx/dy accumulate correctly.
+  // Multi-line: one bbox per tspan, with running x/y so dx/dy
+  // accumulate correctly.
   let curX = baseX
   let curY = baseY
   for (const tspan of tspans) {
@@ -203,6 +233,16 @@ function pointInBBox(px: number, py: number, bb: BBox, tol = TOLERANCE_PX): bool
     px >= bb.x - tol && px <= bb.x + bb.w + tol &&
     py >= bb.y - tol && py <= bb.y + bb.h + tol
   )
+}
+
+/** Two bboxes overlap when they intersect by AT LEAST `minOverlap` px
+ *  in BOTH x and y dimensions. The «in both» rule means a label that
+ *  shares a row with another label but sits in a different x-range
+ *  doesn't trip — only true geometric overlaps. */
+function bboxesOverlap(a: BBox, b: BBox, minOverlap = 2): boolean {
+  const overlapX = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)
+  const overlapY = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+  return overlapX >= minOverlap && overlapY >= minOverlap
 }
 
 function lineCrossesBBox(
@@ -292,9 +332,14 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
       const lines = Array.from(svg.querySelectorAll('line')) as SVGLineElement[]
       const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[]
 
+      // Collect every text bbox first so we can do pairwise text-vs-text
+      // checks below without rebuilding bboxes inside the inner loops.
+      const textBBoxList: Array<{ owner: SVGTextElement; bbox: BBox }> = []
       for (const text of texts) {
         if (isInsideTransformedGroup(text)) continue
         for (const bbox of textBBoxes(text)) {
+          textBBoxList.push({ owner: text, bbox })
+
           for (const line of lines) {
             if (isBackground(line) || isInsideTransformedGroup(line)) continue
             const x1 = parseFloat(line.getAttribute('x1') ?? '0')
@@ -316,6 +361,24 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
                 `text "${bbox.label}" at (${bbox.x.toFixed(0)}, ${bbox.y.toFixed(0)}, ${bbox.w.toFixed(0)}×${bbox.h.toFixed(0)}) crossed by <path> "${d.slice(0, 60).replace(/\s+/g, ' ')}..."`,
               )
             }
+          }
+        }
+      }
+
+      // Pairwise text-vs-text overlap. Skip pairs where both bboxes
+      // come from the same `<text>` parent — those are the multi-tspan
+      // lines of one label compared against each other (always
+      // non-overlapping by construction, but the iteration would
+      // pointlessly enumerate them).
+      for (let i = 0; i < textBBoxList.length; i++) {
+        for (let j = i + 1; j < textBBoxList.length; j++) {
+          const a = textBBoxList[i]
+          const b = textBBoxList[j]
+          if (a.owner === b.owner) continue
+          if (bboxesOverlap(a.bbox, b.bbox)) {
+            findings.push(
+              `text "${a.bbox.label}" at (${a.bbox.x.toFixed(0)}, ${a.bbox.y.toFixed(0)}, ${a.bbox.w.toFixed(0)}×${a.bbox.h.toFixed(0)}) overlaps text "${b.bbox.label}" at (${b.bbox.x.toFixed(0)}, ${b.bbox.y.toFixed(0)}, ${b.bbox.w.toFixed(0)}×${b.bbox.h.toFixed(0)})`,
+            )
           }
         }
       }
