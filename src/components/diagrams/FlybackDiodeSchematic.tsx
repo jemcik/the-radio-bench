@@ -90,6 +90,13 @@ export default function FlybackDiodeSchematic() {
       <Resistor x={150} y={TR_Y} label="R_b" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
+      {/* ground-with-battery-ok: transistor-stage convention. The +V
+          battery's «−» terminal and the NPN emitter both return to
+          the same bottom rail; per ARRL textbook convention the
+          emitter return is drawn as an explicit GND symbol so the
+          reader instantly parses «this is the 0 V reference for the
+          switching stage». Falls under case (b) of the «Ground vs
+          battery» rule in circuit-schematics.md. */}
       <Ground x={TR_X} y={GND_Y} orient="down" />
 
       {/* «in» terminal label on the left of the base resistor */}

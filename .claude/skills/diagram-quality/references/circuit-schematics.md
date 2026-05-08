@@ -41,9 +41,11 @@ Past fix: ch 1.5 RCChargingSchematic had `label="V" value="V_in"` — dropped th
 If the schematic includes an explicit `<Battery>`, the battery's negative terminal already defines the 0 V reference; adding a separate `<Ground>` symbol creates the illusion of two distinct references and confuses the reader. Use `<Ground>` only when:
 
 - (a) the supply is shown as a bare terminal label (`V_in`) with no `<Battery>` component, OR
-- (b) several branches share a common return rail and the ground symbol helps declutter.
+- (b) several branches share a common return rail and the ground symbol helps declutter (e.g. transistor-stage circuits where the ARRL convention is an explicit GND at the emitter return — see `FlybackDiodeSchematic.tsx`).
 
 For simple single-loop schematics with an explicit `<Battery>`, omit `<Ground>` and let the bottom rail speak for itself. The prose should match: if the schematic has no ground, don't write «between V_in and ground» — write «between the positive and negative terminals of V_in» or similar.
+
+**Mechanically enforced by `check:circuit-conventions`** (`scripts/check-circuit-conventions.mjs`, wired into `check:all`). The gate flags every `.tsx` under `src/components/diagrams/` that uses BOTH `<Battery>` (or `<BatteryMulti>`) and `<Ground>` (or `<GroundEarth>`). Legitimate case-(b) exceptions opt out by adding a `ground-with-battery-ok: <one-line reason>` marker in any comment style — single-line `// …`, plain block `/* … */`, or JSX block — within ~12 lines above the `<Ground …>` element. Past failure: this rule was already in this file when `ZenerRegulatorSchematic.tsx` shipped with a redundant `<Ground>` and got user-flagged on review. Documentation alone wasn't sufficient — hence the gate.
 
 ## Schematic coordinates — one source of truth
 
@@ -51,4 +53,10 @@ Every component's `(x, y)` lives in a single `const NAME = { x, y }` object. `pi
 
 ## Schematic junction dots
 
-Only at real T-junctions (three or more wires meeting). Never at a corner bend, never at a phantom two-wire crossing.
+Only at real T-junctions (three or more wires meeting from distinct directions). NEVER at a wire that simply turns a 90° corner — one continuous path going from horizontal to vertical is NOT a junction. NEVER at a phantom two-wire crossing.
+
+A `<Junction>` (filled dot) signals «three or more conductors are electrically tied together at this point». A reader trained on schematic notation interprets the dot as «something branches here» and re-traces the wires to confirm. If nothing actually branches, the reader has been lied to and has to back out the assumption.
+
+**Audit protocol when adding or moving a junction:** at the (x, y) it sits, count the wire segments that emanate from that point in distinct directions. Three or more → junction is correct. Two → it's a corner, remove the dot. The mirror failure mode is equally bad: a real T-joint with NO dot — every actual three-way connection in the schematic must have a `<Junction>`.
+
+Not yet mechanically gated (would require parsing every `<Wire points={…}>` and intersecting paths to identify real T-joints). Worth adding when someone re-violates and feels the pain. Past failure: `ZenerRegulatorSchematic.tsx` shipped with two spurious dots at simple R_L corners and one missing dot at a real source-bottom-rail-ground junction — caught by user review.
