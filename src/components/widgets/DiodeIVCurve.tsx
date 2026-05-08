@@ -159,7 +159,7 @@ export default function DiodeIVCurve() {
   const formatCurrent = (mA: number): string => {
     if (mA > I_MAX_MA) return `> ${formatDecimal(I_MAX_MA, 0, locale)} ${tUnit('ma')}`
     if (mA >= 1)   return `${formatDecimal(mA, 1, locale)} ${tUnit('ma')}`
-    if (mA >= 0.001) return `${formatDecimal(mA * 1000, 0, locale)} µ${tUnit('a')}`
+    if (mA >= 0.001) return `${formatDecimal(mA * 1000, 0, locale)} ${tUnit('ua')}`
     return `≈ 0 ${tUnit('ma')}`
   }
 
