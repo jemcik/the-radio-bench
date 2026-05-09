@@ -343,6 +343,7 @@ export default function Chapter1_10() {
                   s11: <G k="s11" />,
                   vfo: <G k="vfo" />,
                   capN: <G k="junction capacitance" />,
+                  lc: <G k="lc" />,
                 }}
               />
             </span>
