@@ -2,11 +2,17 @@
  * Chapter 1.10 §6 — Flyback diode protecting a transistor switch.
  *
  * Topology:
- *   +V supply at the top rail. A relay coil (drawn as an inductor with
- *   a label «coil») hangs vertically between +V and a switching node.
- *   The switching node connects to the collector of an NPN transistor;
- *   the emitter goes to ground. The base is driven by an «in» terminal
- *   through a base resistor.
+ *   V_in supply at the top rail. A relay coil (drawn as an inductor
+ *   with a label «coil») hangs vertically between V_in and a
+ *   switching node. The switching node connects to the collector of
+ *   an NPN transistor; the emitter goes back to V_in's negative
+ *   terminal via the bottom rail. The base is driven by an «in»
+ *   terminal through a base resistor (R_b limits base current).
+ *
+ *   No separate Ground symbol — V_in's «−» pin IS the reference.
+ *   Earlier revisions drew an explicit GND on the bottom rail; user
+ *   review flagged it as the same illusion-of-two-references bug
+ *   that ZenerRegulatorSchematic had.
  *
  *   Across the relay coil sits the flyback diode, with cathode UP toward
  *   +V and anode DOWN toward the switching node. In normal conduction
@@ -26,7 +32,6 @@ import {
   Resistor,
   Inductor,
   Battery,
-  Ground,
   TerminalLabel,
   pins2,
   pinsBJT,
@@ -115,42 +120,28 @@ export default function FlybackDiodeSchematic() {
       <Resistor x={150} y={TR_Y} label="R_b" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
-      {/* Placement: y = GND_Y + 15 puts Ground's PIN exactly on the
-          bottom rail at y=GND_Y, with the stem and bars hanging
-          BELOW the rail. Earlier revision had y=GND_Y, which put
-          Ground's CENTER on the rail and its first horizontal bar
-          drawn AT y=GND_Y — overlapping the rail wire.
-
-          orient="right" (NOT orient="down"). The Ground primitive's
-          local geometry is already drawn «pin up, bars below»; the
-          rotate(orientAngle(orient)) transform then rotates the
-          whole symbol. orient="right" → 0° rotation → keeps the
-          as-drawn orientation. orient="down" → 90° CW → bars become
-          vertical at x=TR_X. Same fix BalunSchematic.tsx documents
-          for itself. */}
-      {/* ground-with-battery-ok: transistor-stage convention — the
-          +V battery's «−» terminal and the NPN emitter both return
-          to the same bottom rail; per ARRL textbook convention the
-          emitter return is drawn as an explicit GND. Case (b) of
-          circuit-schematics.md «Ground vs battery». */}
-      <Ground x={COIL_X} y={GND_Y + 15} orient="right" />
-
       {/* «in» terminal label on the left of the base resistor */}
       <TerminalLabel x={70} y={TR_Y} anchor="end">in</TerminalLabel>
 
       {/* Junctions
           ─────────
-          Two real T-joints at the top-rail tap into the coil and at
-          the switching node where coil-bottom / diode-anode-via-rail /
-          collector-stub all meet. The (TR_X, GND_Y) dot marks where
-          the bottom rail, the emitter return, and the Ground stem all
-          tie together. The earlier (DIODE_X, SW_Y) dot was a
-          convention violation: only the switching-node wire turns a
-          corner there (going right to (340,150) then up to flyback.p1)
-          — one wire, two segments, NOT a 3-way junction. Removed. */}
+          Two real T-joints. (1) top-rail tap into the coil; (2) the
+          switching node where coil-bottom + diode-anode wire +
+          collector-stub all meet. The bottom rail at (COIL_X, GND_Y)
+          is just an L-bend: the rail comes in from the left, the
+          emitter wire comes down from above, they share an endpoint —
+          one corner with two wire ends, NOT a 3-way junction.
+
+          Earlier revisions of this diagram drew an explicit Ground
+          symbol on the bottom rail at this point. That was a
+          convention violation flagged by user review: when the
+          schematic already shows a two-terminal Battery, the
+          battery's «−» pin IS the 0 V reference; adding a separate
+          Ground symbol creates the illusion of two distinct
+          references where there is one. Removed; bottom rail returns
+          directly to V_in's «−» terminal. */}
       <Junction x={COIL_X} y={TOP_Y} />
       <Junction x={COIL_X} y={SW_Y} />
-      <Junction x={COIL_X} y={GND_Y} />
     </Circuit>
   )
 }
