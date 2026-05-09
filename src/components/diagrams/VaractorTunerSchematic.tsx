@@ -96,6 +96,7 @@ export default function VaractorTunerSchematic() {
             strong: <strong />,
             tank: <G k="tank" />,
             reson: <G k="resonance" />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
           }}
         />
       }

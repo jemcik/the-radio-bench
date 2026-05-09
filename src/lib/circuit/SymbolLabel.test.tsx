@@ -101,7 +101,13 @@ describe('OrientedLabel', () => {
     expect(labelEl?.getAttribute('text-anchor')).toBe('middle')
     expect(labelEl?.getAttribute('font-weight')).toBe('600')
     expect(valueEl?.getAttribute('y')).toBe('54')
-    expect(valueEl?.getAttribute('opacity')).toBe('0.7')
+    // Value renders at full opacity — uniform across all label helpers
+    // in the library (PassiveLabel, CenteredLabel, OrientedLabel,
+    // Battery's helper). The earlier 0.7 dimming was inconsistent with
+    // PassiveLabel and shipped a visible bug on the Zener regulator
+    // widget («чому напруга біля Z має світліший колір?»).
+    // Enforced by `circuit-label-opacity-uniform.test.tsx`.
+    expect(valueEl?.getAttribute('opacity')).toBeNull()
   })
 
   it('vertical: shifts both texts to the right of the body', () => {

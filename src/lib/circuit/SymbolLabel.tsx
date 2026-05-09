@@ -314,8 +314,17 @@ export function CenteredLabel({
             {label}
           </SymbolText>
         )}
+        {/* Value renders at FULL opacity. PassiveLabel, OrientedLabel,
+            CenteredLabel, and Battery's helper all share this contract:
+            secondary value labels use VALUE_SIZE / regular weight, but
+            the SAME opacity as primary labels. Earlier revisions of
+            CenteredLabel + OrientedLabel + Battery dimmed values to
+            0.7 — the user spotted the resulting inconsistency on the
+            Zener regulator widget («чому напруга біля Z світліша?»).
+            Now uniform across the library; uniformity enforced by
+            `circuit-label-opacity-uniform.test.tsx`. */}
         {value && (
-          <SymbolText x={sideX} y={y + 9} size={VALUE_SIZE} anchor="start" opacity={0.7}>
+          <SymbolText x={sideX} y={y + 9} size={VALUE_SIZE} anchor="start">
             {value}
           </SymbolText>
         )}
@@ -333,8 +342,9 @@ export function CenteredLabel({
           {label}
         </SymbolText>
       )}
+      {/* See note above on full-opacity value labels. */}
       {value && (
-        <SymbolText x={x} y={valueY} size={VALUE_SIZE} opacity={0.7}>
+        <SymbolText x={x} y={valueY} size={VALUE_SIZE}>
           {value}
         </SymbolText>
       )}
@@ -365,8 +375,10 @@ export function OrientedLabel({
           {label}
         </SymbolText>
       )}
+      {/* Value at FULL opacity — uniform across all primitive label
+          helpers. See note in CenteredLabel for the rationale. */}
       {value && (
-        <SymbolText x={lx} y={valueY} size={VALUE_SIZE} anchor={anchor} opacity={0.7}>
+        <SymbolText x={lx} y={valueY} size={VALUE_SIZE} anchor={anchor}>
           {value}
         </SymbolText>
       )}

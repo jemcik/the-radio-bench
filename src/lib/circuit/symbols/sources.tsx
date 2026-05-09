@@ -91,12 +91,14 @@ function AcSourceLabel({
   // «Battery designator vs value»), the value IS the primary identifier
   // and gets the same bold / large treatment as a designator label.
   // When both are present, value stays the secondary annotation
-  // (smaller, dimmer) under a bold designator. Mirrors the Battery
-  // primitive's identical adaptation.
+  // (smaller, regular weight) under a bold designator. Mirrors the
+  // Battery primitive's identical adaptation. Opacity is FULL in both
+  // cases — uniform across every primitive label helper in the library
+  // (PassiveLabel, CenteredLabel, OrientedLabel) per the contract
+  // enforced by `circuit-label-opacity-uniform.test.tsx`.
   const valueIsPrimary = !label
   const valueSize = valueIsPrimary ? LABEL_SIZE : VALUE_SIZE
   const valueWeight = valueIsPrimary ? 600 : undefined
-  const valueOpacity = valueIsPrimary ? undefined : 0.7
   if (vert) {
     return (
       <>
@@ -112,7 +114,6 @@ function AcSourceLabel({
             size={valueSize}
             weight={valueWeight}
             anchor="start"
-            opacity={valueOpacity}
           >
             {value}
           </SymbolText>
@@ -133,7 +134,6 @@ function AcSourceLabel({
           y={valueIsPrimary ? y - G : y + G}
           size={valueSize}
           weight={valueWeight}
-          opacity={valueOpacity}
         >
           {value}
         </SymbolText>

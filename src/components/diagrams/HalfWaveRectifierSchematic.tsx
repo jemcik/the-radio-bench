@@ -53,7 +53,7 @@ export default function HalfWaveRectifierSchematic() {
         <Trans
           i18nKey="ch1_10.halfWaveSchematicCaption"
           ns="ui"
-          components={{ var: <MathVar /> }}
+          components={{ var: <MathVar />, strong: <strong /> }}
         />
       }
       maxWidth={520}

@@ -807,10 +807,22 @@ export const glossary: Record<string, GlossaryEntry> = {
     formula: 'V_F ≈ 0.7 V (Si) | 0.3 V (Schottky) | 1.8–3.0 V (LED)',
     see: ['diode', 'schottky diode', 'led'],
   },
-  'pin diode': {
-    tip: 'A diode with an undoped intrinsic layer between the P and N regions — slow at DC but acts as a current-controlled resistor at RF.',
+  'iv curve': {
+    tip: 'The graph of current through a device versus voltage across it. For an ideal resistor it is a straight line with slope 1/R; for non-linear elements (diodes, transistors, Zeners) it has a characteristic shape that captures how the device responds to applied voltage at every operating point.',
     detail:
-      'A PIN diode is a three-layer structure: P-type → Intrinsic (undoped) → N-type. At DC and audio frequencies it behaves like an ordinary diode, but at RF the intrinsic region is too thick for normal rectification — instead, the device looks like a resistor whose value depends on the DC bias current. That makes PIN diodes the standard parts for RF switches, attenuators, and limiters: control the bias, control the resistance, control whether the RF signal passes or is shunted away. Common amateur-radio uses: the transmit/receive switch in handheld transceivers, electronically variable attenuators in front-end protection, and high-power RF protection circuits. Typical parts: BAR63, HSMP-3893, BAP-50.',
+      'The I–V («current-voltage») curve is the simplest way to characterize a two-terminal device. Voltage on the X axis, current on the Y axis; any operating point falls somewhere on this curve. For a resistor the curve is a straight line through the origin (slope 1/R, Ohm’s law). For real semiconductors the curve has a shape that captures the device’s non-linear behaviour: the diode’s exponential knee, the Zener’s near-vertical breakdown cliff, the transistor’s saturation region. Together with KVL and KCL, the I–V curve fully determines the device’s behaviour in any circuit — the operating point is just the intersection of the device curve with the «load line» drawn from the rest of the circuit.',
+    see: ['diode', 'forward voltage drop', 'load line'],
+  },
+  'load line': {
+    tip: 'A straight line drawn on a device’s I–V curve representing the constraint imposed by the rest of the circuit (typically a series resistor and a supply voltage). The actual operating point is where the device curve and the load line cross.',
+    detail:
+      'The load line is the graphical solution to «what voltage and current does the circuit settle at when the device is non-linear?». For a device in series with a resistor R driven by a supply V_in, KVL says V_device = V_in − I · R — a straight line in (V, I) space with slope −1/R, x-intercept V_in (when I = 0), and y-intercept V_in / R (when V_device = 0). Plotting that line on top of the device’s I–V curve, the operating point is simply the intersection. As V_in or R changes, the line slides; the operating point traces along the device’s curve. The same technique sets up transistor bias points, sizes diode rectifiers, and predicts op-amp output behaviour — any time a non-linear device sits between a fixed supply and a passive load.',
+    see: ['iv curve'],
+  },
+  'pin diode': {
+    tip: 'A diode with an undoped «intrinsic» silicon layer between the P- and N-doped regions; at radio frequencies the charge stored in that layer can’t drain fast enough to follow the signal, so the diode behaves as a resistor whose value is set by the DC bias current.',
+    detail:
+      'A PIN diode is a three-layer structure: P-type → Intrinsic (undoped) → N-type. The intrinsic middle layer acts as a charge bucket — a small DC bias current floods it with carriers, and once full, the carriers take microseconds to drain. That’s far longer than one RF half-cycle, so at radio frequencies the bucket stays full no matter what the signal does, and the diode stops behaving like a rectifier. Instead, the RF current through the i-layer is carried by those very same stored carriers — their density sets the layer’s ohmic resistance, and the DC bias current sets the density (more DC → more carriers → lower RF resistance). That mechanism — a small DC current modulating a much larger RF signal — is why PIN diodes are the standard parts for RF switches, attenuators, and limiters. Common amateur-radio uses: the transmit/receive switch in handheld transceivers (a pair of PIN diodes plus a bias network), electronically-variable attenuators for front-end protection, and high-power RF protection circuits. Typical parts: BAR63, HSMP-3893, BAP-50.',
     see: ['diode', 'rf'],
   },
   'schottky diode': {

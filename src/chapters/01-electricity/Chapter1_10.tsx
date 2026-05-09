@@ -13,7 +13,7 @@ import HalfWaveRectifierWaveform from '@/components/diagrams/HalfWaveRectifierWa
 import BridgeRectifierSchematic from '@/components/diagrams/BridgeRectifierSchematic'
 import RippleSmoothingWidget from '@/components/widgets/RippleSmoothingWidget'
 import ZenerRegulatorSchematic from '@/components/diagrams/ZenerRegulatorSchematic'
-import ZenerIVCurve from '@/components/diagrams/ZenerIVCurve'
+import ZenerRegulatorWidget from '@/components/widgets/ZenerRegulatorWidget'
 import FlybackDiodeSchematic from '@/components/diagrams/FlybackDiodeSchematic'
 import VaractorTunerSchematic from '@/components/diagrams/VaractorTunerSchematic'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
@@ -257,7 +257,72 @@ export default function Chapter1_10() {
         />
       </p>
 
-      <ZenerIVCurve />
+      <ZenerRegulatorWidget />
+
+      {/* The reader's blocker is exactly «but the curve isn't truly
+          vertical, so where IS the stabilization?» — a concrete-numbers
+          rebuttal goes here, BEFORE the regulator schematic, so that
+          when the schematic appears the reader is already primed to
+          look for V_in → R_s → Zener → GND with R_s as the absorber. */}
+      <p>
+        <Trans
+          i18nKey="ch1_10.zenerHowSlope"
+          ns="ui"
+          components={{
+            ...mathComponents,
+            strong: <strong />,
+            ivc: <G k="iv curve" />,
+          }}
+        />
+      </p>
+      {/* The «battery + r_z» mental model + the etymology of «dynamic».
+          Two reader-blockers landed here: (a) the V/I confusion (Ohm's
+          law applied directly gives a wildly varying R because the
+          curve doesn't pass through 0,0 — the «5.1 V battery» part
+          dominates); (b) «dynamic» = describes change, not «varying».
+          Without this paragraph the reader has to infer V_Z = V_Z + I·r_z
+          from Step 3 of the example below; with it, Step 3 is just the
+          model spelled out in numbers. */}
+      <p>
+        <Trans
+          i18nKey="ch1_10.zenerHowModel"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_10.zenerHowCircuit"
+          ns="ui"
+          components={{
+            ...mathComponents,
+            nowrap: nowrap,
+            vd: <G k="voltage divider" />,
+          }}
+        />
+      </p>
+
+      <Callout variant="math">
+        <p>
+          <Trans
+            i18nKey="ch1_10.zenerHowExample"
+            ns="ui"
+            components={{
+              ...mathComponents,
+              strong: <strong />,
+              nowrap: nowrap,
+            }}
+          />
+        </p>
+      </Callout>
+
+      <p>
+        <Trans
+          i18nKey="ch1_10.zenerHowAnalogy"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong /> }}
+        />
+      </p>
 
       <ZenerRegulatorSchematic />
 
@@ -341,11 +406,13 @@ export default function Chapter1_10() {
                 components={{
                   ...mathComponents,
                   strong: <strong />,
+                  em: <em />,
                   s11: <G k="s11" />,
                   vfo: <G k="vfo" />,
                   capN: <G k="junction capacitance" />,
                   lc: <G k="lc" />,
                   resfreq: <G k="resonant frequency" />,
+                  pin: <G k="pin diode" />,
                 }}
               />
               {/* Varactor's «two pins, two jobs» bias network needs

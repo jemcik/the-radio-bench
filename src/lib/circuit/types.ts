@@ -144,6 +144,14 @@ export function pinsBJT(
       case 'down':  return { x: cx - oy, y: cy + ox }
       case 'left':  return { x: cx - ox, y: cy - oy }
       case 'up':    return { x: cx + oy, y: cy - ox }
+      // Diagonal orientations were added on this branch for the bridge-
+      // rectifier diodes (45° edges of the diamond). Transistors don't
+      // ship with diagonal mounts in any current schematic, so we never
+      // reach this branch — but TS needs the case for exhaustiveness
+      // since `Orientation` was widened to include them. Fall back to
+      // the unrotated position; if a diagonal-mounted BJT becomes a
+      // real need, replace this with the appropriate ±45° rotation.
+      default: return { x: cx + ox, y: cy + oy }
     }
   }
 
@@ -171,6 +179,9 @@ export function pinsOpAmp(
       case 'down':  return { x: cx - oy, y: cy + ox }
       case 'left':  return { x: cx - ox, y: cy - oy }
       case 'up':    return { x: cx + oy, y: cy - ox }
+      // See pinsBJT for the diagonal-fallback rationale — op-amps are
+      // never mounted at 45° in this codebase.
+      default: return { x: cx + ox, y: cy + oy }
     }
   }
 
@@ -196,6 +207,10 @@ export function pin1(
     case 'down':  return { pin: { x: cx, y: cy - h } }
     case 'left':  return { pin: { x: cx + h, y: cy } }
     case 'up':    return { pin: { x: cx, y: cy + h } }
+    // Single-terminal symbols (ground, antenna) are always mounted at
+    // a cardinal orientation — diagonals are unused. See pinsBJT for
+    // the rationale on the diagonal-fallback default.
+    default: return { pin: { x: cx, y: cy } }
   }
 }
 
