@@ -15,6 +15,7 @@ import RippleSmoothingWidget from '@/components/widgets/RippleSmoothingWidget'
 import ZenerRegulatorSchematic from '@/components/diagrams/ZenerRegulatorSchematic'
 import ZenerIVCurve from '@/components/diagrams/ZenerIVCurve'
 import FlybackDiodeSchematic from '@/components/diagrams/FlybackDiodeSchematic'
+import VaractorTunerSchematic from '@/components/diagrams/VaractorTunerSchematic'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
 
@@ -350,6 +351,11 @@ export default function Chapter1_10() {
           </li>
         ))}
       </ul>
+
+      {/* ── Varactor tuner schematic — visualises «two pins, two
+              jobs» (DC bias path + AC signal path) so readers don't
+              have to imagine it from prose alone. */}
+      <VaractorTunerSchematic />
 
       {/* ── Lab ────────────────────────────────────────────────── */}
       <LabActivity
