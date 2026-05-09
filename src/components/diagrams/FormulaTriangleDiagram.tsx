@@ -109,24 +109,30 @@ export default function FormulaTriangleDiagram() {
                 <line x1={cx} y1={dividerY} x2={cx} y2={baseY}
                   stroke={border} strokeWidth="1" />
 
-                {/* ── V (top section) ── */}
+                {/* Formula-triangle glyphs (V on top, I/R on bottom).
+                    These are not component designators — they're the
+                    pedagogical letters of the Ohm's-Law triangle, sized
+                    by purpose: V is bigger because it sits in the
+                    top half (which represents the «result» of V=I·R).
+                    Exempt from the diagram-label-consistency gate. */}
                 <text x={cx} y={topCenterY}
                   textAnchor="middle" fontSize="1.375em" fontWeight="700"
-                  fill={c.covered === 'V' ? 'white' : fg}>
+                  fill={c.covered === 'V' ? 'white' : fg}
+                  data-uniform-typography-exempt="formula-triangle-glyph">
                   V
                 </text>
 
-                {/* ── I (bottom-left) ── */}
                 <text x={botLeftCx} y={botCenterY}
                   textAnchor="middle" fontSize="1.25em" fontWeight="700"
-                  fill={c.covered === 'I' ? 'white' : fg}>
+                  fill={c.covered === 'I' ? 'white' : fg}
+                  data-uniform-typography-exempt="formula-triangle-glyph">
                   I
                 </text>
 
-                {/* ── R (bottom-right) ── */}
                 <text x={botRightCx} y={botCenterY}
                   textAnchor="middle" fontSize="1.25em" fontWeight="700"
-                  fill={c.covered === 'R' ? 'white' : fg}>
+                  fill={c.covered === 'R' ? 'white' : fg}
+                  data-uniform-typography-exempt="formula-triangle-glyph">
                   R
                 </text>
 

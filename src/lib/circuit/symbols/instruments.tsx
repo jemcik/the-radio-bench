@@ -72,9 +72,10 @@ export function Meter({
           em-box middle (correct for uppercase letters in a circle). */}
       <text
         x={x} y={y}
-        fontSize="16" fontWeight="bold"
+        fontSize="16" fontWeight={600}
         textAnchor="middle" dominantBaseline="central"
         fill={accent}
+        data-uniform-typography-exempt="meter-glyph"
       >
         {letter}
       </text>

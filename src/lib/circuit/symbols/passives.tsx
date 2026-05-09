@@ -19,10 +19,23 @@ function PassiveLabel({
 }: SymbolProps & { orient: NonNullable<SymbolProps['orient']> }) {
   // `getLabelPosition` puts horizontal labels at y-14 — too tight for a
   // 14 px glyph above a body that extends to y-8 (resistor zigzag peaks,
-  // capacitor plates). Push labels up by 4 more px so there's ~4 px of
-  // breathing room between the glyph and the symbol.
+  // capacitor plates).
+  //
+  // Two cases:
+  //  • Single label OR single value: push 4 px more (final y-18) so the
+  //    glyph sits above the body with 3 px breathing room.
+  //  • Both label AND value: the value lands at labelY + LABEL_SIZE, so
+  //    we have to lift the label enough that the value clears the body
+  //    too. Push 18 px more (final y-32): label at y-32, value at y-18
+  //    — value lands where a single label used to, label moves up by
+  //    one line. This requires the schematic's TOP_Y to be ≥ ~50 so
+  //    the glyph isn't clipped by the SVG top edge; SCHEMATIC_PAD_TOP=
+  //    35 fits a single label only.
   const { lx, ly, anchor } = getLabelPosition(x, y, orient)
-  const labelY = isVertical(orient) ? ly : ly - 4
+  const bothPresent = !!label && !!value
+  const labelY = isVertical(orient)
+    ? ly
+    : ly - (bothPresent ? 18 : 4)
   return (
     <>
       {label && (

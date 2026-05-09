@@ -289,7 +289,7 @@ export default function Chapter1_6() {
           <Trans
             i18nKey="ch1_6.energySparkCalloutMechanism"
             ns="ui"
-            components={{ ...mathComponents, strong: <strong />, bemf: <G k="back-emf" /> }}
+            components={{ ...mathComponents, strong: <strong />, bemf: <G k="back-emf" />, an: <G k="anode" />, cat: <G k="cathode" /> }}
           />
         </p>
       </Callout>

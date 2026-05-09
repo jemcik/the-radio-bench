@@ -231,7 +231,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolDiodeName')}
           description={
-            <Trans i18nKey="ch0_5.symbolDiodeDesc" ns="ui" components={{ var: <MathVar /> }} />
+            <Trans i18nKey="ch0_5.symbolDiodeDesc" ns="ui" components={{ var: <MathVar />, an: <G k="anode" />, cat: <G k="cathode" /> }} />
           }
         >
           <Diode x={55} y={28} />

@@ -64,7 +64,7 @@ export function Crystal({ x, y, orient = 'right', label, value }: SymbolProps) {
         <line x1="6" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      <CenteredLabel x={x} y={y} label={label} value={value} />
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }

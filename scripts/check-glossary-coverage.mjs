@@ -135,6 +135,14 @@ const EXEMPT_PER_CHAPTER = {
   // the gate is checking for. Exempt to avoid asking authors to
   // pick between the two adjacent glossary keys.
   ch1_6: new Set(['time constant']),
+  // ch1_10 «capacitance» — same pattern as ch1_6's «time constant».
+  // The varactor entry uses «junction capacitance» (a separate
+  // glossary key with its own definition — depletion-region physics,
+  // not capacitor-plate physics) wrapped via the `capN` alias. The
+  // bare-word regex sees «capacitance» inside «junction capacitance»
+  // and counts it as unwrapped. The wider phrase IS the correct
+  // tooltip target here.
+  ch1_10: new Set(['capacitance']),
 }
 
 function readGlossaryKeys() {

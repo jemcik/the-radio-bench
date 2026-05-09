@@ -65,10 +65,11 @@ export function NodePoint({
         x={x} y={y}
         fontSize="13"
         fontStyle="italic"
-        fontWeight={700}
+        fontWeight={600}
         textAnchor="middle"
         dominantBaseline="central"
         fill={accent}
+        data-uniform-typography-exempt="node-point-letter"
       >
         {letter}
       </text>
@@ -116,8 +117,16 @@ export function TerminalLabel({
   anchor = 'end',
   tone = 'fg',
   color,
-  weight,
+  weight = 600,
 }: TerminalLabelProps) {
+  // Default weight=600 matches the bold-designator styling that
+  // every other Circuit primitive (Resistor.label, Capacitor.label,
+  // Battery.value-as-primary, …) applies to component identifiers.
+  // Without this default, rail-end labels like V_in / V_out rendered
+  // at regular weight while the R / C / L on the same schematic
+  // rendered bold — visible as «Vin looks thinner than R» on every
+  // RC / RL / divider diagram. Caller can still pass a different
+  // weight (or `undefined`) to opt out.
   const fill = color
     ?? (tone === 'mutedFg' ? svgTokens.mutedFg : svgTokens.fg)
 

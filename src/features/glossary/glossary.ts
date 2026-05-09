@@ -196,6 +196,25 @@ export const glossary: Record<string, GlossaryEntry> = {
     formula: 'Xc = 1 / (2πfC)',
     see: ['impedance', 'frequency'],
   },
+  'junction capacitance': {
+    tip: 'The voltage-dependent capacitance of a reverse-biased P-N junction’s depletion region — unwanted in switching diodes, deliberately exploited by varactors.',
+    detail:
+      'A reverse-biased P-N junction has a depletion region — a layer free of mobile charge carriers, sandwiched between the doped P and N zones. Electrically that depletion region acts as a thin dielectric between two conductive bodies, so the junction itself behaves like a small capacitor. The depletion-region width depends on the reverse voltage: more reverse voltage widens the depletion → smaller capacitance; less reverse voltage narrows it → larger capacitance. In ordinary signal and rectifier diodes this junction capacitance is unwanted parasitic — it limits switching speed and adds attenuation at high frequencies. In a varactor (varicap) diode the doping profile is engineered to MAXIMISE this voltage-dependent behaviour, turning the junction itself into a voltage-controlled capacitor with a few pF of capacitance tunable across 1–30 V of reverse bias. Every modern voltage-controlled oscillator and phase-locked-loop frequency synthesizer uses varactors to tune frequency electronically without moving parts.',
+    unit: 'Farad (F)',
+    see: ['capacitance', 'diode'],
+  },
+  vfo: {
+    tip: 'Variable-frequency oscillator — an oscillator whose output frequency can be tuned by an external control (a knob, a voltage, a digital command).',
+    detail:
+      'A VFO (Variable-Frequency Oscillator) is the part of a radio that generates the carrier frequency you transmit on or the local-oscillator frequency that mixes with received signals. «Variable» means the frequency is adjustable across a band — the user turns a tuning knob or a digital control sets the value. In old equipment the variable element was a mechanical air-gap variable capacitor inside a resonant tank; in modern radios it is a varactor diode whose junction capacitance changes with control voltage, often inside a phase-locked-loop circuit that locks the VFO to a precise crystal-derived reference. Stability and phase noise of the VFO directly limit the radio\'s on-air signal quality.',
+    see: ['frequency'],
+  },
+  kvl: {
+    tip: 'Kirchhoff\'s Voltage Law — the sum of voltage rises and drops around any closed loop in a circuit equals zero.',
+    detail:
+      'KVL (Kirchhoff\'s Voltage Law) says: walk around any closed loop in a circuit, add the voltage rise from each source you enter and subtract the voltage drop across each component you traverse, and the total comes back to zero. Equivalent statement: «what goes up must come down» applied to potential. KVL is the partner of KCL (Kirchhoff\'s Current Law, current into a node = current out) — together they let you write enough equations to solve any DC circuit. Worked example: a 9 V battery with two resistors in series; the 9 V rise across the battery must equal the sum of the two voltage drops across the resistors.',
+    see: ['voltage'],
+  },
   continuity: {
     tip: 'A test that checks whether current can flow between two points.',
     detail:
@@ -767,7 +786,51 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Semiconductor that allows current in one direction only.',
     detail:
       'A diode has an anode (+) and cathode (−). Current flows easily from anode to cathode (forward biased) with a small voltage drop (0.6 V for silicon, 0.3 V for Schottky). In reverse, almost no current flows until the breakdown voltage is reached. Diodes are used for rectification (AC→DC), protection, and signal detection.',
-    see: ['diode testing'],
+    see: ['anode', 'cathode', 'rectification', 'diode testing'],
+  },
+  anode: {
+    tip: 'The terminal of a diode, LED, or battery on the «positive» side — where conventional current enters the device.',
+    detail:
+      'The anode is one of the two terminals of a diode, LED, or other polarised component. By convention, current enters the device through the anode and leaves through the cathode. In the diode schematic symbol, the anode sits at the flat side of the triangle (the wide end). On a real through-hole diode, the anode is the lead WITHOUT the band painted on the body. On an LED, the anode is the longer lead (and inside the bulb, the larger frame). Word origin: from Greek «ἄνοδος» — «way up», where positive current «enters».',
+    see: ['cathode', 'diode', 'led'],
+  },
+  cathode: {
+    tip: 'The terminal of a diode, LED, or battery on the «negative» side — where conventional current leaves the device.',
+    detail:
+      'The cathode is the second of the two terminals of a polarised component (the anode is the other). By convention, current leaves the device through the cathode. In the diode schematic symbol, the cathode is the bar at the tip of the triangle. On a real through-hole diode, the cathode is the lead with the painted BAND on the body — same end as the bar in the symbol. On an LED, the cathode is the shorter lead (and inside the bulb, the smaller frame next to the reflector). Get this end the wrong way round and the diode simply will not conduct in normal operation. Word origin: Greek «κάθοδος» — «way down».',
+    see: ['anode', 'diode', 'led'],
+  },
+  'forward voltage drop': {
+    tip: 'The voltage that develops across a conducting diode — roughly constant (≈ 0.6 V for silicon) over a wide range of currents.',
+    detail:
+      'The forward voltage drop V_F is the (almost) flat voltage that a diode pushes back when current flows through it in the conducting direction. It depends on the semiconductor material, not on the current level: small-signal silicon diodes (1N4148) sit at ≈ 0.6–0.7 V over the entire 1–100 mA range; Schottky diodes (1N5819) at ≈ 0.2–0.3 V; LEDs at ≈ 1.8 V (red), ≈ 2.1 V (green), ≈ 3.0 V (blue/white). For circuit design the rule is «treat the diode as a constant battery in series with the wire»: a 5 V supply driving a series silicon diode + load resistor only delivers 4.3 V to the resistor. The drop varies a little with current — about 60 mV per decade — which is the «slope of the I–V curve past the knee» you see in the chapter widget.',
+    formula: 'V_F ≈ 0.7 V (Si) | 0.3 V (Schottky) | 1.8–3.0 V (LED)',
+    see: ['diode', 'schottky diode', 'led'],
+  },
+  'iv curve': {
+    tip: 'The graph of current through a device versus voltage across it. For an ideal resistor it is a straight line with slope 1/R; for non-linear elements (diodes, transistors, Zeners) it has a characteristic shape that captures how the device responds to applied voltage at every operating point.',
+    detail:
+      'The I–V («current-voltage») curve is the simplest way to characterize a two-terminal device. Voltage on the X axis, current on the Y axis; any operating point falls somewhere on this curve. For a resistor the curve is a straight line through the origin (slope 1/R, Ohm’s law). For real semiconductors the curve has a shape that captures the device’s non-linear behaviour: the diode’s exponential knee, the Zener’s near-vertical breakdown cliff, the transistor’s saturation region. Together with KVL and KCL, the I–V curve fully determines the device’s behaviour in any circuit — the operating point is just the intersection of the device curve with the «load line» drawn from the rest of the circuit.',
+    see: ['diode', 'forward voltage drop', 'load line'],
+  },
+  'load line': {
+    tip: 'A straight line drawn on a device’s I–V curve representing the constraint imposed by the rest of the circuit (typically a series resistor and a supply voltage). The actual operating point is where the device curve and the load line cross.',
+    detail:
+      'The load line is the graphical solution to «what voltage and current does the circuit settle at when the device is non-linear?». For a device in series with a resistor R driven by a supply V_in, KVL says V_device = V_in − I · R — a straight line in (V, I) space with slope −1/R, x-intercept V_in (when I = 0), and y-intercept V_in / R (when V_device = 0). Plotting that line on top of the device’s I–V curve, the operating point is simply the intersection. As V_in or R changes, the line slides; the operating point traces along the device’s curve. The same technique sets up transistor bias points, sizes diode rectifiers, and predicts op-amp output behaviour — any time a non-linear device sits between a fixed supply and a passive load.',
+    see: ['iv curve'],
+  },
+  'pin diode': {
+    tip: 'A diode with an undoped «intrinsic» silicon layer between the P- and N-doped regions; at radio frequencies the charge stored in that layer can’t drain fast enough to follow the signal, so the diode behaves as a resistor whose value is set by the DC bias current.',
+    detail:
+      'A PIN diode is a three-layer structure: P-type → Intrinsic (undoped) → N-type. The intrinsic middle layer acts as a charge bucket — a small DC bias current floods it with carriers, and once full, the carriers take microseconds to drain. That’s far longer than one RF half-cycle, so at radio frequencies the bucket stays full no matter what the signal does, and the diode stops behaving like a rectifier. Instead, the RF current through the i-layer is carried by those very same stored carriers — their density sets the layer’s ohmic resistance, and the DC bias current sets the density (more DC → more carriers → lower RF resistance). That mechanism — a small DC current modulating a much larger RF signal — is why PIN diodes are the standard parts for RF switches, attenuators, and limiters. Common amateur-radio uses: the transmit/receive switch in handheld transceivers (a pair of PIN diodes plus a bias network), electronically-variable attenuators for front-end protection, and high-power RF protection circuits. Typical parts: BAR63, HSMP-3893, BAP-50.',
+    see: ['diode', 'rf'],
+  },
+  'schottky diode': {
+    tip: 'A diode built from a metal–semiconductor junction instead of two pieces of doped silicon — half the forward drop, and switches faster.',
+    detail:
+      'A Schottky diode replaces one of the two doped-silicon halves of an ordinary diode with a metal layer (often platinum or molybdenum). The metal-semiconductor interface conducts at a much lower voltage than a silicon-silicon junction: V_F ≈ 0.2–0.3 V instead of 0.6–0.7 V, halving the power wasted in a low-voltage rectifier. Schottky diodes also have negligible «reverse-recovery time» — they stop conducting almost instantly when the polarity reverses — which makes them the only practical choice in switching power supplies running at hundreds of kHz. The trade-offs: higher reverse leakage current (microamps instead of nanoamps) and lower reverse-breakdown voltage (40–60 V is typical; 100 V is rare). Common parts: 1N5819 (40 V, 1 A), BAT54 (SMD signal Schottky), MBRP40045 (high-current bridge for solar/automotive).',
+    formula: 'V_F ≈ 0.3 V at 1 mA',
+    see: ['diode', 'forward voltage drop', 'rectification'],
   },
   antenna: {
     tip: 'Converts electrical signals to radio waves and vice versa.',

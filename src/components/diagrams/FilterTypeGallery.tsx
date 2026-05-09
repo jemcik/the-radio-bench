@@ -86,6 +86,17 @@ const Y_MIN_DB = -30
 const X_HALF_DECADES = 1.4
 const Q_BAND = 4
 
+// Soft cap on dB before mapping to y. The visible plot window is
+// Y_MIN_DB..Y_MAX_DB; the curve is clipped to the plot rectangle via
+// SVG `<clipPath>` (see the response-plot block in the JSX). Sample-
+// time clamping was the long-standing bug that pinned y to the chart
+// edge so the curve LITERALLY rode the top/bottom border, looking like
+// a false plateau — caught by `diagram-curve-edge-rail.test.tsx`. The
+// soft cap below keeps y inside ~3× plot height (so the path string
+// stays sane) without producing the false plateau; clipPath then hides
+// anything past the actual chart bounds.
+const Y_SOFT_CAP_DB = 80
+
 function buildPath(shape: FilterShape): string {
   const STEPS = 180
   const parts: string[] = []
@@ -93,7 +104,8 @@ function buildPath(shape: FilterShape): string {
     const t = i / STEPS
     const logU = -X_HALF_DECADES + t * (2 * X_HALF_DECADES)
     const u = Math.pow(10, logU)
-    const db = Math.max(Y_MIN_DB, Math.min(Y_MAX_DB, magDb(shape, u, Q_BAND)))
+    const dbRaw = magDb(shape, u, Q_BAND)
+    const db = Math.max(-Y_SOFT_CAP_DB, Math.min(Y_SOFT_CAP_DB, dbRaw))
     const x = PLOT_X + t * PLOT_W
     const y = PLOT_TOP_Y + ((Y_MAX_DB - db) / (Y_MAX_DB - Y_MIN_DB)) * PLOT_H
     parts.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
@@ -289,6 +301,10 @@ function Panel({ shape, title, inLabel, outLabel, freqAxisLabel }: PanelProps) {
   const xCorner = PLOT_X + PLOT_W / 2
   const yMinus3 = PLOT_TOP_Y + ((Y_MAX_DB - -3) / (Y_MAX_DB - Y_MIN_DB)) * PLOT_H
   const cornerSubscript = shape === 'bpf' || shape === 'bsf' ? '0' : 'c'
+  // Per-shape clipPath id — multiple Panel instances render on the same
+  // page (one per filter type), each needs its own id so SVG fragment
+  // identifiers don't cross-pollinate.
+  const clipId = `ftg-clip-${shape}`
 
   return (
     <svg
@@ -297,6 +313,11 @@ function Panel({ shape, title, inLabel, outLabel, freqAxisLabel }: PanelProps) {
       aria-label={title}
       style={{ display: 'block', width: '100%', height: 'auto' }}
     >
+      <defs>
+        <clipPath id={clipId}>
+          <rect x={PLOT_X} y={PLOT_TOP_Y} width={PLOT_W} height={PLOT_H} />
+        </clipPath>
+      </defs>
       {/* Panel background — subtle border for visual grouping */}
       <rect
         x={1} y={1}
@@ -347,7 +368,9 @@ function Panel({ shape, title, inLabel, outLabel, freqAxisLabel }: PanelProps) {
         opacity={0.45}
       />
 
-      {/* Magnitude trace */}
+      {/* Magnitude trace — clipped to the plot rectangle so values past
+          ±Y_MAX_DB / Y_MIN_DB exit the chart with their real slope rather
+          than riding the chart boundary as a false plateau. */}
       <path
         d={path}
         stroke={svgTokens.primary}
@@ -355,6 +378,7 @@ function Panel({ shape, title, inLabel, outLabel, freqAxisLabel }: PanelProps) {
         fill="none"
         strokeLinejoin="round"
         strokeLinecap="round"
+        clipPath={`url(#${clipId})`}
       />
 
       {/* dB axis label — top of plot, anchored above the frame */}

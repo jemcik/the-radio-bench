@@ -162,6 +162,46 @@ Markup conventions (subscripts inside `<var>X_{…}</var>`, `<G>` vs `<strong>` 
 
 The recurring failure was fixing only what the user screenshot, then missing siblings in the same widget. After any unit-symbol fix, grep the file for `Hz` / `dB` / `mW` / `µ` and convert every occurrence in one pass; then check sibling widgets in the same chapter.
 
+### Bare subscripts (`X_yyy`) need a renderer — every single time
+
+Two recurring landmines in this class shipped to readers in ch 1.10 and required user-screenshot rescue:
+
+1. **Cyrillic-base in glossary unit field** — `Вольти розмаху (В_pp)` shipped because the renderer (`withSubscripts()`, used for `unit` / `formula` / popovers / SVG label helpers) only matches a Latin one-letter base. Cyrillic `В` slipped through and rendered the underscore literally. Project convention: variable names stay Latin everywhere — even inside Ukrainian prose — and only the unit symbol switches script (`5 В`, `100 кГц`). Now enforced by `markup.cyrillic-base-subscript` (ERROR) in the UA linter.
+2. **Hardcoded JSX literal with bare subscripts** — `<p>ΔV ≈ I_load · t_period / C = …</p>` shipped without going through `t()` or any renderer, so all five subscripts printed as literal underscores. The existing `check:bare-subscript-renders` only scans i18n keys → call sites; a hardcoded JSX literal is invisible to it. Now enforced by `check:hardcoded-jsx-subscript` (ERROR), which scans every `.tsx` under widgets / diagrams / chapter-heroes / chapters / features for multi-token JSX text literals containing `[A-Za-z]_[A-Za-z0-9]+`.
+
+The right rendering path is always one of:
+- `{withSubscripts(t('key'))}` for HTML / prose
+- `{withSubscriptsSvg(t('key'))}` for SVG `<text>` content
+- `<MathText>{t('key')}</MathText>` when the value uses LaTeX-braced form `X_{Y}` (KaTeX handles both)
+- Canonical `<var>X_{Y}</var>` markup in the i18n value rendered via `<Trans components={{ var: <MathVar /> }} />`
+
+The two new gates are both wired into `check:all`, so they run before every PR. They WILL fire on attempted regressions — when one does, do NOT silence with an opt-out comment unless the literal has been visually verified to render correctly through some other path. The default action is «move it to i18n + wrap.»
+
+### Diagram text labels must not overlap chart shapes
+
+ZenerIVCurve shipped with FOUR overlap bugs at once (forward curve through «пряме», top clip through «I (mA)», breakdown curve through «−V_Z», dashed marker through «пробій — стабілізація»). All four were geometric, none were visible in the JSX source or i18n strings — they only appeared once you computed the actual coordinate of the label vs the actual coordinate of the curve.
+
+Now enforced by `src/components/diagrams/diagram-text-overlap.test.tsx` — a Vitest test that auto-discovers every diagram via `import.meta.glob`, renders it, computes an approximate bbox for each `<text>` (handles single-line and multi-tspan multi-line, and percent-form `font-size="70%"` for subscripts), then samples every foreground `<line>` and `<path>` in the same SVG to check for crossings. Background elements (gridlines, highlight bands — opacity < 0.7 or stroke-width < 1) are filtered out, as are elements inside `<g transform>` (Circuit primitives use local coordinate systems that aren't comparable to the global SVG frame). 95 of 103 diagrams currently pass; the 8 in `SKIP_FILES` are documented one-by-one with the specific intentional close-placement that caused the noise.
+
+When authoring a new chart-style diagram with manually-positioned axis labels, region labels, or marker labels: **always run `npx vitest run src/components/diagrams/diagram-text-overlap.test.tsx` after the first render**. The geometric bug class doesn't show up in code review and isn't always obvious on screen unless you know to look for it.
+
+### Curve-rides-chart-edge: never clamp y at sample-time
+
+Recurring class — has shipped in at least Zener I-V, half-wave waveform, filter response, and (almost) several others. Symptom in source:
+
+```js
+const yClipped = Math.max(yMin, Math.min(yMax, raw))
+```
+
+at sample-time, mapped to a path d-string. The visible result is a curve that LITERALLY follows the top or bottom border of the chart for the entire span past the clip point — a flat horizontal rail glued to the plot edge. Pedagogically reads as «the quantity saturates at this value» (it doesn't — real diodes don't saturate at 20 mA, real filters don't bottom out at −60 dB).
+
+**The fix is universally the same:**
+1. Stop clamping at the sample. Apply only a SOFT cap (~3× plot range) so y doesn't go to ±10⁷ for `exp` overflow.
+2. Wrap the curve `<path>` in an SVG `<clipPath>` whose rectangle matches the plot bounds. Use `useId()` so multiple instances on the same page don't collide.
+3. The visible curve now exits the chart with its real slope; anything past the bounds is hidden by the clip.
+
+Now enforced by `src/components/diagrams/diagram-curve-edge-rail.test.tsx`. The gate auto-discovers every diagram, parses each foreground `<path>`'s sample points, and flags ≥ 5 consecutive samples at the path's bbox extreme y. Paths with `clipPath` (any ancestor) are skipped — the author has explicitly handled the clip. Curves whose top/bottom plateaus are real signal (square waves, step functions, normalized-Bode 0-dB passband) are listed in `SKIP_FILES` with one-line notes.
+
 ## Lab activity content
 
 - **Battery preference is AA (1.5 V), not 9 V.** AA cells are universally available and cheap; 9 V batteries are a niche format in many countries. Ratio-based experiments work just as well at 1.5 V — switch the multimeter to the 2 V range / autorange for three decimal places of resolution.

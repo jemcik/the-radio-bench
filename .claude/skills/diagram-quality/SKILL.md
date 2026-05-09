@@ -67,7 +67,8 @@ Self-review checklist when your schematic is drafted:
 - `<svg width={W} height={H} viewBox="0 0 W H">` with W and H as literal numbers. Same values both places.
 - **Never** `width="100%"`. The chapter container is `max-w-5xl` (1024 px); percentage widths inflate every fontSize by the container/viewBox ratio. A `fontSize="13"` in a viewBox 460 wide rendered at 100% becomes ~26 px on screen.
 - **Never** CSS `maxWidth` or `transform: scale(…)`. Same problem — scales everything, breaks the font-floor rule invisibly.
-- The wrapper helper `SVGDiagram` passes `width="100%"` internally and therefore **scales**. Prefer a bare `<svg width={W} height={H} viewBox="0 0 W H" style={{ margin: '0 auto' }}>` for widgets where you control sizing.
+- The wrapper helper `SVGDiagram` passes `width="100%"` internally and therefore **scales**. **Two valid choices when SVGDiagram is in play:** (a) use em-based font sizes throughout (`0.812em` ≈ 13 px, etc.) — em inherits from the document root and stays at fixed px regardless of SVG scale; (b) drop SVGDiagram entirely for a bare `<svg width={W} height={H} viewBox="0 0 W H" style={{ margin: '0 auto', maxWidth: '100%', height: 'auto' }}>` — no scaling, numeric `fontSize="13"` works as written. Mixing SVGDiagram + numeric `fontSize` is the bug class that landed in ch1.10 (fonts ~2× body text); now mechanically blocked by `check:svg-diagram-fontsize-units` in the gate suite.
+- **Pre-flight grep before any new diagram:** `grep -nE 'fontSize="[0-9]+(\.[0-9]+)?"' src/components/diagrams/<NewDiagram>.tsx` — if SVGDiagram is also imported in that file, the gate will fail. Either switch to em or drop SVGDiagram.
 - Narrow viewports: wrap the SVG in a container with `overflow-x-auto`. The diagram keeps its dimensions and the card scrolls, which is the correct trade-off per user feedback (`feedback_svg_font_minimum_on_screen.md`).
 - Pick W and H to match the on-screen size you actually want. If a plot feels too big, shrink W and H — don't leave a big viewBox and add a max-width.
 
@@ -248,6 +249,33 @@ Then verify visually via the `visual-verify` skill (Claude-in-Chrome MCP → use
 ### Stage 5 — Visual sanity pass (the under-appreciated step)
 
 Before saying "done", reread the chapter prose top-to-bottom with the diagram in mind. For each promise like `"The … diagram shows X"`, confirm the diagram actually shows X (not a near-miss). This is the step that catches dangling-prose-promise bugs (`feedback_orphan_i18n_and_prose.md`).
+
+### Stage 6 — Read every label (mandatory; «glance and ship» is not verification)
+
+Reader-flagged class on ch 1.10 bridge schematic (May 2026): I shipped a schematic with diode designators (D1, D2, D3, D4) drawn directly on top of the vertical leads connecting them into the circuit, AND with the AC-source value label («V_in») rendered inside the source's circle, overlapping the sine wave. **Both bugs were obvious on a close-up — invisible on a full-page screenshot.** I claimed «visual verification» based on a low-resolution overview and did not actually read the labels.
+
+The fix at the primitive level shipped (`CenteredLabel` orient-aware; `AcSource` custom label placement; unit test `symbol-label-overlap.test.tsx` locking the contract). The discipline fix at the *process* level lives here. Before saying a diagram is verified:
+
+1. **Get a close-up screenshot of the diagram alone**, NOT a full-page screenshot. With Claude-in-Chrome:
+   - `find` the diagram element by id/aria-label
+   - `scroll_to` it
+   - Take a screenshot with the diagram filling at least half the viewport
+   - If labels are still small, zoom the page (browser-level zoom or scroll a card into a wide viewport)
+
+2. **Read every text label letter by letter.** Confirm:
+   - You can see and read each label («D1», not «D」» or «1» alone or unreadable smudge)
+   - No label sits on top of a wire, lead, or other line
+   - No label sits inside a component body (the AC-source circle, the meter face, etc.)
+   - Subscripts are correctly positioned (V_F not V F)
+   - Translated labels read correctly (no «[UA TODO]» leakage, no English in UA mode)
+
+3. **Compare to a sibling schematic.** Density and label placement should match other diagrams in the same chapter. If your labels look bigger / smaller / oddly placed compared to a neighbour, something's wrong.
+
+4. **Toggle locale + theme.** UA mode, dark mode. Same checks. Translated labels often run wider than EN; dark mode can hide low-opacity text.
+
+If at step 2 you can't actually READ a label because the screenshot is too small — that's not a pass condition, that's a stop condition. Get a closer screenshot or open browser dev tools and read the rendered SVG text directly.
+
+**Never substitute «I see the diagram exists» for «I read the labels».** «Looks fine on the overview» fails this stage every time.
 
 ## References — fetched on demand
 

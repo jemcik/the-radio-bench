@@ -286,11 +286,21 @@ function hasInlineExpansion(value, acronym, idx) {
   const atm = acrTrailParens.exec(window)
   if (atm && looksLikeExpansion(atm[1])) return true
 
-  // (f) `ACRONYM: <full form>` — colon-introduced definition (common in
-  // quiz explanations and key-takeaway lines: «KCL: at any junction…»).
-  const colonForm = new RegExp(`\\b${acronym}\\b\\s*:\\s*([^.;\\n]{12,160})`)
-  const cm = colonForm.exec(window)
-  if (cm && looksLikeExpansion(cm[1])) return true
+  // Heuristic (f) — `ACRONYM: <full form>` colon-introduced definition —
+  // was REMOVED. A colon after an acronym in chapter prose almost always
+  // introduces what the concept DOES, not what the letters STAND FOR:
+  //
+  //   «PLL: tune by changing a control voltage, no mechanical parts»
+  //
+  // is a description of behaviour, not an expansion of P-L-L. The
+  // original (f) accepted any 3-word phrase after the colon as an
+  // «expansion», which let undefined acronyms like PLL slip through
+  // the gate (caught by user review on ch1.10 §family). Authors who
+  // want to introduce an acronym must use one of the parenthetical
+  // forms (a)-(e) above — «PLL (phase-locked loop)» or
+  // «phase-locked loop (PLL)» — or wrap the acronym with a glossary
+  // tag. Colon-introduced behaviour text is fine prose; it just
+  // can't double as an acronym definition.
 
   return false
 }
@@ -309,6 +319,13 @@ function isGlossWrapped(value, acronym, idx) {
 
 // Iterate every value under any `chN_M` block (skip glossary, _names,
 // _ui, etc. — they're not chapter prose).
+//
+// TODO (separate PR): also scan `glossary.<key>.tip|detail|formula`
+// fields. The popover is often the first place a reader meets a term,
+// so an unglossed acronym there has the same harm class as in chapter
+// prose (surfaced May 2026 on `forward voltage drop.detail` containing
+// «ВАХ»). Extending `isChapterKey` to include glossary fields raises
+// 44 pre-existing usages to triage — scoped out of the ch1.10 PR.
 function isChapterKey(k) {
   return /^ch\d+_\d+\./.test(k)
 }

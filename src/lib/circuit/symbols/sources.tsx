@@ -8,7 +8,7 @@
  *   - GroundEarth: earth ground (single-terminal)
  */
 
-import { type SymbolProps, type SinglePinProps, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, type SinglePinProps, type Orientation, orientAngle, isVertical, STROKE } from '../types'
 import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 
 // ─── AcSource ─────────────────────────────────────────────────────────────────
@@ -55,8 +55,90 @@ export function AcSource({
         <line x1={12} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
       </g>
 
-      <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
+      {/* Custom label placement: AcSource has a 12-radius CIRCLE body,
+          so the standard OrientedLabel value offset (y + 4 for horizontal)
+          would put the value INSIDE the circle, overlapping the sine
+          wave. Instead, place label above the circle and value below
+          (or to the side for vertical orient), clearing the body by
+          ≥ 8 px. Reader-flagged on ch1.10 BridgeRectifierSchematic
+          where «V_in» landed on top of the sine wave. */}
+      <AcSourceLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
+  )
+}
+
+/* Internal helper — custom label/value placement for AcSource that
+   clears the 12-radius circle body. Not exported. */
+function AcSourceLabel({
+  x,
+  y,
+  orient,
+  label,
+  value,
+}: {
+  x: number
+  y: number
+  orient: Orientation
+  label?: string
+  value?: string
+}) {
+  if (!label && !value) return null
+  // Body radius (12) + clearance (10) = 22.
+  const G = 22
+  const vert = orient === 'up' || orient === 'down'
+  // When only `value` is supplied (the common case for sources that
+  // carry a symbolic supply name like «V_in» — see circuit-schematics.md
+  // «Battery designator vs value»), the value IS the primary identifier
+  // and gets the same bold / large treatment as a designator label.
+  // When both are present, value stays the secondary annotation
+  // (smaller, regular weight) under a bold designator. Mirrors the
+  // Battery primitive's identical adaptation. Opacity is FULL in both
+  // cases — uniform across every primitive label helper in the library
+  // (PassiveLabel, CenteredLabel, OrientedLabel) per the contract
+  // enforced by `circuit-label-opacity-uniform.test.tsx`.
+  const valueIsPrimary = !label
+  const valueSize = valueIsPrimary ? LABEL_SIZE : VALUE_SIZE
+  const valueWeight = valueIsPrimary ? 600 : undefined
+  if (vert) {
+    return (
+      <>
+        {label && (
+          <SymbolText x={x + G} y={y - 7} size={LABEL_SIZE} weight={600} anchor="start">
+            {label}
+          </SymbolText>
+        )}
+        {value && (
+          <SymbolText
+            x={x + G}
+            y={valueIsPrimary ? y : y + 9}
+            size={valueSize}
+            weight={valueWeight}
+            anchor="start"
+          >
+            {value}
+          </SymbolText>
+        )}
+      </>
+    )
+  }
+  return (
+    <>
+      {label && (
+        <SymbolText x={x} y={y - G} size={LABEL_SIZE} weight={600}>
+          {label}
+        </SymbolText>
+      )}
+      {value && (
+        <SymbolText
+          x={x}
+          y={valueIsPrimary ? y - G : y + G}
+          size={valueSize}
+          weight={valueWeight}
+        >
+          {value}
+        </SymbolText>
+      )}
+    </>
   )
 }
 
@@ -114,20 +196,41 @@ export function Battery({
       <SymbolText x={minus.x} y={minus.y} size={10}>−</SymbolText>
 
       {/* Label + value placement.
-          Vertical battery (down/up): designator on the LEFT, value on the
-          RIGHT. x-offsets budget room for the plates (long plate ends at
-          ±10) plus the polarity marks on the right (at x+9, glyph reaches
-          ≈ x+12), so the value starts at x+14 to clear them cleanly.
-          Horizontal battery: the default 'above the body' OrientedLabel. */}
+          Vertical battery (down/up): designator on the LEFT, value on
+          the RIGHT. x-offsets budget room for the plates (long plate
+          ends at ±10) plus the polarity marks on the right (at x+9,
+          glyph reaches ≈ x+12), so the value starts at x+14 to clear
+          them cleanly.
+          Horizontal battery: the default 'above the body' OrientedLabel.
+
+          Weight / size of the value:
+          • When BOTH label and value are present, value is the
+            secondary annotation — render at VALUE_SIZE / regular
+            weight so it reads as «parameter» under the bold designator
+            (same convention as Resistor / Capacitor / Inductor).
+          • When ONLY value is present (the common case for batteries
+            that carry a symbolic supply name like «V_in» or «+V» — see
+            circuit-schematics.md «Battery designator vs value»), the
+            value IS the primary identifier of the source. Render it at
+            LABEL_SIZE / weight=600 so it visually matches the
+            schematic's designator labels (R_s, R_L, Z, C1 …). Fixes a
+            user-flagged inconsistency where V_in looked thin and small
+            next to the bold R_s / R_L on the same schematic. */}
       {isVertical(orient) ? (
         <>
           {label && (
-            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight="bold" anchor="end">
+            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight={600} anchor="end">
               {label}
             </SymbolText>
           )}
           {value && (
-            <SymbolText x={x + 14} y={y} size={VALUE_SIZE} anchor="start">
+            <SymbolText
+              x={x + 14}
+              y={y}
+              size={label ? VALUE_SIZE : LABEL_SIZE}
+              weight={label ? undefined : 600}
+              anchor="start"
+            >
               {value}
             </SymbolText>
           )}
