@@ -342,7 +342,7 @@ export default function Chapter1_10() {
                   strong: <strong />,
                   s11: <G k="s11" />,
                   ant: <G k="antenna" />,
-                  capN: <G k="capacitance" />,
+                  capN: <G k="junction capacitance" />,
                 }}
               />
             </span>

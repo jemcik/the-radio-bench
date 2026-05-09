@@ -196,6 +196,13 @@ export const glossary: Record<string, GlossaryEntry> = {
     formula: 'Xc = 1 / (2πfC)',
     see: ['impedance', 'frequency'],
   },
+  'junction capacitance': {
+    tip: 'The voltage-dependent capacitance of a reverse-biased P-N junction’s depletion region — unwanted in switching diodes, deliberately exploited by varactors.',
+    detail:
+      'A reverse-biased P-N junction has a depletion region — a layer free of mobile charge carriers, sandwiched between the doped P and N zones. Electrically that depletion region acts as a thin dielectric between two conductive bodies, so the junction itself behaves like a small capacitor. The depletion-region width depends on the reverse voltage: more reverse voltage widens the depletion → smaller capacitance; less reverse voltage narrows it → larger capacitance. In ordinary signal and rectifier diodes this junction capacitance is unwanted parasitic — it limits switching speed and adds attenuation at high frequencies. In a varactor (varicap) diode the doping profile is engineered to MAXIMISE this voltage-dependent behaviour, turning the junction itself into a voltage-controlled capacitor with a few pF of capacitance tunable across 1–30 V of reverse bias. Every modern voltage-controlled oscillator (VCO) and PLL frequency-synthesizer uses varactors to tune frequency electronically without moving parts.',
+    unit: 'Farad (F)',
+    see: ['capacitance', 'diode'],
+  },
   continuity: {
     tip: 'A test that checks whether current can flow between two points.',
     detail:
