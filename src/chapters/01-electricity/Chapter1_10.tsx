@@ -347,15 +347,21 @@ export default function Chapter1_10() {
                   lc: <G k="lc" />,
                 }}
               />
+              {/* Varactor's «two pins, two jobs» bias network needs
+                  a picture; embed the tuner schematic immediately
+                  beneath the varactor row's prose so reader's eye
+                  goes prose → diagram in one motion. Other family-
+                  table rows are short enough to read without an
+                  illustration. */}
+              {key === 'familyTableVaractor' && (
+                <div className="mt-3">
+                  <VaractorTunerSchematic />
+                </div>
+              )}
             </span>
           </li>
         ))}
       </ul>
-
-      {/* ── Varactor tuner schematic — visualises «two pins, two
-              jobs» (DC bias path + AC signal path) so readers don't
-              have to imagine it from prose alone. */}
-      <VaractorTunerSchematic />
 
       {/* ── Lab ────────────────────────────────────────────────── */}
       <LabActivity
