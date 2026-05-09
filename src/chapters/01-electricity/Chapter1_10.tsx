@@ -345,6 +345,7 @@ export default function Chapter1_10() {
                   vfo: <G k="vfo" />,
                   capN: <G k="junction capacitance" />,
                   lc: <G k="lc" />,
+                  resfreq: <G k="resonant frequency" />,
                 }}
               />
               {/* Varactor's «two pins, two jobs» bias network needs
