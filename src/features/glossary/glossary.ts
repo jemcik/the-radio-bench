@@ -199,9 +199,21 @@ export const glossary: Record<string, GlossaryEntry> = {
   'junction capacitance': {
     tip: 'The voltage-dependent capacitance of a reverse-biased P-N junction’s depletion region — unwanted in switching diodes, deliberately exploited by varactors.',
     detail:
-      'A reverse-biased P-N junction has a depletion region — a layer free of mobile charge carriers, sandwiched between the doped P and N zones. Electrically that depletion region acts as a thin dielectric between two conductive bodies, so the junction itself behaves like a small capacitor. The depletion-region width depends on the reverse voltage: more reverse voltage widens the depletion → smaller capacitance; less reverse voltage narrows it → larger capacitance. In ordinary signal and rectifier diodes this junction capacitance is unwanted parasitic — it limits switching speed and adds attenuation at high frequencies. In a varactor (varicap) diode the doping profile is engineered to MAXIMISE this voltage-dependent behaviour, turning the junction itself into a voltage-controlled capacitor with a few pF of capacitance tunable across 1–30 V of reverse bias. Every modern voltage-controlled oscillator (VCO) and PLL frequency-synthesizer uses varactors to tune frequency electronically without moving parts.',
+      'A reverse-biased P-N junction has a depletion region — a layer free of mobile charge carriers, sandwiched between the doped P and N zones. Electrically that depletion region acts as a thin dielectric between two conductive bodies, so the junction itself behaves like a small capacitor. The depletion-region width depends on the reverse voltage: more reverse voltage widens the depletion → smaller capacitance; less reverse voltage narrows it → larger capacitance. In ordinary signal and rectifier diodes this junction capacitance is unwanted parasitic — it limits switching speed and adds attenuation at high frequencies. In a varactor (varicap) diode the doping profile is engineered to MAXIMISE this voltage-dependent behaviour, turning the junction itself into a voltage-controlled capacitor with a few pF of capacitance tunable across 1–30 V of reverse bias. Every modern voltage-controlled oscillator and phase-locked-loop frequency synthesizer uses varactors to tune frequency electronically without moving parts.',
     unit: 'Farad (F)',
     see: ['capacitance', 'diode'],
+  },
+  vfo: {
+    tip: 'Variable-frequency oscillator — an oscillator whose output frequency can be tuned by an external control (a knob, a voltage, a digital command).',
+    detail:
+      'A VFO (Variable-Frequency Oscillator) is the part of a radio that generates the carrier frequency you transmit on or the local-oscillator frequency that mixes with received signals. «Variable» means the frequency is adjustable across a band — the user turns a tuning knob or a digital control sets the value. In old equipment the variable element was a mechanical air-gap variable capacitor inside a resonant tank; in modern radios it is a varactor diode whose junction capacitance changes with control voltage, often inside a phase-locked-loop circuit that locks the VFO to a precise crystal-derived reference. Stability and phase noise of the VFO directly limit the radio\'s on-air signal quality.',
+    see: ['frequency'],
+  },
+  kvl: {
+    tip: 'Kirchhoff\'s Voltage Law — the sum of voltage rises and drops around any closed loop in a circuit equals zero.',
+    detail:
+      'KVL (Kirchhoff\'s Voltage Law) says: walk around any closed loop in a circuit, add the voltage rise from each source you enter and subtract the voltage drop across each component you traverse, and the total comes back to zero. Equivalent statement: «what goes up must come down» applied to potential. KVL is the partner of KCL (Kirchhoff\'s Current Law, current into a node = current out) — together they let you write enough equations to solve any DC circuit. Worked example: a 9 V battery with two resistors in series; the 9 V rise across the battery must equal the sum of the two voltage drops across the resistors.',
+    see: ['voltage'],
   },
   continuity: {
     tip: 'A test that checks whether current can flow between two points.',

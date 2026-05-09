@@ -26,6 +26,7 @@ export default function Chapter1_2() {
     () => buildQuizFromI18n(t, 'ch1_2', QUIZ_QUESTION_COUNT, {
       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
       psu: <G k="psu" />,
+      kvl: <G k="kvl" />,
     }),
     [t],
   )

@@ -341,7 +341,7 @@ export default function Chapter1_10() {
                   ...mathComponents,
                   strong: <strong />,
                   s11: <G k="s11" />,
-                  ant: <G k="antenna" />,
+                  vfo: <G k="vfo" />,
                   capN: <G k="junction capacitance" />,
                 }}
               />
