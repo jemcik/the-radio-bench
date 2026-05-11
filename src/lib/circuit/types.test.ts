@@ -3,13 +3,14 @@ import {
   isDiagonal,
   isVertical,
   orientAngle,
-  pin1,
   pins2,
   pinsBJT,
-  pinsOpAmp,
-  HALF,
-  SPAN,
 } from './types'
+
+// Standard span = 60 (was previously exported as SPAN, now internal).
+// HALF = SPAN/2 = 30; pin endpoints sit ±HALF from the component centre.
+const SPAN = 60
+const HALF = 30
 
 describe('orientAngle', () => {
   it.each([
@@ -139,38 +140,26 @@ describe('pins2', () => {
 })
 
 describe('pinsBJT', () => {
+  // Offsets match the chris-pikul TransistorNPN primitive's actual
+  // external pin endpoints in local coords: base (-30, 0), collector
+  // (+10, -30), emitter (+10, +30). Was previously -26 / +12,±19 — the
+  // ARRL-era hand-drawn-transistor geometry that was NOT updated during
+  // the chris-pikul migration. Corrected May 2026.
   it('right: base on left, collector upper-right, emitter lower-right', () => {
     const { base, collector, emitter } = pinsBJT(0, 0, 'right')
-    expect(base).toEqual({ x: -26, y: 0 })
-    expect(collector).toEqual({ x: 12, y: -19 })
-    expect(emitter).toEqual({ x: 12, y: 19 })
+    expect(base).toEqual({ x: -30, y: 0 })
+    expect(collector).toEqual({ x: 10, y: -30 })
+    expect(emitter).toEqual({ x: 10, y: 30 })
   })
 
   it('down rotates the layout 90° clockwise', () => {
     const { base, collector, emitter } = pinsBJT(0, 0, 'down')
-    expect(base).toEqual({ x: 0, y: -26 })
-    expect(collector).toEqual({ x: 19, y: 12 })
-    expect(emitter).toEqual({ x: -19, y: 12 })
+    expect(base).toEqual({ x: 0, y: -30 })
+    expect(collector).toEqual({ x: 30, y: 10 })
+    expect(emitter).toEqual({ x: -30, y: 10 })
   })
 })
 
-describe('pinsOpAmp', () => {
-  it('right: inputs on the left, output on the right', () => {
-    const { inv, non, out } = pinsOpAmp(0, 0, 'right')
-    expect(inv).toEqual({ x: -30, y: -12 })
-    expect(non).toEqual({ x: -30, y: 12 })
-    expect(out).toEqual({ x: 30, y: 0 })
-  })
-})
-
-describe('pin1', () => {
-  it('default down — pin sits above the body', () => {
-    const { pin } = pin1(0, 0)
-    expect(pin).toEqual({ x: 0, y: -HALF / 2 })
-  })
-
-  it('right — pin sits to the left of the body', () => {
-    const { pin } = pin1(0, 0, 'right')
-    expect(pin).toEqual({ x: -HALF / 2, y: 0 })
-  })
-})
+// `pinsOpAmp` and `pin1` helpers were removed May 2026 (chris-pikul
+// migration cleanup) — their offsets were stale and the helpers had
+// zero callsites. See types.ts comment for the rationale.

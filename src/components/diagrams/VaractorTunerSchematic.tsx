@@ -133,7 +133,9 @@ export default function VaractorTunerSchematic() {
           Wire endpoint at VTUNE_Y + 14 = 38 — well below the subscript
           glyph «tune» (whose bbox bottom sits at y≈30 with VTUNE_Y=24).
           Earlier revision ended at VTUNE_Y + 8 and the wire's last px
-          fell INSIDE the subscript bbox; gate flagged. */}
+          fell INSIDE the subscript bbox; gate flagged.
+          wire-pin-alignment-ok: endpoint targets the V_tune TerminalLabel,
+          not the R_b pin (which sits 12 px below at y=50). */}
       <Wire points={[rb.p1, { x: RB_X, y: VTUNE_Y + 14 }]} />
 
       {/* ── Components ──────────────────────────────────────────── */}
@@ -149,6 +151,9 @@ export default function VaractorTunerSchematic() {
           lands the pin tip exactly on the stub wire's endpoint
           (GND_BODY_Y). */}
       <Ground x={GND_X} y={GND_BODY_Y + 10} orient="right" />
+      {/* wire-pin-alignment-ok: wire's FIRST point is at the tank-bottom
+          rail T-joint (a rail intersection, not a pin); LAST point is
+          at Ground pin tip exactly. */}
       <Wire points={[{ x: GND_X, y: TANK_BOT_Y }, { x: GND_X, y: GND_BODY_Y }]} />
 
       {/* ── Terminal labels ─────────────────────────────────────── */}

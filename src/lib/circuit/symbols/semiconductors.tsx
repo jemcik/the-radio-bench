@@ -154,15 +154,31 @@ export function TransistorPMOS({ x, y, orient = 'right', circle = true, label, v
 /**
  * Op-Amp — operational amplifier (triangle symbol).
  * Source: IC-COM-OpAmp.svg
- * Pins: inverting (-30, -10), non-inverting (-30, +10), output (+30, 0).
- * The upstream also exposes V+/V- supply rails on top and bottom; we use
- * just the inputs and output for now and overlay `−` / `+` markers locally.
+ *
+ * Pin endpoints in local coords:
+ *   non-inverting «+» input: (-30, -10)   ← upper-left
+ *   inverting     «−» input: (-30, +10)   ← lower-left
+ *   output                 : (+30,  0)
+ *
+ * The chris-pikul source also draws V+ and V− supply-rail stubs that
+ * extend to the top and bottom edges of the source viewBox (local y =
+ * ±30, x ≈ 0). For our pedagogical schematics these almost always look
+ * like disconnected wire stubs because the supply nodes aren't part of
+ * the lesson. `supplies` defaults to `false` — pass `supplies={true}`
+ * when the circuit explicitly wires V+ / V− to drawn supply rails.
  */
-export function OpAmp({ x, y, orient = 'right', label, value }: OpAmpProps) {
+export function OpAmp({ x, y, orient = 'right', label, value, supplies = false }: OpAmpProps & { supplies?: boolean }) {
+  // Path split:
+  //   • body: triangle + 2 inputs + 1 output + «+» / «−» glyphs
+  //   • rails (opt-in): V+ stub from (74.69, 0) to (74.69, 50) and V−
+  //     stub from (75.06, 150) to (75.06, 100), both inside the source
+  //     viewBox above/below the triangle.
+  const body = 'M25 25v100l100-50L25 25zm0 25H0m125 25h25M0 100h25m9.5-47H53m-9.25-9.25v18.5M34.5 97H53'
+  const rails = 'M74.69 0v50M75.06 150v-50'
   return (
     <>
       <VendoredSymbol x={x} y={y} orient={orient}>
-        <path d="M25 25v100l100-50L25 25zm0 25H0m125 25h25M0 100h25m9.5-47H53m-9.25-9.25v18.5M34.5 97H53M74.69 0v50m.37 100v-50" />
+        <path d={supplies ? `${body}${rails}` : body} />
       </VendoredSymbol>
 
       {/* Component label (right of symbol) */}

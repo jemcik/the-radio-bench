@@ -102,7 +102,7 @@ function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[]
       {/* Designator subscripts omitted — only one of each component in this
           schematic, so numbering adds no information. The symbols-tour
           section above still teaches the R₁/C₁/Q₁ convention. */}
-      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="B" value="3V" />
+      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="B" />
       <Resistor x={150} y={TOP_Y} label="R" />
       <LED x={230} y={TOP_Y} label="D" />
       {/* No <Junction>s — this is a single loop with only bends, no

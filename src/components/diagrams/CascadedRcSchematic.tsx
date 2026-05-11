@@ -70,12 +70,22 @@ const c1 = pins2(C1_X, (TOP_Y + BOT_Y) / 2, 'down')
 const r2 = pins2(R2_X, TOP_Y)
 const c2 = pins2(C2_X, (TOP_Y + BOT_Y) / 2, 'down')
 
-// Op-amp pin positions (matches OpAmp primitive's geometry: center.x±30,
-// + input at center.y+12, − input at center.y-12, output at center.y).
+// Op-amp pin positions matching the chris-pikul OpAmp primitive's
+// actual rendered geometry: source `H0` at y=50 → local y = (50-75)*0.4
+// = -10 for the «+» (top) input; bottom input at local y = +10.
+//
+// Two past bugs in this file (both reader-flagged):
+//   1. +/- y-offsets SWAPPED (PLUS_IN_Y = +12, MINUS_IN_Y = -12), which
+//      routed the signal into the inverting input and the feedback into
+//      the non-inverting input — positive feedback, not a unity-gain
+//      follower.
+//   2. y-offsets magnitude was ±12 instead of ±10, leaving a 2-px gap
+//      between the external wires and the actual pin tips. The op-amp's
+//      tiny pin stubs read as disconnected from the wiring.
 const OPAMP_PLUS_IN_X = BUF_X - 30
-const OPAMP_PLUS_IN_Y = BUF_OPAMP_Y + 12
+const OPAMP_PLUS_IN_Y = BUF_OPAMP_Y - 10
 const OPAMP_MINUS_IN_X = BUF_X - 30
-const OPAMP_MINUS_IN_Y = BUF_OPAMP_Y - 12
+const OPAMP_MINUS_IN_Y = BUF_OPAMP_Y + 10
 const OPAMP_OUT_X = BUF_X + 30
 const OPAMP_OUT_Y = BUF_OPAMP_Y
 

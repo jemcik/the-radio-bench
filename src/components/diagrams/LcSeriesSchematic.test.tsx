@@ -13,9 +13,9 @@ describe('LcSeriesSchematic', () => {
     expect(text).toContain('C')
   })
 
-  it('renders the source value v_in', () => {
+  it('renders the source value V_in', () => {
     const { container } = renderWithProviders(<LcSeriesSchematic />)
-    expect(container.textContent).toContain('v')  // battery value renders «v_in»
+    expect(container.textContent).toContain('V')  // battery value renders «V_in»
   })
 
   it('renders an accessible <title>', () => {

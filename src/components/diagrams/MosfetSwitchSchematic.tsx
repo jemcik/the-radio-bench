@@ -41,7 +41,10 @@ const BOT_Y = 285
 
 const SUPPLY_X = 80
 const LOAD_X = 280
-const TR_X = LOAD_X - 12
+// Drain pin lands at LOAD_X column. pinsMOSFET (delegating to pinsBJT)
+// returns drain at cx+10 per chris-pikul TransistorNMOS geometry, so
+// TR_X = LOAD_X - 10. Was -12 before pinsBJT was corrected (May 2026).
+const TR_X = LOAD_X - 10
 const GATE_TERM_X = 70
 
 const supply = pins2(SUPPLY_X, (TOP_Y + BOT_Y) / 2, 'down')
@@ -72,7 +75,7 @@ export default function MosfetSwitchSchematic() {
       <Wire points={[tr.gate, gateR.p2]} />
       <Wire points={[gateR.p1, { x: GATE_TERM_X + 6, y: TR_Y }]} />
 
-      <Battery x={SUPPLY_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="+3.3V" />
+      <Battery x={SUPPLY_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="3.3V" />
       <Resistor x={LOAD_X} y={RC_Y} orient="down" label="R_c" />
       <LED x={LOAD_X} y={LED_Y} orient="down" />
       <Resistor x={160} y={TR_Y} label="R_g" />

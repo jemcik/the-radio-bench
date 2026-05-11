@@ -58,7 +58,7 @@ function LedCircuit({ caption, legend }: { caption: string; legend: LegendEntry[
         { x: LEFT_X,  y: BOT_Y },
         bat.p2,
       ]} />
-      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="V" value="3V" />
+      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="V" />
       <Resistor x={150} y={TOP_Y} label="R" />
       <LED x={230} y={TOP_Y} label="I" />
     </Circuit>

@@ -2,14 +2,14 @@
  * Chapter 1.11 §2 — BJT switch driving an LED.
  *
  * Topology:
- *   +V rail (3.3 V logic supply) at the top. The collector resistor
+ *   Supply rail (3.3 V logic supply) at the top. The collector resistor
  *   R_c and the LED hang in series from the rail down to the
  *   transistor's collector, with R_c on top so the LED's cathode
  *   connects directly to the collector. The emitter sits on the
  *   bottom rail, which returns to the supply's negative terminal.
  *
  *   Base drive: an «in» terminal on the left feeds through R_b to
- *   the base. When «in» goes HIGH (+3.3 V) the transistor saturates
+ *   the base. When «in» goes HIGH (3.3 V) the transistor saturates
  *   and current flows through R_c → LED → Q1 to ground.
  *
  * Pure `@/lib/circuit` primitives.
@@ -38,10 +38,11 @@ const BOT_Y = 285
 
 const SUPPLY_X = 80
 const LOAD_X = 280       // R_c + LED + collector column
-const TR_X = LOAD_X - 12 // shift transistor centre 12 px left so its
-                          // collector pin (cx+12) lands at x=LOAD_X —
-                          // same trick as FlybackDiodeSchematic, gives
-                          // a single straight vertical from LED-cathode
+const TR_X = LOAD_X - 10 // shift transistor centre 10 px left so its
+                          // collector pin (cx+10 per chris-pikul
+                          // TransistorNPN) lands at x=LOAD_X — same
+                          // trick as FlybackDiodeSchematic, gives a
+                          // single straight vertical from LED-cathode
                           // to collector with no stub.
 const BASE_TERM_X = 70
 
@@ -85,7 +86,7 @@ export default function BjtSwitchSchematic() {
       <Wire points={[baseR.p1, { x: BASE_TERM_X + 6, y: TR_Y }]} />
 
       {/* ── Components ────────────────────────────────────────── */}
-      <Battery x={SUPPLY_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="+3.3V" />
+      <Battery x={SUPPLY_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="3.3V" />
       <Resistor x={LOAD_X} y={RC_Y} orient="down" label="R_c" />
       <LED x={LOAD_X} y={LED_Y} orient="down" />
       <Resistor x={160} y={TR_Y} label="R_b" />

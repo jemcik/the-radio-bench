@@ -5,15 +5,15 @@
  * See ../vendored/SOURCE.md for the per-symbol mapping.
  */
 
-import { type SymbolProps, type SinglePinProps, type Orientation, isVertical, orientAngle, STROKE } from '../types'
+import { type SymbolProps, type SinglePinProps, type Orientation, isVertical, STROKE } from '../types'
 import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
 import { VendoredSymbol } from './_VendoredSymbol'
 
 /**
  * Battery polarity markers — «+» beside the positive (long) plate and
  * «−» beside the negative (short) plate. Rendered OUTSIDE the vendored
- * symbol's rotation group so the marker glyphs themselves stay upright
- * (a «+» cross and a horizontal «−») regardless of the body's orient.
+ * symbol's rotation group so the marker glyphs stay upright (a «+»
+ * cross and a horizontal «−») regardless of the body's orient.
  *
  * The chris-pikul source SVG bakes these markers into the same path as
  * the plates and leads, which means the «−» (a single horizontal stroke,
@@ -23,36 +23,80 @@ import { VendoredSymbol } from './_VendoredSymbol'
  * its voltage polarity as + and –»), so the fix is to render them
  * properly — not to drop them.
  *
- * `halfWidth` is the horizontal distance from component centre to each
- * marker in the default `orient='right'` frame. Battery uses 15 (plates
- * sit at ±3.7 from centre); BatteryMulti uses 20 (wider body, plates at
- * ±11). The marker glyph itself is a 10-unit cross / line, sized to
- * match the chris-pikul originals.
+ * Placement is ORIENT-AWARE (a simple rotation of a single default
+ * position doesn't work because the conventional placement differs
+ * between horizontal and vertical orient):
+ *
+ *   • Horizontal orient (`right` / `left`): markers sit ABOVE the body,
+ *     each one over its respective plate (+ over long plate, − over
+ *     short plate). This is the chris-pikul / ARRL convention for a
+ *     horizontally-drawn cell.
+ *
+ *   • Vertical orient (`down` / `up`): markers sit to one SIDE of the
+ *     body axis (away from where Battery puts the value label at
+ *     `x+14`), each one at the y-level of its plate (+ next to long
+ *     plate, − next to short plate). Rotating the horizontal placement
+ *     would put markers FAR above/below the body — visually disconnected
+ *     from the cell (a reader's screenshot showed «−» sitting below the
+ *     value label, looking unrelated to the battery).
+ *
+ * `plateGap` is the absolute distance from the body centre to the
+ * outermost positive/negative plate along the body's electrical axis.
+ * Battery (single cell): 3.7 (plates at ±3.7 local). BatteryMulti:
+ * ≈11 (outermost plates at ±11 local).
+ *
+ * Glyph size 5 (cross / minus stroke) is much smaller than the 10-px
+ * chris-pikul originals — the originals were visually intrusive at
+ * vertical-battery scale.
  */
 function PolarityMarkers({
-  x, y, orient, halfWidth,
+  x, y, orient, plateGap,
 }: {
-  x: number; y: number; orient: Orientation; halfWidth: number
+  x: number; y: number; orient: Orientation; plateGap: number
 }) {
-  const a = (orientAngle(orient) * Math.PI) / 180
-  const c = Math.cos(a)
-  const s = Math.sin(a)
-  const rot = (px: number, py: number) => ({
-    x: x + px * c - py * s,
-    y: y + px * s + py * c,
-  })
-  // Default-orient positions: «+» upper-left (above long plate, which
-  // sits on the left after the «pin1 = positive» mirror), «−» upper-right.
-  const plus = rot(-halfWidth, -15)
-  const minus = rot(halfWidth, -15)
+  const vert = isVertical(orient)
+  const GLYPH = 5
+  const half = GLYPH / 2
+
+  let plusX: number, plusY: number, minusX: number, minusY: number
+  if (vert) {
+    // Vertical orient: markers on the RIGHT of the body axis, at the
+    // y-level of their respective plates. The perpendicular extent of
+    // each plate (after rotation) is x=±10 for long plate, ±5 for
+    // short; the LATERAL=15 offset clears the long plate's right edge
+    // (10) plus the glyph half-width (2.5) plus a ~3-px breathing gap
+    // (the user's request: «3 пікселі далі від значка»). Battery's
+    // own value label sits FURTHER RIGHT at x+20, OUTSIDE the markers.
+    //
+    // `orient='down'` puts the long (positive) plate at TOP (y=-3.7
+    // for Battery); `orient='up'` flips that.
+    const longPlateAtTop = orient === 'down' ? -1 : 1
+    const lateral = 15
+    plusX = x + lateral
+    plusY = y + longPlateAtTop * plateGap
+    minusX = x + lateral
+    minusY = y - longPlateAtTop * plateGap
+  } else {
+    // Horizontal orient: markers ABOVE the body, each above its plate.
+    // `orient='right'` (default) puts long plate at LEFT (x=-plateGap);
+    // `orient='left'` flips that. Same 15-px outside-body clearance as
+    // the vertical case.
+    const longPlateAtLeft = orient === 'right' ? -1 : 1
+    const vertical = 15
+    plusX = x + longPlateAtLeft * plateGap
+    plusY = y - vertical
+    minusX = x - longPlateAtLeft * plateGap
+    minusY = y - vertical
+  }
+
   return (
     <g stroke="currentColor" strokeWidth={STROKE} fill="none" strokeLinecap="round">
-      {/* «+» — a small cross, 10 units wide × 10 units tall, drawn UPRIGHT
-          (the cross strokes are always horizontal + vertical regardless
-          of `orient`). */}
-      <path d={`M${plus.x - 5},${plus.y}h10M${plus.x},${plus.y - 5}v10`} />
-      {/* «−» — a horizontal stroke, 10 units wide, also drawn UPRIGHT. */}
-      <path d={`M${minus.x - 5},${minus.y}h10`} />
+      {/* «+» — a small cross, 5 units wide × 5 units tall, drawn UPRIGHT
+          (the cross strokes stay horizontal + vertical regardless of
+          `orient`). */}
+      <path d={`M${plusX - half},${plusY}h${GLYPH}M${plusX},${plusY - half}v${GLYPH}`} />
+      {/* «−» — a horizontal stroke, 5 units wide, also drawn UPRIGHT. */}
+      <path d={`M${minusX - half},${minusY}h${GLYPH}`} />
     </g>
   )
 }
@@ -197,7 +241,7 @@ export function Battery({
           <path d="M84.25 50v50m-18.5-37.5v25M84.25 75H150m-84.25 0H0" />
         </g>
       </VendoredSymbol>
-      <PolarityMarkers x={x} y={y} orient={orient} halfWidth={15} />
+      <PolarityMarkers x={x} y={y} orient={orient} plateGap={3.7} />
 
       {isVertical(orient) ? (
         <>
@@ -207,8 +251,11 @@ export function Battery({
             </SymbolText>
           )}
           {value && (
+            // x+22 sits OUTSIDE the PolarityMarkers cluster on the
+            // right (markers centred at x+15, glyph extends to x+17.5),
+            // leaving ~4 px of breathing room before the value text.
             <SymbolText
-              x={x + 14}
+              x={x + 22}
               y={y}
               size={label ? VALUE_SIZE : LABEL_SIZE}
               anchor="start"
@@ -253,7 +300,7 @@ export function BatteryMulti({
           <path d="M84.25 62.5v25M103 50v50M65.5 50v50M46.75 62.5v25M103 75h47M46.75 75H0" />
         </g>
       </VendoredSymbol>
-      <PolarityMarkers x={x} y={y} orient={orient} halfWidth={20} />
+      <PolarityMarkers x={x} y={y} orient={orient} plateGap={11} />
       <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )

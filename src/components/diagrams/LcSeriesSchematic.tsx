@@ -66,7 +66,7 @@ export default function LcSeriesSchematic() {
       {/* Return rail */}
       <Wire points={[{ x: END_X, y: TOP_Y }, { x: END_X, y: BOT_Y }, { x: SRC_X, y: BOT_Y }, src.p2]} />
 
-      <Battery x={SRC_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="v_in" />
+      <Battery x={SRC_X} y={(TOP_Y + BOT_Y) / 2} orient="down" value="V_in" />
       <Inductor x={L_X} y={TOP_Y} label="L" />
       <Capacitor x={C_X} y={TOP_Y} label="C" />
     </Circuit>

@@ -39,7 +39,12 @@ import {
 import { Diode, TransistorNPN } from '@/lib/circuit/symbols/semiconductors'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 540
+// Content extends from the «in» terminal label (left, ≈x=40 after
+// italic glyph extent) to the «D» diode label (right, ≈x=380 with
+// CenteredLabel's gap=20 placement). 420 viewBox width gives ~20 px
+// margins on each side. Was 540 — leaving ~170 px of empty space on
+// the right of the diode that the reader flagged as wasted area.
+const SCHEMATIC_W = 420
 const SCHEMATIC_H = 280
 
 const TOP_Y = 35
@@ -51,17 +56,18 @@ const GND_Y = 250
 const SUPPLY_X = 80
 const COIL_X = 240
 const DIODE_X = 340
-// Transistor centred 12 px LEFT of COIL_X so its collector / emitter
-// pins (which both sit at cx + 12 in pinsBJT for orient='right') land
-// at x = COIL_X. That puts the collector directly under the switching
+// Transistor centred 10 px LEFT of COIL_X so its collector / emitter
+// pins (which both sit at cx + 10 in pinsBJT for orient='right',
+// matching chris-pikul TransistorNPN's actual pin geometry) land at
+// x = COIL_X. That puts the collector directly under the switching
 // node and the emitter directly above the bottom-rail-meets-ground
 // point — both wires become straight verticals with NO right-angle
-// stubs. Earlier revision had TR_X = COIL_X = 240, which forced 12-px
-// horizontal stubs (and before that, a single 31-px diagonal) out to
-// the pins. The Q1 designator above the body shifts left with the
-// body and leaves a clean 3-4 px gap from the collector wire passing
-// through x=COIL_X.
-const TR_X = COIL_X - 12   // 228
+// stubs.
+//
+// Used to be COIL_X - 12 (matching the pre-chris-pikul ARRL hand-drawn
+// transistor's +12 offset); pinsBJT-offsets were corrected May 2026
+// to +10 chris-pikul, and this anchor moved with them.
+const TR_X = COIL_X - 10   // 230
 
 const supply = pins2(SUPPLY_X, (TOP_Y + GND_Y) / 2, 'down')
 const coil = pins2(COIL_X, (COIL_TOP_Y + SW_Y) / 2, 'down')
@@ -81,7 +87,7 @@ export default function FlybackDiodeSchematic() {
           components={{ var: <MathVar />, strong: <strong /> }}
         />
       }
-      maxWidth={580}
+      maxWidth={460}
     >
       {/* +V rail */}
       <Wire points={[supply.p1, { x: SUPPLY_X, y: TOP_Y }, { x: DIODE_X, y: TOP_Y }, flyback.p2]} />

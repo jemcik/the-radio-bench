@@ -2985,7 +2985,7 @@
     "schematicCascadedRcIn": "<var>V_{\\mathrm{in}}</var>",
     "schematicCascadedRcOut": "<var>V_{\\mathrm{out}}</var>",
     "schematicCascadedRcGnd": "GND",
-    "schematicCascadedRcBufferLabel": "buffer ×1",
+    "schematicCascadedRcBufferLabel": "buffer",
     "orderBufferAside": "The triangle in the middle is an op-amp wired as a <strong>voltage follower</strong> (unity-gain buffer): it copies the voltage from its + input to its output unchanged. What makes it useful here: the input draws almost no current (so it doesn't load the first RC stage), and the output has very low <imp>impedance</imp> (so it can drive the second stage without sag). Together that keeps the two stages from affecting each other's cutoffs. Op-amp internals are out of scope for this section — we'll meet the op-amp properly later."
   },
   "ch1_9": {

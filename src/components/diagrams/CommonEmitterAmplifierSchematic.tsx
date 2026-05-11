@@ -49,7 +49,11 @@ const BOT_Y = 320
 const SUPPLY_X = 80
 const DIV_X = 220       // R_1 / R_2 divider column
 const TR_COL_X = 360    // collector / R_C / output column
-const TR_X = TR_COL_X - 12 // shift transistor for clean vertical wires
+const TR_X = TR_COL_X - 10 // shift transistor 10 px left so its collector
+                            // pin (cx+10 per chris-pikul TransistorNPN)
+                            // lands on the collector column. Was -12
+                            // before chris-pikul pin geometry was fixed
+                            // in pinsBJT (May 2026).
 const COUT_X = 460      // output coupling cap on the right
 const CIN_X = 140       // input coupling cap on the left
 
@@ -94,6 +98,9 @@ export default function CommonEmitterAmplifierSchematic() {
             to output coupling cap ─────────────────────────── */}
       <Wire points={[rc.p2, tr.collector]} />
       <Wire points={[{ x: TR_COL_X, y: RC_Y }, cout.p1]} />
+      {/* wire-pin-alignment-ok: «out» rail extension past C_out — endpoint
+          intentionally 6 px past the cap's right pin to leave room for
+          the «out» terminal label. */}
       <Wire points={[cout.p2, { x: COUT_X + 30 + 6, y: RC_Y }]} />
 
       {/* ── Emitter through R_E to bottom rail ─────────────── */}
