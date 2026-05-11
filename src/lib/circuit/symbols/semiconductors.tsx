@@ -1,76 +1,51 @@
 /**
- * Semiconductor symbols for circuit schematics.
+ * Semiconductor symbols — diodes, transistors (BJT, MOSFET), op-amps.
  *
- * Includes diodes (rectifier, LED, Zener), transistors (NPN, PNP), and op-amps.
- * All follow ARRL Handbook standards and rotate about their center point.
+ * Geometry adapted from chris-pikul/electronic-symbols (MIT-licensed).
+ * See ../vendored/SOURCE.md for the source revision and the full per-symbol
+ * mapping. The shared `VendoredSymbol` wrapper handles the 0.4 down-scale
+ * from the upstream 150×150 frame onto our local (-30..+30) coordinates,
+ * so each component just lists its source paths verbatim.
  */
 
-import { type SymbolProps, type TransistorProps, type OpAmpProps, orientAngle, STROKE } from '../types'
+import { type SymbolProps, type TransistorProps, type OpAmpProps, STROKE } from '../types'
 import { CenteredLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
+import { VendoredSymbol } from './_VendoredSymbol'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // DIODES
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * Diode — standard rectifier diode (ARRL).
- * Triangle (cathode-facing right) with vertical bar at cathode.
+ * Diode — standard rectifier diode.
+ * Source: Diode-COM-Standard.svg
+ * Pins: anode (-30, 0), cathode (+30, 0).
  */
 export function Diode({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Triangle pointing right (anode-left, cathode-right) */}
-        <path d="M-8,-9 L8,0 L-8,9 Z" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Cathode bar (vertical) */}
-        <line x1="8" y1="-9" x2="8" y2="9" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Leads */}
-        <line x1="-30" y1="0" x2="-8" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="m100 75-50 31.25v-62.5L100 75zm0-34.25v68.5M50 75H0m100 0h50" />
+      </VendoredSymbol>
       <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
- * LED — light-emitting diode.
- * Diode with two small arrows pointing away to indicate light emission.
+ * LED — light-emitting diode with two emission arrows pointing up-right.
+ * Source: Diode-COM-LED.svg
+ * Pins: anode (-30, 0), cathode (+30, 0).
  */
 export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Triangle pointing right */}
-        <path d="M-8,-9 L8,0 L-8,9 Z" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Cathode bar */}
-        <line x1="8" y1="-9" x2="8" y2="9" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Leads */}
-        <line x1="-30" y1="0" x2="-8" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Light emission arrows — two parallel 45° shafts with open chevron
-            arrowheads (per KiCad / ARRL convention). For a (1,−1) shaft
-            direction the chevron splits into one horizontal barb (backward)
-            and one vertical barb (downward), each 3 units long.
-            Stroke is lighter than the body so arrows read as annotation. */}
-        <g strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-          <line x1="2" y1="-11" x2="9" y2="-18" stroke="currentColor" />
-          <polyline points="6,-18 9,-18 9,-15" fill="none" stroke="currentColor" />
-
-          <line x1="6" y1="-9" x2="13" y2="-16" stroke="currentColor" />
-          <polyline points="10,-16 13,-16 13,-13" fill="none" stroke="currentColor" />
-        </g>
-      </g>
-
-      {/* Label sits BELOW the LED body — the emission arrows occupy the
-          space above, so placing the label there would force an awkwardly
-          large gap. Below the body it sits at the standard distance. */}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="m100 75-50 31.25v-62.5L100 75zm0-34.25v68.5M50 75H0m100 0h50m-50-43.75 18.75-18.75" />
+        <path fill="currentColor" stroke="none" d="m122.49 19.34 3.87-14.45-14.45 3.87 10.58 10.58z" />
+        <path d="m118.75 50 18.75-18.75" />
+        <path fill="currentColor" stroke="none" d="m141.24 38.09 3.87-14.45-14.45 3.87 10.58 10.58z" />
+      </VendoredSymbol>
       <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} labelSide="below" />
     </>
   )
@@ -78,26 +53,16 @@ export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
 
 /**
  * Zener Diode — voltage regulation diode with bent cathode bar.
+ * Source: Diode-COM-Zener.svg
+ * Pins: anode (-30, 0), cathode (+30, 0).
  */
 export function DiodeZener({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Triangle pointing right */}
-        <path d="M-8,-9 L8,0 L-8,9 Z" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Cathode bar with bent hooks */}
-        <line x1="8" y1="-9" x2="8" y2="9" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Top hook */}
-        <line x1="8" y1="-9" x2="6" y2="-9" stroke="currentColor" strokeWidth={STROKE} />
-        {/* Bottom hook */}
-        <line x1="8" y1="9" x2="10" y2="9" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Leads */}
-        <line x1="-30" y1="0" x2="-8" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="8" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="m100 75-50 31.25v-62.5L100 75zm-50 0H0m100 0h50" />
+        <path d="M112.5 109.5 100 100V50l-12.5-9.5" />
+      </VendoredSymbol>
       <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
@@ -108,79 +73,76 @@ export function DiodeZener({ x, y, orient = 'right', label, value }: SymbolProps
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * NPN Bipolar Junction Transistor — ARRL Handbook standard.
- *
- * Geometry (orient='right', at origin):
- *   Circle:     r=15
- *   Base bar:   x=−4, y=−11 to +11
- *   Base lead:  (−26, 0) → (−4, 0)
- *   Collector:  diagonal (−4, −6) → pin (12, −19)  (~39° from horizontal)
- *   Emitter:    diagonal (−4, 6) → pin (12, 19) with filled arrowhead.
- *
- * Pins extended 2 units along the lead direction (from (10, ±17) to
- * (12, ±19)) so future wire connections have a longer stub to attach to.
- * Stub outside the circle is ≈ 8 units, up from ≈ 5.
- *
- * Emitter direction d=(16, 13), |d|=√425. Arrowhead:
- *   tip   (4, 12.5)    — t≈0.5, inside circle (|·|≈13.1)
- *   wing  (−1.9, 11.6) — t≈0.25 + 3 perp
- *   wing  (1.9, 6.9)   — t≈0.25 − 3 perp
- * Both wings at distance ≈ √36 ≈ 6 from tip.
+ * NPN Bipolar Junction Transistor.
+ * Source: Transistor-COM-BJT-NPN.svg
+ * Pins: base (-30, 0), collector (+10, -30), emitter (+10, +30).
  */
 export function TransistorNPN({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {circle && <circle cx="0" cy="0" r="15" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
-
-        {/* Base bar + lead */}
-        <line x1="-4" y1="-11" x2="-4" y2="11" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="-26" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Collector — diagonal from bar to pin */}
-        <line x1="-4" y1="-6" x2="12" y2="-19" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter — diagonal with filled arrowhead pointing outward */}
-        <line x1="-4" y1="6" x2="12" y2="19" stroke="currentColor" strokeWidth={STROKE} />
-        <polygon points="4,12.5 -1.9,11.6 1.9,6.9" fill="currentColor" />
-      </g>
-
-      {/* Label gap of 26 (was 22) clears the body circle (r=15) plus
-          the «central» dominant-baseline ascent of a 14-px label.
-          With gap=22 the label's bottom edge landed within ~1 px of
-          the circle's top stroke — flagged as «label touches the
-          symbol» on FlybackDiodeSchematic. The 4-px bump leaves a
-          comfortable ~5 px breathing room. */}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {circle && <circle cx="75" cy="75" r="50" />}
+        <path d="M100 150v-31.25M0 75h50m0-31.25v62.5M100 0v40.5l-50 22m0 25 37.52 22.47" />
+        <path fill="currentColor" stroke="none" d="m81.8 115.26 14.95.24-7.27-13.07-7.68 12.83z" />
+      </VendoredSymbol>
       <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={26} />
     </>
   )
 }
 
 /**
- * PNP Bipolar Junction Transistor — ARRL Handbook standard.
- * Same as NPN but emitter arrow points inward (toward base junction).
- * Tip at bar junction (−4, 6), wings at (−0.8, 11.8) and (2.4, 8) —
- * both inside r=15. Wings at distance ≈ √44 ≈ 6.6 from tip.
+ * PNP Bipolar Junction Transistor.
+ * Source: Transistor-COM-BJT-PNP.svg
+ * Pins: base (-30, 0), collector (+10, +30), emitter (+10, -30) — note the
+ * upstream uses emitter-on-top for the inward arrow orientation.
  */
 export function TransistorPNP({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {circle && <circle cx="0" cy="0" r="15" fill="none" stroke="currentColor" strokeWidth={STROKE} />}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {circle && <circle cx="75" cy="75" r="50" />}
+        <path d="M0 75h50m0 31.25v-62.5M100 150v-40.5l-50-22M99.84 0v31.25L62.22 53.94" />
+        <path fill="currentColor" stroke="none" d="M60.23 46.41 53 59.5l14.95-.28-7.72-12.81z" />
+      </VendoredSymbol>
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={26} />
+    </>
+  )
+}
 
-        {/* Base bar + lead */}
-        <line x1="-4" y1="-11" x2="-4" y2="11" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="-26" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} />
+/**
+ * n-channel enhancement-mode MOSFET.
+ * Source: Transistor-COM-MOSFET-N-Enhancement.svg
+ * Pins: gate (-30, 0), drain (+10, -30), source (+10, +30).
+ */
+export function TransistorNMOS({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
+  return (
+    <>
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {circle && <circle cx="75" cy="75" r="50" />}
+        <path d="M0 75h50m0-25v50m12.5-59.25v18.5m0 50v-18.5m0-25v18.5M100 0v50H62.5M100 150V75H62.5m37.5 25H62.5" />
+        <path fill="currentColor" stroke="none" d="M68.75 75 87.5 62.5v25L68.75 75z" />
+      </VendoredSymbol>
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={26} />
+    </>
+  )
+}
 
-        {/* Collector — diagonal from bar to pin */}
-        <line x1="-4" y1="-6" x2="12" y2="-19" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Emitter — diagonal with filled arrowhead pointing inward */}
-        <line x1="-4" y1="6" x2="12" y2="19" stroke="currentColor" strokeWidth={STROKE} />
-        <polygon points="-4,6 -0.8,11.8 2.4,8" fill="currentColor" />
-      </g>
-
-      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={22} />
+/**
+ * p-channel enhancement-mode MOSFET.
+ * Source: Transistor-COM-MOSFET-P-Enhancement.svg
+ * Pins: gate (-30, 0), drain (+10, -30), source (+10, +30). Arrow direction
+ * is reversed from N-channel (apex points into the gate / away from body).
+ */
+export function TransistorPMOS({ x, y, orient = 'right', circle = true, label, value }: TransistorProps) {
+  return (
+    <>
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {circle && <circle cx="75" cy="75" r="50" />}
+        <path d="M0 75h50m0-25v50m12.5-59.25v18.5m0 50v-18.5m0-25v18.5M100 0v75H62.5m37.5 75v-50H62.5" />
+        <path fill="currentColor" stroke="none" d="M93.75 75 75 87.5v-25L93.75 75z" />
+        <path d="M100 50H62.5" />
+      </VendoredSymbol>
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} gap={26} />
     </>
   )
 }
@@ -190,34 +152,22 @@ export function TransistorPNP({ x, y, orient = 'right', circle = true, label, va
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * Op-Amp — operational amplifier (ARRL triangle symbol).
- * Triangle pointing right with − (inverting) and + (non-inverting) inputs,
- * and output on the right.
+ * Op-Amp — operational amplifier (triangle symbol).
+ * Source: IC-COM-OpAmp.svg
+ * Pins: inverting (-30, -10), non-inverting (-30, +10), output (+30, 0).
+ * The upstream also exposes V+/V- supply rails on top and bottom; we use
+ * just the inputs and output for now and overlay `−` / `+` markers locally.
  */
 export function OpAmp({ x, y, orient = 'right', label, value }: OpAmpProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Triangle: (-20,-22) to (24,0) to (-20,22) */}
-        <path d="M-20,-22 L24,0 L-20,22 Z" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Input markers — drawn inside the rotated group so they follow orientation */}
-        <SymbolText x={-12} y={-8} size={12}>−</SymbolText>
-        <SymbolText x={-12} y={10} size={12}>+</SymbolText>
-
-        {/* Inverting input lead (upper-left) */}
-        <line x1="-30" y1="-12" x2="-20" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Non-inverting input lead (lower-left) */}
-        <line x1="-30" y1="12" x2="-20" y2="12" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Output lead (right) */}
-        <line x1="24" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M25 25v100l100-50L25 25zm0 25H0m125 25h25M0 100h25m9.5-47H53m-9.25-9.25v18.5M34.5 97H53M74.69 0v50m.37 100v-50" />
+      </VendoredSymbol>
 
       {/* Component label (right of symbol) */}
       {label && (
-        <SymbolText x={x + 32} y={y} size={LABEL_SIZE} weight={600} anchor="start">
+        <SymbolText x={x + 32} y={y} size={LABEL_SIZE} anchor="start">
           {label}
         </SymbolText>
       )}
@@ -230,3 +180,7 @@ export function OpAmp({ x, y, orient = 'right', label, value }: OpAmpProps) {
     </>
   )
 }
+
+// STROKE re-exported for callers that draw freehand lines alongside symbols
+// (kept here to avoid breaking imports in downstream schematic files).
+export { STROKE }

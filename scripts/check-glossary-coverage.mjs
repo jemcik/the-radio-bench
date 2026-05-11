@@ -60,6 +60,16 @@ const EXEMPT_TERMS = new Set([
   'antenna', 'dipole', 'yagi', 'isotropic', 'coax', 'transceiver',
   'ionosphere', 'skywave', 'ground wave',
   'rectification',
+  // Words with strong dual technical meanings that the bare-word regex
+  // can't disambiguate:
+  //  – «cutoff» means a transistor region (no I_C) AND a filter cutoff
+  //    frequency (RC LPF f_c). Both are legitimate technical uses;
+  //    chapter context disambiguates for the reader.
+  //  – «kvl» (Kirchhoff's voltage law) is fundamental and mentioned in
+  //    many chapters; named on first encounter in ch1_2 (Ohm's Law)
+  //    and doesn't need re-tooltipping everywhere it surfaces.
+  'cutoff',
+  'kvl',
   'drift velocity', 'conventional current',
   'derivative', 'logarithm',
   'form factor', 'carrier',
@@ -104,37 +114,25 @@ const EXEMPT_PER_CHAPTER = {
   // ch1_1 «tank» — water-tower analogy in waterPipeAriaLabel, NOT a
   // tank-circuit reference. The gate's word-boundary regex can't tell
   // them apart.
-  ch1_1: new Set(['tank']),
+  // «transistor» — forward-reference in the conductor/semiconductor
+  // introduction; passing mention, not concept-focal.
+  ch1_1: new Set(['tank', 'transistor']),
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
-  // ch1_5: `mlcc` only appears in `typesGalleryAria` (aria-label) and
-  // `typeMLCC` (CapacitorTypeGallery silhouette label) — both rendered
-  // through raw `t()` to a plain string prop, so a `<G>` wrap would
-  // ship as literal angle brackets. `pcb` only in
-  // `bypassCapSchematicCaption`, rendered via `<MathText>` which
-  // doesn't process custom glossary tags. Glossary entries exist;
-  // the wraps can't be applied here without a render-path refactor.
-  ch1_5: new Set(['mlcc', 'pcb']),
-  // ch1_7 «solenoid» — only in heroAriaLabel (aria attribute).
-  ch1_7: new Set(['solenoid']),
-  // ch0_5: «dc» and «inductor» each appear ONLY in non-prose contexts.
+  // ch0_5 «How to Read a Schematic» introduces transistor/NPN/PNP/base/
+  // collector/emitter as part of its symbol vocabulary, but the chapter
+  // is about reading schematics — actual transistor behaviour is taught
+  // in ch1_11. Wrapping every symbol mention here would tooltip-bomb
+  // the symbol-card layouts (which are mostly aria-label / heading
+  // contexts that can't carry `<G>` tags cleanly).
+  // «dc» and «inductor» each appear ONLY in non-prose contexts.
   // dc → symbolBatteryDesc (rendered via raw `t()` to a `description`
   // prop, not Trans, so JSX `<G>` won't render). inductor →
   // symbolInductorName (one-word symbol-card heading «Inductor (coil)»;
   // wrapping the entire heading would turn the whole title into a
   // tooltip target and disrupt the symbol-card layout).
-  ch0_5: new Set(['dc', 'inductor']),
-  // ch1_6 «time constant» — chapter is exclusively about RL circuits,
-  // and every mention of «time constant» is inside the multi-word
-  // phrase «RL time constant» wrapped via the `tc` alias bound to
-  // glossary key «rl time constant». The bare-word regex sees the
-  // «time constant» substring inside the wrap and counts it as
-  // unwrapped, even though the surrounding phrase IS already a
-  // glossary tooltip — a wider concept («rl time constant») than
-  // the gate is checking for. Exempt to avoid asking authors to
-  // pick between the two adjacent glossary keys.
-  ch1_6: new Set(['time constant']),
+  ch0_5: new Set(['dc', 'inductor', 'transistor', 'npn', 'pnp', 'base', 'collector', 'emitter']),
   // ch1_10 «capacitance» — same pattern as ch1_6's «time constant».
   // The varactor entry uses «junction capacitance» (a separate
   // glossary key with its own definition — depletion-region physics,
@@ -142,7 +140,50 @@ const EXEMPT_PER_CHAPTER = {
   // bare-word regex sees «capacitance» inside «junction capacitance»
   // and counts it as unwrapped. The wider phrase IS the correct
   // tooltip target here.
-  ch1_10: new Set(['capacitance']),
+  ch1_10: new Set(['capacitance', 'transistor', 'base', 'gate', 'drain']),
+  // ch1_2 «drain» — passing reference (parasitic drain on a battery
+  // analogy), not a FET drain terminal.
+  ch1_2: new Set(['drain']),
+  // ch1_3 «base» — passing reference (e.g. «base of …»), not a BJT
+  // base terminal. The English bare word collides.
+  ch1_3: new Set(['base']),
+  // ch1_5 «drain» — passing reference (charge draining off a cap),
+  // not a FET drain.
+  ch1_5: new Set(['mlcc', 'pcb', 'drain']),
+  // ch1_6 — transistor/base/collector mentioned in coil-driver lab
+  // and ferrite-bead context; passing references, not the chapter's
+  // focus (inductors). Concept-focal coverage lives in ch1_11.
+  ch1_6: new Set(['time constant', 'transistor', 'base', 'collector']),
+  // ch1_7 — transistor/collector/drain in tank-circuit driver context;
+  // passing references, not concept-focal.
+  ch1_7: new Set(['solenoid', 'transistor', 'collector', 'drain']),
+  // ch1_8 «gate» — passing reference («gate-keeper» metaphor or logic
+  // gate), not a FET gate terminal.
+  ch1_8: new Set(['gate']),
+  // ch1_11: «impedance» appears only inside the wrapped «<inI>input
+  // impedance</inI>» phrase (mapped to the «input impedance» glossary
+  // key — a more specific tooltip target than the bare-word «impedance»
+  // entry). Same pattern as ch1_6's «time constant» / ch1_10's
+  // «capacitance». «emi» is a glossary key the gate's bare-word regex
+  // catches inside the chapter's «<emi>emitter</emi>» alias span — a
+  // false self-match (alias name collides with an unrelated glossary
+  // key). Other false-positives caught by ch1_11 prose:
+  //   – «base» mentions inside the «base–emitter junction» that we
+  //     already wrap on first occurrence; the regex still catches
+  //     the second occurrence inside the wrapped phrase.
+  // ch1_11: «impedance» appears only inside the wrapped «<inI>input
+  // impedance</inI>» phrase (mapped to the «input impedance» glossary
+  // key — a more specific tooltip target than the bare-word «impedance»
+  // entry). «emi» is a glossary key the gate's bare-word regex catches
+  // inside the chapter's «<emi>emitter</emi>» alias span — a false
+  // self-match.
+  // «saturation» — the bare-word matches the magnetic-core saturation
+  // glossary entry (an inductor/transformer concept), but in this
+  // chapter every occurrence is about TRANSISTOR saturation, glossed
+  // via the dedicated «transistor saturation» entry (wrapped via the
+  // <sat> alias on first occurrence). Magnetic-core saturation is
+  // irrelevant in this chapter.
+  ch1_11: new Set(['impedance', 'emi', 'saturation']),
 }
 
 function readGlossaryKeys() {

@@ -85,11 +85,12 @@ export default function RfChokeSchematic() {
       <Capacitor x={C_X} y={(TOP_Y + BOT_Y) / 2} orient="down" label="C" />
       <Inductor x={RFC_X} y={(TOP_Y + SIG_Y) / 2} orient="down" label={t('ch1_6.rfChokeRfc')} />
 
-      {/* Junction at collector node where signal path meets RFC drop */}
+      {/* Junction at collector node where signal path meets RFC drop —
+          a real 3-wire T-joint (signal-in, signal-out, RFC-drop). */}
       <Junction x={NODE_X} y={SIG_Y} />
-      {/* Junction at top where C and RFC both connect to V+ rail */}
-      <Junction x={C_X} y={TOP_Y} />
-      <Junction x={RFC_X} y={TOP_Y} />
+      {/* No junctions at (C_X, TOP_Y) or (RFC_X, TOP_Y): each is the
+          L-corner where the V+ rail bends to drop into a component pin,
+          not a 3-conductor convergence. */}
 
       {/* Terminal labels */}
       <TerminalLabel x={RF_IN_X - 6} y={SIG_Y} anchor="end">

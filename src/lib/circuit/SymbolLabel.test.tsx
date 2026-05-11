@@ -99,7 +99,16 @@ describe('OrientedLabel', () => {
     const [labelEl, valueEl] = Array.from(container.querySelectorAll('text'))
     expect(labelEl?.getAttribute('y')).toBe('36')
     expect(labelEl?.getAttribute('text-anchor')).toBe('middle')
-    expect(labelEl?.getAttribute('font-weight')).toBe('600')
+    // No explicit font-weight as of May 2026 — every primitive label
+    // slot (Resistor/Capacitor/OrientedLabel/CenteredLabel/TerminalLabel/
+    // Transformer.ratio) renders without a font-weight attribute so the
+    // browser default (regular = 400) applies uniformly. Earlier the
+    // designator slot was bold (600); user flagged the resulting weight
+    // gap between rail labels (V_p) and value labels (1:N) on the same
+    // SVG, and chose uniform regular weight across the library. The
+    // size hierarchy (LABEL_SIZE=14 vs VALUE_SIZE=13) now carries the
+    // designator/value distinction alone.
+    expect(labelEl?.getAttribute('font-weight')).toBeNull()
     expect(valueEl?.getAttribute('y')).toBe('54')
     // Value renders at full opacity — uniform across all label helpers
     // in the library (PassiveLabel, CenteredLabel, OrientedLabel,

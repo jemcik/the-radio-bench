@@ -21,8 +21,8 @@
 import {
   Circuit,
   Wire,
-  Junction,
   AcSource,
+  AC_SOURCE_RADIUS,
   Resistor,
   Transformer,
   TerminalLabel,
@@ -49,16 +49,18 @@ const X_TX = 290
 const X_LOAD = 440
 const RIGHT_EDGE_X = 525
 
-// Transformer used in orient='up' so primary appears on the LEFT
-// (matching the schematic flow). After rotation:
-//   primary.p2 (top-left)    = (X_TX-12, MID_Y-30)
-//   primary.p1 (bottom-left) = (X_TX-12, MID_Y+30)
-//   secondary.p2 (top-right) = (X_TX+12, MID_Y-30)
-//   secondary.p1 (bot-right) = (X_TX+12, MID_Y+30)
-const TX_PRI_X = X_TX - 12
-const TX_SEC_X = X_TX + 12
-const TX_TOP_Y = MID_Y - 30
-const TX_BOT_Y = MID_Y + 30
+// Transformer in native orient='right' — primary winding vertical on the
+// LEFT, secondary vertical on the RIGHT (matches the schematic flow:
+// V_p loop on left → primary; R_load loop on right → secondary). Pin
+// positions after the chris-pikul wrapper's 0.4 down-scale:
+//   primary p1 (top-left)     = (X_TX-30, MID_Y-25)
+//   primary p2 (bottom-left)  = (X_TX-30, MID_Y+25)
+//   secondary p1 (top-right)  = (X_TX+30, MID_Y-25)
+//   secondary p2 (bot-right)  = (X_TX+30, MID_Y+25)
+const TX_PRI_X = X_TX - 30
+const TX_SEC_X = X_TX + 30
+const TX_TOP_Y = MID_Y - 25
+const TX_BOT_Y = MID_Y + 25
 
 export default function TransformerVoltageSchematic() {
   const { t } = useTranslation('ui')
@@ -108,25 +110,24 @@ export default function TransformerVoltageSchematic() {
       <Transformer
         x={X_TX}
         y={MID_Y}
-        orient="up"
         ratio={t('ch1_9.schematicVoltageDemoRatio')}
       />
       <Resistor x={X_LOAD} y={TOP_Y} />
 
-      {/* Junction dots where stubs meet rails (T-joints) */}
-      <Junction x={TX_PRI_X} y={TOP_Y} />
-      <Junction x={TX_PRI_X} y={BOT_Y} />
-      <Junction x={TX_SEC_X} y={TOP_Y} />
-      <Junction x={TX_SEC_X} y={BOT_Y} />
+      {/* No junction dots here — each rail-to-stub turn is an L-bend
+          inside ONE polyline <Wire>, not a T-joint of three wires.
+          Junction dots are reserved for 3-wire intersections. */}
 
       {/* ── LABELS ───────────────────────────────────────────────────── */}
-      {/* AC source label above the rail */}
-      <TerminalLabel x={X_AC} y={TOP_Y - 22} anchor="middle">
+      {/* AC source label — clears the chris-pikul circle (radius 20)
+          by a 10-px gap. Hardcoded `TOP_Y - 22` baked the previous
+          ARRL-style r=12 body and ended up overlapping after migration. */}
+      <TerminalLabel x={X_AC} y={TOP_Y - (AC_SOURCE_RADIUS + 10)} anchor="middle">
         {t('ch1_9.schematicVoltageDemoVp')}
       </TerminalLabel>
 
-      {/* Load label above the rail */}
-      <TerminalLabel x={X_LOAD} y={TOP_Y - 22} anchor="middle">
+      {/* Load label — same 30-px clearance as the AC label for symmetry */}
+      <TerminalLabel x={X_LOAD} y={TOP_Y - (AC_SOURCE_RADIUS + 10)} anchor="middle">
         {t('ch1_9.schematicVoltageDemoLoad')}
       </TerminalLabel>
 

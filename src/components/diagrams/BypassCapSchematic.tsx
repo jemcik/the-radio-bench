@@ -103,12 +103,11 @@ export default function BypassCapSchematic() {
         value={`100 ${t('units.nf')}`}
       />
 
-      {/* T-junctions: where the bypass branch taps each rail, and
-          where the V+ / GND rails turn down to the pin stubs. */}
+      {/* T-junctions: where the bypass branch taps each rail. The rail-
+          to-pin-stub turns at PIN_TIP_X are L-corners (one polyline
+          across two <Wire> elements), NOT T-joints — no dot there. */}
       <Junction x={BYPASS_X} y={TOP_Y} />
       <Junction x={BYPASS_X} y={BOT_Y} />
-      <Junction x={PIN_TIP_X} y={TOP_Y} />
-      <Junction x={PIN_TIP_X} y={BOT_Y} />
 
       {/* Chip body — rectangle sitting to the RIGHT of the pin stubs. */}
       <rect

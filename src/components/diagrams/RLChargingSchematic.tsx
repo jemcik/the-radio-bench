@@ -19,7 +19,6 @@ import { Trans } from 'react-i18next'
 import {
   Circuit,
   Wire,
-  Junction,
   Resistor,
   Inductor,
   Battery,
@@ -107,9 +106,9 @@ export default function RLChargingSchematic() {
         I
       </TerminalLabel>
 
-      {/* No junction dots needed — the loop is a single straight path,
-          no T-joints. */}
-      <Junction x={L_X} y={TOP_Y} />
+      {/* No junction dots — the loop is a single straight path, no
+          T-joints (the comment above was correct but the dot below was
+          shipped anyway; flagged by check:junction-placement). */}
     </Circuit>
   )
 }

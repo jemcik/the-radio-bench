@@ -143,10 +143,12 @@ export default function VaractorTunerSchematic() {
       <Resistor x={RB_X} y={RB_CENTER_Y} orient="down" label="R_b" />
 
       {/* Ground hangs from the tank-bottom rail at the midpoint
-          between D and L. orient='right' keeps the canonical «pin up,
-          bars below» rendering (per the FlybackDiode / Balun
-          convention). */}
-      <Ground x={GND_X} y={GND_BODY_Y + 15} orient="right" />
+          between D and L. orient='right' is the canonical «pin up,
+          bars below» rendering. With the compact Ground primitive
+          (pin = 10 local px), placing the centre at GND_BODY_Y+10
+          lands the pin tip exactly on the stub wire's endpoint
+          (GND_BODY_Y). */}
+      <Ground x={GND_X} y={GND_BODY_Y + 10} orient="right" />
       <Wire points={[{ x: GND_X, y: TANK_BOT_Y }, { x: GND_X, y: GND_BODY_Y }]} />
 
       {/* ── Terminal labels ─────────────────────────────────────── */}

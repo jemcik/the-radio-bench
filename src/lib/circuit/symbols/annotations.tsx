@@ -117,16 +117,25 @@ export function TerminalLabel({
   anchor = 'end',
   tone = 'fg',
   color,
-  weight = 600,
+  weight,
 }: TerminalLabelProps) {
-  // Default weight=600 matches the bold-designator styling that
-  // every other Circuit primitive (Resistor.label, Capacitor.label,
-  // Battery.value-as-primary, …) applies to component identifiers.
-  // Without this default, rail-end labels like V_in / V_out rendered
-  // at regular weight while the R / C / L on the same schematic
-  // rendered bold — visible as «Vin looks thinner than R» on every
-  // RC / RL / divider diagram. Caller can still pass a different
-  // weight (or `undefined`) to opt out.
+  // No default `weight` → React omits the `font-weight` attribute,
+  // matching the `SymbolText`-based label slots (`Resistor.label`,
+  // `OrientedLabel`, `CenteredLabel`, `Transformer.ratio`, …) which
+  // also leave the attribute unset. Browser default is regular (400)
+  // for both, so V_p / V_out / R_load read with the same ink weight
+  // as 1:N / R_1 / C_1 — the visual uniformity the user asked for
+  // after the chris-pikul migration (May 2026).
+  //
+  // The mechanical gate `diagram-label-consistency.test.tsx` strings-
+  // matches the `font-weight` attribute, so «no attribute» and
+  // «"400"» count as different tuples even though they render
+  // identically. Keeping the default unset is what makes the gate
+  // happy without a special-case rule.
+  //
+  // Caller can still pass `weight={600}` (or any explicit number) to
+  // opt back into bold for one specific label if a chapter genuinely
+  // needs the emphasis.
   const fill = color
     ?? (tone === 'mutedFg' ? svgTokens.mutedFg : svgTokens.fg)
 

@@ -1,36 +1,31 @@
 /**
- * Miscellaneous circuit symbols: antenna, crystal, transformer.
+ * Miscellaneous symbols — antenna, crystal, transformer.
  *
- * Single-pin symbols (antenna), two-pin passive components (crystal),
- * and multi-pin transformer (primary/secondary coils with core).
+ * Geometry adapted from chris-pikul/electronic-symbols (MIT-licensed).
+ * See ../vendored/SOURCE.md for the per-symbol mapping.
  */
 
-import { type SinglePinProps, type SymbolProps, orientAngle, STROKE } from '../types'
+import { type SinglePinProps, type SymbolProps } from '../types'
 import { CenteredLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
+import { VendoredSymbol } from './_VendoredSymbol'
 
 // ──────────────────────────────────────────────────────────────────────────────
-// SINGLE-TERMINAL SYMBOLS
+// SINGLE-TERMINAL
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * Antenna — standard transmit/receive antenna symbol.
- * Single terminal with upward-pointing V-shaped antenna elements.
+ * Antenna — aerial (T-shaped with two diagonal arms).
+ * Source: Antenna-COM-Aerial.svg
+ * Pin: at the bottom of the viewBox → (0, +30) in local coords.
  */
 export function Antenna({ x, y, orient = 'up', label }: SinglePinProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Lead from pin upward to antenna */}
-        <line x1="0" y1="15" x2="0" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* V-shaped antenna arms */}
-        <line x1="0" y1="0" x2="-10" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="0" y1="0" x2="10" y2="-12" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
-      {/* Antenna's label sits below the symbol (unique among single-pin parts) */}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M74.88 150V12.5m.12 50 37.5-50M75 62.5l-37.5-50" />
+      </VendoredSymbol>
       {label && (
-        <SymbolText x={x} y={y + 25} size={LABEL_SIZE} weight={600}>
+        <SymbolText x={x} y={y + 25} size={LABEL_SIZE}>
           {label}
         </SymbolText>
       )}
@@ -39,31 +34,20 @@ export function Antenna({ x, y, orient = 'up', label }: SinglePinProps) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// TWO-TERMINAL SYMBOLS
+// TWO-TERMINAL
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * Crystal — quartz crystal oscillator (ARRL standard).
- * Two vertical plates with a crystal body between them.
+ * Crystal — quartz crystal oscillator.
+ * Source: Miscellaneous-COM-Crystal_Oscillator.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function Crystal({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left plate */}
-        <line x1="-6" y1="-8" x2="-6" y2="8" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Right plate */}
-        <line x1="6" y1="-8" x2="6" y2="8" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Crystal body (rectangle between plates) */}
-        <rect x="-3" y="-6" width="6" height="12" fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Leads */}
-        <line x1="-30" y1="0" x2="-6" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="6" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M50 25h50v100H50zM37.5 43.75v62.5m75-62.5v62.5M0 74.63h37.5m75 .37H150" />
+      </VendoredSymbol>
       <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
@@ -74,86 +58,51 @@ export function Crystal({ x, y, orient = 'right', label, value }: SymbolProps) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * Props for transformer symbol.
- * Extends basic symbol props with optional transformer ratio label.
+ * Props for transformer symbol — keeps the optional `ratio` annotation
+ * separate from the designator `label` (so a callsite can write
+ * `<Transformer label="T1" ratio="1:4" />`).
  */
 export interface TransformerProps {
   x: number
   y: number
   orient?: 'right' | 'down' | 'left' | 'up'
   label?: string
-  ratio?: string  // e.g., "1:2" for step-up
+  ratio?: string
 }
 
 /**
- * Transformer — ARRL Handbook style two-winding transformer.
+ * Transformer — two windings with a core between them.
+ * Source: Transformer-COM-Standard.svg
  *
- * Primary winding on TOP (horizontal `⌒⌒⌒⌒` row, bumps going UP).
- * Iron core: two parallel HORIZONTAL lines between the windings.
- * Secondary winding on BOTTOM (horizontal row, bumps going DOWN).
+ * The upstream draws the windings VERTICALLY (primary on left, secondary
+ * on right) with the iron core as two parallel vertical lines between
+ * them. We expose the same orientation: `orient='right'` (default) leaves
+ * the windings vertical; pass `orient='down'` for the «horizontal» layout
+ * with primary on top, secondary on bottom.
  *
- * Pin layout (default orient='right'):
- *   primary p1 (-30, -12) ──[bumps up]──── (+30, -12) primary p2
- *                          ════════════
- *                          ════════════  ← iron core
- *   secondary p1 (-30, 12) ─[bumps down]── (+30, 12) secondary p2
- *
- * Each winding mirrors the horizontal Inductor primitive's proportions
- * (4 bumps × 9 px wide × 6 px peak amplitude) so the two symbols read
- * at the same visual weight.
+ * Pins (orient='right'):
+ *   primary p1   (-30, -25) ↔  primary p2   (-30, +25)
+ *   secondary p1 (+30, -25) ↔  secondary p2 (+30, +25)
  */
 export function Transformer({ x, y, orient = 'right', label, ratio }: TransformerProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* PRIMARY WINDING (top) — horizontal coil at y=-12 with leads
-            extending out to the corner pins. 4 semicircular bumps
-            going UP (away from the core in the centre).
-            Path: lead ─── bumps ─── lead.
-            sweep=0 going right ⇒ counter-clockwise ⇒ bulges UP. */}
-        <path
-          d="M -30 -12 L -18 -12 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 L 30 -12"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* SECONDARY WINDING (bottom) — mirror of primary at y=+12.
-            sweep=1 going right ⇒ clockwise ⇒ bulges DOWN. */}
-        <path
-          d="M -30 12 L -18 12 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 a 4.5 6 0 0 1 9 0 L 30 12"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* IRON CORE — two parallel HORIZONTAL lines between windings */}
-        <line x1="-18" y1="-3" x2="18" y2="-3" stroke="currentColor" strokeWidth={STROKE} />
-        <line x1="-18" y1="3" x2="18" y2="3" stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
-      {/* Designator label (`label` prop) always sits ABOVE the body via
-          CenteredLabel. The ratio label gets orient-aware positioning:
-          for the default horizontal body (orient='right'/'left') it
-          fits below; but for the vertical body (orient='up'/'down')
-          there are usually wire stubs going above and below the body
-          to a horizontal rail, so we place the ratio to the SIDE
-          instead — at x+24 with start-anchored text — where there's
-          empty schematic space. */}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {/* No `fill="currentColor"` — these are STROKED coil bumps, not
+            filled blobs. They inherit `fill="none"` from VendoredSymbol. */}
+        <path d="M0 12.5h37.5s18.81 0 18.81 15.63-18.68 15.62-18.68 15.62 18.75 0 18.75 15.63S37.63 75 37.63 75s18.75 0 18.75 15.63-18.75 15.62-18.75 15.62 18.75 0 18.75 15.63-18.75 15.62-18.75 15.62H0M68.75 6.25v137.5m12.5 0V6.25" />
+        <path d="M150.13 137.5h-37.5s-18.82 0-18.82-15.62 18.69-15.63 18.69-15.63-18.75 0-18.75-15.62S112.5 75 112.5 75s-18.75 0-18.75-15.62 18.75-15.63 18.75-15.63-18.75 0-18.75-15.62S112.5 12.5 112.5 12.5h37.63" />
+      </VendoredSymbol>
       {label && (
-        <CenteredLabel x={x} y={y} label={label} gap={orient === 'up' || orient === 'down' ? 38 : 26} />
+        <CenteredLabel x={x} y={y} label={label} gap={orient === 'up' || orient === 'down' ? 38 : 38} />
       )}
       {ratio && (orient === 'up' || orient === 'down') && (
-        <SymbolText x={x + 24} y={y} size={VALUE_SIZE} anchor="start">
+        <SymbolText x={x + 38} y={y} size={VALUE_SIZE} anchor="start">
           {ratio}
         </SymbolText>
       )}
       {ratio && (orient === 'right' || orient === 'left') && (
-        <SymbolText x={x} y={y + 26} size={VALUE_SIZE}>
+        <SymbolText x={x} y={y + 38} size={VALUE_SIZE}>
           {ratio}
         </SymbolText>
       )}

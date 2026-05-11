@@ -269,11 +269,11 @@ export default function BridgeRectifierSchematic() {
 
       {/* ════════ MANUAL DIODE LABELS (outer side, upright) ────── */}
       {/* D1 (top-left edge): label upper-left of body */}
-      <SymbolText x={D1_X - 22} y={D1_Y - 18} size={LABEL_SIZE} weight={600} anchor="end">
+      <SymbolText x={D1_X - 22} y={D1_Y - 18} size={LABEL_SIZE} anchor="end">
         D1
       </SymbolText>
       {/* D2 (top-right edge): label upper-right of body */}
-      <SymbolText x={D2_X + 22} y={D2_Y - 18} size={LABEL_SIZE} weight={600} anchor="start">
+      <SymbolText x={D2_X + 22} y={D2_Y - 18} size={LABEL_SIZE} anchor="start">
         D2
       </SymbolText>
       {/* D3 (bottom-right edge): label sits in the wedge BETWEEN the diode
@@ -285,19 +285,19 @@ export default function BridgeRectifierSchematic() {
           (≈ x=292 at this y) and the bottom-detour wire (x=350). D3 is
           the only label that has to flip — the others sit on outer corners
           with no nearby wire. */}
-      <SymbolText x={D3_X + 22} y={D3_Y + 18} size={LABEL_SIZE} weight={600} anchor="end">
+      <SymbolText x={D3_X + 22} y={D3_Y + 18} size={LABEL_SIZE} anchor="end">
         D3
       </SymbolText>
       {/* D4 (bottom-left edge): label lower-left of body */}
-      <SymbolText x={D4_X - 22} y={D4_Y + 18} size={LABEL_SIZE} weight={600} anchor="end">
+      <SymbolText x={D4_X - 22} y={D4_Y + 18} size={LABEL_SIZE} anchor="end">
         D4
       </SymbolText>
 
       {/* ════════ DC OUTPUT TERMINAL LABELS ───────────────────── */}
-      <TerminalLabel x={TERM_X} y={TOP_Y} anchor="start" weight={600}>
+      <TerminalLabel x={TERM_X} y={TOP_Y} anchor="start">
         DC+
       </TerminalLabel>
-      <TerminalLabel x={TERM_X} y={BOT_Y} anchor="start" weight={600}>
+      <TerminalLabel x={TERM_X} y={BOT_Y} anchor="start">
         DC−
       </TerminalLabel>
 

@@ -222,10 +222,12 @@ export default function Chapter0_5() {
           name={t('ch0_5.symbolGroundName')}
           description={t('ch0_5.symbolGroundDesc')}
         >
-          {/* Ground extends y−15 (lead top) to y+10 (shortest line), centre
-              offset ≈ −2.5 from component y. y=30 puts the visual centre at
-              27.5, matching the viewport centre (28). */}
-          <Ground x={55} y={30} />
+          {/* Ground in `orient='right'` (canonical pin-up, stripes-down).
+              With the compact primitive: pin tip at y−10, stripes at
+              y+0/+5/+10. Total height 20; visual centre at y.
+              y=28 places the visual centre at 28, matching viewport
+              vertical centre (viewBox is 110×56). */}
+          <Ground x={55} y={28} orient="right" />
         </SymbolCell>
 
         <SymbolCell

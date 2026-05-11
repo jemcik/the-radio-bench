@@ -82,10 +82,14 @@ export const SPAN = 60
 /** Half-span — distance from component centre to each pin. */
 export const HALF = SPAN / 2
 
-/** Stroke width for all lines (components + wires unified to prevent visible transitions). */
-export const STROKE = 2
-/** Stroke width for wires (same as STROKE for seamless joins). */
-export const WIRE_STROKE = 2
+/** Stroke width for all schematic lines — component outlines, internal
+ *  details, terminal leads, and wires. Single uniform thickness across the
+ *  library (per the May 2026 chris-pikul migration decision). Wires use the
+ *  same value to keep node joins seamless. Ratio stroke/circle-diameter is
+ *  1.5/30 = 1/20, matching textbook conventions (Sedra-Smith, Razavi). */
+export const STROKE = 1.5
+/** Stroke width for wires (kept in sync with STROKE for seamless joins). */
+export const WIRE_STROKE = 1.5
 
 // ─── pin helpers ──────────────────────────────────────────────────────────────
 
@@ -160,6 +164,26 @@ export function pinsBJT(
     collector: rot(cUpX, cUpY),
     emitter:   rot(eDownX, eDownY),
   }
+}
+
+/**
+ * Compute absolute pin positions for a MOSFET transistor.
+ *
+ * Pin geometry mirrors `pinsBJT` exactly — gate replaces base, drain
+ * replaces collector, source replaces emitter. Identical pin coordinates
+ * mean wires drawn for a BJT layout work unchanged when the symbol is
+ * swapped for a MOSFET (same span, same pin positions, same lead stubs).
+ *
+ *  orient='right' (default):
+ *    gate on left, drain upper-right, source lower-right
+ */
+export function pinsMOSFET(
+  cx: number,
+  cy: number,
+  orient: Orientation = 'right',
+): { gate: Point; drain: Point; source: Point } {
+  const { base, collector, emitter } = pinsBJT(cx, cy, orient)
+  return { gate: base, drain: collector, source: emitter }
 }
 
 /**

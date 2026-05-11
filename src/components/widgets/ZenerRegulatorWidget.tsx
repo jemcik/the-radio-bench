@@ -407,9 +407,11 @@ export default function ZenerRegulatorWidget() {
           )}
 
           {/* Each component carries TWO labels: the designator
-              (R_s / Z / R_L / V_in — primary, weight=600 size=14) and
-              a live numeric reading (the voltage across it — secondary,
-              size=13). The primitives lay them out in their canonical
+              (R_s / Z / R_L / V_in — primary, size=14) and a live
+              numeric reading (the voltage across it — secondary,
+              size=13). Both render at regular weight as of May 2026;
+              the size hierarchy alone carries the designator/value
+              distinction. The primitives lay them out in their canonical
               slots: Battery puts them side-by-side (left/right of the
               vertical body), DiodeZener stacks them right of the body
               (CenteredLabel), Resistor stacks them above the body

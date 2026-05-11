@@ -1,5 +1,8 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": [
+    "scripts/convert-electronic-symbol.mjs"
+  ],
   "ignoreIssues": {
     "src/components/diagrams/SVGDiagram.tsx": ["exports", "types"],
     "src/components/lab/**": ["exports", "types"],

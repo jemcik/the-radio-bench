@@ -1203,6 +1203,35 @@ const RULES = [
     pattern: /<(?!(?:strong|em|b|i|code|u|sub|sup|span|a|mark|kbd|small|nowrap|var|br)\b)([a-z]+)>[^<()]{2,}\s+\([^)]+\)<\/\1>/g,
     hint: 'Glossary tag wraps both an abbreviation AND its parenthetical expansion. Wrap only the short form: «<tag>ABBR</tag> (Full form)» so the tooltip anchors correctly and the reader sees one underlined term, not two.',
   },
+
+  {
+    // Recurring Gemini regression: EN "device" → UA «прилад» in any
+    // context. In UA electronics terminology «прилад» is reserved for
+    // MEASURING / LAB INSTRUMENTS (multimeter, oscilloscope, VNA,
+    // signal generator). For a CIRCUIT COMPONENT — passive (resistor /
+    // capacitor / inductor) or active (diode / transistor / op-amp) —
+    // the canonical UA term is «компонент» / «пристрій» / «елемент»
+    // (see references/glossary.md for the disambiguation rule).
+    //
+    // Common offending phrases:
+    //   – «трививідний прилад»  → «трививідний пристрій»
+    //   – «активний прилад»     → «активний компонент»
+    //   – «напівпровідниковий прилад» → «напівпровідниковий пристрій»
+    //   – «прилад, керований»   → «компонент, керований»
+    //   – «сімейства приладів» (when next sentence names the family
+    //     concretely) → «сімейства транзисторів» / «сімейства діодів»
+    //
+    // Past fix in ch 1.11 (2026-05): four glossary entries (transistor,
+    // bjt, fet, transconductance) and two ch1_11 strings (intro2,
+    // quiz_q1_explanation) shipped from Gemini with «прилад» as the
+    // generic device head-noun. User caught all six on first read.
+    id: 'forbidden.prylad-as-component',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern:
+      /(?:трививідн|двовивідн|чотирививідн|N-вивідн|n-вивідн|активн|пасивн|напівпровідников|дискретн|лінійн|нелінійн)(?:ий|ого|ому|им|ій|ого|у|а|е|і)\s+прилад|прилад,\s+керован|сімейств[аи]\s+приладів|с[іе]м'?[ая]\s+приладів/g,
+    hint: 'Forbidden: «прилад» as a circuit-component head-noun (recurring Gemini regression). «Прилад» in UA means a MEASURING INSTRUMENT (multimeter / oscilloscope / VNA). For a circuit component use «компонент» (active / passive / linear), «пристрій» (semiconductor / N-terminal), «елемент» (circuit-element abstraction), or the concrete noun («транзистор», «діод»). See references/glossary.md «прилад vs пристрій vs компонент» for full rule.',
+  },
 ]
 
 // ─── Runner ───────────────────────────────────────────────────────────────

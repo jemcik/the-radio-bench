@@ -43,6 +43,7 @@ export {
   type OpAmpProps,
   pins2,
   pinsBJT,
+  pinsMOSFET,
   pinsOpAmp,
   pin1,
   orientAngle,
@@ -57,10 +58,10 @@ export {
 export { Resistor, Capacitor, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
-export { AcSource, Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
+export { AcSource, Battery, BatteryMulti, Ground, GroundEarth, AC_SOURCE_RADIUS } from './symbols'
 
 // Symbols — semiconductors
-export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, OpAmp } from './symbols'
+export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, TransistorNMOS, TransistorPMOS, OpAmp } from './symbols'
 
 // Symbols — instruments
 export {
