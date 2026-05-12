@@ -36,7 +36,9 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 540
+// Content x: LEFT_EDGE_X=60 .. X_LOAD=410 + resistor body ~30 + label ~20.
+// Was 540 — ~100 px of empty space on the right. See `check:diagram-viewbox-fit`.
+const SCHEMATIC_W = 470
 
 const TOP_Y = SCHEMATIC_PAD_TOP + 15
 const RAIL_SPAN = 130
@@ -81,7 +83,7 @@ export default function AutotransformerSchematic() {
     <Circuit
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
-      maxWidth={580}
+      maxWidth={520}
       caption={
         <Trans
           i18nKey="ch1_9.schematicAutoCaption"

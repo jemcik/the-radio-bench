@@ -1255,7 +1255,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   fet: {
     tip: 'Field-Effect Transistor — three-terminal voltage-controlled device where a gate voltage controls drain current, with no DC gate current.',
     detail:
-      'A FET (Field-Effect Transistor) controls conduction between drain and source via the electric field produced by a voltage applied to the gate. Two flavours of gate exist — JFETs use a reverse-biased diode junction, MOSFETs use a thin oxide insulator — and two channel-doping modes — depletion (channel conducts at zero gate bias) and enhancement (channel does not conduct until gate is biased past a threshold V_th). The FET\'s defining advantage is its near-infinite DC input impedance: the gate draws no current, so a FET amplifier can be driven from very weak sources without loading them down. The drain current depends on the over-drive (V_GS − V_th); the slope δI_D/δV_GS is the transconductance g_m, which takes the role of «1/R_E» in the FET equivalent of the common-emitter gain formula.',
+      'A FET (Field-Effect Transistor) controls conduction between drain and source via the electric field produced by a voltage applied to the gate. Two flavours of gate exist — JFETs use a reverse-biased diode junction, MOSFETs use a thin oxide insulator — and two channel-doping modes — depletion (channel conducts at zero gate bias) and enhancement (channel does not conduct until gate is biased past a threshold V_th). The FET\'s defining advantage is its near-infinite DC input impedance: the gate draws no current, so a FET amplifier can be driven from very weak sources without loading them down. The drain current depends on the over-drive (V_GS − V_th); the slope ∂I_D/∂V_GS is the transconductance g_m, which takes the role of «1/R_E» in the FET equivalent of the common-emitter gain formula.',
     see: ['transistor', 'bjt', 'mosfet', 'jfet', 'transconductance'],
   },
   mosfet: {
@@ -1353,15 +1353,15 @@ export const glossary: Record<string, GlossaryEntry> = {
   'common source': {
     tip: 'The FET equivalent of the common-emitter amplifier: input on the gate, output on the drain. Gain ≈ −g_m · R_D, with phase inversion.',
     detail:
-      'The common-source (CS) amplifier is the FET version of the common-emitter circuit. The gate is biased to a voltage that puts the FET in its active region; the drain connects through R_D to the supply rail; the source is grounded (or returned to ground via a small R_S). An AC input on the gate produces a drain current swing g_m · v_in, where g_m = δI_D/δV_GS is the transconductance (typically 1–100 mS depending on the FET and operating current). That drain current swing drops across R_D as v_out = −g_m · R_D · v_in. The minus sign is phase inversion. The CS topology shares the CE\'s strengths (single-stage gain, easy biasing) and adds the FET\'s near-infinite input impedance — useful when the source is a piezo, electrometer, or any other high-impedance node.',
+      'The common-source (CS) amplifier is the FET version of the common-emitter circuit. The gate is biased to a voltage that puts the FET in its active region; the drain connects through R_D to the supply rail; the source is grounded (or returned to ground via a small R_S). An AC input on the gate produces a drain current swing g_m · v_in, where g_m = ∂I_D/∂V_GS is the transconductance (typically 1–100 mS depending on the FET and operating current). That drain current swing drops across R_D as v_out = −g_m · R_D · v_in. The minus sign is phase inversion. The CS topology shares the CE\'s strengths (single-stage gain, easy biasing) and adds the FET\'s near-infinite input impedance — useful when the source is a piezo, electrometer, or any other high-impedance node.',
     formula: 'A_v ≈ −g_m · R_D',
     see: ['fet', 'mosfet', 'common emitter', 'transconductance'],
   },
   transconductance: {
-    tip: 'The slope of a device\'s output current versus input voltage — δI_out / δV_in. Units are siemens (S = A/V). For a FET, g_m sets the voltage gain in a common-source amplifier the same way 1/R_E sets the gain in a BJT common-emitter amplifier.',
+    tip: 'The slope of a device\'s output current versus input voltage — ∂I_out / ∂V_in. Units are siemens (S = A/V). For a FET, g_m sets the voltage gain in a common-source amplifier the same way 1/R_E sets the gain in a BJT common-emitter amplifier.',
     detail:
       'Transconductance g_m measures how strongly an input voltage modulates an output current. For a FET, g_m = ∂I_D / ∂V_GS at a given operating point; values are typically 1–100 mS depending on the device and bias current. For a BJT operated as a transconductance device (Ebers-Moll picture), g_m = I_C / V_T where V_T ≈ 25 mV is the thermal voltage at room temperature — so a BJT at 1 mA collector current has g_m ≈ 40 mS, much higher than most FETs. Transconductance shows up directly in the gain formulae of voltage amplifiers: A_v = −g_m · R_load, regardless of whether the transistor is a BJT or a FET. The unit is the siemens (S), or equivalently the «mho» (ohm spelled backwards).',
-    formula: 'g_m = δI_out / δV_in',
+    formula: 'g_m = ∂I_out / ∂V_in',
     see: ['common source', 'fet', 'mosfet'],
   },
   beta: {

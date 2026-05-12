@@ -34,10 +34,16 @@ import {
 import { svgTokens } from './svgTokens'
 
 /* ── Overall layout ──────────────────────────────────────────────── */
-const VB_W = 600
-const VB_H = 260
+// Content x: ~135..465 — was VB_W=600, leaving ~135 px empty on EACH side.
+// Tightened to 400; START_X / BAT_*_X re-centre automatically off VB_W.
+// VB_H tightened from 260 → 200 to remove top/bottom dead space; MAIN_Y
+// shifted up to 90 so the caption «ізольований вузол: Σ = 0» still has
+// room below the plates. Display maxWidth dropped from 600 → 420 so the
+// figure no longer dominates the column. Reader-flagged on first pass.
+const VB_W = 400
+const VB_H = 200
 
-const MAIN_Y = 110 // vertical centre of the plate row
+const MAIN_Y = 90 // vertical centre of the plate row
 const PLATE_H = 70 // plate height
 const PLATE_TOP = MAIN_Y - PLATE_H / 2
 const PLATE_BOT = MAIN_Y + PLATE_H / 2
@@ -156,7 +162,7 @@ export default function SeriesIslandIllustration() {
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
         aria-label={t('ch1_5.seriesIslandAria')}
-        style={{ display: 'block', maxWidth: 600, margin: '0 auto' }}
+        style={{ display: 'block', maxWidth: 420, margin: '0 auto' }}
       >
         {/* Island cloud — drawn FIRST so it sits behind the plates/wires. */}
         <g style={{ color: svgTokens.note }}>

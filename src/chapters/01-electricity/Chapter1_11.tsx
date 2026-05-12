@@ -102,8 +102,8 @@ export default function Chapter1_11() {
                 nowrap,
                 npn: <G k="npn" />,
                 pnp: <G k="pnp" />,
-                base: <G k="base" />,
-                col: <G k="collector" />,
+                baseT: <G k="base" />,
+                colT: <G k="collector" />,
                 emi: <G k="emitter" />,
               }}
             />
@@ -150,8 +150,8 @@ export default function Chapter1_11() {
             em: <em />,
             nowrap,
             sat: <G k="transistor saturation" />,
-            base: <G k="base" />,
-            col: <G k="collector" />,
+            baseT: <G k="base" />,
+            colT: <G k="collector" />,
             emi: <G k="emitter" />,
           }}
         />

@@ -30,7 +30,10 @@ import { LED, TransistorNMOS } from '@/lib/circuit/symbols/semiconductors'
 import { MathVar } from '@/components/ui/math'
 import { G } from '@/features/glossary/glossary-term'
 
-const SCHEMATIC_W = 540
+// viewBox sized to actual content extent (content x: 59..313, y: 35..285).
+// SCHEMATIC_W was 540 before — gave ~227 px of empty space on the right.
+// See BjtSwitchSchematic for the same fix and the lessons-learnt context.
+const SCHEMATIC_W = 340
 const SCHEMATIC_H = 320
 
 const TOP_Y = 35
@@ -65,7 +68,7 @@ export default function MosfetSwitchSchematic() {
           components={{ var: <MathVar />, strong: <strong />, g2: <G k="gate" /> }}
         />
       }
-      maxWidth={580}
+      maxWidth={420}
     >
       <Wire points={[supply.p1, { x: SUPPLY_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }, rc.p1]} />
       <Wire points={[rc.p2, led.p1]} />

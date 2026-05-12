@@ -27,7 +27,12 @@ import {
 import { LED, TransistorNPN } from '@/lib/circuit/symbols/semiconductors'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 540
+// viewBox sized to actual content extent (content x: 59..313, y: 35..285).
+// SCHEMATIC_W was 540 before — gave ~227 px of empty space on the right,
+// because the schematic occupies the left half of an over-wide canvas.
+// Reader-flagged for ch 1.11 (and earlier ch 1.10 flyback) — now enforced
+// by check:diagram-viewbox-fit, which scans rendered diagrams at test time.
+const SCHEMATIC_W = 340
 const SCHEMATIC_H = 320
 
 const TOP_Y = 35
@@ -64,7 +69,7 @@ export default function BjtSwitchSchematic() {
           components={{ var: <MathVar />, strong: <strong /> }}
         />
       }
-      maxWidth={580}
+      maxWidth={420}
     >
       {/* +V rail from supply up and across to the top of R_c */}
       <Wire points={[supply.p1, { x: SUPPLY_X, y: TOP_Y }, { x: LOAD_X, y: TOP_Y }, rc.p1]} />

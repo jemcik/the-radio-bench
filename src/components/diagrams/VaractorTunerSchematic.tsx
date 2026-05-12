@@ -44,7 +44,11 @@ import { Diode } from '@/lib/circuit/symbols/semiconductors'
 import { MathVar } from '@/components/ui/math'
 import { G } from '@/features/glossary/glossary-term'
 
-const SCHEMATIC_W = 540
+// viewBox sized to content extent: content x = 50..360 (+ symbol half-
+// width ~30 each side → ~20..390). Was 540 before — left a ~150 px empty
+// strip on the right that read as the schematic floating in a half-empty
+// card. Reader-flagged. See `check:diagram-viewbox-fit` gate.
+const SCHEMATIC_W = 420
 const SCHEMATIC_H = 270
 
 // Vertical layout: V_tune at top, Rb hanging down to tank top, the
@@ -100,7 +104,7 @@ export default function VaractorTunerSchematic() {
           }}
         />
       }
-      maxWidth={600}
+      maxWidth={480}
     >
       {/* ── AC in (left) → Cc → tank top ────────────────────────── */}
       {/* Wire from the «AC in» terminal at x=ACIN_X+8 (just past the
