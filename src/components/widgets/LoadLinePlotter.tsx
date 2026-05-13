@@ -120,31 +120,55 @@ export default function LoadLinePlotter() {
   const [beta, setBeta] = useState(100)     // current gain
 
   // ── Q-point solver ───────────────────────────────────────────
-  // Active-region: I_C ≈ β · I_B (Early correction negligible for the
-  // pedagogical pass). Then V_CE = V_CC − I_C · R_C. Clamp into
-  // [V_CE_sat, V_CC] to handle saturation / cutoff edge cases.
+  // Q-point = intersection of the load line v_ce = V_CC − i_c · R_C with
+  // the BJT curve at user's I_B. Both equations must be satisfied
+  // simultaneously by the point we draw — otherwise the open circle
+  // sits visibly off the brown curve and the reader is right to ask
+  // why. Earlier this used the linear approximation i_c ≈ β·I_B (no
+  // Early correction); the curve render uses tanh()·(1 + v_ce/V_EARLY),
+  // so at v_ce = 4.6 V the curve is 4.6 % higher than the linear i_c
+  // and the dot sat ~4 px below the brown curve. Reader-flagged.
+  //
+  // Fixed-point iteration on
+  //   i_c = β·I_B · tanh(v_ce / V_KNEE) · (1 + v_ce / V_EARLY)
+  //   v_ce = V_CC − i_c · R_C
+  // converges in 2–3 steps for any (R_C, V_CC, β, I_B) in the slider
+  // ranges. 5 iterations gives sub-px residuals across the whole grid.
   const computed = useMemo(() => {
     const i_b_mA = ibUa / 1000
-    const i_c_active_mA = beta * i_b_mA   // mA
     const r_c_kohm = rcKohm
-    const v_drop_active = i_c_active_mA * r_c_kohm  // mA × kΩ = V
-    const v_ce_active = vcc - v_drop_active
+
+    // Detect region from the LINEAR approximation first (i_c ≈ β·I_B);
+    // only iterate once we know we're in the active region. Iterating
+    // fixed-point on the full tanh()·(1 + v_ce/V_EARLY) curve when v_ce
+    // is negative makes it oscillate (tanh(max(v,0)) → 0 → v=V_CC → I_C
+    // jumps → v negative again) and never converges.
+    const linear_ic = beta * i_b_mA
+    const linear_vce = vcc - linear_ic * r_c_kohm
 
     let v_ce: number
     let i_c: number
     let region: 'saturation' | 'active' | 'cutoff'
-    if (i_c_active_mA <= 0) {
+
+    if (linear_ic <= 0) {
       v_ce = vcc
       i_c = 0
       region = 'cutoff'
-    } else if (v_ce_active <= V_CE_SAT) {
-      // Saturated — V_CE clamped, I_C set by load
+    } else if (linear_vce <= V_CE_SAT) {
+      // Linear load line crosses below V_CE_SAT — saturated. V_CE
+      // clamped, I_C set by the load.
       v_ce = V_CE_SAT
       i_c = (vcc - V_CE_SAT) / r_c_kohm
       region = 'saturation'
     } else {
-      v_ce = v_ce_active
-      i_c = i_c_active_mA
+      // Active region — iterate to pick up Early-effect correction so
+      // the Q-point sits exactly on the rendered curve.
+      v_ce = linear_vce
+      for (let it = 0; it < 5; it++) {
+        const ic = beta * i_b_mA * Math.tanh(v_ce / V_KNEE) * (1 + v_ce / V_EARLY)
+        v_ce = vcc - ic * r_c_kohm
+      }
+      i_c = beta * i_b_mA * Math.tanh(v_ce / V_KNEE) * (1 + v_ce / V_EARLY)
       region = 'active'
     }
 
@@ -312,10 +336,18 @@ export default function LoadLinePlotter() {
           />
         </g>
 
-        {/* Load-line label, near the diagonal midpoint */}
+        {/* Load-line label — anchored to the UPPER quarter of the
+            diagonal, with a vertical offset so the text sits above
+            (not on) the dashed line. The midpoint anchor used before
+            collided with the Q-point label at default slider values:
+            both ended up near the geometric centre of the plot.
+            Reader-flagged. The upper quarter is far enough from the
+            full sweep of Q-point positions (which run along the line
+            from saturation at top-left to cutoff at bottom-right) that
+            no slider combination puts the dot directly on this label. */}
         <text
-          x={(loadLineX0 + loadLineX1) / 2 + 16}
-          y={(loadLineY0 + loadLineY1) / 2 - 8}
+          x={loadLineX0 + (loadLineX1 - loadLineX0) * 0.22}
+          y={loadLineY0 + (loadLineY1 - loadLineY0) * 0.22 - 12}
           fontSize="12"
           fontStyle="italic"
           fill={svgTokens.experiment}
@@ -324,10 +356,15 @@ export default function LoadLinePlotter() {
           {t('ch1_11.widget.loadLine.loadLineLabel')}
         </text>
 
-        {/* Q-point label — small offset to the right of the dot */}
+        {/* Q-point label — slightly above-right of the dot so it sits
+            clear of the brown curve (which runs horizontally through
+            the dot in the active region — vertically-centred labels
+            collide with it). The load-line label is now in the upper
+            quarter of the diagonal, so this above-the-dot position
+            no longer collides with it. */}
         <text
-          x={Math.min(xToPx(computed.v_ce) + 12, PLOT_X1 - 50)}
-          y={yToPx(computed.i_c) - 8}
+          x={Math.min(xToPx(computed.v_ce) + 12, PLOT_X1 - 80)}
+          y={yToPx(computed.i_c) - 12}
           fontSize="12"
           fontStyle="italic"
           fontWeight="600"

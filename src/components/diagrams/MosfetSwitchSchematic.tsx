@@ -84,7 +84,9 @@ export default function MosfetSwitchSchematic() {
       <Resistor x={160} y={TR_Y} label="R_g" />
       <TransistorNMOS x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
-      <TerminalLabel x={GATE_TERM_X} y={TR_Y} anchor="end">in</TerminalLabel>
+      {/* Uppercase V_in: DC logic-level input. See BjtSwitchSchematic
+          for the convention rationale (V_X = DC bias, v_x = AC). */}
+      <TerminalLabel x={GATE_TERM_X} y={TR_Y} anchor="end">V_in</TerminalLabel>
     </Circuit>
   )
 }

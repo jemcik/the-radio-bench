@@ -97,7 +97,11 @@ export default function BjtSwitchSchematic() {
       <Resistor x={160} y={TR_Y} label="R_b" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
-      <TerminalLabel x={BASE_TERM_X} y={TR_Y} anchor="end">in</TerminalLabel>
+      {/* Uppercase V_in: this is a DC logic-level input (3.3 V HIGH /
+          0 V LOW), not an AC small signal. Matches the bjtSwitchKey /
+          bjtSwitchHowItWorks prose which discusses V_in throughout.
+          AoE/Sedra-Smith convention: V_X = DC bias, v_x = AC small signal. */}
+      <TerminalLabel x={BASE_TERM_X} y={TR_Y} anchor="end">V_in</TerminalLabel>
     </Circuit>
   )
 }

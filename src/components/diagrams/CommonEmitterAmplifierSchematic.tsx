@@ -45,6 +45,11 @@ const TR_Y = 200
 const RE_Y = 270
 const BOT_Y = 320
 
+// Collector node = bottom pin of R_C, where the collector wire +
+// output-coupling-cap branch meet. Used both for the y-position of C_out
+// and for the junction dot. RC_Y + 30 because pins2 default span=60.
+const COLLECTOR_NODE_Y = RC_Y + 30
+
 // Columns
 const SUPPLY_X = 80
 const DIV_X = 220       // R_1 / R_2 divider column
@@ -64,10 +69,19 @@ const supply = pins2(SUPPLY_X, (TOP_Y + BOT_Y) / 2, 'down')
 const r1 = pins2(DIV_X, (TOP_Y + BASE_Y) / 2, 'down')
 const r2 = pins2(DIV_X, (BASE_Y + BOT_Y) / 2, 'down')
 const rc = pins2(TR_COL_X, RC_Y, 'down')
-const re = pins2(TR_COL_X - 12, RE_Y, 'down') // emitter column = TR_X + emitter_x_offset (12) = TR_COL_X
+// R_E sits on TR_COL_X — the same x as the transistor's emitter pin
+// (TR_X + 10 per chris-pikul TransistorNPN). Was TR_COL_X - 12 from the
+// pre-May-2026 pinsBJT geometry where emitter offset was +12; after the
+// pin geometry was corrected, this constant was never updated and the
+// emitter/bottom-rail wires ran at a 12-px diagonal, reader-flagged.
+const re = pins2(TR_COL_X, RE_Y, 'down')
 const tr = pinsBJT(TR_X, TR_Y, 'right')
 const cin = pins2(CIN_X, BASE_Y)
-const cout = pins2(COUT_X, RC_Y)
+// C_out sits at the COLLECTOR node (= bottom of R_C, where wire from R_C,
+// wire to transistor collector, and branch to C_out converge). Was at RC_Y
+// (centre of R_C body) — the branch wire visibly cut through the R_C
+// symbol. Reader-flagged.
+const cout = pins2(COUT_X, COLLECTOR_NODE_Y)
 
 export default function CommonEmitterAmplifierSchematic() {
   return (
@@ -94,14 +108,14 @@ export default function CommonEmitterAmplifierSchematic() {
       {/* ── R_2 down to bottom rail ─────────────────────────── */}
       <Wire points={[r2.p2, { x: DIV_X, y: BOT_Y }]} />
 
-      {/* ── Collector through R_C to top rail (already wired); branch
-            to output coupling cap ─────────────────────────── */}
+      {/* ── Collector node: R_C bottom pin meets the wire down to the
+            collector pin and the horizontal branch out to C_out ── */}
       <Wire points={[rc.p2, tr.collector]} />
-      <Wire points={[{ x: TR_COL_X, y: RC_Y }, cout.p1]} />
+      <Wire points={[rc.p2, cout.p1]} />
       {/* wire-pin-alignment-ok: «out» rail extension past C_out — endpoint
           intentionally 6 px past the cap's right pin to leave room for
           the «out» terminal label. */}
-      <Wire points={[cout.p2, { x: COUT_X + 30 + 6, y: RC_Y }]} />
+      <Wire points={[cout.p2, { x: COUT_X + 30 + 6, y: COLLECTOR_NODE_Y }]} />
 
       {/* ── Emitter through R_E to bottom rail ─────────────── */}
       <Wire points={[tr.emitter, re.p1]} />
@@ -119,22 +133,32 @@ export default function CommonEmitterAmplifierSchematic() {
       <Resistor x={DIV_X} y={(TOP_Y + BASE_Y) / 2} orient="down" label="R_1" />
       <Resistor x={DIV_X} y={(BASE_Y + BOT_Y) / 2} orient="down" label="R_2" />
       <Resistor x={TR_COL_X} y={RC_Y} orient="down" label="R_C" />
-      <Resistor x={TR_COL_X - 12} y={RE_Y} orient="down" label="R_E" />
+      <Resistor x={TR_COL_X} y={RE_Y} orient="down" label="R_E" />
       <Capacitor x={CIN_X} y={BASE_Y} label="C_in" />
-      <Capacitor x={COUT_X} y={RC_Y} label="C_out" />
+      <Capacitor x={COUT_X} y={COLLECTOR_NODE_Y} label="C_out" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
       {/* I/O terminal labels */}
-      <TerminalLabel x={IN_TERM_X} y={BASE_Y} anchor="end">in</TerminalLabel>
-      <TerminalLabel x={COUT_X + 30 + 12} y={RC_Y} anchor="start">out</TerminalLabel>
+      {/* Terminal labels match the chapter prose:
+          • CE amp is analysed in terms of the small-signal AC variables
+            v_in (input wiggle on the base) and v_out (output wiggle on
+            the collector), so the terminal labels use lowercase v —
+            consistent with «v_X(t) = V_X + v_x(t)» textbook convention
+            (AoE / Sedra-Smith): uppercase V_X for DC bias, lowercase v_x
+            for the AC component. Bare «in» / «out» terminals on the
+            previous version forced the reader to map «in» (schematic
+            label) ↔ «v_in» (prose) themselves — reader-flagged. */}
+      <TerminalLabel x={IN_TERM_X} y={BASE_Y} anchor="end">v_in</TerminalLabel>
+      <TerminalLabel x={COUT_X + 30 + 12} y={COLLECTOR_NODE_Y} anchor="start">v_out</TerminalLabel>
 
-      {/* Junctions where 3+ wires meet — DIV_X nodes have R1/R2 tap +
-          input cap meeting. TR_COL_X nodes were spurious L-corners
-          flagged by check:junction-placement; if the visual layout
-          needs T-marking there, restructure the wires to make the
-          point a real 3-wire convergence first. */}
+      {/* Junctions where 3+ wires meet:
+          • (DIV_X, TOP_Y) — top rail tap into R_1.
+          • (DIV_X, BASE_Y) — R_1/R_2 mid-point + C_in tap into base.
+          • (TR_COL_X, COLLECTOR_NODE_Y) — R_C bottom pin meets wire down
+            to collector AND wire right to C_out. */}
       <Junction x={DIV_X} y={TOP_Y} />
       <Junction x={DIV_X} y={BASE_Y} />
+      <Junction x={TR_COL_X} y={COLLECTOR_NODE_Y} />
     </Circuit>
   )
 }

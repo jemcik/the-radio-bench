@@ -12,6 +12,7 @@ import BjtSwitchSchematic from '@/components/diagrams/BjtSwitchSchematic'
 import MosfetSwitchSchematic from '@/components/diagrams/MosfetSwitchSchematic'
 import CommonEmitterAmplifierSchematic from '@/components/diagrams/CommonEmitterAmplifierSchematic'
 import BjtOutputCurves from '@/components/diagrams/BjtOutputCurves'
+import BjtOperationVisualizer from '@/components/widgets/BjtOperationVisualizer'
 import BjtSwitchDesigner from '@/components/widgets/BjtSwitchDesigner'
 import LoadLinePlotter from '@/components/widgets/LoadLinePlotter'
 import CeGainCalculator from '@/components/widgets/CeGainCalculator'
@@ -128,7 +129,46 @@ export default function Chapter1_11() {
         </li>
       </ul>
 
-      {/* ── Section 2: BJT as a switch ───────────────────────── */}
+      {/* ── Section 2: How a transistor actually works ───────── */}
+      {/* This section was added after the user reported being unable
+          to truly understand the chapter without ~6 rounds of chat
+          Q&A. The previous flow jumped from «BJT has three pins»
+          straight into «here is a BJT switch» without ever showing
+          the internal mechanism. */}
+      <Section id="inside" labelKey="ch1_11.sectionInside" />
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideIntro"
+          ns="ui"
+          components={{ strong: <strong /> }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideMechanism"
+          ns="ui"
+          components={{ ...mathComponents, nowrap }}
+        />
+      </p>
+
+      <BjtOperationVisualizer />
+
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideTwoLaws"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideRegions"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
+        />
+      </p>
+
+      {/* ── Section 3: BJT as a switch ───────────────────────── */}
       <Section id="bjtSwitch" labelKey="ch1_11.sectionBjtSwitch" />
       <p>
         <Trans
@@ -230,7 +270,7 @@ export default function Chapter1_11() {
             <Trans
               i18nKey="ch1_11.mosfetSwitchVsBjtBjt"
               ns="ui"
-              components={{ strong: <strong /> }}
+              components={{ strong: <strong />, var: <MathVar /> }}
             />
           </span>
         </li>

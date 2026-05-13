@@ -7,11 +7,18 @@ import LoadLinePlotter from './LoadLinePlotter'
  * LoadLinePlotter smoke tests.
  *
  * Defaults: V_CC = 9 V, R_C = 2.2 kΩ, I_B = 20 µA, β = 100.
- *   I_C(active) = 100 × 20 µA = 2.0 mA
- *   V_drop on R_C = 2.0 mA × 2.2 kΩ = 4.4 V
- *   V_CE = 9 − 4.4 = 4.6 V — comfortably in the active region
  *
- * Headroom: up = 9 − 4.6 = 4.4 V; down = 4.6 − 0.2 = 4.4 V (mid-rail!).
+ * Q-point is solved with the full curve model (tanh + Early effect)
+ * so the dot sits ON the rendered curve. The Early correction
+ * (1 + V_CE/V_EARLY) with V_EARLY = 100 V pushes I_C up by ~4–5 %
+ * relative to the bare β·I_B value at typical V_CE, which then
+ * pulls V_CE slightly closer to V_CE_SAT through the load line.
+ *
+ *   Linear (no Early): I_C = 2.0 mA, V_CE = 9 − 2.0·2.2 = 4.6 V
+ *   With Early:        I_C ≈ 2.09 mA, V_CE ≈ 4.41 V (converged)
+ *
+ * Tests assert the iterated (with-Early) values, since those are
+ * what the user sees both as the dot position AND as the readout.
  */
 
 function setup(language: 'en' | 'uk' = 'en') {
@@ -19,18 +26,19 @@ function setup(language: 'en' | 'uk' = 'en') {
 }
 
 describe('LoadLinePlotter', () => {
-  it('renders the default Q-point with V_CE ≈ 4.6 V and I_C ≈ 2 mA', () => {
+  it('renders the default Q-point with V_CE ≈ 4.41 V and I_C ≈ 2.09 mA', () => {
     const { container } = setup()
-    expect(container.textContent).toMatch(/4\.6\s*V/)
-    expect(container.textContent).toMatch(/2\s*mA/)
+    expect(container.textContent).toMatch(/4\.41\s*V/)
+    expect(container.textContent).toMatch(/2\.09\s*mA/)
   })
 
   it('updates the Q-point when V_CC is increased', () => {
     const { container } = setup()
-    // V_CC 9 → 12 with same R_C, β, I_B → V_CE = 12 − 4.4 = 7.6 V
+    // V_CC 9 → 12 with same R_C, β, I_B. Linear V_CE = 12 − 4.4 = 7.6 V;
+    // with Early at v_ce ≈ 7.3 the i_c lifts ~7 %, so converged V_CE ≈ 7.28 V.
     const vccSlider = container.querySelector('input#load-line-vcc') as HTMLInputElement
     fireEvent.change(vccSlider, { target: { value: '12' } })
-    expect(container.textContent).toMatch(/7\.6\s*V/)
+    expect(container.textContent).toMatch(/7\.28\s*V/)
   })
 
   it('moves the Q-point into saturation when R_C is large enough', () => {
