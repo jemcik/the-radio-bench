@@ -74,16 +74,70 @@ const C_X0 = 270
 const C_X1 = 470        // collector spans 270..470
 
 // Particle simulation
-const MAX_PARTICLES = 80
+//
+// MAX_PARTICLES must comfortably exceed the steady-state population
+// (spawn_rate × traverse_time) at peak current, otherwise the cap
+// clips spawning early and the visible carriers cluster around the
+// emitter (where they spawn) instead of spreading across the body.
+// At i_c = 10 mA and SPAWN_TIME_AT_FULL_MA = 50 ms we spawn ~20/sec;
+// at vx ≈ 1.5 px/frame × 30 fps ≈ 45 px/sec the traverse time across
+// 410 px is ≈ 9 sec. Steady state ≈ 20 × 9 = 180 particles. 200 cap
+// gives a small headroom.
+const MAX_PARTICLES = 200
 const PARTICLE_RADIUS = 2.4
 
 const V_T = 0.026       // thermal voltage at room temp (≈ kT/q)
 const I_S = 1e-12       // mA — saturation current scale
-const I_C_CAP_MA = 10   // soft cap; values pinned here = «saturation»
 
-// Region thresholds (in mA — derived from V_BE)
-const CUTOFF_THRESHOLD_MA = 0.001  // below 1 µA → cutoff
-const SATURATION_THRESHOLD_MA = 9.5 // near the cap → saturation hint
+// Region thresholds (in mA — derived from V_BE via the diode equation
+// i_c = I_S · exp(V_BE / V_T) with I_S = 1e-12 mA, V_T = 0.026 V).
+//
+// These constants are NOT independent of the chapter prose — both the
+// `insideRegions` paragraph AND the widget's `regionDescription` text
+// quote specific V_BE boundaries for cutoff / active / saturation. The
+// numbers below are picked so the region label flips at exactly those
+// quoted V_BE values:
+//
+//   cutoff → active   at V_BE ≈ 0.60 V (i_c ≈ 0.011 mA)
+//   active → saturation at V_BE ≈ 0.75 V (i_c ≈ 3.35 mA)
+//
+// I_C_CAP_MA caps the readout slightly above the saturation threshold
+// so the visualisation models «load can no longer supply more current»
+// — a real CE-switch load would clip the current at this level.
+//
+// Tied to prose by BjtOperationVisualizer.test.tsx — if you change
+// either the model constants or the prose V_BE thresholds, that test
+// will fail until both sides agree again. The previous version had
+// SATURATION_THRESHOLD_MA = 9.5 mA which corresponded to V_BE ≈ 0.78
+// while prose said active ends at 0.75; reader-flagged.
+//
+// SATURATION_THRESHOLD_MA == I_C_CAP_MA on purpose: the «saturation»
+// label is meant to communicate «the load is now clipping the
+// current», so it must NOT fire before the cap actually kicks in.
+// Earlier version had a 3.3/4.0 gap which gave a window where the
+// label said «saturation, capped at 4 mA» while the readout showed
+// i_c = 3.37 mA (clearly not capped yet) — the description text was
+// lying. Reader-flagged.
+const CUTOFF_THRESHOLD_MA = 0.01                  // V_BE ≈ 0.60 V boundary
+const I_C_CAP_MA = 3.5                            // soft cap = saturation start
+const SATURATION_THRESHOLD_MA = I_C_CAP_MA        // label fires when cap engages
+
+/**
+ * Particle motion is state-based, not spring-physics-based:
+ *   • flowing — drifts rightward at constant vx, vy stays small.
+ *     Non-recombining particles stay in this state until they exit at
+ *     the collector side; recombining particles switch to «branching»
+ *     when they hit the middle of the base.
+ *   • branching — only used by recombining carriers. The particle
+ *     decelerates horizontally and accelerates downward to curve out
+ *     through the base wire (visible as i_b leaving the device).
+ *     This is the physically-correct picture: the carrier that
+ *     recombined in the base re-emerges through the base contact.
+ *   • Previous version used spring-toward-recombineY which gave an
+ *     undamped oscillation that read on screen as the particle
+ *     «bouncing» up and down. Reader-flagged.
+ */
+type ParticlePhase = 'flowing' | 'branching'
 
 interface Particle {
   x: number
@@ -92,22 +146,63 @@ interface Particle {
   vy: number
   /** Does this carrier recombine in the base instead of reaching the collector? */
   recombines: boolean
-  /** Once a recombining particle reaches the base region, it veers and disappears. */
-  recombineY: number
-  /** Lifetime / fade. */
+  phase: ParticlePhase
   alive: boolean
 }
 
+const BRANCH_TRIGGER_X = (B_X0 + B_X1) / 2  // veer once past the base midline
+
+// Length of the opacity fade-in at the left wall and fade-out at the
+// right wall. Particles spawn inside the body but with opacity ≈ 0;
+// they ramp up as they cross this strip, giving the visual impression
+// of «being injected at the emitter junction» (and symmetrically
+// «being absorbed at the collector junction» on the way out).
+// Previously particles materialised at full opacity at a random x and
+// despawned mid-stream — reader-flagged as «appearing from nothing».
+const FADE_STRIP = 30
+
 function makeParticle(beta: number, rng: () => number): Particle {
   return {
+    // Spawn STRICTLY inside the emitter body, just past the left wall.
+    // Combined with the fade-in opacity below, the visual reads as
+    // «electrons entering from the emitter contact», not appearing in
+    // the middle of empty space or — worse — outside the structure.
     x: E_X0 + rng() * 10,
     y: STRUCT_Y0 + 20 + rng() * (STRUCT_Y1 - STRUCT_Y0 - 40),
-    vx: 1.4 + rng() * 0.4,
-    vy: (rng() - 0.5) * 0.3,
+    // Wide vx spread (1.0 → 1.9, was 1.4 → 1.8) so faster particles
+    // overtake slower ones during their traversal — any initial
+    // clumping spreads out naturally before they reach the collector.
+    vx: 1.0 + rng() * 0.9,
+    vy: 0,
     recombines: rng() < 1 / beta,
-    recombineY: STRUCT_Y1 - 10 - rng() * 8,
+    phase: 'flowing',
     alive: true,
   }
+}
+
+/**
+ * Per-particle opacity for fade-in (entering the emitter wall) and
+ * fade-out (leaving via the collector wall, or via the base wire for
+ * recombining carriers). Returns 0..0.85.
+ */
+function particleOpacity(p: Particle): number {
+  const FULL = 0.85
+  if (p.phase === 'branching') {
+    // Fade out as the carrier dives below the body into the base wire.
+    if (p.y > STRUCT_Y1 - 8) {
+      const t = (STRUCT_Y1 + 12 - p.y) / 20
+      return Math.max(0, Math.min(FULL, t * FULL))
+    }
+    return FULL
+  }
+  // Flowing phase — fade in near left wall, fade out near right wall.
+  if (p.x < E_X0 + FADE_STRIP) {
+    return Math.max(0, Math.min(FULL, ((p.x - E_X0) / FADE_STRIP) * FULL))
+  }
+  if (p.x > C_X1 - FADE_STRIP) {
+    return Math.max(0, Math.min(FULL, ((C_X1 - p.x) / FADE_STRIP) * FULL))
+  }
+  return FULL
 }
 
 interface SliderRowProps {
@@ -185,8 +280,8 @@ export default function BjtOperationVisualizer() {
   // re-renders; a frame counter in state forces re-render at the
   // animation framerate (capped at ~30 fps).
   const particlesRef = useRef<Particle[]>([])
-  const lastSpawnRef = useRef<number>(0)
   const lastFrameRef = useRef<number>(0)
+  const prevFrameTimeRef = useRef<number>(0)
   const [, setTick] = useState(0)
   const tickRef = useRef(0)
 
@@ -203,7 +298,7 @@ export default function BjtOperationVisualizer() {
   useEffect(() => {
     let rafId = 0
     const FRAME_MS = 1000 / 30
-    const SPAWN_TIME_AT_FULL_MA = 30  // ms between spawns at i_c = 10 mA
+    const SPAWN_TIME_AT_FULL_MA = 50  // ms between spawns at i_c = 10 mA
 
     const tick = (now: number) => {
       // Throttle to ~30 fps so SVG render stays cheap.
@@ -211,44 +306,80 @@ export default function BjtOperationVisualizer() {
         rafId = requestAnimationFrame(tick)
         return
       }
+      const dt = prevFrameTimeRef.current === 0 ? FRAME_MS : (now - prevFrameTimeRef.current)
+      prevFrameTimeRef.current = now
       lastFrameRef.current = now
 
       const rng = rngRef.current
       const particles = particlesRef.current
 
-      // Spawn rate: roughly one particle per SPAWN_TIME_AT_FULL_MA at
-      // i_c = 10 mA, linear in i_c, no spawning in cutoff.
+      // Poisson-like spawning: each frame, expected spawn count is
+      // (dt / spawnInterval). Floor + Bernoulli for the fractional
+      // part de-syncs spawns from frame-tick boundaries — the previous
+      // «if elapsed > interval» logic locked spawns to ~1 per frame at
+      // high current and read on screen as discrete waves of particles
+      // travelling together. Reader-flagged.
+      //
+      // spawnInterval uses SQRT scaling instead of linear (i_c_cap/i_c).
+      // Active-region currents span three orders of magnitude (10 µA →
+      // 10 mA); linear scaling makes the low-current end invisible
+      // (one particle every 33 seconds at the active threshold).
+      // sqrt() compresses the dynamic range so the bottom of the active
+      // range still shows perceptible flow (~1 every 1.3 sec at 15 µA)
+      // while the top remains a dense stream (~20/sec at 10 mA). The
+      // visualisation trades exact-proportionality for pedagogical
+      // clarity — what we want the reader to feel is «current grows
+      // with V_BE», not «current is exactly proportional to N particles».
       if (i_c_mA > CUTOFF_THRESHOLD_MA) {
-        const spawnInterval = SPAWN_TIME_AT_FULL_MA * (I_C_CAP_MA / Math.max(i_c_mA, 0.01))
-        if (now - lastSpawnRef.current > spawnInterval && particles.length < MAX_PARTICLES) {
+        const spawnInterval = SPAWN_TIME_AT_FULL_MA * Math.sqrt(I_C_CAP_MA / Math.max(i_c_mA, 0.001))
+        const expected = dt / spawnInterval
+        const whole = Math.floor(expected)
+        const frac = expected - whole
+        const spawnCount = whole + (rng() < frac ? 1 : 0)
+        for (let i = 0; i < spawnCount; i++) {
+          if (particles.length >= MAX_PARTICLES) break
           particles.push(makeParticle(beta, rng))
-          lastSpawnRef.current = now
         }
       }
 
-      // Update positions.
+      // Update positions — state-based, no spring oscillation.
       for (const p of particles) {
         if (!p.alive) continue
 
-        p.x += p.vx
-        p.y += p.vy
-        // Mild vertical drift toward centre to keep particles within
-        // the device body.
-        const yMid = (STRUCT_Y0 + STRUCT_Y1) / 2
-        p.vy += (yMid - p.y) * 0.0005
+        if (p.phase === 'flowing') {
+          // Drift right; vy stays at 0 so the path is a clean
+          // horizontal line. The visual story is «electrons get
+          // injected at the emitter and drift across the body to the
+          // collector». Any wobble used to read as «electrons jumping
+          // around» which is the wrong physics intuition.
+          p.x += p.vx
 
-        // Recombining particles drift toward bottom of base as they
-        // cross into the base region.
-        if (p.recombines && p.x > B_X0 - 4 && p.x < B_X1 + 4) {
-          p.vy += (p.recombineY - p.y) * 0.04
-          if (Math.abs(p.y - p.recombineY) < 2) {
+          // Trigger branch for recombining carriers once they cross
+          // the base midline.
+          if (p.recombines && p.x >= BRANCH_TRIGGER_X) {
+            p.phase = 'branching'
+          }
+
+          // Non-recombining: exit at the collector wall. Despawn AT the
+          // wall (x = C_X1), not 20 px before — the opacity fade-out
+          // below handles the visual disappearance smoothly.
+          if (!p.recombines && p.x >= C_X1) {
             p.alive = false
           }
-        }
+        } else if (p.phase === 'branching') {
+          // Smooth curve down through the base wire — accelerate vy,
+          // decelerate vx. Reads as «the carrier veers down out of
+          // the device through the base terminal» = visible i_b.
+          p.vy = Math.min(p.vy + 0.10, 1.6)
+          p.vx = Math.max(p.vx - 0.06, 0)
+          p.x += p.vx
+          p.y += p.vy
 
-        // Despawn at far right (reached collector terminal).
-        if (p.x > C_X1 - 20) {
-          p.alive = false
+          // Exit at the base contact (just past the bottom of the
+          // body, where the base wire connects).
+          if (p.y > STRUCT_Y1 + 12) {
+            p.alive = false
+          }
         }
       }
 
@@ -427,14 +558,20 @@ export default function BjtOperationVisualizer() {
           B
         </text>
 
-        {/* ── Particles (electrons flowing emitter → collector) */}
+        {/* ── Particles (electrons flowing emitter → collector).
+             Recombining carriers that have already entered the branch
+             phase get the caution colour to visually identify them as
+             «about to leave through the base wire» (visible i_b).
+             Opacity fades in/out near the body walls so carriers
+             appear to be «injected» / «collected» rather than
+             materialising mid-stream. */}
         {particlesRef.current.map((p, idx) => (
           <circle
             key={idx}
             cx={p.x} cy={p.y}
             r={PARTICLE_RADIUS}
-            fill={p.recombines && p.x > B_X0 ? svgTokens.caution : svgTokens.primary}
-            opacity={0.85}
+            fill={p.phase === 'branching' ? svgTokens.caution : svgTokens.primary}
+            opacity={particleOpacity(p)}
           />
         ))}
 

@@ -153,9 +153,39 @@ export default function Chapter1_11() {
 
       <BjtOperationVisualizer />
 
+      <p>{t('ch1_11.insideTwoLawsIntro')}</p>
+      <ul className="not-prose space-y-3 my-4 text-foreground">
+        <li className="flex gap-3 items-start rounded-md border border-border bg-card/40 px-4 py-3 leading-6">
+          <span aria-hidden="true" className="shrink-0 mt-[7px] inline-block w-2 h-2 rounded-full bg-primary/70" />
+          <span className="flex-1 min-w-0 text-sm">
+            <Trans
+              i18nKey="ch1_11.insideTwoLawsVoltage"
+              ns="ui"
+              components={{ ...mathComponents, strong: <strong />, nowrap }}
+            />
+          </span>
+        </li>
+        <li className="flex gap-3 items-start rounded-md border border-border bg-card/40 px-4 py-3 leading-6">
+          <span aria-hidden="true" className="shrink-0 mt-[7px] inline-block w-2 h-2 rounded-full bg-primary/70" />
+          <span className="flex-1 min-w-0 text-sm">
+            <Trans
+              i18nKey="ch1_11.insideTwoLawsCurrent"
+              ns="ui"
+              components={{ ...mathComponents, strong: <strong />, nowrap }}
+            />
+          </span>
+        </li>
+      </ul>
       <p>
         <Trans
-          i18nKey="ch1_11.insideTwoLaws"
+          i18nKey="ch1_11.insideTwoLawsCompete"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideTwoLawsWidget"
           ns="ui"
           components={{ ...mathComponents, strong: <strong />, nowrap }}
         />
