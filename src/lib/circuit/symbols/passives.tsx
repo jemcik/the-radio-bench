@@ -1,5 +1,13 @@
-import { type SymbolProps, orientAngle, isVertical, STROKE } from '../types'
+/**
+ * Passive components — resistors, capacitors, inductors.
+ *
+ * Geometry adapted from chris-pikul/electronic-symbols (MIT-licensed).
+ * See ../vendored/SOURCE.md for the per-symbol mapping.
+ */
+
+import { type SymbolProps, isVertical } from '../types'
 import { SymbolText, getLabelPosition, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
+import { VendoredSymbol } from './_VendoredSymbol'
 
 /**
  * Passive components share an "above-the-body" label style: both the
@@ -17,20 +25,6 @@ function PassiveLabel({
   label,
   value,
 }: SymbolProps & { orient: NonNullable<SymbolProps['orient']> }) {
-  // `getLabelPosition` puts horizontal labels at y-14 — too tight for a
-  // 14 px glyph above a body that extends to y-8 (resistor zigzag peaks,
-  // capacitor plates).
-  //
-  // Two cases:
-  //  • Single label OR single value: push 4 px more (final y-18) so the
-  //    glyph sits above the body with 3 px breathing room.
-  //  • Both label AND value: the value lands at labelY + LABEL_SIZE, so
-  //    we have to lift the label enough that the value clears the body
-  //    too. Push 18 px more (final y-32): label at y-32, value at y-18
-  //    — value lands where a single label used to, label moves up by
-  //    one line. This requires the schematic's TOP_Y to be ≥ ~50 so
-  //    the glyph isn't clipped by the SVG top edge; SCHEMATIC_PAD_TOP=
-  //    35 fits a single label only.
   const { lx, ly, anchor } = getLabelPosition(x, y, orient)
   const bothPresent = !!label && !!value
   const labelY = isVertical(orient)
@@ -39,7 +33,7 @@ function PassiveLabel({
   return (
     <>
       {label && (
-        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight={600} anchor={anchor}>
+        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} anchor={anchor}>
           {label}
         </SymbolText>
       )}
@@ -53,160 +47,80 @@ function PassiveLabel({
 }
 
 /**
- * Resistor — ARRL zigzag style
- *
- * SVG path (at origin, orient='right'):
- *   Lead from (-30,0) to (-16,0)
- *   Zigzag: (-12,-8) → (-4,8) → (4,-8) → (12,8) → (16,0)
- *   Lead from (16,0) to (30,0)
- *
- * The zigzag creates 3.5 cycles matching ARRL standard.
+ * Resistor — IEEE zigzag.
+ * Source: Resistor-IEEE-Standard.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function Resistor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left lead */}
-        <line x1="-30" y1="0" x2="-16" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Zigzag resistor body */}
-        <polyline
-          points="-16,0 -12,-8 -4,8 4,-8 12,8 16,0 30,0"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M0 74.94h31.25l10.29-24.97L54.92 100l13.39-50 13.38 50 13.39-49.62L108.46 100l10.29-25H150" />
+      </VendoredSymbol>
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
- * Capacitor — fixed (two parallel plates)
- *
- * SVG path (at origin, orient='right'):
- *   Lead from (-30,0) to (-4,0)
- *   Plate 1: vertical line (-4,-10) to (-4,10)
- *   Plate 2: vertical line (4,-10) to (4,10)
- *   Lead from (4,0) to (30,0)
+ * Capacitor — non-polarised (two parallel plates).
+ * Source: Capacitor-IEEE-NonPolarized.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function Capacitor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left lead */}
-        <line x1="-30" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Plate 1 (left, positive) */}
-        <line x1="-4" y1="-10" x2="-4" y2="10" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Plate 2 (right, negative) */}
-        <line x1="4" y1="-10" x2="4" y2="10" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Right lead */}
-        <line x1="4" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M150 74.97H84.5M0 75.25h66.5M54 44s12.5 12.25 12.5 31S54 106 54 106m30.5-62v62" />
+      </VendoredSymbol>
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
- * Capacitor (Electrolytic) — polarised
- *
- * Same as Capacitor but with one curved plate and a "+" mark.
+ * Capacitor — polarised (electrolytic) with curved plate and «+» marker.
+ * Source: Capacitor-IEEE-Polarized.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function CapacitorElectrolytic({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left lead */}
-        <line x1="-30" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Plate 1 (left, positive) */}
-        <line x1="-4" y1="-10" x2="-4" y2="10" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* Plate 2 (right, negative) — curved using quadratic bezier */}
-        <path
-          d="M 4 -10 Q 6 0 4 10"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* Right lead */}
-        <line x1="4" y1="0" x2="30" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* "+" mark near positive plate */}
-        <SymbolText x={-10} y={-8} size={9} opacity={0.5}>+</SymbolText>
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M150 74.97H84.5M0 75.25h66.5M54 44s12.5 12.25 12.5 31S54 106 54 106m30.5-62v62m46.75-56h-25m12.5-12.5v25" />
+      </VendoredSymbol>
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
- * Inductor — air-core (4 semicircular bumps)
+ * Inductor — air-core (4 semicircular bumps).
+ * Source: Inductor-COM-Air.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function Inductor({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left lead */}
-        <line x1="-30" y1="0" x2="-18" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* 4 semicircular bumps (arcs bulging upward) */}
-        <path
-          d="M -18 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 L 30 0"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M0 75.13h12.5s0-18.82 15.63-18.82S43.75 75 43.75 75s0-18.75 15.63-18.75S75 75 75 75s0-18.75 15.63-18.75S106.25 75 106.25 75s0-18.75 15.63-18.75S137.5 75 137.5 75H150" />
+      </VendoredSymbol>
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )
 }
 
 /**
- * Inductor (Magnetic Core) — air-core with iron core lines
+ * Inductor — magnetic core (bumps + two parallel horizontal core lines).
+ * Source: Inductor-COM-Magnetic.svg
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function InductorCore({ x, y, orient = 'right', label, value }: SymbolProps) {
   return (
     <>
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Left lead */}
-        <line x1="-30" y1="0" x2="-18" y2="0" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-
-        {/* 4 semicircular bumps (arcs bulging upward) */}
-        <path
-          d="M -18 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 a 4.5 6 0 0 0 9 0 L 30 0"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Iron core — two horizontal parallel lines, separated from
-            the coil bumps so the «magnetic core» mark reads as a
-            distinct ARRL-style decorator rather than merging with the
-            bumps' outline (matches the ARRL Handbook «Magnetic-core»
-            inductor symbol with clear bumps↔core gap). */}
-        <line x1="-16" y1="10" x2="16" y2="10" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-        <line x1="-16" y1="13" x2="16" y2="13" stroke="currentColor" strokeWidth={STROKE} strokeLinecap="round" />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M0 75.13h12.5s0-18.82 15.63-18.82S43.75 75 43.75 75s0-18.75 15.63-18.75S75 75 75 75s0-18.75 15.63-18.75S106.25 75 106.25 75s0-18.75 15.63-18.75S137.5 75 137.5 75H150M12.5 43.75h125m-125-12.5h125" />
+      </VendoredSymbol>
       <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
     </>
   )

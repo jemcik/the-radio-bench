@@ -62,6 +62,24 @@ describe('withSubscripts', () => {
     expect(subs).toHaveLength(3)
     expect([...subs].map(s => s.textContent)).toEqual(['L', 'C', 'S'])
   })
+
+  it('handles LaTeX-style braced form X_{Y}', () => {
+    const c = renderInline(withSubscripts('V_{GS} = V_{th}'))
+    const subs = c.querySelectorAll('sub')
+    expect(subs).toHaveLength(2)
+    expect([...subs].map(s => s.textContent)).toEqual(['GS', 'th'])
+    // Verify the braces themselves don't leak into the text
+    expect(c.textContent).not.toContain('{')
+    expect(c.textContent).not.toContain('}')
+  })
+
+  it('handles bare and braced forms mixed in one string (FET glossary regression)', () => {
+    const c = renderInline(withSubscripts('δI_{D}/δV_{GS} is the transconductance g_m'))
+    const subs = c.querySelectorAll('sub')
+    expect(subs).toHaveLength(3)
+    expect([...subs].map(s => s.textContent)).toEqual(['D', 'GS', 'm'])
+    expect(c.textContent).not.toContain('{')
+  })
 })
 
 describe('withSubscriptsSvg', () => {

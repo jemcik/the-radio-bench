@@ -1,12 +1,16 @@
 /**
- * Circuit schematic library — ARRL-standard symbols for Radiopedia.
+ * Circuit schematic library — chris-pikul/electronic-symbols vendored
+ * primitives for Radiopedia.
  *
  * PUBLIC API
  * ──────────
- *  Components : Circuit, Wire, Junction, and all symbols
- *  Utilities  : pins2, pinsBJT, pinsOpAmp, pin1 (pin position helpers)
+ *  Components : Circuit, Wire, Junction, NodePoint, TerminalLabel,
+ *               and the symbol primitives (Resistor, Battery, OpAmp, …)
+ *  Utilities  : pins2 (two-terminal helper), pinsBJT, pinsMOSFET
+ *               (transistor pin helpers; offsets match the chris-pikul
+ *               primitive geometry — see types.ts comments)
  *  Types      : Orientation, Point, SymbolProps, etc.
- *  Constants  : SPAN, HALF, STROKE, WIRE_STROKE
+ *  Constants  : STROKE, WIRE_STROKE, AC_SOURCE_RADIUS, METER_PIN_SPAN
  *
  * USAGE
  *   import { Circuit, Wire, Junction, Resistor, Battery, pins2 } from '@/lib/circuit'
@@ -43,12 +47,8 @@ export {
   type OpAmpProps,
   pins2,
   pinsBJT,
-  pinsOpAmp,
-  pin1,
-  orientAngle,
+  pinsMOSFET,
   isVertical,
-  SPAN,
-  HALF,
   STROKE,
   WIRE_STROKE,
 } from './types'
@@ -57,10 +57,10 @@ export {
 export { Resistor, Capacitor, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
-export { AcSource, Battery, BatteryMulti, Ground, GroundEarth } from './symbols'
+export { AcSource, Battery, BatteryMulti, Ground, GroundEarth, AC_SOURCE_RADIUS } from './symbols'
 
 // Symbols — semiconductors
-export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, OpAmp } from './symbols'
+export { Diode, LED, DiodeZener, TransistorNPN, TransistorPNP, TransistorNMOS, TransistorPMOS, OpAmp } from './symbols'
 
 // Symbols — instruments
 export {
@@ -72,4 +72,4 @@ export {
 export { Antenna, Crystal, Transformer } from './symbols'
 
 // Symbols — pedagogical annotations (named-node markers, terminal labels)
-export { NodePoint, TerminalLabel, Tap } from './symbols'
+export { NodePoint, TerminalLabel } from './symbols'

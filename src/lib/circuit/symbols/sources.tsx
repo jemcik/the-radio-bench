@@ -1,27 +1,121 @@
 /**
- * Circuit schematic library — voltage and current sources
+ * Voltage / current sources and ground primitives.
  *
- * Components:
- *   - Battery: single cell (ARRL standard)
- *   - BatteryMulti: multi-cell (3 cells)
- *   - Ground: chassis ground (single-terminal)
- *   - GroundEarth: earth ground (single-terminal)
+ * Geometry adapted from chris-pikul/electronic-symbols (MIT-licensed).
+ * See ../vendored/SOURCE.md for the per-symbol mapping.
  */
 
-import { type SymbolProps, type SinglePinProps, type Orientation, orientAngle, isVertical, STROKE } from '../types'
+import { type SymbolProps, type SinglePinProps, type Orientation, isVertical, STROKE } from '../types'
 import { OrientedLabel, SymbolText, LABEL_SIZE, VALUE_SIZE } from '../SymbolLabel'
+import { VendoredSymbol } from './_VendoredSymbol'
+
+/**
+ * Battery polarity markers — «+» beside the positive (long) plate and
+ * «−» beside the negative (short) plate. Rendered OUTSIDE the vendored
+ * symbol's rotation group so the marker glyphs stay upright (a «+»
+ * cross and a horizontal «−») regardless of the body's orient.
+ *
+ * The chris-pikul source SVG bakes these markers into the same path as
+ * the plates and leads, which means the «−» (a single horizontal stroke,
+ * not rotation-symmetric) renders as a stray vertical line under
+ * `orient='down'`/`'up'`. ARRL Handbook 2023 Figure 2.1 shows both
+ * polarity markers explicitly («the symbol for a battery is shown with
+ * its voltage polarity as + and –»), so the fix is to render them
+ * properly — not to drop them.
+ *
+ * Placement is ORIENT-AWARE (a simple rotation of a single default
+ * position doesn't work because the conventional placement differs
+ * between horizontal and vertical orient):
+ *
+ *   • Horizontal orient (`right` / `left`): markers sit ABOVE the body,
+ *     each one over its respective plate (+ over long plate, − over
+ *     short plate). This is the chris-pikul / ARRL convention for a
+ *     horizontally-drawn cell.
+ *
+ *   • Vertical orient (`down` / `up`): markers sit to one SIDE of the
+ *     body axis (away from where Battery puts the value label at
+ *     `x+14`), each one at the y-level of its plate (+ next to long
+ *     plate, − next to short plate). Rotating the horizontal placement
+ *     would put markers FAR above/below the body — visually disconnected
+ *     from the cell (a reader's screenshot showed «−» sitting below the
+ *     value label, looking unrelated to the battery).
+ *
+ * `plateGap` is the absolute distance from the body centre to the
+ * outermost positive/negative plate along the body's electrical axis.
+ * Battery (single cell): 3.7 (plates at ±3.7 local). BatteryMulti:
+ * ≈11 (outermost plates at ±11 local).
+ *
+ * Glyph size 5 (cross / minus stroke) is much smaller than the 10-px
+ * chris-pikul originals — the originals were visually intrusive at
+ * vertical-battery scale.
+ */
+function PolarityMarkers({
+  x, y, orient, plateGap,
+}: {
+  x: number; y: number; orient: Orientation; plateGap: number
+}) {
+  const vert = isVertical(orient)
+  const GLYPH = 5
+  const half = GLYPH / 2
+
+  let plusX: number, plusY: number, minusX: number, minusY: number
+  if (vert) {
+    // Vertical orient: markers on the RIGHT of the body axis, at the
+    // y-level of their respective plates. The perpendicular extent of
+    // each plate (after rotation) is x=±10 for long plate, ±5 for
+    // short; the LATERAL=15 offset clears the long plate's right edge
+    // (10) plus the glyph half-width (2.5) plus a ~3-px breathing gap
+    // (the user's request: «3 пікселі далі від значка»). Battery's
+    // own value label sits FURTHER RIGHT at x+20, OUTSIDE the markers.
+    //
+    // `orient='down'` puts the long (positive) plate at TOP (y=-3.7
+    // for Battery); `orient='up'` flips that.
+    const longPlateAtTop = orient === 'down' ? -1 : 1
+    const lateral = 15
+    plusX = x + lateral
+    plusY = y + longPlateAtTop * plateGap
+    minusX = x + lateral
+    minusY = y - longPlateAtTop * plateGap
+  } else {
+    // Horizontal orient: markers ABOVE the body, each above its plate.
+    // `orient='right'` (default) puts long plate at LEFT (x=-plateGap);
+    // `orient='left'` flips that. Same 15-px outside-body clearance as
+    // the vertical case.
+    const longPlateAtLeft = orient === 'right' ? -1 : 1
+    const vertical = 15
+    plusX = x + longPlateAtLeft * plateGap
+    plusY = y - vertical
+    minusX = x - longPlateAtLeft * plateGap
+    minusY = y - vertical
+  }
+
+  return (
+    <g stroke="currentColor" strokeWidth={STROKE} fill="none" strokeLinecap="round">
+      {/* «+» — a small cross, 5 units wide × 5 units tall, drawn UPRIGHT
+          (the cross strokes stay horizontal + vertical regardless of
+          `orient`). */}
+      <path d={`M${plusX - half},${plusY}h${GLYPH}M${plusX},${plusY - half}v${GLYPH}`} />
+      {/* «−» — a horizontal stroke, 5 units wide, also drawn UPRIGHT. */}
+      <path d={`M${minusX - half},${minusY}h${GLYPH}`} />
+    </g>
+  )
+}
 
 // ─── AcSource ─────────────────────────────────────────────────────────────────
 
+/** Radius of the AC source body circle in our local SVG coordinates.
+ *  Source SVG is r=50 in a 150-px viewBox; VendoredSymbol scales by 0.4
+ *  → r=20 locally. Exported so callsites can place external labels with
+ *  the proper clearance (e.g., `TerminalLabel y={TOP_Y - (AC_SOURCE_RADIUS + 10)}`)
+ *  instead of hardcoding an offset that breaks the next time the
+ *  primitive resizes. */
+export const AC_SOURCE_RADIUS = 20
+
 /**
- * AcSource — AC voltage source (ARRL standard).
- * A circle with one full sine-wave cycle inside, two leads extending out.
- * Used wherever a circuit needs an AC stimulus rather than a battery: mains
- * supplies, signal generators, transformer primaries.
- *
- * Polarity is conventional (no plates): a `value` such as «230V» reads as
- * the RMS amplitude. For radio-frequency contexts pass a frequency too,
- * e.g. value="230V / 50Hz".
+ * AcSource — AC voltage source.
+ * Source: Source-COM-AC.svg
+ * A circle with sinusoid inside, two leads at left/right.
+ * Pins: (-30, 0) and (+30, 0).
  */
 export function AcSource({
   x,
@@ -32,43 +126,17 @@ export function AcSource({
 }: SymbolProps) {
   return (
     <g>
-      {/* Component body — circle + sine wave + leads */}
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Enclosing circle (radius 12 — pin span 60 means 18 px between
-            circle edge and pin) */}
-        <circle cx={0} cy={0} r={12} fill="none" stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Sine wave inside — one full cycle, fits inside r=12 with 2 px
-            margin so the curve doesn't graze the circle. Two cubic bezier
-            segments approximate sin from -7 to +7 with control points at
-            ±3.5 elevation. */}
-        <path
-          d="M -7 0 C -5 -5 -2 -5 0 0 C 2 5 5 5 7 0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={STROKE}
-          strokeLinecap="round"
-        />
-
-        {/* Leads — same span as a battery (HALF on each side from centre) */}
-        <line x1={-30} y1={0} x2={-12} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={12} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
-      {/* Custom label placement: AcSource has a 12-radius CIRCLE body,
-          so the standard OrientedLabel value offset (y + 4 for horizontal)
-          would put the value INSIDE the circle, overlapping the sine
-          wave. Instead, place label above the circle and value below
-          (or to the side for vertical orient), clearing the body by
-          ≥ 8 px. Reader-flagged on ch1.10 BridgeRectifierSchematic
-          where «V_in» landed on top of the sine wave. */}
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <circle cx="75" cy="75" r="50" />
+        <path d="M25 75H0m125 0h25m-113 .38s6.38-15.63 22.13-15.63 9.5 30.75 31.5 30.75S112 75.38 112 75.38" />
+      </VendoredSymbol>
       <AcSourceLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
 }
 
-/* Internal helper — custom label/value placement for AcSource that
-   clears the 12-radius circle body. Not exported. */
+/* Internal helper — custom label/value placement for AcSource that clears
+   the 20-radius (in our coords) circle body. Not exported. */
 function AcSourceLabel({
   x,
   y,
@@ -83,27 +151,22 @@ function AcSourceLabel({
   value?: string
 }) {
   if (!label && !value) return null
-  // Body radius (12) + clearance (10) = 22.
-  const G = 22
+  // Source circle radius is 50 px → 20 SVG units after the 0.4 down-scale.
+  // Add ~8 px clearance.
+  const G = 28
   const vert = orient === 'up' || orient === 'down'
-  // When only `value` is supplied (the common case for sources that
-  // carry a symbolic supply name like «V_in» — see circuit-schematics.md
-  // «Battery designator vs value»), the value IS the primary identifier
-  // and gets the same bold / large treatment as a designator label.
-  // When both are present, value stays the secondary annotation
-  // (smaller, regular weight) under a bold designator. Mirrors the
-  // Battery primitive's identical adaptation. Opacity is FULL in both
-  // cases — uniform across every primitive label helper in the library
-  // (PassiveLabel, CenteredLabel, OrientedLabel) per the contract
-  // enforced by `circuit-label-opacity-uniform.test.tsx`.
   const valueIsPrimary = !label
+  // Lone value takes the LABEL slot (size 14) so an AC source / battery
+  // with only «V_in» reads at the same size as a Resistor whose label
+  // is «R». When a separate designator is supplied, the value falls back
+  // to VALUE_SIZE. Weight is uniformly regular (400) across the library
+  // as of May 2026 — see TerminalLabel/OrientedLabel for the rationale.
   const valueSize = valueIsPrimary ? LABEL_SIZE : VALUE_SIZE
-  const valueWeight = valueIsPrimary ? 600 : undefined
   if (vert) {
     return (
       <>
         {label && (
-          <SymbolText x={x + G} y={y - 7} size={LABEL_SIZE} weight={600} anchor="start">
+          <SymbolText x={x + G} y={y - 7} size={LABEL_SIZE} anchor="start">
             {label}
           </SymbolText>
         )}
@@ -112,7 +175,6 @@ function AcSourceLabel({
             x={x + G}
             y={valueIsPrimary ? y : y + 9}
             size={valueSize}
-            weight={valueWeight}
             anchor="start"
           >
             {value}
@@ -124,7 +186,7 @@ function AcSourceLabel({
   return (
     <>
       {label && (
-        <SymbolText x={x} y={y - G} size={LABEL_SIZE} weight={600}>
+        <SymbolText x={x} y={y - G} size={LABEL_SIZE}>
           {label}
         </SymbolText>
       )}
@@ -133,7 +195,6 @@ function AcSourceLabel({
           x={x}
           y={valueIsPrimary ? y - G : y + G}
           size={valueSize}
-          weight={valueWeight}
         >
           {value}
         </SymbolText>
@@ -145,10 +206,15 @@ function AcSourceLabel({
 // ─── Battery ──────────────────────────────────────────────────────────────────
 
 /**
- * Battery — single cell (ARRL standard)
- * Two vertical plates with a small gap, oriented horizontally by default.
- * Both plates use the SAME stroke width (per ARRL) — polarity is shown
- * by plate LENGTH only: long plate = positive, short plate = negative.
+ * Battery — single cell.
+ * Source: Source-COM-Battery-Single.svg
+ *
+ * Upstream draws the long (positive) plate on the RIGHT and the «+» marker
+ * adjacent to it. To match the existing project convention of «pin1 (left) =
+ * positive», we mirror the source horizontally inside the wrapper so the
+ * long plate and «+» land on the left side.
+ *
+ * Pins: positive (-30, 0), negative (+30, 0).
  */
 export function Battery({
   x,
@@ -157,78 +223,41 @@ export function Battery({
   label,
   value,
 }: SymbolProps) {
-  const angle = orientAngle(orient)
-
-  // Polarity label positions — computed per orientation so they stay
-  // upright and next to the correct plate regardless of rotation.
-  // Plates sit at ±2 on the axis perpendicular to the leads; labels sit
-  // just next to the plate in the "away-from-body" direction.
-  // Both labels sit 5 units from their plate on the outside. The plates
-  // are at ±2 on the perpendicular axis, so +7 / −7 gives symmetric spacing.
-  const plus  = orient === 'down'  ? { x: x + 9, y: y - 7 }
-              : orient === 'up'    ? { x: x - 9, y: y + 7 }
-              : orient === 'left'  ? { x: x + 7, y: y - 9 }
-              : /* right */          { x: x - 7, y: y - 9 }
-
-  const minus = orient === 'down'  ? { x: x + 9, y: y + 7 }
-              : orient === 'up'    ? { x: x - 9, y: y - 7 }
-              : orient === 'left'  ? { x: x - 7, y: y + 10 }
-              : /* right */          { x: x + 7, y: y + 10 }
-
   return (
     <g>
-      {/* Component body — plates + leads */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
-        {/* Positive plate (pin1 side, left) — LONG */}
-        <line x1={-2} y1={-10} x2={-2} y2={10} stroke="currentColor" strokeWidth={STROKE} />
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {/* Mirror horizontally so the positive (long) plate lands on the
+            LEFT, matching the «pin1 = positive» convention. The chris-
+            pikul source path also bakes «+» and «−» polarity markers
+            into the geometry; we strip them out here («m125-37.5h-25
+            M112.5 25v25» for «+» and «M25 37.5h25» for «−») and re-emit
+            them via the orient-aware `PolarityMarkers` helper below.
+            This keeps both markers upright in every orient — the «−»
+            in particular is asymmetric, so leaving it inside the
+            rotated group renders it as a vertical stroke for orient
+            'up'/'down'. ARRL Figure 2.1 explicitly shows both markers,
+            so we keep both — just rendered properly. */}
+        <g transform="translate(150 0) scale(-1 1)">
+          <path d="M84.25 50v50m-18.5-37.5v25M84.25 75H150m-84.25 0H0" />
+        </g>
+      </VendoredSymbol>
+      <PolarityMarkers x={x} y={y} orient={orient} plateGap={3.7} />
 
-        {/* Negative plate (pin2 side, right) — SHORT, same stroke width */}
-        <line x1={2} y1={-6} x2={2} y2={6} stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Leads */}
-        <line x1={-30} y1={0} x2={-2} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={2} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
-      {/* Polarity labels — outside rotation so they always read correctly.
-          Full opacity (same as the rest of the symbol) per user feedback. */}
-      <SymbolText x={plus.x} y={plus.y} size={9}>+</SymbolText>
-      <SymbolText x={minus.x} y={minus.y} size={10}>−</SymbolText>
-
-      {/* Label + value placement.
-          Vertical battery (down/up): designator on the LEFT, value on
-          the RIGHT. x-offsets budget room for the plates (long plate
-          ends at ±10) plus the polarity marks on the right (at x+9,
-          glyph reaches ≈ x+12), so the value starts at x+14 to clear
-          them cleanly.
-          Horizontal battery: the default 'above the body' OrientedLabel.
-
-          Weight / size of the value:
-          • When BOTH label and value are present, value is the
-            secondary annotation — render at VALUE_SIZE / regular
-            weight so it reads as «parameter» under the bold designator
-            (same convention as Resistor / Capacitor / Inductor).
-          • When ONLY value is present (the common case for batteries
-            that carry a symbolic supply name like «V_in» or «+V» — see
-            circuit-schematics.md «Battery designator vs value»), the
-            value IS the primary identifier of the source. Render it at
-            LABEL_SIZE / weight=600 so it visually matches the
-            schematic's designator labels (R_s, R_L, Z, C1 …). Fixes a
-            user-flagged inconsistency where V_in looked thin and small
-            next to the bold R_s / R_L on the same schematic. */}
       {isVertical(orient) ? (
         <>
           {label && (
-            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} weight={600} anchor="end">
+            <SymbolText x={x - 12} y={y} size={LABEL_SIZE} anchor="end">
               {label}
             </SymbolText>
           )}
           {value && (
+            // x+22 sits OUTSIDE the PolarityMarkers cluster on the
+            // right (markers centred at x+15, glyph extends to x+17.5),
+            // leaving ~4 px of breathing room before the value text.
             <SymbolText
-              x={x + 14}
+              x={x + 22}
               y={y}
               size={label ? VALUE_SIZE : LABEL_SIZE}
-              weight={label ? undefined : 600}
               anchor="start"
             >
               {value}
@@ -245,8 +274,10 @@ export function Battery({
 // ─── BatteryMulti ─────────────────────────────────────────────────────────────
 
 /**
- * BatteryMulti — multi-cell battery (3 cells)
- * Three pairs of plates, tall/thin alternating with short/thick.
+ * BatteryMulti — multi-cell battery.
+ * Source: Source-COM-Battery-Multiple.svg
+ * Mirrored horizontally for the same «pin1 = positive» convention as Battery.
+ * Pins: positive (-30, 0), negative (+30, 0).
  */
 export function BatteryMulti({
   x,
@@ -255,29 +286,21 @@ export function BatteryMulti({
   label,
   value,
 }: SymbolProps) {
-  const angle = orientAngle(orient)
-
   return (
     <g>
-      {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${angle})`}>
-        {/* Cell 1 */}
-        <line x1={-10} y1={-10} x2={-10} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-6} y1={-6} x2={-6} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
-
-        {/* Cell 2 */}
-        <line x1={-2} y1={-10} x2={-2} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={2} y1={-6} x2={2} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
-
-        {/* Cell 3 */}
-        <line x1={6} y1={-10} x2={6} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={10} y1={-6} x2={10} y2={6} stroke="currentColor" strokeWidth={STROKE + 0.8} />
-
-        {/* Leads */}
-        <line x1={-30} y1={0} x2={-10} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={10} y1={0} x2={30} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {/* See Battery (above) for the markers-stripping rationale.
+            Removed segments: «m137.5-37.5h-25M125 25v25» («+») and
+            «M12.5 37.5h25» («−») — both re-emitted by PolarityMarkers
+            below, orient-aware. BatteryMulti's body is wider (plates
+            at ±11 local instead of ±3.7) so the marker half-width is
+            bumped from 15 (Battery) to 20 to keep them clear of the
+            outermost plates. */}
+        <g transform="translate(150 0) scale(-1 1)">
+          <path d="M84.25 62.5v25M103 50v50M65.5 50v50M46.75 62.5v25M103 75h47M46.75 75H0" />
+        </g>
+      </VendoredSymbol>
+      <PolarityMarkers x={x} y={y} orient={orient} plateGap={11} />
       <OrientedLabel x={x} y={y} orient={orient} label={label} value={value} />
     </g>
   )
@@ -286,9 +309,46 @@ export function BatteryMulti({
 // ─── Ground ───────────────────────────────────────────────────────────────────
 
 /**
- * Ground — chassis ground (ARRL standard, single-terminal)
- * Single pin at top (in 'down' orientation).
- * Three horizontal lines decreasing in width.
+ * Ground — general (Earth) ground.
+ * Source: Ground-COM-General.svg (with shortened pin AND tightened
+ * stripes — see below).
+ *
+ * The upstream chris-pikul drawing uses a long 75-source-unit pin
+ * (30 local px after scale 0.4) and stripe widths 100 → 50 → 12.5
+ * spaced 25 source units apart (i.e. 40 → 20 → 5 local px at 10-local-
+ * px spacing). That whole symbol totalled 50 local px tall and was too
+ * dominant in tight schematics like the balun and varactor-tuner.
+ *
+ * The custom path here applies two compactions:
+ *   • Pin shortened to 25 source units (10 local px), starting at
+ *     source y=50 instead of y=0 — see `Battery`-side rationale for the
+ *     same chris-pikul-pin-is-too-long issue.
+ *   • Each stripe halved in length AND inter-stripe spacing halved:
+ *     widths 100 → 50 → 12.5 became 50 → 25 → 6.25 source units;
+ *     stripe ys 75 → 100 → 125 became 75 → 87.5 → 100.
+ *   Net: symbol height 20 local px (was 50), still preserving the
+ *   3-line IEEE earth-ground convention (each row shorter than the one
+ *   above it).
+ *
+ * Local geometry (after wrapper's `translate(-75,-75)` + `scale(0.4)`):
+ *   pin            : (0, -10) [tip] → (0, 0) [base, at top stripe]
+ *   stripe widths  : top 20 → middle 10 → smallest 2.5
+ *   stripe ys      : y=0, y=+5, y=+10
+ *
+ * Pin TIP location (where the external wire connects) relative to
+ * component centre, after each `orient` rotation:
+ *   orient='right' (no rotation) → tip at (0, -10)  pin points UP    ← typical
+ *   orient='down'  (rotate  90°) → tip at (+10, 0)  pin points RIGHT
+ *   orient='left'  (rotate 180°) → tip at (0, +10)  pin points DOWN
+ *   orient='up'    (rotate -90°) → tip at (-10, 0)  pin points LEFT
+ *
+ * Use `orient='right'` (NOT `orient='up'`!) for the standard «pin
+ * connects upward to a rail above, stripes hang below» layout — that's
+ * the unrotated chris-pikul drawing. Place the component at
+ * (rail_x, rail_y + 10) so the tip lands exactly on the rail. Default
+ * `orient='down'` is kept for backward compatibility but rotates the
+ * symbol so the pin points right — only correct when the rail sits to
+ * the LEFT of the ground symbol.
  */
 export function Ground({
   x,
@@ -298,17 +358,9 @@ export function Ground({
 }: SinglePinProps) {
   return (
     <g>
-      {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Lead from top */}
-        <line x1={0} y1={-15} x2={0} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Three horizontal lines, decreasing in width */}
-        <line x1={-12} y1={0} x2={12} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-8} y1={5} x2={8} y2={5} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-4} y1={10} x2={4} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M75 50v25m-25 0h50m-37.5 12.5h25M71.875 100h6.25" />
+      </VendoredSymbol>
       <OrientedLabel x={x} y={y} orient={orient} label={label} />
     </g>
   )
@@ -317,8 +369,11 @@ export function Ground({
 // ─── GroundEarth ──────────────────────────────────────────────────────────────
 
 /**
- * GroundEarth — earth ground
- * Three horizontal lines with diagonal hatching below.
+ * GroundEarth — chassis ground (hatched).
+ * Source: Ground-COM-Chassis.svg (with shortened pin — see `Ground` for
+ * the rationale; same `V0 → V50` change shrinks the pin from 30 to 10
+ * local px and matches Ground's proportions). Pin TIP and placement
+ * rules follow the same conventions as `Ground`.
  */
 export function GroundEarth({
   x,
@@ -328,22 +383,10 @@ export function GroundEarth({
 }: SinglePinProps) {
   return (
     <g>
-      {/* Component body */}
-      <g transform={`translate(${x},${y}) rotate(${orientAngle(orient)})`}>
-        {/* Lead from top */}
-        <line x1={0} y1={-15} x2={0} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Three horizontal lines */}
-        <line x1={-12} y1={0} x2={12} y2={0} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-8} y1={5} x2={8} y2={5} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-4} y1={10} x2={4} y2={10} stroke="currentColor" strokeWidth={STROKE} />
-
-        {/* Diagonal hatching below */}
-        <line x1={-10} y1={14} x2={-4} y2={20} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={-4} y1={14} x2={2} y2={20} stroke="currentColor" strokeWidth={STROKE} />
-        <line x1={2} y1={14} x2={8} y2={20} stroke="currentColor" strokeWidth={STROKE} />
-      </g>
-
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        <path d="M56.25 125 75 75h-.31V50" />
+        <path d="m25 125 18.75-50h62.5L87.5 125" />
+      </VendoredSymbol>
       <OrientedLabel x={x} y={y} orient={orient} label={label} />
     </g>
   )

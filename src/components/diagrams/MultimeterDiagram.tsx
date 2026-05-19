@@ -95,7 +95,7 @@ function VoltmeterParallel({
       <Wire points={[vMtr.p2, { x: vR1.p2.x, y: V_MTR.y }, vR1.p2]} color={VOLT_ACCENT} />
 
       {/* ── components (positions derived from the shared centres) ── */}
-      <Battery {...V_BAT} orient="down" value="1.5V" />
+      <Battery {...V_BAT} orient="down"/>
       <Resistor {...V_R1} label="R₁" />
       <Meter {...V_MTR} letter="V" accent={VOLT_ACCENT} />
 
@@ -137,15 +137,13 @@ function AmmeterSeries({
       <Wire points={[{ x: AL, y: A_BOT }, aBat.p2]} />
 
       {/* ── components (positions derived from the shared centres) ── */}
-      <Battery {...A_BAT} orient="down" value="1.5V" />
+      <Battery {...A_BAT} orient="down"/>
       <Meter {...A_AM} letter="A" accent={AMP_ACCENT} />
       <Resistor {...A_R1} label="R₁" />
 
-      {/* ── junction dots — only at the ammeter's pin connections, where
-            the meter is inserted "into" the wire. Corners (AL,A_TOP) etc.
-            are single-wire bends, not electrical connections. ── */}
-      <Junction x={aAm.p1.x} y={aAm.p1.y} />
-      <Junction x={aAm.p2.x} y={aAm.p2.y} />
+      {/* No junction dots in the ammeter loop: each meter pin connects
+          to exactly one wire (meter body + 1 wire = 2 conductors, not a
+          T-joint). Corners are single-wire bends, also not junctions. */}
     </Circuit>
   )
 }

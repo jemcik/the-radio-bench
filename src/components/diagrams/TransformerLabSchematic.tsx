@@ -16,7 +16,6 @@
 import {
   Circuit,
   Wire,
-  Junction,
   Transformer,
   Meter,
   TerminalLabel,
@@ -49,11 +48,13 @@ const LEFT_EDGE_X = 110
 const X_TX = 330
 const X_METER = 540
 
-// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
-const TX_PRI_X = X_TX - 12
-const TX_SEC_X = X_TX + 12
-const TX_TOP_Y = MID_Y - 30
-const TX_BOT_Y = MID_Y + 30
+// Transformer in native orient='right' — primary winding vertical on
+// the LEFT, secondary vertical on the RIGHT. See TransformerVoltageSchematic
+// for the chris-pikul pin-layout details.
+const TX_PRI_X = X_TX - 30
+const TX_SEC_X = X_TX + 30
+const TX_TOP_Y = MID_Y - 25
+const TX_BOT_Y = MID_Y + 25
 
 // Meter — vertical orientation so its two probes sit on the secondary
 // rails; meterPins helper gives the absolute lead positions.
@@ -92,14 +93,10 @@ export default function TransformerLabSchematic() {
       <Wire points={[{ x: TX_SEC_X, y: TX_BOT_Y }, { x: TX_SEC_X, y: BOT_Y }, { x: meter.p2.x, y: BOT_Y }, meter.p2]} />
 
       {/* ── COMPONENTS ──────────────────────────────────────────────── */}
-      {/* No `ratio` prop: for orient='up' the primitive places the
-          ratio label at (x+24, y) — i.e., to the RIGHT of the body
-          at vertical centre, where it visually attaches to the
-          secondary winding and reads as «secondary's label»
-          rather than «transformer's ratio». The «10 витків» /
-          «40 витків» labels under each winding already carry the
-          1:4 information without that ambiguity. */}
-      <Transformer x={X_TX} y={MID_Y} orient="up" />
+      {/* No `ratio` prop: the «10 витків» / «40 витків» labels under
+          each winding already carry the 1:4 information unambiguously,
+          and rendering both would visually compete. */}
+      <Transformer x={X_TX} y={MID_Y} />
       <Meter
         x={X_METER}
         y={MID_Y}
@@ -110,10 +107,8 @@ export default function TransformerLabSchematic() {
       />
 
       {/* T-joints where stubs meet rails */}
-      <Junction x={TX_PRI_X} y={TOP_Y} />
-      <Junction x={TX_PRI_X} y={BOT_Y} />
-      <Junction x={TX_SEC_X} y={TOP_Y} />
-      <Junction x={TX_SEC_X} y={BOT_Y} />
+      {/* No junction dots — each rail-to-stub turn is an L-bend inside
+          one polyline <Wire>, not a T-joint of three conductors. */}
 
       {/* ── TERMINAL LABELS ─────────────────────────────────────────── */}
       <TerminalLabel x={LEFT_EDGE_X - 6} y={TOP_Y} anchor="end" tone="mutedFg">

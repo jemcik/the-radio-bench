@@ -172,6 +172,32 @@ export default function HalfWaveRectifierWaveform() {
           stroke={svgTokens.fg}
           strokeWidth={0.8}
         />
+        {/* Dashed «+V_peak» reference line at the upper peak height.
+            Mirrors the same dashed reference on the bottom plot; gives
+            the reader a visual anchor for the «+V_peak» text label
+            on the left and makes «the input sine REACHES this line»
+            unambiguous. */}
+        <line
+          x1={PLOT_X0}
+          y1={topZeroY - AMP_PX}
+          x2={PLOT_X1}
+          y2={topZeroY - AMP_PX}
+          stroke={svgTokens.fg}
+          strokeWidth={0.6}
+          strokeDasharray="3 3"
+          opacity={0.45}
+        />
+        {/* Dashed «−V_peak» reference at the lower peak height. */}
+        <line
+          x1={PLOT_X0}
+          y1={topZeroY + AMP_PX}
+          x2={PLOT_X1}
+          y2={topZeroY + AMP_PX}
+          stroke={svgTokens.fg}
+          strokeWidth={0.6}
+          strokeDasharray="3 3"
+          opacity={0.45}
+        />
         <g clipPath={`url(#${clipId})`}>
           <path
             d={inPath}
@@ -268,13 +294,19 @@ export default function HalfWaveRectifierWaveform() {
           />
         </g>
         {/* +V_peak label on bottom plot — labels the dashed reference
-            line, NOT the actual peak. Output peak sits below by V_F. */}
+            line at the would-be peak height. Same fillOpacity as the
+            top-plot V_peak labels: semantically these are the SAME
+            quantity (the input V_peak), so they must read with the
+            same visual weight. An earlier revision dimmed this one to
+            0.5 to encode «reference, not actual peak», but the reader
+            saw only inconsistency between two identically-written
+            labels. */}
         <text
           x={PLOT_X0 - 10}
           y={botZeroY - AMP_PX + 4}
           fontSize="13"
           fill={svgTokens.fg}
-          fillOpacity={0.5}
+          fillOpacity={0.85}
           textAnchor="end"
           fontFamily="Georgia, serif"
         >

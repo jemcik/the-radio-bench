@@ -77,15 +77,19 @@ export interface Point {
 
 // ─── sizing constants ─────────────────────────────────────────────────────────
 
-/** Pin-to-pin distance for standard two-terminal components (px). */
-export const SPAN = 60
-/** Half-span — distance from component centre to each pin. */
-export const HALF = SPAN / 2
+/** Pin-to-pin distance for standard two-terminal components (px).
+ *  Internal — `pins2` uses this as its default span. Callers compose
+ *  via `pins2(...)`, never the raw constant. */
+const SPAN = 60
 
-/** Stroke width for all lines (components + wires unified to prevent visible transitions). */
-export const STROKE = 2
-/** Stroke width for wires (same as STROKE for seamless joins). */
-export const WIRE_STROKE = 2
+/** Stroke width for all schematic lines — component outlines, internal
+ *  details, terminal leads, and wires. Single uniform thickness across the
+ *  library (per the May 2026 chris-pikul migration decision). Wires use the
+ *  same value to keep node joins seamless. Ratio stroke/circle-diameter is
+ *  1.5/30 = 1/20, matching textbook conventions (Sedra-Smith, Razavi). */
+export const STROKE = 1.5
+/** Stroke width for wires (kept in sync with STROKE for seamless joins). */
+export const WIRE_STROKE = 1.5
 
 // ─── pin helpers ──────────────────────────────────────────────────────────────
 
@@ -124,19 +128,30 @@ export function pins2(
  *
  *  orient='right' (default):
  *    base on left, collector upper-right, emitter lower-right
+ *
+ *  Offsets match the chris-pikul TransistorNPN/PNP primitive's actual
+ *  external pin endpoints (derived from `Transistor-COM-BJT-NPN.svg`,
+ *  source pin endpoints at (0, 75), (100, 0), (100, 150); after the
+ *  wrapper's translate(-75,-75) scale(0.4) these become local
+ *  (-30, 0), (10, -30), (10, 30)).
+ *
+ *  Earlier `pinsBJT` returned (-26, 0), (12, -19), (12, 19) — that was
+ *  the ARRL-era hand-drawn-transistor geometry and was NOT updated
+ *  during the chris-pikul migration. Schematics using `tr.collector`
+ *  etc. ended up with wire endpoints 2–11 px off the actual primitive
+ *  pin tips. Reader-flagged on FlybackDiodeSchematic; fixed May 2026
+ *  by aligning helper offsets to the primitive.
  */
 export function pinsBJT(
   cx: number,
   cy: number,
   orient: Orientation = 'right',
 ): { base: Point; collector: Point; emitter: Point } {
-  // Offsets relative to centre, in 'right' orientation.
-  // Collector/emitter follow the same ~41° diagonal used inside the symbol,
-  // extending just past the circle (r=18) so leads are short stubs — not
-  // long lines crossing half the schematic.
-  const bx = -26, by = 0
-  const cUpX = 12, cUpY = -19
-  const eDownX = 12, eDownY = 19
+  // Offsets relative to centre, in 'right' orientation. Match the
+  // chris-pikul TransistorNPN/PNP primitive's external pin endpoints.
+  const bx = -30, by = 0
+  const cUpX = 10, cUpY = -30
+  const eDownX = 10, eDownY = 30
 
   const rot = (ox: number, oy: number): Point => {
     switch (orient) {
@@ -163,56 +178,34 @@ export function pinsBJT(
 }
 
 /**
- * Compute absolute pin positions for an op-amp.
+ * Compute absolute pin positions for a MOSFET transistor.
+ *
+ * Pin geometry mirrors `pinsBJT` exactly — gate replaces base, drain
+ * replaces collector, source replaces emitter. Identical pin coordinates
+ * mean wires drawn for a BJT layout work unchanged when the symbol is
+ * swapped for a MOSFET (same span, same pin positions, same lead stubs).
  *
  *  orient='right' (default):
- *    inv(−) upper-left, non(+) lower-left, out on the right
+ *    gate on left, drain upper-right, source lower-right
  */
-export function pinsOpAmp(
+export function pinsMOSFET(
   cx: number,
   cy: number,
   orient: Orientation = 'right',
-): { inv: Point; non: Point; out: Point } {
-  const rot = (ox: number, oy: number): Point => {
-    switch (orient) {
-      case 'right': return { x: cx + ox, y: cy + oy }
-      case 'down':  return { x: cx - oy, y: cy + ox }
-      case 'left':  return { x: cx - ox, y: cy - oy }
-      case 'up':    return { x: cx + oy, y: cy - ox }
-      // See pinsBJT for the diagonal-fallback rationale — op-amps are
-      // never mounted at 45° in this codebase.
-      default: return { x: cx + ox, y: cy + oy }
-    }
-  }
-
-  return {
-    inv: rot(-30, -12),
-    non: rot(-30, 12),
-    out: rot(30, 0),
-  }
+): { gate: Point; drain: Point; source: Point } {
+  const { base, collector, emitter } = pinsBJT(cx, cy, orient)
+  return { gate: base, drain: collector, source: emitter }
 }
 
-/**
- * Compute absolute pin position for a single-terminal symbol
- * (ground, antenna).
- */
-export function pin1(
-  cx: number,
-  cy: number,
-  orient: Orientation = 'down',
-): { pin: Point } {
-  const h = HALF / 2 // shorter lead for single-terminal
-  switch (orient) {
-    case 'right': return { pin: { x: cx - h, y: cy } }
-    case 'down':  return { pin: { x: cx, y: cy - h } }
-    case 'left':  return { pin: { x: cx + h, y: cy } }
-    case 'up':    return { pin: { x: cx, y: cy + h } }
-    // Single-terminal symbols (ground, antenna) are always mounted at
-    // a cardinal orientation — diagonals are unused. See pinsBJT for
-    // the rationale on the diagonal-fallback default.
-    default: return { pin: { x: cx, y: cy } }
-  }
-}
+// Note: `pinsOpAmp` and `pin1` were removed May 2026 as part of the
+// chris-pikul migration cleanup. `pinsOpAmp` had wrong y-offsets (±12
+// vs the primitive's actual ±10) and `pin1`'s offsets weren't updated
+// for the compact Ground primitive (pin tip at -10, not -15). Both
+// were unused at the time of removal — CascadedRcSchematic hardcodes
+// op-amp pin coords inline, and Ground / Antenna callers position via
+// absolute coords. If a new schematic needs a single-pin helper,
+// derive it from the primitive's actual SVG path geometry, not from
+// a memorised constant.
 
 // ─── shared props interface ───────────────────────────────────────────────────
 

@@ -62,9 +62,12 @@ export default function BlocksHighPassSchematic() {
         />
       }
     >
-      {/* Top rail: V_in → C → node */}
+      {/* Top rail: V_in → C → node → V_out tap. The tail past the node
+          to V_out is what makes the node a real 3-wire T-joint (C-out,
+          R-drop, V_out-tap) rather than a 2-wire L-corner. */}
       <Wire points={[{ x: VIN_X, y: TOP_Y }, c.p1]} />
       <Wire points={[c.p2, { x: NODE_X, y: TOP_Y }]} />
+      <Wire points={[{ x: NODE_X, y: TOP_Y }, { x: VOUT_LABEL_X - 6, y: TOP_Y }]} />
 
       {/* Drop from node through R to the bottom rail */}
       <Wire points={[{ x: NODE_X, y: TOP_Y }, r.p1]} />

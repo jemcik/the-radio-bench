@@ -80,7 +80,7 @@ export default function LcParallelSchematic() {
       <Junction x={L_X} y={TOP_Y} />
       <Junction x={L_X} y={BOT_Y} />
 
-      <Battery x={SRC_X} y={MID_Y} orient="down" value="v_in" />
+      <Battery x={SRC_X} y={MID_Y} orient="down" value="V_in" />
       <Inductor x={L_X} y={MID_Y} orient="down" label="L" />
       <Capacitor x={C_X} y={MID_Y} orient="down" label="C" />
     </Circuit>

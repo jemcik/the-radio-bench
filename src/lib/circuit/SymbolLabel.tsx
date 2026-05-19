@@ -310,7 +310,7 @@ export function CenteredLabel({
     return (
       <>
         {label && (
-          <SymbolText x={sideX} y={y - 7} size={LABEL_SIZE} weight={600} anchor="start">
+          <SymbolText x={sideX} y={y - 7} size={LABEL_SIZE} anchor="start">
             {label}
           </SymbolText>
         )}
@@ -338,7 +338,7 @@ export function CenteredLabel({
   return (
     <>
       {label && (
-        <SymbolText x={x} y={labelY} size={LABEL_SIZE} weight={600}>
+        <SymbolText x={x} y={labelY} size={LABEL_SIZE}>
           {label}
         </SymbolText>
       )}
@@ -371,7 +371,7 @@ export function OrientedLabel({
   return (
     <>
       {label && (
-        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} weight={600} anchor={anchor}>
+        <SymbolText x={lx} y={labelY} size={LABEL_SIZE} anchor={anchor}>
           {label}
         </SymbolText>
       )}

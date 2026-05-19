@@ -36,12 +36,17 @@ const TOP_Y = SCHEMATIC_PAD_TOP + 25
 const RAIL_SPAN = 100
 const BOT_Y = TOP_Y + RAIL_SPAN
 const MID_Y = (TOP_Y + BOT_Y) / 2
-// Extra +40 below the bottom rail to accommodate the Ground symbol
-// hanging beneath the shield wire: 15 px of vertical lead plus 10 px
-// of stripes plus a few px of breathing room. The default
-// `schematicHeight` only allots 20 px below BOT_Y (PAD_BOT), which
-// would clip the lower ⏚ stripes.
-const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 40
+// Extra +25 below the bottom rail to accommodate the compact Ground
+// symbol hanging beneath the shield wire. Layout below BOT_Y (pin
+// 10 local px, stripes halved & tightened — see Ground docstring):
+//   +0    bottom rail / Ground pin tip
+//   +10   pin base = top stripe (20-px wide)
+//   +15   middle stripe (10-px wide)
+//   +20   smallest stripe (2.5-px wide)
+//   +25   bottom edge with breathing room
+// The default `schematicHeight` only allots ~20 px below BOT_Y (PAD_BOT),
+// which would just barely clip the smallest stripe — hence +25.
+const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 25
 
 // Rails moved inward (was 60 / 525) so the «Коаксіал 50 Ом» and
 // «Диполь 200 Ом» labels — anchored OUTSIDE the rail ends — fit inside
@@ -52,11 +57,18 @@ const LEFT_EDGE_X = 110
 const X_TX = 290
 const RIGHT_EDGE_X = 470
 
-// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
-const TX_PRI_X = X_TX - 12
-const TX_SEC_X = X_TX + 12
-const TX_TOP_Y = MID_Y - 30
-const TX_BOT_Y = MID_Y + 30
+// Transformer in native orient='right' — primary winding vertical on
+// the LEFT, secondary vertical on the RIGHT (matches the horizontal
+// coax→balun→dipole signal flow). chris-pikul pin positions after
+// the wrapper's 0.4 down-scale:
+//   primary p1 (top-left)     = (X_TX-30, MID_Y-25)
+//   primary p2 (bottom-left)  = (X_TX-30, MID_Y+25)
+//   secondary p1 (top-right)  = (X_TX+30, MID_Y-25)
+//   secondary p2 (bot-right)  = (X_TX+30, MID_Y+25)
+const TX_PRI_X = X_TX - 30
+const TX_SEC_X = X_TX + 30
+const TX_TOP_Y = MID_Y - 25
+const TX_BOT_Y = MID_Y + 25
 
 // Ground symbol on the primary's bottom terminal — placed exactly at
 // the left edge of the bottom rail (X = LEFT_EDGE_X). Earlier this
@@ -103,16 +115,14 @@ export default function BalunSchematic() {
       <Wire points={[{ x: TX_SEC_X, y: TX_BOT_Y }, { x: TX_SEC_X, y: BOT_Y }, { x: RIGHT_EDGE_X, y: BOT_Y }]} />
 
       {/* ── COMPONENTS ──────────────────────────────────────────────── */}
-      <Transformer x={X_TX} y={MID_Y} orient="up" ratio="1 : 2" />
-      {/* Ground symbol — `orient='right'` is the unrotated path, which
-          is the canonical down-pointing ⏚ with the pin at the top of
-          its 15-px lead. Placing the component origin at BOT_Y+15
-          puts the pin tip exactly on the bottom rail (y=BOT_Y) and
-          hangs the three horizontal stripes 15–25 px below the wire,
-          with a clearly visible vertical lead bridging them. The
-          previous `orient='down'` rotated the whole symbol 90° CW,
-          so the pin pointed sideways and never met the wire. */}
-      <Ground x={X_GND} y={BOT_Y + 15} orient="right" />
+      <Transformer x={X_TX} y={MID_Y} ratio="1 : 2" />
+      {/* Ground symbol — `orient='right'` is the unrotated chris-pikul
+          path with the shortened pin (10 local px, see Ground docstring).
+          Pin tip at local (0, -10), so for the tip to land on the rail
+          at y=BOT_Y we set the component origin to y=BOT_Y+10. Stripes
+          sit at y=BOT_Y+10 (top, 40px wide), +20 (middle, 20px), +30
+          (smallest, 5px). */}
+      <Ground x={X_GND} y={BOT_Y + 10} orient="right" />
 
       {/* ── LABELS ──────────────────────────────────────────────────── */}
       {/* «Коаксіал 50 Ом» / «Диполь 200 Ом» are positioned vertically

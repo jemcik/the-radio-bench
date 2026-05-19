@@ -51,6 +51,12 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(__dirname, '..')
 const EN_PATH = path.join(REPO, 'src/i18n/locales/en/ui.json')
+// Also scan UA — translators occasionally add subscripts to keys where
+// EN doesn't have any (e.g. expanding «δI_D» into «δI_{D}» in the
+// braced form), and the gate must catch those too. Past failure: FET
+// glossary detail in UA had `δI_{D}/δV_{GS}` while EN had bare
+// `δI_D/δV_GS`; only UA showed the unrendered braces.
+const UK_PATH = path.join(REPO, 'src/i18n/locales/uk/ui.json')
 const SRC_DIR = path.join(REPO, 'src')
 
 // Bare `X_Y`. Single Latin letter at a token boundary, underscore, then 1+
@@ -104,11 +110,26 @@ function walkSrc(dir, acc = []) {
 }
 
 const en = JSON.parse(readFileSync(EN_PATH, 'utf8'))
+const uk = JSON.parse(readFileSync(UK_PATH, 'utf8'))
 const flat = flatten(en)
+const flatUk = flatten(uk)
 const flaggedKeys = new Map()  // key → { bare, braced }
+// Merge bare/braced classification from BOTH locales: if EN has bare
+// and UA has braced (or vice versa), the key gets the union — call
+// sites must handle whichever form appears in EITHER locale.
 for (const [k, v] of Object.entries(flat)) {
   const c = classify(v)
   if (c) flaggedKeys.set(k, c)
+}
+for (const [k, v] of Object.entries(flatUk)) {
+  const c = classify(v)
+  if (!c) continue
+  const existing = flaggedKeys.get(k)
+  if (existing) {
+    flaggedKeys.set(k, { bare: existing.bare || c.bare, braced: existing.braced || c.braced })
+  } else {
+    flaggedKeys.set(k, c)
+  }
 }
 
 if (flaggedKeys.size === 0) {
@@ -121,12 +142,12 @@ const files = walkSrc(SRC_DIR)
 // Match `t('some.key')` and `t("some.key")`, capture the key.
 const T_CALL = /\bt\(\s*['"]([\w.-]+)['"]\s*[),]/g
 
-// Function-call wrappers that handle the BARE `X_Y` form.
-//
-// IMPORTANT: these do NOT handle the BRACED `X_{Y}` form — their regex only
-// matches `[A-Za-z0-9]+` after the underscore (no braces). A braced flagged
-// key wrapped in withSubscripts() would render literal `{` / `}` in the UI.
-const SAFE_FN_WRAPPERS_BARE = ['withSubscripts', 'withSubscriptsSvg']
+// Function-call wrappers that handle BOTH bare `X_Y` AND braced `X_{Y}`
+// forms. As of May 2026 the regex in `text-with-subscripts.tsx` accepts
+// either form via `_(?:\{([A-Za-z0-9]+)\}|([A-Za-z0-9]+))`. Used to be
+// bare-only — a braced key wrapped in withSubscripts rendered literal
+// `{` / `}` (caught in FET glossary detail, UA locale).
+const SAFE_FN_WRAPPERS = ['withSubscripts', 'withSubscriptsSvg']
 
 // JSX-element wrappers that handle BOTH forms (KaTeX understands LaTeX
 // syntax natively, so `X_{Y}` and `X_Y` both render).
@@ -167,14 +188,12 @@ function isInsideJsxWrapper(back, tags) {
   return false
 }
 
-function isCallSiteSafe(back, classification) {
-  // Braced (or mixed) form: only <MathText> handles `X_{Y}` correctly.
-  if (classification.braced) {
-    return isInsideJsxWrapper(back, SAFE_JSX_WRAPPERS_ANY)
-  }
-  // Bare-only: function wrappers OR MathText all work.
+function isCallSiteSafe(back, _classification) {
+  // Both function wrappers and JSX wrappers handle bare AND braced forms
+  // (as of May 2026). Classification kept as a parameter for API stability
+  // and in case future wrappers reintroduce per-form distinctions.
   return (
-    isInsideFnWrapper(back, SAFE_FN_WRAPPERS_BARE) ||
+    isInsideFnWrapper(back, SAFE_FN_WRAPPERS) ||
     isInsideJsxWrapper(back, SAFE_JSX_WRAPPERS_ANY)
   )
 }
@@ -236,9 +255,11 @@ for (const file of files) {
     const idx = m.index
     const back = text.slice(Math.max(0, idx - 800), idx)
     const bareSafe =
-      isInsideFnWrapper(back, SAFE_FN_WRAPPERS_BARE) ||
+      isInsideFnWrapper(back, SAFE_FN_WRAPPERS) ||
       isInsideJsxWrapper(back, SAFE_JSX_WRAPPERS_ANY)
-    const anySafe = isInsideJsxWrapper(back, SAFE_JSX_WRAPPERS_ANY)
+    const anySafe =
+      isInsideFnWrapper(back, SAFE_FN_WRAPPERS) ||
+      isInsideJsxWrapper(back, SAFE_JSX_WRAPPERS_ANY)
     const list = indirectCallsByProp.get(propName) ?? []
     list.push({
       file: path.relative(REPO, file),

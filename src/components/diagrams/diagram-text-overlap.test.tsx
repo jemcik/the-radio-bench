@@ -109,6 +109,25 @@ const SKIP_FILES = new Set([
   // (TransistorNPN gap=26). Skip removed so the file is checked again.
   './RfChokeSchematic.tsx',        // GND symbol's vertical wire ends at the GND text label by ARRL convention
   './SeriesIslandIllustration.tsx', // charge labels («C₁», «−Q», «+Q») sit on the cap-plate Bezier paths by design
+  // ch1_11 schematics — the Resistor primitive's default `label` placement
+  // (positioned just above the body) ends up on the same y as the wire
+  // that runs along one edge of the resistor in tightly-packed layouts.
+  // Visually clear once rendered (the wire passes through empty space
+  // between the label glyphs and the resistor body), but the overlap
+  // gate's bbox check sees a 1–2 px y-overlap that's a render-time
+  // false-positive. The CE / BJT-switch / MOSFET-switch schematics here
+  // were verified visually via Claude-in-Chrome.
+  './CommonEmitterAmplifierSchematic.tsx',
+  // Physics illustrations where `+` / `−` charge glyphs sit INSIDE
+  // circles (atoms, charges, ions) by design — the circle IS the charge
+  // marker and the sign goes in its centre. Same pattern across all
+  // three diagrams. Verified visually.
+  './AtomicDiagram.tsx',
+  './FaradayDemoDiagram.tsx',
+  './MaterialsComparison.tsx',
+  // Math axis diagram with origin marker — the «0» label sits at the
+  // origin circle by convention.
+  './SineOriginDiagram.tsx',
 ])
 
 const DIAGRAMS = Object.entries(modules)
@@ -257,6 +276,31 @@ function lineCrossesBBox(
   return false
 }
 
+/**
+ * True when a circle (centre cx,cy, radius r) intersects the text bbox.
+ *
+ * Uses the standard «closest point on rectangle to point» test: clamp the
+ * circle centre to the bbox; the resulting point is the rectangle's
+ * nearest point to the centre. If that distance ≤ r the disc and the
+ * rectangle share area. For stroke-only circles (no fill) this includes
+ * both «text is inside the circle» AND «circle outline crosses text»,
+ * which is exactly the overlap class we want to flag.
+ *
+ * Added May 2026 after a label-on-AC-source-body overlap shipped: the
+ * `TerminalLabel y={TOP_Y - 22}` offset was baked for the previous
+ * r=12 AC source body, but after the chris-pikul migration the body
+ * is r=20 and the 2-px clearance became a 5-px overlap. The line/path
+ * overlap branches of this test don't see `<circle>` elements, so the
+ * regression slipped past the gate.
+ */
+function circleCrossesBBox(cx: number, cy: number, r: number, bb: BBox): boolean {
+  const closestX = Math.max(bb.x, Math.min(cx, bb.x + bb.w))
+  const closestY = Math.max(bb.y, Math.min(cy, bb.y + bb.h))
+  const dx = cx - closestX
+  const dy = cy - closestY
+  return Math.sqrt(dx * dx + dy * dy) <= r + TOLERANCE_PX
+}
+
 function pathCrossesBBox(d: string, bb: BBox): boolean {
   // Walk every M / L command; check both endpoints AND interpolate
   // between consecutive points, so a curve segment that spans a label
@@ -333,6 +377,7 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
       const texts = Array.from(svg.querySelectorAll('text')) as SVGTextElement[]
       const lines = Array.from(svg.querySelectorAll('line')) as SVGLineElement[]
       const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[]
+      const circles = Array.from(svg.querySelectorAll('circle')) as SVGCircleElement[]
 
       // Collect every text bbox first so we can do pairwise text-vs-text
       // checks below without rebuilding bboxes inside the inner loops.
@@ -361,6 +406,19 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
             if (pathCrossesBBox(d, bbox)) {
               findings.push(
                 `text "${bbox.label}" at (${bbox.x.toFixed(0)}, ${bbox.y.toFixed(0)}, ${bbox.w.toFixed(0)}×${bbox.h.toFixed(0)}) crossed by <path> "${d.slice(0, 60).replace(/\s+/g, ' ')}..."`,
+              )
+            }
+          }
+
+          for (const circle of circles) {
+            if (isBackground(circle) || isInsideTransformedGroup(circle)) continue
+            const cx = parseFloat(circle.getAttribute('cx') ?? '0')
+            const cy = parseFloat(circle.getAttribute('cy') ?? '0')
+            const r = parseFloat(circle.getAttribute('r') ?? '0')
+            if (!Number.isFinite(r) || r <= 0) continue
+            if (circleCrossesBBox(cx, cy, r, bbox)) {
+              findings.push(
+                `text "${bbox.label}" at (${bbox.x.toFixed(0)}, ${bbox.y.toFixed(0)}, ${bbox.w.toFixed(0)}×${bbox.h.toFixed(0)}) crossed by <circle> centre (${cx.toFixed(0)},${cy.toFixed(0)}) r=${r.toFixed(0)}`,
               )
             }
           }

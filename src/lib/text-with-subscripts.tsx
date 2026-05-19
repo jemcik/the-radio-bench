@@ -33,12 +33,22 @@ import { Fragment, type ReactNode } from 'react'
  *   string, whitespace, or punctuation) — guards against in-word
  *   underscores being misread as subscripts.
  *
- * Examples that match:   X_L, X_C, V_C, R_loss, Q_U, f_0, f_H
+ * Examples that match:   X_L, X_C, V_C, R_loss, Q_U, f_0, f_H,
+ *                        δI_D, V_{GS}, R_{loss}
  * Examples that DON'T:   co_2 (inside a word), file_name (no upper),
  *                        `_underscored_` (no leading letter at boundary)
+ *
+ * BRACED-FORM SUPPORT
+ * ───────────────────
+ * Both `X_Y` (bare) and `X_{Y}` (LaTeX-style braced) forms render
+ * identically — pick whichever reads better in the source string.
+ * Past failure: glossary FET detail in UA had `δI_{D}/δV_{GS}` (from
+ * a Gemini-translated edit using the more explicit LaTeX form); the
+ * bare-only regex didn't match and the text rendered with literal
+ * braces. Reader-flagged.
  */
 
-const SUB_PATTERN = /(?<![A-Za-z])([A-Za-z])_([A-Za-z0-9]+)/g
+const SUB_PATTERN = /(?<![A-Za-z])([A-Za-z])_(?:\{([A-Za-z0-9]+)\}|([A-Za-z0-9]+))/g
 
 interface TextToken { type: 'text'; value: string }
 interface SubToken  { type: 'sub';  base: string; sub: string }
@@ -58,7 +68,10 @@ function tokenise(s: string): Token[] {
     if (start > lastIndex) {
       tokens.push({ type: 'text', value: s.slice(lastIndex, start) })
     }
-    tokens.push({ type: 'sub', base: match[1], sub: match[2] })
+    // match[2] = braced form capture, match[3] = bare form capture.
+    // Exactly one of them is non-undefined.
+    const sub = match[2] ?? match[3]
+    tokens.push({ type: 'sub', base: match[1], sub })
     lastIndex = start + match[0].length
   }
   if (lastIndex < s.length) {

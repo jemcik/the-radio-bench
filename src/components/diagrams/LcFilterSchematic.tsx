@@ -31,7 +31,17 @@ import { useTranslation, Trans } from 'react-i18next'
 import { G } from '@/features/glossary/glossary-term'
 import { mathComponents } from '@/lib/trans-defaults'
 
-const SCHEMATIC_W = 500
+// Width budgeted for terminal labels («З пульсаціями» / «Без пульсацій»
+// in UA ≈ 95 px each, «rectified DC» / «smoothed DC» in EN ≈ 90 px),
+// each anchored OUTSIDE the schematic body. With IN_X=110 / OUT_X=450
+// each label sits comfortably within the 560-px viewBox.
+//
+// Previously SCHEMATIC_W=500 with labels «Випрямлена напруга» /
+// «Згладжена напруга» (each ≈ 130 px) — the labels overflowed the
+// viewBox and were clipped by the figure's rounded card on both sides.
+// Switching to «З пульсаціями» / «Без пульсацій» dropped UA label
+// width and the new layout has the bigger margin to spare even so.
+const SCHEMATIC_W = 560
 
 const TOP_Y = SCHEMATIC_PAD_TOP + 10 // signal rail
 const RAIL_SPAN = 110
@@ -39,11 +49,11 @@ const BOT_Y = TOP_Y + RAIL_SPAN
 const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 10
 
 // Column positions
-const IN_X = 60
-const L_X = 200       // series inductor on signal rail
-const NODE_X = 290    // LC node
+const IN_X = 110
+const L_X = 240       // series inductor on signal rail
+const NODE_X = 330    // LC node
 const C_X = NODE_X    // shunt capacitor
-const OUT_X = 420
+const OUT_X = 450
 
 const l = pins2(L_X, TOP_Y)
 const c = pins2(C_X, (TOP_Y + BOT_Y) / 2, 'down')
@@ -55,7 +65,7 @@ export default function LcFilterSchematic() {
     <Circuit
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
-      maxWidth={540}
+      maxWidth={600}
       caption={
         <Trans
           i18nKey="ch1_6.filterChokeSchematicCaption"

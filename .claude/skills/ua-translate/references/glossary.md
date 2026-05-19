@@ -1,5 +1,32 @@
 # Ukrainian terminology glossary
 
+## Hard rule: preserve EN parens-acronyms in UA
+
+When the EN string introduces an acronym at first mention with the textbook
+pattern «full form (ACRONYM)» — e.g. `bipolar junction transistor (BJT)`,
+`field-effect transistor (FET)`, `Kirchhoff's Current Law (KCL)` — the UA
+translation MUST keep the same acronym in parens, paired with its UA full
+form. Pattern: `Біполярний транзистор (BJT, англ. <em>bipolar junction
+transistor</em>)`.
+
+Why this matters: chapters routinely use the bare acronym a dozen times
+later in the same chapter (in tables, figure captions, quizzes). The EN
+reader has been introduced to the acronym inline at first mention; the UA
+reader must get the same introduction or the acronym becomes a black box.
+
+Past regression: ch 1.11 first ship dropped «(BJT)» / «(FET)» from UA
+`intro2`. The reader saw «Біполярний транзистор» in the introduction and
+then bare «BJT» in `mosfetSwitchVsBjt` and `quiz_q1_explanation` with no
+link between the two. Now enforced by `scripts/check-acronym-parity.mjs`
+which compares EN-side parens-acronyms against the corresponding UA value
+and fails the build if any are missing.
+
+Exception: when the project deliberately localises the acronym (e.g. EN
+«VHF» → UA «УКХ»), record the key in `EXEMPT_KEYS` of the parity script
+with a one-line comment naming the substitute.
+
+
+
 **Single source of truth** for every domain term. Before translating, check here first. Never coin a new Ukrainian rendering without adding it to this file and getting user approval.
 
 Each entry tracks: **EN term** → **UK rendering** + **grammatical gender** + notes on inflection/register.
@@ -258,3 +285,10 @@ Source English idioms that translate literally into awkward Ukrainian. Use these
 - **`сила струму` vs `струм`**: formal definitions and the terms table use `сила струму`. Running prose about current flowing somewhere uses `струм`. Widget labels and value boxes show whichever fits naturally in the sentence — default to `сила струму` for labels announcing the quantity.
 - **React variable tags**: `<var>I</var>`, `<var>V</var>`, `<var>R</var>`, `<var>E</var>` — wired to the `MathVar` component in `Chapter1_1.tsx` (and any chapter that uses them) which passes through KaTeX for proper math serif. Capital I in italic sans-serif renders as `/` — always use the `<var>` wrapper, never bare `<i>I</i>`.
 - **Ion charge notation**: `+3/−2` means 3 positive protons / 2 remaining electrons after one has been removed. The broken balance is `+3/−3` (neutral state). Preserve this exact notation in atomicCaption.
+- **«прилад» vs «пристрій» vs «компонент» vs «елемент»** — recurring Gemini regression. EN "device" gets translated to **`прилад`** by Gemini in any context, but in UA electronics terminology «прилад» is reserved for **measurement instruments** (multimeter, oscilloscope, signal generator, VNA, etc.). For a **circuit component** — passive (resistor / capacitor / inductor) or active (diode / transistor / op-amp) — use one of:
+   - **`компонент`** — generic «circuit component» / «active component»; preferred when paired with an adjective like «активний», «пасивний», «дискретний», «лінійний». E.g. `active device → активний компонент`, `current-controlled device → компонент, керований струмом`.
+   - **`пристрій`** — preferred for the «N-terminal device» phrasing common in semiconductor physics texts. E.g. `three-terminal device → трививідний пристрій`, `semiconductor device → напівпровідниковий пристрій`.
+   - **`елемент`** — interchangeable with «компонент»; slightly more abstract («елемент кола»). Prefer «компонент» in beginner prose, «елемент» when discussing schematic abstraction.
+   - **Concrete noun** — when EN says «two big families of devices» and the next sentence names them, drop the head noun: `two big families of devices → два великі сімейства транзисторів`.
+
+   **Hard rule**: «прилад» is correct ONLY when the referent is a measuring / lab instrument. Anything that lives ON a schematic as a circuit element is `компонент` / `пристрій` / `елемент`. Past fix in ch 1.11: `transistor.detail` and four other glossary entries shipped as «трививідний прилад» (Gemini default) — caught only by user review. Now enforced by `forbidden.prylad-as-component` in the UA linter (see `scripts/lint-ua-translation.mjs`).

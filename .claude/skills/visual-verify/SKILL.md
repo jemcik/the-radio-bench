@@ -32,7 +32,7 @@ This is the **only** sanctioned way to start a server in this repo. `preview_sta
 **Always invoke for any change in:**
 
 - `src/components/diagrams/*.tsx` — schematic figures, galleries, hero illustrations, plotters
-- `src/lib/circuit/symbols/*.tsx` — circuit primitives (Resistor, Capacitor, Inductor, Ground, Transformer, Tap, …)
+- `src/lib/circuit/symbols/*.tsx` — circuit primitives (Resistor, Capacitor, Inductor, Ground, Transformer, OpAmp, …)
 - `src/components/chapter-heroes/*.tsx` — chapter hero SVGs
 - `src/features/glossary/term.tsx` and `glossary-term.tsx` — popover behaviour
 - `src/chapters/*/Chapter*.tsx` — anything in chapter pages

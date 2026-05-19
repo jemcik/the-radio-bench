@@ -13,6 +13,22 @@ export default tseslint.config(
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Underscore-prefixed names mark «intentionally unused» (e.g. an
+      // API-retained prop whose runtime behaviour isn't yet wired up).
+      // The convention is standard across TS/JS codebases; honour it
+      // here so primitives can keep stable signatures without per-line
+      // eslint-disable comments.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
+    },
   },
   {
     files: ['**/*.{jsx,tsx}'],

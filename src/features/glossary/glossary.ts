@@ -1237,4 +1237,150 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Real amplifiers almost always run as a chain of «stages»: a low-noise input stage extracts a tiny signal from the antenna, one or two intermediate stages add gain, and a final power stage drives the load. Each stage solves one problem — input impedance, gain, output impedance, linearity — and the chain composes them. The stages are decoupled from one another by coupling capacitors (which pass the AC signal but block each stage\'s DC bias point) and by separate bias networks; that decoupling is what lets you design and tune one stage at a time without the others drifting. The Ukrainian term «каскад» is used the same way and dates back to the tube era; «ступінь» is a more modern synonym preferred in beginner texts.',
     see: ['power amplifier', 'coupling capacitor', 'bypass capacitor'],
   },
+
+  // ── Transistors ───────────────────────────────────────────────────
+  transistor: {
+    tip: 'A three-terminal semiconductor device whose conduction between two terminals is controlled by a signal applied to the third — the building block of every active circuit.',
+    detail:
+      'A transistor is a three-terminal device in which a small signal at the control terminal sets a much larger current flowing between the other two. That property — power amplification — is what distinguishes it from passives like resistors, capacitors, and inductors. Two big families exist: bipolar junction transistors (BJTs), where a small base current controls a much larger collector current, and field-effect transistors (FETs), where a gate voltage controls drain current with no DC gate current at all. Both come in two polarities (NPN/PNP for BJTs, n-channel/p-channel for FETs) and both do the same two jobs — switch (fully on or fully off, the basis of digital logic) and amplify (somewhere in between, the basis of every analog signal path). Every modern integrated circuit, microcontroller, and radio is built from billions of transistors fabricated together on one piece of silicon.',
+    see: ['bjt', 'fet', 'mosfet', 'amplifier stage'],
+  },
+  bjt: {
+    tip: 'Bipolar Junction Transistor — three-terminal current-controlled device where a small base current controls a much larger collector current.',
+    detail:
+      'A BJT (Bipolar Junction Transistor) is a sandwich of three doped silicon layers — NPN or PNP — with three terminals: base, collector, emitter. Conduction relies on both kinds of charge carrier (electrons AND holes), which is what «bipolar» means. The base-emitter junction acts as a forward-biased diode (~0.7 V drop when on); a small base current I_B causes a much larger collector current I_C, related by I_C = β · I_B, where β (also called h_FE) is the current gain — typically 50–500. β is the BJT\'s most useful and least reliable parameter: it varies factor-of-three across specimens and 30–50 % across temperature, which is why every well-designed BJT circuit makes its operating point depend on resistor ratios rather than on β. Common small-signal NPN parts: 2N3904, BC547, 2N2222.',
+    formula: 'I_C = β · I_B',
+    see: ['transistor', 'fet', 'common emitter', 'beta'],
+  },
+  fet: {
+    tip: 'Field-Effect Transistor — three-terminal voltage-controlled device where a gate voltage controls drain current, with no DC gate current.',
+    detail:
+      'A FET (Field-Effect Transistor) controls conduction between drain and source via the electric field produced by a voltage applied to the gate. Two flavours of gate exist — JFETs use a reverse-biased diode junction, MOSFETs use a thin oxide insulator — and two channel-doping modes — depletion (channel conducts at zero gate bias) and enhancement (channel does not conduct until gate is biased past a threshold V_th). The FET\'s defining advantage is its near-infinite DC input impedance: the gate draws no current, so a FET amplifier can be driven from very weak sources without loading them down. The drain current depends on the over-drive (V_GS − V_th); the slope ∂I_D/∂V_GS is the transconductance g_m, which takes the role of «1/R_E» in the FET equivalent of the common-emitter gain formula.',
+    see: ['transistor', 'bjt', 'mosfet', 'jfet', 'transconductance'],
+  },
+  mosfet: {
+    tip: 'Metal-Oxide-Semiconductor FET — the dominant FET type today, with a glass-insulated gate and almost zero DC gate current.',
+    detail:
+      'A MOSFET is the FET variant whose gate is separated from the channel by a thin layer of silicon dioxide (glass) — typically only a few nm thick. That insulator means the DC gate current is essentially zero (10⁻¹⁴ A range), giving the MOSFET its near-infinite input impedance. MOSFETs come in n-channel and p-channel polarities and almost always operate in enhancement mode (channel does not conduct until V_GS exceeds threshold V_th). For switching, the on-state behaviour is dominated by R_DS(on) — the on-resistance of the channel, which can be a few milliohms in modern power MOSFETs. That low R_DS(on) is why MOSFETs replaced BJTs in every modern motor driver, switching power supply, and battery management chip: a 5 A load through 5 mΩ wastes 125 mW, where a BJT at the same current burns 1 W. «Logic-level» MOSFETs are designed to turn fully on at 3 V or 2.5 V V_GS so they can be driven directly from microcontroller pins. The thin gate oxide is delicate: an electrostatic discharge from your finger can puncture it permanently, so MOSFETs ship with shorting clips and need ESD precautions during handling. Common parts: 2N7000 (small-signal n-MOS), IRLZ44N (logic-level power n-MOS), IRF540 (standard-level power n-MOS).',
+    see: ['fet', 'transistor', 'enhancement mode'],
+  },
+  jfet: {
+    tip: 'Junction FET — a FET whose gate is a reverse-biased diode junction with the channel; depletion-mode only and uncommon outside low-noise audio and RF front ends.',
+    detail:
+      'A JFET (Junction Field-Effect Transistor) controls channel conduction via the depletion region of a reverse-biased p-n junction between gate and channel. The junction must stay reverse-biased — forward-biasing it would draw current and destroy the JFET\'s «no gate current» property — so JFETs only operate in depletion mode (channel conducts at V_GS = 0; cutoff requires V_GS biased away from the channel polarity). Compared to MOSFETs, JFETs have lower 1/f (flicker) noise and better RF noise performance, which is why they survive in low-noise preamplifier designs (e.g. the BF862 in HF receiver front ends and the 2SK170 in audio phono stages). For general digital and switching work, MOSFETs have eclipsed JFETs.',
+    see: ['fet', 'transistor'],
+  },
+  npn: {
+    tip: 'BJT polarity where the emitter arrow points outward — operates with collector positive relative to emitter; built from N-type / P-type / N-type silicon layers.',
+    detail:
+      'NPN is the more common BJT polarity in beginner circuits and modern silicon. The acronym describes the physical structure: an N-doped collector layer, a P-doped base layer in the middle, and an N-doped emitter layer. Conventional current flows from collector to emitter when the transistor is on; the base-emitter junction must be forward-biased (~0.7 V, base positive relative to emitter) for any current to flow. The schematic symbol shows an outward-pointing arrow on the emitter — current flows out of the emitter. Common parts: 2N3904, BC547, 2N2222.',
+    see: ['bjt', 'pnp'],
+  },
+  pnp: {
+    tip: 'BJT polarity opposite to NPN — emitter arrow points inward, operates with emitter positive relative to collector. Used for «high-side» switching.',
+    detail:
+      'PNP is the polarity-mirror of NPN: a P-doped collector, N-doped base, P-doped emitter. Voltages and currents reverse — the emitter is the most-positive terminal, current flows into the emitter, base must be 0.7 V below emitter to turn the transistor on. Schematic symbol has an inward-pointing arrow on the emitter. PNPs appear most often in «high-side» switches (load returned to ground, switch sits between V+ and load) and in complementary push-pull output stages. Common parts: 2N3906, BC557 (the complements of 2N3904 and BC547).',
+    see: ['bjt', 'npn'],
+  },
+  base: {
+    tip: 'The middle (control) terminal of a BJT — a small current here controls the much larger current flowing from collector to emitter.',
+    detail:
+      'The base is the BJT\'s control terminal — physically the thin P-doped layer (in NPN) sandwiched between the two N-doped collector and emitter. Forward-biasing the base-emitter junction (~0.7 V) injects minority carriers into the base, where they are swept across into the collector. That small base current commands a much larger collector current via the relation I_C = β · I_B; in a working circuit you size the base resistor so the desired I_B flows when the input is HIGH. The base IS NOT a voltage input — it is a current input. Treating it as a voltage source would draw an enormous current as soon as you exceed the V_BE threshold.',
+    see: ['bjt', 'collector', 'emitter'],
+  },
+  collector: {
+    tip: 'The high-current «output» terminal of a BJT — collects the carriers that flow through the base region under control of the base current.',
+    detail:
+      'The collector is the BJT terminal at which the controlled current emerges (NPN) or enters (PNP). It connects to one of the heavily-doped outer regions (N for NPN, P for PNP). In normal active operation, the base-collector junction is reverse-biased — current does not flow because of the diode, but rather because carriers injected into the base are swept across to the collector by the field. The collector typically connects through a load resistor to the supply rail; the voltage at the collector is V_CC − I_C · R_C, which is the amplifier\'s output node.',
+    see: ['bjt', 'base', 'emitter'],
+  },
+  emitter: {
+    tip: 'The «source» terminal of a BJT — emits the carriers that flow under control of the base. Marked with an arrow on the schematic symbol indicating polarity.',
+    detail:
+      'The emitter is the heavily-doped terminal of a BJT that supplies the carriers that the rest of the transistor steers into the collector. In an NPN it is N-doped and supplies electrons; in a PNP it is P-doped and supplies holes. The schematic-symbol arrow on the emitter is the polarity marker — outward for NPN (current flows OUT of the emitter), inward for PNP. In the standard common-emitter circuit the emitter is grounded (or returned to ground via a small R_E) and the input signal is applied to the base; in an emitter follower the emitter is the OUTPUT and the collector is tied to the rail.',
+    see: ['bjt', 'base', 'collector'],
+  },
+  gate: {
+    tip: 'The control terminal of a FET — voltage applied here sets drain-source conduction without drawing DC current (the gate is insulated for MOSFETs, reverse-biased for JFETs).',
+    detail:
+      'The gate is the FET\'s voltage-controlled input. In a MOSFET it is a thin metal/polysilicon layer separated from the channel by a glass insulator; in a JFET it is a reverse-biased p-n junction. Either way, no DC current flows into the gate — the FET responds purely to the gate VOLTAGE. The drain current depends on V_GS − V_th, where V_th is the threshold voltage at which the channel begins to conduct. That voltage-control behaviour gives FETs their near-infinite input impedance, which is essential when driving the input from a high-impedance source (e.g. a piezo pickup, a glass-electrode pH sensor, or the previous stage\'s collector output). The gate-oxide of a MOSFET is fragile: ESD from your finger can punch through it permanently.',
+    see: ['fet', 'mosfet', 'drain', 'source', 'transistor'],
+  },
+  drain: {
+    tip: 'The high-current «output» terminal of a FET — the FET equivalent of a BJT\'s collector.',
+    detail:
+      'The drain is the terminal at which controlled current emerges in an n-channel FET (or enters in a p-channel). The current is set by V_GS over the threshold V_th, and is nearly independent of drain-source voltage V_DS over the active region of the FET\'s output curves. In a common-source amplifier, the drain connects through a load resistor R_D to the supply rail and is the amplifier\'s output node — exactly analogous to the collector in a common-emitter BJT amplifier.',
+    see: ['fet', 'mosfet', 'gate', 'source', 'transistor'],
+  },
+  'fet source': {
+    tip: 'The reference / common terminal of a FET — the FET equivalent of a BJT\'s emitter.',
+    detail:
+      'The source is the FET terminal that supplies the channel carriers (electrons for n-channel, holes for p-channel) and which the gate voltage is measured against (V_GS = V_gate − V_source). In a common-source amplifier the source is grounded (or returned to ground via a small R_S for emitter-degeneration-style bias stability), and the input signal is applied to the gate. In a source follower (the FET equivalent of an emitter follower) the source is the OUTPUT terminal and the drain is tied to the rail.',
+    see: ['fet', 'mosfet', 'gate', 'drain'],
+  },
+  'transistor saturation': {
+    tip: 'The «closed switch» mode of a BJT — V_CE has been pulled down to ~0.2 V and the load (not β) sets the collector current.',
+    detail:
+      'A BJT in saturation has both junctions forward-biased: base-emitter is on (~0.7 V), and the base-collector junction has also gone into forward conduction because V_CE dropped low enough. In this state V_CE is fixed at ~0.1–0.3 V (regardless of current), and the collector current is whatever the external load and supply rail allow — Ohm\'s law on (R_C + load), with V_CE_sat as a small offset. The transistor\'s β no longer matters as long as β · I_B exceeds the load\'s I_C demand by a healthy margin (typically 5–10×). This is the «on» state of a BJT switch. The companion state, with no base current and no collector current, is cutoff. The «in-between» state where V_CE > 0.5 V and I_C ≈ β · I_B is the active region — used for amplification, not switching. (The same English word also names magnetic-core saturation in inductors and transformers — a different physical phenomenon; see the «saturation» entry for the magnetic-core variant.)',
+    formula: 'V_CE_sat ≈ 0.2 V; I_C_max = (V_CC − V_CE_sat) / R_load',
+    see: ['bjt', 'cutoff', 'active region', 'saturation'],
+  },
+  cutoff: {
+    tip: 'The «open switch» mode of a transistor — base current (BJT) or gate-source voltage (FET) is below threshold, so essentially no current flows from collector/drain to emitter/source.',
+    detail:
+      'A transistor in cutoff has no carriers flowing through it, except for tiny leakage currents (nanoamps for BJTs, picoamps for FETs). For a BJT, cutoff means base current is zero (or V_BE is below the ~0.6 V turn-on threshold) — the base-emitter diode is not conducting, so no carriers are injected into the base, and the collector current drops to leakage levels. For a FET, cutoff means V_GS is below V_th — the channel does not conduct. This is the «off» state of any transistor switch and the resting state of an amplifier between signal swings.',
+    see: ['saturation', 'active region', 'transistor'],
+  },
+  'active region': {
+    tip: 'The flat middle part of a BJT\'s output curves where I_C ≈ β · I_B and barely depends on V_CE — the region used for linear amplification.',
+    detail:
+      'The active region is the operating regime in which a transistor amplifies linearly. For a BJT: base-emitter junction forward-biased, base-collector junction reverse-biased, V_CE typically above ~0.5 V. In this region the collector behaves like a current source whose value is set by I_B, and the slope of the output curve (∂I_C/∂V_CE) is small — the transistor approximates an ideal current source. The «family» of output curves you see in textbooks is a sequence of these flat regions stacked vertically, one per base current setting. To amplify, you place the Q-point (quiescent operating point) somewhere in the active region and let the AC signal modulate around it; as long as the swing stays inside the active region, the output is a faithful (if larger) replica of the input.',
+    see: ['saturation', 'cutoff', 'q point', 'bjt'],
+  },
+  'q point': {
+    tip: 'Quiescent point — the steady-state (V_CE, I_C) at which a transistor sits when no AC signal is applied. The Q-point is the centre of the swing.',
+    detail:
+      'The Q-point (or operating point, or bias point) is the DC operating point of an amplifier — where the transistor sits when the AC input is zero. It is found graphically as the intersection of the load line (set by V_CC and R_C) with the output curve corresponding to the chosen base current. The «right» Q-point is usually the middle of the load line at V_CE ≈ V_CC / 2, which gives equal swing room toward saturation (V_CE → 0) and toward cutoff (V_CE → V_CC) before the output clips. Bias too close to either end and one half of the signal smashes into the rail. In practice the Q-point is set by the four-resistor bias network (R_1, R_2 divider plus R_E), chosen so that I_C lands where you want it regardless of which specific transistor you grabbed from the bin.',
+    see: ['load line', 'active region', 'common emitter'],
+  },
+  'common emitter': {
+    tip: 'The standard single-transistor BJT voltage amplifier: input on the base, output on the collector, emitter grounded (or returned to ground through a small R_E). Gain ≈ −R_C / R_E, with phase inversion.',
+    detail:
+      'The common-emitter (CE) amplifier is the BJT amplifier topology you\'ll see most often. Voltage-divider bias (R_1 + R_2) holds the base steady at a chosen DC voltage; the emitter is connected to ground through a small resistor R_E that sets the emitter current by Ohm\'s law (I_E = V_E / R_E); the collector connects through R_C to V_CC. An AC input wiggles the base voltage, the emitter follows it (V_BE is a near-constant 0.7 V drop), R_E converts the emitter wiggle into an emitter-current wiggle, and R_C converts the collector-current wiggle (≈ I_E) into an output voltage wiggle. The result is gain = −R_C / R_E — a clean ratio of resistors, β-independent and temperature-stable. The minus sign is phase inversion: a positive input wiggle becomes a negative output wiggle. Typical gains are 5–100 per stage; for higher gains, cascade stages or use a different topology (cascode, op-amp).',
+    formula: 'A_v ≈ −R_C / R_E',
+    see: ['bjt', 'common source', 'q point', 'load line'],
+  },
+  'common source': {
+    tip: 'The FET equivalent of the common-emitter amplifier: input on the gate, output on the drain. Gain ≈ −g_m · R_D, with phase inversion.',
+    detail:
+      'The common-source (CS) amplifier is the FET version of the common-emitter circuit. The gate is biased to a voltage that puts the FET in its active region; the drain connects through R_D to the supply rail; the source is grounded (or returned to ground via a small R_S). An AC input on the gate produces a drain current swing g_m · v_in, where g_m = ∂I_D/∂V_GS is the transconductance (typically 1–100 mS depending on the FET and operating current). That drain current swing drops across R_D as v_out = −g_m · R_D · v_in. The minus sign is phase inversion. The CS topology shares the CE\'s strengths (single-stage gain, easy biasing) and adds the FET\'s near-infinite input impedance — useful when the source is a piezo, electrometer, or any other high-impedance node.',
+    formula: 'A_v ≈ −g_m · R_D',
+    see: ['fet', 'mosfet', 'common emitter', 'transconductance'],
+  },
+  transconductance: {
+    tip: 'The slope of a device\'s output current versus input voltage — ∂I_out / ∂V_in. Units are siemens (S = A/V). For a FET, g_m sets the voltage gain in a common-source amplifier the same way 1/R_E sets the gain in a BJT common-emitter amplifier.',
+    detail:
+      'Transconductance g_m measures how strongly an input voltage modulates an output current. For a FET, g_m = ∂I_D / ∂V_GS at a given operating point; values are typically 1–100 mS depending on the device and bias current. For a BJT operated as a transconductance device (Ebers-Moll picture), g_m = I_C / V_T where V_T ≈ 25 mV is the thermal voltage at room temperature — so a BJT at 1 mA collector current has g_m ≈ 40 mS, much higher than most FETs. Transconductance shows up directly in the gain formulae of voltage amplifiers: A_v = −g_m · R_load, regardless of whether the transistor is a BJT or a FET. The unit is the siemens (S), or equivalently the «mho» (ohm spelled backwards).',
+    formula: 'g_m = ∂I_out / ∂V_in',
+    see: ['common source', 'fet', 'mosfet'],
+  },
+  beta: {
+    tip: 'The current gain of a BJT — β = I_C / I_B. Typically 50–500 for a small-signal NPN, but varies factor-of-three across specimens and 30–50 % across temperature.',
+    detail:
+      'β (or h_FE on datasheets) is the BJT\'s current-gain ratio: a base current I_B causes a collector current of about β · I_B, as long as the transistor is in the active region. For a typical small-signal NPN like the 2N3904, β is between 100 and 300 at I_C = 10 mA and room temperature; that range is the spread across specimens of the same part number. β also varies with collector current (usually peaks somewhere in the mA range and rolls off at low and high I_C) and with temperature (rises ~0.5 % per °C). β is useful as an order-of-magnitude estimate, but circuits should not depend on a specific β value — the standard four-resistor bias circuit is designed so β cancels out of the answer, leaving the operating point set by resistor ratios alone. The Greek letter is read «beta» and used interchangeably with h_FE in the literature.',
+    formula: 'β = I_C / I_B',
+    see: ['bjt', 'common emitter'],
+  },
+  'enhancement mode': {
+    tip: 'A FET in which the channel does NOT conduct at zero gate voltage — V_GS must be raised past a threshold V_th to turn it on. The dominant species in modern MOSFETs.',
+    detail:
+      'An enhancement-mode FET starts non-conducting at V_GS = 0; you must «enhance» the channel by applying a gate voltage past the threshold V_th (typically 1–4 V for n-channel) to allow current flow. Almost every modern MOSFET is enhancement mode, because that mode\'s «off-by-default» behaviour matches the way logic gates and switches need to behave. The complementary mode is depletion (channel conducts at V_GS = 0; gate voltage must «deplete» it to turn it off); JFETs are depletion-only, MOSFETs come in either mode but enhancement dominates. The schematic symbol marks enhancement with a BROKEN channel line (three short segments) — visual shorthand for «no channel until you turn it on».',
+    see: ['mosfet', 'fet'],
+  },
+  'logic level': {
+    tip: 'Of a MOSFET: rated to turn fully on at low gate-drive voltages (V_GS ≈ 2.5–3 V) so it can be driven directly from a 3.3 V or 5 V microcontroller pin without an extra driver stage.',
+    detail:
+      'A «logic-level» MOSFET is one whose datasheet quotes R_DS(on) at V_GS values below ~3 V — meaning it turns fully on with a 3.3 V or 5 V microcontroller pin as the gate drive, no booster circuit needed. Standard-level MOSFETs (e.g. IRF540) are designed for V_GS ≥ 10 V to be fully on, and a 3.3 V or 5 V drive will leave them only partially on (high R_DS(on), excessive heat dissipation). The convention in part numbers is the letter L: IRLZ44N is logic-level, IRFZ44N is standard. Always check the datasheet curve of R_DS(on) vs V_GS at your intended V_GS — at room temperature, with V_GS at the value your microcontroller actually outputs.',
+    see: ['mosfet', 'fet'],
+  },
 }

@@ -261,9 +261,12 @@ function buildLoadLinePath(
    wider than the 35 px canonical pad. The static schematic doesn't
    need this extra room because it labels R_s with `label` only. */
 
-const SCH_W = 440        // R_L value «100,0 Ом» extends to x≈400 from
-                          // CenteredLabel's sideX=SCH_RL_X+20=350; canvas
-                          // needs to clear that to avoid clipping the «Ом».
+// Content x: SCH_SRC_X=60 .. SCH_RL_X=330 + R_L value label «100,0 Ом»
+// extends to x≈400 from CenteredLabel's sideX=SCH_RL_X+20=350. Canvas
+// MUST clear that or the «Ом» clips when the load-resistor toggle is on.
+// Previously bumped down to 340 (load OFF, xMax=297) — that hid the R_L
+// label entirely with load ON. Reader-flagged.
+const SCH_W = 440
 // Schematic SVG height matches the chart's CHART_H (240) so the two
 // side-by-side cards line up. Without this, the schematic at its
 // natural compact height ≈ 200 px sat shorter than the chart and the
@@ -407,9 +410,11 @@ export default function ZenerRegulatorWidget() {
           )}
 
           {/* Each component carries TWO labels: the designator
-              (R_s / Z / R_L / V_in — primary, weight=600 size=14) and
-              a live numeric reading (the voltage across it — secondary,
-              size=13). The primitives lay them out in their canonical
+              (R_s / Z / R_L / V_in — primary, size=14) and a live
+              numeric reading (the voltage across it — secondary,
+              size=13). Both render at regular weight as of May 2026;
+              the size hierarchy alone carries the designator/value
+              distinction. The primitives lay them out in their canonical
               slots: Battery puts them side-by-side (left/right of the
               vertical body), DiodeZener stacks them right of the body
               (CenteredLabel), Resistor stacks them above the body

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 import { CenteredLabel } from './SymbolLabel'
-import { Diode, DiodeZener, LED, TransistorNPN, TransistorPNP } from './symbols/semiconductors'
+import { Diode, DiodeZener, LED, TransistorNPN, TransistorPNP, TransistorNMOS, TransistorPMOS } from './symbols/semiconductors'
 import { Crystal } from './symbols/misc'
 import { type Orientation } from './types'
 
@@ -97,6 +97,8 @@ const SYMBOLS: Array<{
   // passes the common props, which match. Cast at the call site.
   { name: 'TransistorNPN', Component: TransistorNPN as never },
   { name: 'TransistorPNP', Component: TransistorPNP as never },
+  { name: 'TransistorNMOS', Component: TransistorNMOS as never },
+  { name: 'TransistorPMOS', Component: TransistorPMOS as never },
   { name: 'Crystal', Component: Crystal },
 ]
 

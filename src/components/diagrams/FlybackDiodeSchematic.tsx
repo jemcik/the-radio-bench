@@ -39,7 +39,12 @@ import {
 import { Diode, TransistorNPN } from '@/lib/circuit/symbols/semiconductors'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 540
+// Content extends from the «in» terminal label (left, ≈x=40 after
+// italic glyph extent) to the «D» diode label (right, ≈x=380 with
+// CenteredLabel's gap=20 placement). 420 viewBox width gives ~20 px
+// margins on each side. Was 540 — leaving ~170 px of empty space on
+// the right of the diode that the reader flagged as wasted area.
+const SCHEMATIC_W = 420
 const SCHEMATIC_H = 280
 
 const TOP_Y = 35
@@ -51,17 +56,18 @@ const GND_Y = 250
 const SUPPLY_X = 80
 const COIL_X = 240
 const DIODE_X = 340
-// Transistor centred 12 px LEFT of COIL_X so its collector / emitter
-// pins (which both sit at cx + 12 in pinsBJT for orient='right') land
-// at x = COIL_X. That puts the collector directly under the switching
+// Transistor centred 10 px LEFT of COIL_X so its collector / emitter
+// pins (which both sit at cx + 10 in pinsBJT for orient='right',
+// matching chris-pikul TransistorNPN's actual pin geometry) land at
+// x = COIL_X. That puts the collector directly under the switching
 // node and the emitter directly above the bottom-rail-meets-ground
 // point — both wires become straight verticals with NO right-angle
-// stubs. Earlier revision had TR_X = COIL_X = 240, which forced 12-px
-// horizontal stubs (and before that, a single 31-px diagonal) out to
-// the pins. The Q1 designator above the body shifts left with the
-// body and leaves a clean 3-4 px gap from the collector wire passing
-// through x=COIL_X.
-const TR_X = COIL_X - 12   // 228
+// stubs.
+//
+// Used to be COIL_X - 12 (matching the pre-chris-pikul ARRL hand-drawn
+// transistor's +12 offset); pinsBJT-offsets were corrected May 2026
+// to +10 chris-pikul, and this anchor moved with them.
+const TR_X = COIL_X - 10   // 230
 
 const supply = pins2(SUPPLY_X, (TOP_Y + GND_Y) / 2, 'down')
 const coil = pins2(COIL_X, (COIL_TOP_Y + SW_Y) / 2, 'down')
@@ -81,7 +87,7 @@ export default function FlybackDiodeSchematic() {
           components={{ var: <MathVar />, strong: <strong /> }}
         />
       }
-      maxWidth={580}
+      maxWidth={460}
     >
       {/* +V rail */}
       <Wire points={[supply.p1, { x: SUPPLY_X, y: TOP_Y }, { x: DIODE_X, y: TOP_Y }, flyback.p2]} />
@@ -114,14 +120,22 @@ export default function FlybackDiodeSchematic() {
       <Wire points={[supply.p2, { x: SUPPLY_X, y: GND_Y }, { x: COIL_X, y: GND_Y }]} />
 
       {/* ── Components ────────────────────────────────────────── */}
-      <Battery x={SUPPLY_X} y={(TOP_Y + GND_Y) / 2} orient="down" value="V_in" />
+      {/* V_CC for the relay coil supply — distinct from the V_in logic
+          terminal that drives the base. Same node would render with the
+          same label, but topologically these are two unrelated voltages:
+          V_CC is typically 12 V (relay coil rail), V_in is logic level
+          (3.3 V or 5 V from a microcontroller). */}
+      <Battery x={SUPPLY_X} y={(TOP_Y + GND_Y) / 2} orient="down" value="V_CC" />
       <Inductor x={COIL_X} y={(COIL_TOP_Y + SW_Y) / 2} orient="down" label="coil" />
       <Diode x={DIODE_X} y={(COIL_TOP_Y + SW_Y) / 2} orient="up" label="D" />
       <Resistor x={150} y={TR_Y} label="R_b" />
       <TransistorNPN x={TR_X} y={TR_Y} orient="right" label="Q1" />
 
-      {/* «in» terminal label on the left of the base resistor */}
-      <TerminalLabel x={70} y={TR_Y} anchor="end">in</TerminalLabel>
+      {/* «V_in» terminal label on the left of the base resistor.
+          Uppercase V_X for DC logic-level switching input — matches the
+          flyback caption prose which names V_in. AoE/Sedra-Smith
+          convention: V_X = DC bias, v_x = AC small signal. */}
+      <TerminalLabel x={70} y={TR_Y} anchor="end">V_in</TerminalLabel>
 
       {/* Junctions
           ─────────

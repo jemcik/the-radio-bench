@@ -210,7 +210,7 @@ export const PARTS: Part[] = [
         part: 1,
         title: 'Transistors',
         subtitle: 'BJT and FET as switch and amplifier — biasing, gain, the load line',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['2.6'],

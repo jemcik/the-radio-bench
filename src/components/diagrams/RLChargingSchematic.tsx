@@ -19,7 +19,6 @@ import { Trans } from 'react-i18next'
 import {
   Circuit,
   Wire,
-  Junction,
   Resistor,
   Inductor,
   Battery,
@@ -36,7 +35,9 @@ import {
 } from '@/lib/circuit/symbols/instruments'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 510
+// Content x: LEFT_X=60 .. L_X=380 (+ symbol half-width ~30, meter dial ~30).
+// Was 510 — left ~100 px empty on the right. See `check:diagram-viewbox-fit`.
+const SCHEMATIC_W = 430
 
 const TOP_Y = SCHEMATIC_PAD_TOP // 35
 const RAIL_SPAN = 110
@@ -70,7 +71,7 @@ export default function RLChargingSchematic() {
           components={{ var: <MathVar /> }}
         />
       }
-      maxWidth={560}
+      maxWidth={480}
     >
       {/* ── Main loop ─────────────────────────────────────────────── */}
       {/* Battery+ up to top rail, across to switch */}
@@ -107,9 +108,9 @@ export default function RLChargingSchematic() {
         I
       </TerminalLabel>
 
-      {/* No junction dots needed — the loop is a single straight path,
-          no T-joints. */}
-      <Junction x={L_X} y={TOP_Y} />
+      {/* No junction dots — the loop is a single straight path, no
+          T-joints (the comment above was correct but the dot below was
+          shipped anyway; flagged by check:junction-placement). */}
     </Circuit>
   )
 }

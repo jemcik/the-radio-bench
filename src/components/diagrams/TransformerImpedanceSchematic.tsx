@@ -13,8 +13,8 @@
 import {
   Circuit,
   Wire,
-  Junction,
   AcSource,
+  AC_SOURCE_RADIUS,
   Resistor,
   Transformer,
   TerminalLabel,
@@ -38,11 +38,17 @@ const X_TX = 290
 const X_LOAD = 440
 const RIGHT_EDGE_X = 525
 
-// orient='up' Transformer — primary on LEFT, secondary on RIGHT.
-const TX_PRI_X = X_TX - 12
-const TX_SEC_X = X_TX + 12
-const TX_TOP_Y = MID_Y - 30
-const TX_BOT_Y = MID_Y + 30
+// Transformer in native orient='right' — primary winding vertical on
+// the LEFT, secondary vertical on the RIGHT. Pin positions after the
+// chris-pikul wrapper's 0.4 down-scale:
+//   primary p1 (top-left)     = (X_TX-30, MID_Y-25)
+//   primary p2 (bottom-left)  = (X_TX-30, MID_Y+25)
+//   secondary p1 (top-right)  = (X_TX+30, MID_Y-25)
+//   secondary p2 (bot-right)  = (X_TX+30, MID_Y+25)
+const TX_PRI_X = X_TX - 30
+const TX_SEC_X = X_TX + 30
+const TX_TOP_Y = MID_Y - 25
+const TX_BOT_Y = MID_Y + 25
 
 export default function TransformerImpedanceSchematic() {
   const { t } = useTranslation('ui')
@@ -79,22 +85,18 @@ export default function TransformerImpedanceSchematic() {
       <Transformer
         x={X_TX}
         y={MID_Y}
-        orient="up"
         ratio={t('ch1_9.schematicImpedanceMatchRatio')}
       />
       <Resistor x={X_LOAD} y={TOP_Y} />
 
-      {/* T-joints */}
-      <Junction x={TX_PRI_X} y={TOP_Y} />
-      <Junction x={TX_PRI_X} y={BOT_Y} />
-      <Junction x={TX_SEC_X} y={TOP_Y} />
-      <Junction x={TX_SEC_X} y={BOT_Y} />
+      {/* No junction dots — each rail-to-stub turn is an L-bend inside
+          one polyline <Wire>, not a T-joint of three conductors. */}
 
-      {/* Labels */}
-      <TerminalLabel x={X_SRC} y={TOP_Y - 22} anchor="middle">
+      {/* Labels — clear the AC source body by AC_SOURCE_RADIUS + 10. */}
+      <TerminalLabel x={X_SRC} y={TOP_Y - (AC_SOURCE_RADIUS + 10)} anchor="middle">
         {t('ch1_9.schematicImpedanceMatchSrc')}
       </TerminalLabel>
-      <TerminalLabel x={X_LOAD} y={TOP_Y - 22} anchor="middle">
+      <TerminalLabel x={X_LOAD} y={TOP_Y - (AC_SOURCE_RADIUS + 10)} anchor="middle">
         {t('ch1_9.schematicImpedanceMatchLoad')}
       </TerminalLabel>
     </Circuit>

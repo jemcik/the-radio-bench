@@ -232,6 +232,86 @@ for (const file of files) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// Second pass — dynamic-key-through-t() detection.
+//
+// The T_CALL pass above only sees `t('literal-key')`. It misses the
+// pattern of assigning a markup-bearing key to a variable and then
+// rendering through `t(variable)`:
+//
+//   let warnKey: string
+//   if (sat)        warnKey = 'ch1_11.widget.ceGain.warnSaturated'
+//   else if (cut)   warnKey = 'ch1_11.widget.ceGain.warnCutoff'
+//   else            warnKey = 'ch1_11.widget.ceGain.warnGood'
+//   …
+//   <p>{t(warnKey)}</p>          ← invisible to T_CALL
+//
+// All three warn* values contain `<strong>` / `<var>` markup, so the
+// tags ship as literal text. Reader-flagged in ch 1.11 after the gate
+// passed clean on this exact pattern.
+//
+// Detection strategy: find every `t(identifier)` (not `t('string')`)
+// call site. Apply the same `isCallSiteSafe(back, classification)`
+// check that the T_CALL pass uses. If unsafe, scan the file for
+// literal-string assignments to that identifier (possibly the last
+// segment of a dotted access like `computed.warnKey`) and flag every
+// markup-bearing key the variable could hold. If the call site is in
+// a safe wrapper (Trans, MathText, etc.) we skip — the wrapper
+// handles the markup regardless of which key the variable holds.
+const T_DYNAMIC_RE = /\bt\(\s*([a-zA-Z_$][\w$.]*)\s*[),]/g
+
+for (const file of files) {
+  if (file.endsWith('.test.tsx') || file.endsWith('.test.ts')) continue
+  const text = readFileSync(file, 'utf8')
+  T_DYNAMIC_RE.lastIndex = 0
+  let m
+  while ((m = T_DYNAMIC_RE.exec(text)) !== null) {
+    const expr = m[1]
+    const idx = m.index
+    const back = text.slice(Math.max(0, idx - 800), idx)
+
+    // Determine possible string-literal values this identifier could
+    // hold. Only flag the assignments whose value is a known
+    // markup-bearing i18n key.
+    const lastSegment = expr.includes('.') ? expr.split('.').pop() : expr
+    const assignRe = new RegExp(
+      `\\b${lastSegment}\\s*=\\s*(['"\`])([a-zA-Z_$.][\\w.-]*)\\1`,
+      'g',
+    )
+    let am
+    const possibleKeys = []
+    while ((am = assignRe.exec(text)) !== null) {
+      const key = am[2]
+      if (flaggedKeys.has(key)) possibleKeys.push({ key, pos: am.index })
+    }
+    if (possibleKeys.length === 0) continue
+
+    // For dynamic keys, the strictest classification across the
+    // possible values determines safety. If ANY possible value has
+    // non-MathText tags, the wrapper must be Trans. So fold the
+    // classifications.
+    const onlyMathText = possibleKeys.every(p => flaggedKeys.get(p.key).onlyMathText)
+    const mergedClass = { onlyMathText, tags: [] }
+    if (isCallSiteSafe(back, mergedClass)) continue
+
+    // Unsafe call site — flag every markup-bearing assignment.
+    for (const { key, pos } of possibleKeys) {
+      const cls = flaggedKeys.get(key)
+      const line = text.slice(0, pos).split('\n').length
+      findings.push({
+        file: path.relative(REPO, file),
+        line,
+        key,
+        value: flat[key],
+        tags: cls.tags,
+        onlyMathText: cls.onlyMathText,
+        kind: 'dynamic-through-t',
+        varName: expr,
+      })
+    }
+  }
+}
+
 if (findings.length === 0) {
   console.log(`check-tag-renders OK: ${flaggedKeys.size} flagged i18n key(s) all rendered through <Trans> or <MathText>.`)
   process.exit(0)
@@ -243,6 +323,10 @@ for (const f of findings) {
   console.error(`  ${f.file}:${f.line}`)
   console.error(`    key:   ${f.key}`)
   console.error(`    tags:  <${f.tags.join('>, <')}>`)
+  if (f.kind === 'dynamic-through-t') {
+    console.error(`    via:   variable «${f.varName}» assigned the markup-bearing key,`)
+    console.error(`           then rendered through t(${f.varName}) elsewhere in this file.`)
+  }
   console.error(`    value: ${f.value.length > 90 ? f.value.slice(0, 87) + '…' : f.value}`)
   console.error('')
 }
@@ -252,6 +336,8 @@ console.error('Fix:')
 console.error('  • Replace `<p>{t(\'key\')}</p>` with')
 console.error('       `<p><Trans i18nKey="key" ns="ui" components={{ strong: <strong />, ... }} /></p>`')
 console.error('    mapping every tag in the value to a React component.')
+console.error('  • For dynamic keys (`t(varName)` where varName comes from if/else),')
+console.error('    switch the call site to `<Trans i18nKey={varName} components={...} />`.')
 console.error('  • If the only tags are <var>/<nowrap>, `<MathText>{t(\'key\')}</MathText>` also works.')
 console.error('  • Or rewrite the i18n value to drop the tags.')
 process.exit(1)

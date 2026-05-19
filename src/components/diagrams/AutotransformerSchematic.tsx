@@ -24,12 +24,11 @@
 import {
   Circuit,
   Wire,
-  Junction,
   AcSource,
+  AC_SOURCE_RADIUS,
   Resistor,
   InductorCore,
   TerminalLabel,
-  Tap,
   pins2,
   SCHEMATIC_PAD_TOP,
   schematicHeight,
@@ -37,7 +36,9 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 import { MathVar } from '@/components/ui/math'
 
-const SCHEMATIC_W = 540
+// Content x: LEFT_EDGE_X=60 .. X_LOAD=410 + resistor body ~30 + label ~20.
+// Was 540 — ~100 px of empty space on the right. See `check:diagram-viewbox-fit`.
+const SCHEMATIC_W = 470
 
 const TOP_Y = SCHEMATIC_PAD_TOP + 15
 const RAIL_SPAN = 130
@@ -58,16 +59,19 @@ const X_LOAD = 410
 const W_TOP_Y = MID_Y - 30
 const W_BOT_Y = MID_Y + 30
 
-// InductorCore (orient='down') has its bump peaks at +6 from the axis.
-// We plant the Tap arrow tip a couple of pixels INSIDE the bump's
-// outer stroke (which sits at +7 due to strokeWidth=2) so the
-// arrowhead visibly «pokes into» the winding rather than just
-// touching its outline.
-const BUMP_OFFSET = 4
-// Tap arrow length (must match the Tap primitive default).
-const TAP_SHAFT = 10
-// Where the external tap wire starts: arrow tail = tip + shaft.
-const TAP_WIRE_X0 = X_WINDING + BUMP_OFFSET + TAP_SHAFT
+// InductorCore (orient='down') has its bump peaks at +6 from the axis;
+// stroke width 1.5 puts the bump's outer drawn edge at ≈ +6.75. Start
+// the external tap wire at +8 so it visually emanates from the side of
+// the winding — the wire's end ON the coil acts as the visual T-joint
+// that marks the tap point.
+//
+// Per ARRL Handbook 2023 Figure 4.31B and IEEE/IEC convention, a FIXED
+// autotransformer tap is just a wire branching off the winding line —
+// no arrow. Arrows on autotransformers indicate VARIABLE taps (Variacs,
+// per AoE Fig 1.129). Earlier this diagram used a `<Tap>` arrow whose
+// apex sat at +4 (inside the bumps), making the filled triangle cross
+// the coil drawing — visually a defect the user flagged.
+const TAP_WIRE_X0 = X_WINDING + 8
 
 // Horizontal load resistor on the tap-height rail
 const r = pins2(X_LOAD, TAP_Y)
@@ -79,7 +83,7 @@ export default function AutotransformerSchematic() {
     <Circuit
       width={SCHEMATIC_W}
       height={SCHEMATIC_H}
-      maxWidth={580}
+      maxWidth={520}
       caption={
         <Trans
           i18nKey="ch1_9.schematicAutoCaption"
@@ -118,21 +122,16 @@ export default function AutotransformerSchematic() {
       <InductorCore x={X_WINDING} y={MID_Y} orient="down" />
       <Resistor x={X_LOAD} y={TAP_Y} />
 
-      {/* Tap arrow — ARRL-Handbook convention for «wire enters the
-          winding HERE». Tip touches the bump peak; shaft extends
-          rightward and the tap wire (above) continues from the shaft
-          end out to R_load. Replaces a plain junction dot, which
-          visually disappeared on the inductor's centreline. */}
-      <Tap x={X_WINDING + BUMP_OFFSET} y={TAP_Y} from="right" />
-
-      {/* Junctions: T-joints on rails (tap point itself is now
-          marked by the Tap arrow above, not a junction dot). */}
-      <Junction x={X_WINDING} y={TOP_Y} />
-      <Junction x={X_WINDING} y={BOT_Y} />
-      <Junction x={r.p2.x} y={BOT_Y} />
+      {/* No junction dots, no arrow: per ARRL Figure 4.31B and IEEE
+          convention, a fixed autotransformer tap is just a wire that
+          emerges from the side of the winding. The tap wire (above)
+          starts at TAP_WIRE_X0 — exactly on the bump's drawn edge —
+          so its endpoint visually attaches to the coil, marking the
+          tap point with no extra glyph. */}
 
       {/* ── LABELS ──────────────────────────────────────────────────── */}
-      <TerminalLabel x={X_AC} y={TOP_Y - 22} anchor="middle">
+      {/* AC source label — clears the chris-pikul body by 10 px gap. */}
+      <TerminalLabel x={X_AC} y={TOP_Y - (AC_SOURCE_RADIUS + 10)} anchor="middle">
         {t('ch1_9.schematicAutoSrc')}
       </TerminalLabel>
       <TerminalLabel
