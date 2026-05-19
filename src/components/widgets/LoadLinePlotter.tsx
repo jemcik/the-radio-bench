@@ -179,11 +179,28 @@ export default function LoadLinePlotter() {
     return { v_ce, i_c, region, headroomUp, headroomDown }
   }, [vcc, rcKohm, ibUa, beta])
 
-  // Load line endpoints in plot coordinates
-  const loadLineX0 = xToPx(0)                              // V_CE = 0
-  const loadLineY0 = yToPx(Math.min(vcc / rcKohm, IC_MAX)) // top intercept
-  const loadLineX1 = xToPx(Math.min(vcc, VCE_MAX))         // bottom intercept
+  // Load line: I_C = (V_CC − V_CE)/R_C, with true endpoints
+  // (V_CE=0, I_C=V_CC/R_C) and (V_CE=V_CC, I_C=0). The line is
+  // drawn from the TRUE endpoints — when V_CC/R_C > IC_MAX the
+  // top endpoint sits above the chart and the SVG clipPath chops
+  // off the off-chart portion, preserving the correct slope.
+  //
+  // Earlier this clamped Y to IC_MAX while keeping X at 0, which
+  // produced a line with the WRONG slope (e.g. at V_CC=9, R_C=0.8
+  // the true slope is −1.25 mA/V but the clamped line had slope
+  // −0.67 mA/V — the Q-point then sat visibly off the dashed line).
+  // Reader-flagged.
+  const loadLineX0 = xToPx(0)
+  const loadLineY0 = yToPx(vcc / rcKohm)
+  const loadLineX1 = xToPx(Math.min(vcc, VCE_MAX))
   const loadLineY1 = yToPx(0)
+
+  // Visible top endpoint of the load line — used for label
+  // placement so the label stays inside the chart even when the
+  // mathematical top endpoint is far above it.
+  const visibleTopVce = vcc / rcKohm > IC_MAX ? vcc - IC_MAX * rcKohm : 0
+  const visibleTopX = xToPx(visibleTopVce)
+  const visibleTopY = yToPx(Math.min(vcc / rcKohm, IC_MAX))
 
   // The fixed background curves (lighter)
   const backgroundIbs = [10, 20, 30, 40, 50]
@@ -346,8 +363,8 @@ export default function LoadLinePlotter() {
             from saturation at top-left to cutoff at bottom-right) that
             no slider combination puts the dot directly on this label. */}
         <text
-          x={loadLineX0 + (loadLineX1 - loadLineX0) * 0.22}
-          y={loadLineY0 + (loadLineY1 - loadLineY0) * 0.22 - 12}
+          x={visibleTopX + (loadLineX1 - visibleTopX) * 0.22}
+          y={visibleTopY + (loadLineY1 - visibleTopY) * 0.22 - 12}
           fontSize="12"
           fontStyle="italic"
           fill={svgTokens.experiment}

@@ -279,11 +279,18 @@ export default function BjtOperationVisualizer() {
   // Particles live in a ref so updating them does not trigger React
   // re-renders; a frame counter in state forces re-render at the
   // animation framerate (capped at ~30 fps).
-  const particlesRef = useRef<Particle[]>([])
+  // Particles drive rendering, so they live in state — not a ref. The
+  // previous design used `particlesRef.current` + a `setTick` hack to
+  // force re-renders, but reading a ref during render is a React
+  // anti-pattern (the new `react-hooks/refs` ESLint rule flags it):
+  // refs are for values not needed during render, and stale-ref bugs
+  // become invisible until a deferred re-render exposes them. Now
+  // every rAF tick produces a fresh array via the functional updater,
+  // and React renders the snapshot it was handed — no ref reads in
+  // the render body.
+  const [particles, setParticles] = useState<Particle[]>([])
   const lastFrameRef = useRef<number>(0)
   const prevFrameTimeRef = useRef<number>(0)
-  const [, setTick] = useState(0)
-  const tickRef = useRef(0)
 
   // PRNG seeded per-mount; deterministic for tests / SSR.
   const rngRef = useRef<() => number>(() => 0)
@@ -311,83 +318,107 @@ export default function BjtOperationVisualizer() {
       lastFrameRef.current = now
 
       const rng = rngRef.current
-      const particles = particlesRef.current
 
-      // Poisson-like spawning: each frame, expected spawn count is
-      // (dt / spawnInterval). Floor + Bernoulli for the fractional
-      // part de-syncs spawns from frame-tick boundaries — the previous
-      // «if elapsed > interval» logic locked spawns to ~1 per frame at
-      // high current and read on screen as discrete waves of particles
-      // travelling together. Reader-flagged.
-      //
-      // spawnInterval uses SQRT scaling instead of linear (i_c_cap/i_c).
-      // Active-region currents span three orders of magnitude (10 µA →
-      // 10 mA); linear scaling makes the low-current end invisible
-      // (one particle every 33 seconds at the active threshold).
-      // sqrt() compresses the dynamic range so the bottom of the active
-      // range still shows perceptible flow (~1 every 1.3 sec at 15 µA)
-      // while the top remains a dense stream (~20/sec at 10 mA). The
-      // visualisation trades exact-proportionality for pedagogical
-      // clarity — what we want the reader to feel is «current grows
-      // with V_BE», not «current is exactly proportional to N particles».
-      if (i_c_mA > CUTOFF_THRESHOLD_MA) {
-        const spawnInterval = SPAWN_TIME_AT_FULL_MA * Math.sqrt(I_C_CAP_MA / Math.max(i_c_mA, 0.001))
-        const expected = dt / spawnInterval
-        const whole = Math.floor(expected)
-        const frac = expected - whole
-        const spawnCount = whole + (rng() < frac ? 1 : 0)
-        for (let i = 0; i < spawnCount; i++) {
-          if (particles.length >= MAX_PARTICLES) break
-          particles.push(makeParticle(beta, rng))
-        }
-      }
+      // One setState per frame: spawn + advance + compact via a
+      // PURE updater. React StrictMode double-invokes setState
+      // updaters in dev to detect impurity; an earlier version
+      // mutated particle objects in place (p.x += p.vx, etc.),
+      // which under double-invoke produced inconsistent positions
+      // and visually «froze» the flow after a few frames.
+      // Allocating fresh particle objects per frame trades a tiny
+      // amount of GC churn for StrictMode-safe behaviour.
+      setParticles(prev => {
+        let next: Particle[] = prev
 
-      // Update positions — state-based, no spring oscillation.
-      for (const p of particles) {
-        if (!p.alive) continue
-
-        if (p.phase === 'flowing') {
-          // Drift right; vy stays at 0 so the path is a clean
-          // horizontal line. The visual story is «electrons get
-          // injected at the emitter and drift across the body to the
-          // collector». Any wobble used to read as «electrons jumping
-          // around» which is the wrong physics intuition.
-          p.x += p.vx
-
-          // Trigger branch for recombining carriers once they cross
-          // the base midline.
-          if (p.recombines && p.x >= BRANCH_TRIGGER_X) {
-            p.phase = 'branching'
-          }
-
-          // Non-recombining: exit at the collector wall. Despawn AT the
-          // wall (x = C_X1), not 20 px before — the opacity fade-out
-          // below handles the visual disappearance smoothly.
-          if (!p.recombines && p.x >= C_X1) {
-            p.alive = false
-          }
-        } else if (p.phase === 'branching') {
-          // Smooth curve down through the base wire — accelerate vy,
-          // decelerate vx. Reads as «the carrier veers down out of
-          // the device through the base terminal» = visible i_b.
-          p.vy = Math.min(p.vy + 0.10, 1.6)
-          p.vx = Math.max(p.vx - 0.06, 0)
-          p.x += p.vx
-          p.y += p.vy
-
-          // Exit at the base contact (just past the bottom of the
-          // body, where the base wire connects).
-          if (p.y > STRUCT_Y1 + 12) {
-            p.alive = false
+        // Poisson-like spawning: each frame, expected spawn count
+        // is (dt / spawnInterval). Floor + Bernoulli for the
+        // fractional part de-syncs spawns from frame-tick
+        // boundaries — the previous «if elapsed > interval» logic
+        // locked spawns to ~1 per frame at high current and read
+        // on screen as discrete waves of particles travelling
+        // together. Reader-flagged.
+        //
+        // spawnInterval uses SQRT scaling instead of linear
+        // (i_c_cap/i_c). Active-region currents span three orders
+        // of magnitude (10 µA → 10 mA); linear scaling makes the
+        // low-current end invisible (one particle every 33
+        // seconds at the active threshold). sqrt() compresses the
+        // dynamic range so the bottom of the active range still
+        // shows perceptible flow (~1 every 1.3 sec at 15 µA)
+        // while the top remains a dense stream (~20/sec at
+        // 10 mA). The visualisation trades exact-proportionality
+        // for pedagogical clarity — what we want the reader to
+        // feel is «current grows with V_BE», not «current is
+        // exactly proportional to N particles».
+        if (i_c_mA > CUTOFF_THRESHOLD_MA) {
+          const spawnInterval = SPAWN_TIME_AT_FULL_MA * Math.sqrt(I_C_CAP_MA / Math.max(i_c_mA, 0.001))
+          const expected = dt / spawnInterval
+          const whole = Math.floor(expected)
+          const frac = expected - whole
+          const spawnCount = whole + (rng() < frac ? 1 : 0)
+          if (spawnCount > 0) {
+            const room = MAX_PARTICLES - next.length
+            const toSpawn = Math.min(spawnCount, room)
+            if (toSpawn > 0) {
+              const fresh: Particle[] = new Array(toSpawn)
+              for (let i = 0; i < toSpawn; i++) {
+                fresh[i] = makeParticle(beta, rng)
+              }
+              next = next.concat(fresh)
+            }
           }
         }
-      }
 
-      // Compact: drop dead particles.
-      particlesRef.current = particles.filter(p => p.alive)
+        // Advance positions — pure transform, no mutation. Each
+        // particle becomes a fresh object with the next-frame
+        // values; React state holds these snapshots.
+        next = next
+          .map((p): Particle => {
+            if (!p.alive) return p
 
-      tickRef.current++
-      setTick(tickRef.current)
+            if (p.phase === 'flowing') {
+              // Drift right; vy stays at 0 so the path is a clean
+              // horizontal line. The visual story is «electrons
+              // get injected at the emitter and drift across the
+              // body to the collector». Any wobble used to read
+              // as «electrons jumping around» which is the wrong
+              // physics intuition.
+              const x = p.x + p.vx
+
+              // Recombining carriers veer down once past the base
+              // midline.
+              const phase: Particle['phase'] =
+                p.recombines && x >= BRANCH_TRIGGER_X ? 'branching' : 'flowing'
+
+              // Non-recombining: exit at the collector wall.
+              // Despawn AT the wall (x = C_X1), not 20 px before
+              // — the opacity fade-out below handles the visual
+              // disappearance smoothly.
+              const alive = !p.recombines && x >= C_X1 ? false : true
+
+              return { ...p, x, phase, alive }
+            }
+
+            // branching: smooth curve down through the base wire
+            // — accelerate vy, decelerate vx. Reads as «the
+            // carrier veers down out of the device through the
+            // base terminal» = visible i_b.
+            const vy = Math.min(p.vy + 0.10, 1.6)
+            const vx = Math.max(p.vx - 0.06, 0)
+            const x = p.x + vx
+            const y = p.y + vy
+
+            // Exit at the base contact (just past the bottom of
+            // the body, where the base wire connects).
+            const alive = y > STRUCT_Y1 + 12 ? false : true
+
+            return { ...p, x, y, vx, vy, alive }
+          })
+          .filter(p => p.alive)
+
+        return next
+      })
+
       rafId = requestAnimationFrame(tick)
     }
 
@@ -396,10 +427,17 @@ export default function BjtOperationVisualizer() {
   }, [i_c_mA, beta])
 
   const regionLabel = t(`ch1_11.widget.bjtOp.region.${region}`)
+  // Active uses `font-semibold` WITHOUT a colour tint — the project's
+  // term-accent / primary orange is reserved for glossary terms and
+  // must not appear on plain UI elements (reader-flagged: an orange
+  // «Активний (лінійний)» readout reads as a clickable glossary term
+  // which would be misleading). Cutoff (muted grey) and saturation
+  // (caution amber) use distinctive colours that don't collide with
+  // glossary-term accent.
   const regionToneClass =
     region === 'cutoff' ? 'text-muted-foreground' :
     region === 'saturation' ? 'text-[hsl(var(--caution))]' :
-    'text-primary'
+    'text-foreground font-semibold'
 
   return (
     <Widget
@@ -565,7 +603,7 @@ export default function BjtOperationVisualizer() {
              Opacity fades in/out near the body walls so carriers
              appear to be «injected» / «collected» rather than
              materialising mid-stream. */}
-        {particlesRef.current.map((p, idx) => (
+        {particles.map((p, idx) => (
           <circle
             key={idx}
             cx={p.x} cy={p.y}
@@ -584,9 +622,9 @@ export default function BjtOperationVisualizer() {
               i18nKey="ch1_11.widget.bjtOp.readoutCurrents"
               ns="ui"
               values={{
-                i_b: `${num(i_b_uA.toFixed(2))} µA`,
-                i_c: `${num(i_c_mA.toFixed(3))} mA`,
-                i_e: `${num(i_e_mA.toFixed(3))} mA`,
+                i_b: `${num(Math.round(i_b_uA * 100) / 100)} µA`,
+                i_c: `${num(Math.round(i_c_mA * 1000) / 1000)} mA`,
+                i_e: `${num(Math.round(i_e_mA * 1000) / 1000)} mA`,
               }}
               components={{ var: <MathVar />, strong: <strong /> }}
             />

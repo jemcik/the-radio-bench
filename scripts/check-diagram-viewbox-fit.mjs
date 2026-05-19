@@ -109,7 +109,7 @@ function collectXCoords(src) {
     }
   }
   // Resolve `const FOO = OTHER + N` / `OTHER - N`.
-  for (const m of src.matchAll(/(?:const|let)\s+([A-Z][A-Z0-9_]*)\s*=\s*([A-Z][A-Z0-9_]*)\s*([+\-])\s*(\d+)\b/g)) {
+  for (const m of src.matchAll(/(?:const|let)\s+([A-Z][A-Z0-9_]*)\s*=\s*([A-Z][A-Z0-9_]*)\s*([+-])\s*(\d+)\b/g)) {
     const base = named.get(m[2])
     if (base != null) {
       const n = parseInt(m[4], 10)

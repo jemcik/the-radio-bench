@@ -155,6 +155,7 @@ Common lint-triggered fixes:
 | «(datasheet)» gloss | 2.5 Pro sometimes | Manual: «специфікацією» (glossary-canonical) |
 | «1 µF brick» → «цеглина» (not diminutive) | Both | Accept «цеглинка» (diminutive); reject «цеглина» |
 | «permittivity of free space» → «електрична стала» (bare SI name, erasing pedagogical link) | Both | Keep «діелектрична проникність вакууму» as primary noun; «електрична стала» may appear as parenthetical SI-synonym. The reader needs εᵣ ↔ ε₀ connection visible. See glossary. |
+| «forward bias» / «reverse bias» → «пряме/зворотне ввімкнення» | 3.1 Pro consistently (4× in ch 1.11) | Manual: replace with «пряме/зворотне зміщення» (Wikipedia-canonical UA EE term, matches project usage in `varactorTunerCaption`, `energySparkCalloutMechanism`, glossary `base.detail`, `jfet.detail`). «ввімкнення» literally means "switching on" — describes wiring, not the physics. 2.5 Pro usually picks «зміщення» correctly. |
 
 ---
 

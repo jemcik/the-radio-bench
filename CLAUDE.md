@@ -113,9 +113,21 @@ Before touching any file under `src/components/diagrams/` or `src/components/cha
 
 Before translating any EN → UK content (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never hand-author UA, even for inline mid-conversation rewrites longer than a clause — Claude produces calques even on short sentences (ch 1.5: `найчесніше взяти нову деталь` from EN "honest move" — UA `найчесніше` reads as ethically honest, nonsense in context). The skill's SKILL.md owns the workflow (Gemini 2.5 + 3.1 Pro side-by-side via `gemini-translate.py`, Claude reviewer, linter); references/ holds glossary, landmines, style, markup. Background: Intento 2025 ranks Gemini 2.5 Pro #1 for EN→UA; Claude isn't in the top tier. Claude-only translation of ch 1.1–1.4 cost ~30 landmines per chapter; switching to Gemini-primary in ch 1.5 cut that tenfold.
 
+**Recurring failure mode (logged ch 1.11):** writing EN and UA in the same authoring pass — e.g. a Python script that sets `data['ch1_X'][key] = '<UA prose>'` alongside `data_en['ch1_X'][key] = '<EN prose>'` — silently bypasses the skill. The `ua-translate` skill is not triggered by my own «I'm just dropping in some i18n» framing; it's triggered by «there exists EN prose I want to render in UA». **Hard rule: any UA value longer than a clause MUST come from Gemini side-by-side via the skill, period.** When tempted to «just write the UA too while I'm here», STOP, write only EN, then invoke `ua-translate` for the UA. Hand-writing the UA in the same script wastes the user's review cycles and reverses the tenfold cost reduction the skill exists to deliver.
+
 **Evergreen rule.** Every time the user pushes back on a UA phrasing, decide if Gemini was right (our convention was wrong → update `references/glossary.md`) or wrong (regression → log in `SKILL.md` + add a linter rule if mechanically catchable). Never fix the same class twice across different chapters.
 
 For genuinely one-word swaps (case fix, single glossary term) Gemini is overkill — but any rewrite touching idiom or sentence structure goes through the workflow.
+
+## Beginner-reader review — MANDATORY before declaring chapter prose done
+
+Before saying «готово» / «done» on any task that wrote or rewrote chapter prose (anything under `ch{N}_{M}` in `src/i18n/locales/{en,uk}/ui.json`), invoke the **`beginner-review`** skill at `.claude/skills/beginner-review/`. Spawn it as a subagent — its independent context is the whole point; the subagent must NOT have the rest of the chapter loaded the way you do.
+
+The mechanical UA linter (`check:uk`) catches known bad patterns: bare «вхід» / «вихід» followed by a verb, bare «рівень» without «логічний» qualifier, bare «лінійно» without object. **It does NOT catch context-dependent ambiguity** — pronouns with multiple antecedents, comparatives without baseline, symbols introduced too far back, prose that contradicts a widget visible on the same page.
+
+Pattern that triggered this rule (ch 1.11, May 2026): user caught ~10 prose-clarity issues across one chapter in a single review session — «лінійно» without object, «через нього» ambiguous, «V_BE завжди» contradicting the V_BE slider, «вище» without referring to a screen element, etc. Each was obvious in retrospect, none were caught by self-review. Beginner-review is the structural fix.
+
+**Hard rule:** No `git commit` that touches `ch{N}_{M}.*` keys may proceed without the beginner-review subagent reporting either «No issues found» or a list of issues that have all been addressed and re-verified.
 
 ## If the prose describes a circuit — the schematic goes BEFORE the prose
 
@@ -176,6 +188,37 @@ The right rendering path is always one of:
 - Canonical `<var>X_{Y}</var>` markup in the i18n value rendered via `<Trans components={{ var: <MathVar /> }} />`
 
 The two new gates are both wired into `check:all`, so they run before every PR. They WILL fire on attempted regressions — when one does, do NOT silence with an opt-out comment unless the literal has been visually verified to render correctly through some other path. The default action is «move it to i18n + wrap.»
+
+### Markup-bearing i18n key reached via dynamic `t(varName)` — same render-or-die rule
+
+Recurring failure (ch 1.11 `CeGainCalculator`, reader-flagged): the widget computes which warn message to show in a `useMemo`, assigning the i18n key to a variable through if/else branches, then renders via plain `t(varName)`:
+
+```tsx
+let warnKey: string
+if (saturated)      warnKey = 'ch1_11.widget.ceGain.warnSaturated'
+else if (cutoff)    warnKey = 'ch1_11.widget.ceGain.warnCutoff'
+else                warnKey = 'ch1_11.widget.ceGain.warnGood'
+
+<p>{t(computed.warnKey)}</p>   // ← bug: `<strong>` / `<var>` ship as literal text
+```
+
+The values for `warnSaturated` / `warnCutoff` contained `<strong>` and `<var>` markup. Without `<Trans>` to map those tags to React components, they printed as `<strong>відсічки</strong>` in the reader's UI.
+
+**Why `check:tag-renders` missed it initially**: the gate scanned for `t('literal-key')` calls. A dynamic call `t(varName)` doesn't have a literal key the AST can resolve — for the old gate the key was invisible. After this regression, the gate now ALSO scans `t(identifier)` call sites: for each, it traces backwards through file-local literal-string assignments to that identifier (including dotted access like `computed.warnKey`), and if any reachable key has non-safe-wrapper markup AND the call site isn't inside `<Trans>` / `<MathText>` / other tier-appropriate wrapper, it fails.
+
+**Right pattern for dynamic keys**:
+
+```tsx
+<Trans
+  i18nKey={computed.warnKey}
+  ns="ui"
+  components={{ strong: <strong />, var: <MathVar />, ... }}
+/>
+```
+
+The variable goes straight into `<Trans i18nKey={…}>` — never into `t(...)`. `<Trans>` handles the markup regardless of which key the variable holds, so the dispatch is safe by construction.
+
+**Whenever you write a widget that picks one of several i18n keys at runtime** (status messages, tone variants, validation hints, region labels, multi-state readouts), default to the `<Trans i18nKey={dynamicKey}>` form. Reach for bare `t(varName)` only when you've **manually confirmed every reachable value is markup-free** — and add a comment naming the keys you checked, so future contributors don't have to re-verify.
 
 ### Diagram text labels must not overlap chart shapes
 

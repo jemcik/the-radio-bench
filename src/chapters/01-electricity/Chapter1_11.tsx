@@ -11,6 +11,7 @@ import TransistorSymbolPanel from '@/components/diagrams/TransistorSymbolPanel'
 import BjtSwitchSchematic from '@/components/diagrams/BjtSwitchSchematic'
 import MosfetSwitchSchematic from '@/components/diagrams/MosfetSwitchSchematic'
 import CommonEmitterAmplifierSchematic from '@/components/diagrams/CommonEmitterAmplifierSchematic'
+import BjtBiasingDiagram from '@/components/diagrams/BjtBiasingDiagram'
 import BjtOutputCurves from '@/components/diagrams/BjtOutputCurves'
 import BjtOperationVisualizer from '@/components/widgets/BjtOperationVisualizer'
 import BjtSwitchDesigner from '@/components/widgets/BjtSwitchDesigner'
@@ -145,13 +146,50 @@ export default function Chapter1_11() {
       </p>
       <p>
         <Trans
+          i18nKey="ch1_11.insideDopingNote"
+          ns="ui"
+          components={{ strong: <strong />, em: <em /> }}
+        />
+      </p>
+      <p>
+        <Trans
           i18nKey="ch1_11.insideMechanism"
           ns="ui"
-          components={{ ...mathComponents, nowrap }}
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
         />
       </p>
 
       <BjtOperationVisualizer />
+
+      <p>
+        <Trans
+          i18nKey="ch1_11.insideBiasNote"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong /> }}
+        />
+      </p>
+
+      <BjtBiasingDiagram />
+
+      <Callout variant="tip">
+        <p>
+          <Trans
+            i18nKey="ch1_11.insideWhyEmitterInjects"
+            ns="ui"
+            components={{ ...mathComponents, strong: <strong />, em: <em /> }}
+          />
+        </p>
+      </Callout>
+
+      <Callout variant="tip">
+        <p>
+          <Trans
+            i18nKey="ch1_11.insideWhyIcIndependent"
+            ns="ui"
+            components={{ ...mathComponents, strong: <strong />, em: <em />, nowrap }}
+          />
+        </p>
+      </Callout>
 
       <p>{t('ch1_11.insideTwoLawsIntro')}</p>
       <ul className="not-prose space-y-3 my-4 text-foreground">
@@ -161,7 +199,7 @@ export default function Chapter1_11() {
             <Trans
               i18nKey="ch1_11.insideTwoLawsVoltage"
               ns="ui"
-              components={{ ...mathComponents, strong: <strong />, nowrap }}
+              components={{ ...mathComponents, strong: <strong />, nowrap, ivc: <G k="iv curve" /> }}
             />
           </span>
         </li>
@@ -224,6 +262,14 @@ export default function Chapter1_11() {
             colT: <G k="collector" />,
             emi: <G k="emitter" />,
           }}
+        />
+      </p>
+
+      <p>
+        <Trans
+          i18nKey="ch1_11.bjtSwitchWhyRb"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
         />
       </p>
 
@@ -349,6 +395,14 @@ export default function Chapter1_11() {
 
       <p>
         <Trans
+          i18nKey="ch1_11.curvesWhatChangesVce"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, em: <em />, nowrap }}
+        />
+      </p>
+
+      <p>
+        <Trans
           i18nKey="ch1_11.curvesActiveRegion"
           ns="ui"
           components={{
@@ -371,6 +425,41 @@ export default function Chapter1_11() {
           i18nKey="ch1_11.curvesCutoff"
           ns="ui"
           components={{ strong: <strong /> }}
+        />
+      </p>
+
+      {/* ── Section 4b: Two mental models — switch vs current source.
+           Placed AFTER curves (so «horizontal plateaus on the family
+           of characteristics» is a callback, not a forward ref) and
+           BEFORE the load line / CE amplifier sections (where the
+           current-source intuition becomes the working model). ───── */}
+      <Section id="twoModels" labelKey="ch1_11.sectionTwoModels" />
+      <p>
+        <Trans
+          i18nKey="ch1_11.twoModelsIntro"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong /> }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.twoModelsSwitch"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.twoModelsAmplifier"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.twoModelsBoth"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, nowrap }}
         />
       </p>
 
@@ -433,6 +522,13 @@ export default function Chapter1_11() {
       <Section id="ce" labelKey="ch1_11.sectionCe" />
       <p>
         <Trans
+          i18nKey="ch1_11.ceTerminology"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, em: <em /> }}
+        />
+      </p>
+      <p>
+        <Trans
           i18nKey="ch1_11.ceIntro"
           ns="ui"
           components={{
@@ -459,6 +555,15 @@ export default function Chapter1_11() {
             i18nKey="ch1_11.ceGainFormula"
             ns="ui"
             components={{ ...mathComponents, strong: <strong /> }}
+          />
+        </p>
+      </Callout>
+      <Callout variant="tip">
+        <p>
+          <Trans
+            i18nKey="ch1_11.ceWhyInverted"
+            ns="ui"
+            components={{ ...mathComponents, strong: <strong />, nowrap, brk: <br /> }}
           />
         </p>
       </Callout>
@@ -576,12 +681,12 @@ export default function Chapter1_11() {
           { text: t('ch1_11.labStep2') },
           { text: <Trans i18nKey="ch1_11.labStep3" ns="ui" components={{ ...mathComponents }} /> },
           { text: <Trans i18nKey="ch1_11.labStep4" ns="ui" components={{ ...mathComponents, em: <em /> }} /> },
-          { text: <Trans i18nKey="ch1_11.labStep5" ns="ui" components={{ ...mathComponents }} /> },
+          { text: <Trans i18nKey="ch1_11.labStep5" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em /> }} /> },
         ]}
-        expectedResult={<Trans i18nKey="ch1_11.labExpected" ns="ui" components={{ ...mathComponents }} />}
+        expectedResult={<Trans i18nKey="ch1_11.labExpected" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em /> }} />}
         connectionToTheory={<Trans i18nKey="ch1_11.labConnection" ns="ui" components={{ strong: <strong /> }} />}
         troubleshooting={[
-          <Trans key="trouble1" i18nKey="ch1_11.labTrouble1" ns="ui" components={{ an: <G k="anode" /> }} />,
+          <Trans key="trouble1" i18nKey="ch1_11.labTrouble1" ns="ui" components={{ an: <G k="anode" />, strong: <strong /> }} />,
           <Trans key="trouble2" i18nKey="ch1_11.labTrouble2" ns="ui" components={{ ...mathComponents }} />,
           <Trans key="trouble3" i18nKey="ch1_11.labTrouble3" ns="ui" components={{ ...mathComponents }} />,
         ]}

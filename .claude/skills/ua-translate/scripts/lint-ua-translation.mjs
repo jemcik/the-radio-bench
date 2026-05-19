@@ -1232,6 +1232,64 @@ const RULES = [
       /(?:трививідн|двовивідн|чотирививідн|N-вивідн|n-вивідн|активн|пасивн|напівпровідников|дискретн|лінійн|нелінійн)(?:ий|ого|ому|им|ій|ого|у|а|е|і)\s+прилад|прилад,\s+керован|сімейств[аи]\s+приладів|с[іе]м'?[ая]\s+приладів/g,
     hint: 'Forbidden: «прилад» as a circuit-component head-noun (recurring Gemini regression). «Прилад» in UA means a MEASURING INSTRUMENT (multimeter / oscilloscope / VNA). For a circuit component use «компонент» (active / passive / linear), «пристрій» (semiconductor / N-terminal), «елемент» (circuit-element abstraction), or the concrete noun («транзистор», «діод»). See references/glossary.md «прилад vs пристрій vs компонент» for full rule.',
   },
+
+  // ── BEGINNER-CLARITY RULES (added 2026-05 after repeating reader
+  // pushback on chapter-1.11 transistor prose) ────────────────────────
+  //
+  // These rules target a class of failure where prose written in
+  // «experienced-engineer-speak» uses bare nouns/adverbs that
+  // implicitly assume context the beginner reader does not yet have.
+  // Each rule catches a SPECIFIC failure mode caught by the user in
+  // the chapter:
+  //   * «Коли на вхід надходить високий рівень» — «вхід» which input?
+  //     «рівень» of what?
+  //   * «струм тече лінійно» — linear with respect to what?
+  // The rules are intentionally narrow (single-pattern matches) to
+  // avoid false positives on legitimate qualified uses
+  // («на вхід підсилювача» / «логічний рівень» / «лінійно залежить»).
+
+  {
+    id: 'forbidden.bare-vhid-vyhid',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Catches «на вхід» / «на вихід» / «у вхід» / «у вихід» / «через вхід»
+    // followed directly by a verb (надходить / приходить / подається /
+    // потрапляє / йде / тече / поступає) instead of a qualifier
+    // («на термінал V_in», «на вхід підсилювача», «на вихідний контакт»).
+    pattern: /(?<!\p{L})(?:на|у|в|через)\s+(?:вхід|вихід)\s+(надходить|надходять|приходить|приходять|подається|подаються|потрапляє|потрапляють|тече|течуть|йде|йдуть|поступає|поступають)/giu,
+    hint: 'Beginner-clarity: «на вхід надходить ...» — «вхід» which input? In an introductory chapter every terminal needs a name. Use «на термінал X», «на вхід підсилювача», or «на вхід V_in схеми». Bare «вхід» / «вихід» followed by a motion verb forces the reader to guess.',
+  },
+
+  {
+    id: 'forbidden.bare-riven-level',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Catches «високий рівень» / «низький рівень» NOT preceded by
+    // «логічний» and NOT followed by a genitive noun
+    // («рівень напруги», «рівень сигналу», «рівень потужності»).
+    // Allows: «логічний рівень», «високий рівень напруги», «низький
+    // рівень сигналу», «рівень потужності».
+    pattern: /(?<!\p{L})(?<!логічний\s)(?<!логічного\s)(?<!логічн[оаі][гйм]у\s)(високий|низький)\s+рівень(?!\s+(напруги|сигналу|струму|потужності|шуму|вхідної|вихідної))/giu,
+    hint: 'Beginner-clarity: «високий рівень» — level of what? Use «логічний рівень» (defined earlier in this chapter), or «рівень напруги / сигналу / струму». Bare «рівень» tells the reader nothing about which physical quantity.',
+  },
+
+  {
+    id: 'forbidden.bare-liniyno',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // Catches «лінійно» as a standalone adverb (e.g. «струм тече
+    // лінійно») without specifying what it's linear with respect to.
+    // Allows: «лінійно залежить від», «лінійно пропорційний»,
+    // «лінійно зростає з», «лінійно змінюється відносно», etc.
+    //
+    // The `(?!\p{L})` after «лінійно» ensures we only match the
+    // standalone adverb form, NOT adjective inflections («лінійний»,
+    // «лінійному», «лінійної», «лінійним», «лінійні», etc.) which
+    // are valid in their own right («лінійний блок живлення»,
+    // «лінійний масштаб»).
+    pattern: /(?<!\p{L})лінійно(?!\p{L})(?!\s+(залеж|пропорційн|зроста|зменш|змін|спада|підійма|пада|відносно|з\s))/giu,
+    hint: 'Beginner-clarity: «лінійно» needs an object — linear with respect to what? Use «лінійно залежить від X», «лінійно пропорційний X», «лінійно зростає з X». Bare «лінійно» (as in «струм тече лінійно») is ambiguous: linear with V_BE? with i_b? with time? Name it.',
+  },
 ]
 
 // ─── Runner ───────────────────────────────────────────────────────────────

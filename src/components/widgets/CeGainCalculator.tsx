@@ -191,7 +191,17 @@ export default function CeGainCalculator() {
 
       <ResultBox tone={computed.tone} label="">
         <p className="text-sm text-foreground leading-6">
-          {t(computed.warnKey)}
+          {/* The warn message contains <strong> and <var> markup — must
+              render through <Trans>, not bare `t()`, or the tags ship
+              as literal text. The key is computed at runtime, so the
+              static `check:tag-renders` gate cannot see this call site
+              and won't flag a regression. Hand-verify any future tone
+              variants here. */}
+          <Trans
+            i18nKey={computed.warnKey}
+            ns="ui"
+            components={{ strong: <strong />, var: <MathVar /> }}
+          />
         </p>
       </ResultBox>
     </Widget>

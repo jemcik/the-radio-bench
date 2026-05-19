@@ -34,7 +34,14 @@ const VB_W = 540
 const VB_H = 320
 
 const PAD_L = 70
-const PAD_R = 24
+// PAD_R expanded from 24 → 80 to make room for per-curve I_B labels at
+// the right end of each plateau. The original choice «no inline labels —
+// caption explains it» turned out to be a beginner-clarity bug: the
+// caption tells you there is a parameter I_B that selects which curve,
+// but the reader still has to GUESS which curve corresponds to which
+// I_B. With labels in place the family-of-curves concept reads at a
+// glance. Reader-flagged.
+const PAD_R = 80
 const PAD_T = 28
 const PAD_B = 50
 const PLOT_W = VB_W - PAD_L - PAD_R
@@ -236,13 +243,32 @@ export default function BjtOutputCurves() {
             />
           ))}
         </g>
-        {/* No inline curve labels — the family of curves is implicit
-            (each plateau corresponds to a different I_B), and the
-            caption already explains «for several values of base
-            current». Inline labels at curve-y positions sat ON the
-            curves themselves (caught by the diagram-text-overlap
-            gate). The interactive load-line widget further down
-            highlights one curve at a time as the user drags I_B. */}
+        {/* Per-curve I_B labels — placed JUST OUTSIDE the plot's right
+            edge so they can't overlap the curve they label. Without
+            these the family-of-curves concept is invisible to a fresh
+            reader (caption says «for several values of I_B» but the
+            reader has no way to tell which curve corresponds to which
+            value). Y position = plateau current of that curve at
+            V_CE = 10 V, with Early-effect correction (~ 1.1·I_B·β). */}
+        {I_B_CURVES_UA.map((ib) => {
+          const plateauIc = BETA * (ib / 1000) * (1 + VCE_MAX / V_EARLY)
+          return (
+            <text
+              key={`ib-label-${ib}`}
+              x={PLOT_X1 + 6}
+              y={yToPx(plateauIc)}
+              fontSize="11"
+              textAnchor="start"
+              dominantBaseline="middle"
+              fill={svgTokens.mutedFg}
+              fontFamily="Georgia, serif"
+            >
+              <tspan fontStyle="italic">I</tspan>
+              <tspan dy="3" fontSize="9">B</tspan>
+              <tspan dy="-3" fontSize="11"> = {ib} {t('units.ua')}</tspan>
+            </text>
+          )
+        })}
 
         {/* Region labels — positioned in the middle of each region */}
         {/* «active» — middle-right of plot */}
