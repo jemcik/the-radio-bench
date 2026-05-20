@@ -126,7 +126,7 @@ export default function BypassCapSchematic() {
         x={BODY_X + 5}
         y={VCC_Y}
         fontFamily="inherit"
-        fontSize="10"
+        fontSize="14"
         fontStyle="italic"
         fill={svgTokens.mutedFg}
         textAnchor="start"
@@ -138,7 +138,7 @@ export default function BypassCapSchematic() {
         x={BODY_X + 5}
         y={GND_Y}
         fontFamily="inherit"
-        fontSize="10"
+        fontSize="14"
         fontStyle="italic"
         fill={svgTokens.mutedFg}
         textAnchor="start"

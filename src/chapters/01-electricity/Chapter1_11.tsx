@@ -21,7 +21,7 @@ import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-11'
-const QUIZ_QUESTION_COUNT = 5
+const QUIZ_QUESTION_COUNT = 8
 
 function nowrapSpan() {
   return <span style={{ whiteSpace: 'nowrap' }} />
