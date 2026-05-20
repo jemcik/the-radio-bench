@@ -45,19 +45,63 @@ const MANUAL_DYNAMIC_PREFIXES = [
   'ch0_3.heroAriaLabel', 'ch0_4.heroAriaLabel',  // `t(`ch${id}.heroAriaLabel`)`
 ]
 
-/** Extract dynamic-lookup prefixes from template literals in source.
- *  A call like `t(`ch0_3.prefixName_${prefix.name}`)` contributes the
- *  static prefix `ch0_3.prefixName_`. Any key starting with that is
- *  treated as potentially referenced. */
-function extractTemplatePrefixes(source) {
-  const prefixes = new Set()
-  // t(`literal.${...}`) — captures the literal portion before the first ${
-  const re = /t\(\s*`([^`$]+)\$\{/g
+/** Extract dynamic-lookup patterns from EVERY template literal in source
+ *  that contains an interpolation. A key is treated as referenced if it
+ *  starts with the literal PREFIX (text before the first `${`) AND ends
+ *  with the literal SUFFIX (text after the last `}`).
+ *
+ *  Why scan all backtick templates, not just `t(`…`)`: i18n keys reach
+ *  the runtime through several shapes —
+ *    • `t(`ch1_8.widget.cutoff.mode${m}`)`            (direct)
+ *    • `i18nKey={`ch1_11.widget.bjtOp.regionDescription.${r}`}` (<Trans>)
+ *    • `const titleKey = `ch1_8.filterTypeGallery${s}`; t(titleKey)` (var)
+ *  Capturing every interpolated template covers all three without having
+ *  to special-case the call site.
+ *
+ *  Why the SUFFIX half matters: `t(`ch${id}.heroAriaLabel`)` yields prefix
+ *  `ch` — on its own that matches EVERY chapter key and silently neuters
+ *  orphan detection for the whole `ch*` namespace (this is exactly how a
+ *  batch of dead diagram/hero/widget keys accumulated unnoticed; May 2026).
+ *  Pairing it with suffix `.heroAriaLabel` keeps the match precise.
+ *
+ *  Empty-prefix-AND-empty-suffix patterns (`t(`${prefix}.${key}`)`) carry
+ *  zero constraint — they would match everything — so they are dropped;
+ *  such fully-dynamic keys are covered by extractQuizPrefixes() or a
+ *  MANUAL_DYNAMIC_PREFIXES entry instead. Over-matching only ever risks a
+ *  missed orphan, never a false failure on a live key. */
+function extractTemplatePatterns(source) {
+  const patterns = []
+  // Only template literals in an i18n-key CONTEXT — `t(`…`)`, `i18nKey={`…`}`,
+  // or a `…Key = `…`` assignment later fed to t()/i18nKey. Scanning ALL
+  // backtick templates would pick up non-i18n ones like `key={`ch${i}`}`
+  // (OscilloscopeDiagram channel ids) whose bare `ch` prefix re-neuters the
+  // whole chapter namespace — the very bug this gate exists to prevent.
+  const re = /(?:t\(\s*|i18nKey=\{?\s*|[A-Za-z_]\w*Key\s*=\s*)`([^`]*\$\{[^`]*)`/g
   let m
   while ((m = re.exec(source)) !== null) {
-    prefixes.add(m[1])
+    const tpl = m[1]
+    const open = tpl.indexOf('${')
+    const close = tpl.lastIndexOf('}')
+    const prefix = tpl.slice(0, open)
+    const suffix = close === -1 ? '' : tpl.slice(close + 1)
+    if (prefix === '' && suffix === '') continue
+    patterns.push({ prefix, suffix })
   }
-  return prefixes
+  return patterns
+}
+
+/** Quiz strings are reached through `buildQuizFromI18n(t, 'chX', …)`, which
+ *  builds keys like `chX.quiz_q3_b` via a fully-dynamic `t(`${prefix}.${key}`)`
+ *  the static analysis can't resolve. Extract each call's literal chapter
+ *  prefix and allowlist its `chX.quiz_` namespace. Self-maintaining: a new
+ *  chapter's quiz keys are covered the moment its component calls the helper
+ *  with a literal prefix. */
+function extractQuizPrefixes(source) {
+  const out = []
+  const re = /buildQuizFromI18n\(\s*\w+\s*,\s*'([^']+)'/g
+  let m
+  while ((m = re.exec(source)) !== null) out.push(`${m[1]}.quiz_`)
+  return out
 }
 
 function flatten(obj, prefix = '') {
@@ -93,11 +137,16 @@ function collectSource() {
 
 const keys = flatten(JSON.parse(fs.readFileSync(uiJsonPath, 'utf8')))
 const source = collectSource()
-const autoPrefixes = extractTemplatePrefixes(source)
-const allDynamicPrefixes = [...MANUAL_DYNAMIC_PREFIXES, ...autoPrefixes]
+// Manual + quiz allowlists are prefix-only (empty suffix); template
+// patterns carry both a prefix and a suffix.
+const allPatterns = [
+  ...MANUAL_DYNAMIC_PREFIXES.map(prefix => ({ prefix, suffix: '' })),
+  ...extractQuizPrefixes(source).map(prefix => ({ prefix, suffix: '' })),
+  ...extractTemplatePatterns(source),
+]
 
 const orphans = keys.filter(key => {
-  if (allDynamicPrefixes.some(p => key.startsWith(p))) return false
+  if (allPatterns.some(({ prefix, suffix }) => key.startsWith(prefix) && key.endsWith(suffix))) return false
   return !source.includes(key)
 })
 

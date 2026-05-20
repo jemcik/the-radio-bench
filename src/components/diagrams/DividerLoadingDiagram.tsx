@@ -84,7 +84,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       <circle cx={RAIL_L} cy={RAIL_TOP_Y} r={3} fill={svgTokens.fg} />
       <text
         x={RAIL_L - 6} y={RAIL_TOP_Y - 6}
-        fontFamily="inherit" fontSize="0.687em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
         fill={svgTokens.fg} textAnchor="end"
       >
         {renderLabelContent(t('ch1_4.loadingVinLabel'))}
@@ -93,7 +93,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
       {/* Ground terminal label */}
       <text
         x={RAIL_L - 6} y={RAIL_BOTTOM_Y + 4}
-        fontFamily="inherit" fontSize="0.687em" fontStyle="italic"
+        fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
         fill={svgTokens.mutedFg} textAnchor="end"
       >
         {t('ch1_4.loadingGroundLabel')}
@@ -172,7 +172,7 @@ function DividerGraph({ xOffset, hasLoad }: DividerProps) {
             fontFamily="inherit" fontSize="0.75em" fontStyle="italic"
             fill={svgTokens.caution} textAnchor="start"
           >
-            R_L
+            {renderLabelContent('R_L')}
           </text>
         </>
       )}

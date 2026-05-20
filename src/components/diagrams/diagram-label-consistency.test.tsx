@@ -75,8 +75,6 @@ const SKIP_FILES = new Set([
   // them means rewriting to use TerminalLabel / Resistor / etc., a
   // bigger task than this gate's scope. Skip with TODO until someone
   // does the rewrite.
-  './BypassCapSchematic.tsx',     // TODO: V_cc at fs=10 doesn't match C at fs=14
-  './DividerLoadingDiagram.tsx',  // TODO: V_in at 0.687em doesn't match V_out at 0.75em
 ])
 
 const DIAGRAMS = Object.entries(modules)

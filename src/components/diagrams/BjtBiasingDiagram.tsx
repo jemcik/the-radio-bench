@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
-import { withSubscripts } from '@/lib/text-with-subscripts'
+import { MathText } from '@/components/ui/math-text'
 
 /**
  * Chapter 1.11 — companion to `insideBiasNote`.
@@ -50,7 +50,7 @@ export default function BjtBiasingDiagram() {
   const arrowId = useId()
 
   return (
-    <DiagramFigure caption={withSubscripts(t('ch1_11.biasingDiagram.caption'))}>
+    <DiagramFigure caption={<MathText>{t('ch1_11.biasingDiagram.caption')}</MathText>}>
       <svg
         width={VB_W}
         height={VB_H}
