@@ -67,11 +67,22 @@ Local `npm run build` ≠ CI green. CI uses `npm ci` (strict peer deps; worked a
 
 When the user does ask for a commit: batch related changes into one. Don't commit after every single fix — a commit is a unit of reviewable work, not a save point.
 
-### Research resources for chapter content
+### Chapter pre-flight — MANDATORY before drafting ANY chapter prose/visuals
 
-WebSearch / WebFetch and two on-disk reference PDFs (ARRL Handbook 2023, The Art of Electronics 3rd ed.) are pre-authorised for chapter work. Paths and read-tool caveats live in memory: `memory/reference_research_pdfs.md`. Cite the source in commit/PR when a claim depends on either book.
+**This fires automatically at the START of every new chapter or new section — the user should never have to remind me.** Before writing a single i18n string, designing a widget, or drafting an outline, do ALL of these, in order:
+
+1. **Re-read the structure contract.** Read «How a chapter is structured» in chapter 0.1 (`ch0_1.sectionStructure` and the keys under it: concept-first/analogy-before-formula, interactive widgets, lab activities, quiz, callouts, recommended path, the «understanding not exam-prep» goal) AND the «Notes on Content Philosophy» in `PLAN.md`. Every chapter must obey these — analogy lands before any math, every formula has a worked example + calculator widget, visual density throughout.
+2. **Consult the reference books to ground and groom the content.** Pre-authorised, use without asking (paths in `memory/reference_research_pdfs.md`):
+   - **ARRL Handbook 2023** — `/Users/jemcik/Downloads/ham_26/ARRL handbook 100th/The ARRL Handbook for Radio Communications 2023.pdf` (268 MB → `Read` rejects it; use `pdftotext "<path>" -f <start> -l <end> -` via Bash). Canonical for ham topics: band plans, propagation, antennas, operating practice, radio-wave physics.
+   - **The Art of Electronics** (Horowitz & Hill 3rd ed.) — `/Users/jemcik/Downloads/The Art of Electronics/The Art of Electronics.pdf` (use `Read` with `pages:"N-M"`, max 20 pp/call). Canonical for circuit/component/signal fundamentals and any quantitative claim.
+   - Read the relevant sections for the chapter's topic to fact-check every number, borrow the clearest framing/analogies, and avoid shipping folklore. Cite the book in the commit/PR when a claim depends on it.
+3. **Web-search as needed** (WebSearch / WebFetch, pre-authorised) — current specs, datasheets, regulator pages (ITU, УДЦР…), Wikipedia reality-checks, modern prices/part availability.
+
+Only after 1–3 do outline → visuals → prose. Skipping straight to building is the failure this block exists to prevent (ch 2.1, first attempt).
 
 ## New chapter checklist
+
+**Step 0 happens before any of this** — see «Chapter pre-flight» above (re-read 0.1 structure + content philosophy, consult the ARRL Handbook / Art of Electronics, web-search). Don't draft until it's done.
 
 A chapter is done when ALL of these are true, not just "prose is
 written":

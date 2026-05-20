@@ -90,6 +90,13 @@ const EXEMPT_TERMS = new Set([
   // that genuinely need to point at them should wrap the qualified
   // phrase explicitly.
   'order', 'family', 'trap',
+  // Foundational radio-wave terms (introduced in ch2.1) that recur across
+  // many chapters as ordinary prose words — like «frequency», «antenna»,
+  // «voltage» above. The glossary entries exist and ch2.1 wraps them where
+  // they're taught; every later chapter that says «magnetic field» or
+  // «wavelength» needn't re-tooltip them.
+  'electric field', 'magnetic field', 'electromagnetic wave', 'radio wave',
+  'wavelength', 'speed of light', 'electromagnetic spectrum', 'polarisation',
 ])
 
 // Per-chapter exemptions for terms that ARE in the glossary in general

@@ -227,7 +227,7 @@ export const PARTS: Part[] = [
         part: 2,
         title: 'What Are Radio Waves?',
         subtitle: 'EM waves, wavelength, frequency, polarisation, the spectrum',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['1.3'],

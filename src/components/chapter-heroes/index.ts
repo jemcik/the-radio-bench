@@ -15,6 +15,7 @@ import Ch1_8Hero from './Ch1_8Hero'
 import Ch1_9Hero from './Ch1_9Hero'
 import Ch1_10Hero from './Ch1_10Hero'
 import Ch1_11Hero from './Ch1_11Hero'
+import Ch2_1Hero from './Ch2_1Hero'
 
 /**
  * Chapter-id → hero illustration map.
@@ -44,4 +45,5 @@ export const CHAPTER_HEROES: Record<string, ComponentType> = {
   '1-9': Ch1_9Hero,
   '1-10': Ch1_10Hero,
   '1-11': Ch1_11Hero,
+  '2-1': Ch2_1Hero,
 }
