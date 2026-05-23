@@ -3650,7 +3650,6 @@
     "birthP3": "The diagram below is one stretch of that wave, animated. The electric field <strong>E</strong> oscillates up and down; the magnetic field <strong>B</strong> oscillates side to side, at a perfect right angle to it; and the whole pattern marches to the right. The two fields are not separate things that merely overlap — they are two faces of a single object, the wave, and neither can exist without the other.",
     "emWave": {
       "ariaLabel": "An electromagnetic wave: the electric field oscillating vertically and the magnetic field oscillating horizontally at a right angle to it, both in phase, the whole pattern travelling to the right at the speed of light.",
-      "propagation": "travels at the speed of light, c",
       "legendElectric": "E — electric field",
       "legendMagnetic": "B — magnetic field"
     },
