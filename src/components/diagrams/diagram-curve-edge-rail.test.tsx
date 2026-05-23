@@ -75,6 +75,7 @@ const SKIP_FILES = new Set([
   './BodePlotReadingGuide.tsx', // 0-dB passband flat-top is a real horizontal section
   './BlocksDcPassesAcDiagram.tsx', // square waves + RC step responses; their plateaus are the signal
   './BlocksAcPassesDcDiagram.tsx', // same — block diagram with square / step waveforms
+  './EMWaveDiagram.tsx', // pure E/B sinusoids — the densely-sampled peaks register as flat rails but are real signal extrema, not clip artifacts
 ])
 
 const DIAGRAMS = Object.entries(modules)

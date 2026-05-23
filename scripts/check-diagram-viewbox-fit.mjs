@@ -59,6 +59,7 @@ const SKIP_FILES = new Set([
   // padding; the gate's parse-only view just misses what's there.
   'AtomicDiagram.tsx',         // verified runtime: nucleus + electrons fill 560×400
   'MaterialsComparison.tsx',   // verified runtime: 3-column layout fills 620 width
+  'EmSpectrumLadder.tsx',      // verified runtime: spectrum bands + ticks fill 820 width; all x coords are computed via x(exp) so the parser only sees the lone 788 literal
   // Visually acceptable (runtime padding < 90 px each side, within the
   // typical SVG-label slop budget).
   'BypassCapSchematic.tsx',

@@ -840,6 +840,58 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['impedance', 'swr', 'frequency'],
   },
 
+  'electric field': {
+    tip: 'The region of influence around anything that has a voltage on it.',
+    detail:
+      'An electric field is a region of space in which a stray electric charge would feel a force — the electrical counterpart of gravity, with charge playing the role mass plays for gravity. It surrounds any object carrying a voltage and stores energy: pulling charges apart (as a capacitor does) loads energy into the field, which is released when they are allowed to move back together. In a radio wave the electric field oscillates at right angles to the magnetic field; its strength is measured in volts per metre (V/m) and is the part of the wave usually measured.',
+    unit: 'Volts per metre (V/m)',
+    see: ['magnetic field', 'electromagnetic wave', 'voltage', 'charge'],
+  },
+  'magnetic field': {
+    tip: 'The region of influence around anything carrying an electric current.',
+    detail:
+      'A magnetic field is a region of space that exerts a force on moving charge (current) and on magnets. It appears whenever current flows — the field you wound into a coil in Chapter 1.6 — and stores energy that is released when the current is allowed to change. In an electromagnetic wave the magnetic field sits at a perfect right angle to the electric field and oscillates in step with it; its strength is measured in amperes per metre (A/m).',
+    unit: 'Amperes per metre (A/m)',
+    see: ['electric field', 'electromagnetic wave', 'current', 'inductor'],
+  },
+  'electromagnetic wave': {
+    tip: 'A self-sustaining ripple of linked electric and magnetic fields travelling through space.',
+    detail:
+      'An electromagnetic wave is created when the energy stored in an electric or magnetic field changes: a changing magnetic field spawns a changing electric field and vice versa, so the pair regenerate each other and travel outward at the speed of light, needing no wire or medium to carry them. The two fields are not separate things that happen to overlap — they are two aspects of one entity, held at right angles and oscillating in phase. Maxwell predicted such waves in 1864; Hertz demonstrated them in 1886. Radio waves, light, and X-rays are all electromagnetic waves, differing only in frequency.',
+    see: ['radio wave', 'electric field', 'magnetic field', 'frequency'],
+  },
+  'radio wave': {
+    tip: 'An electromagnetic wave at a frequency low enough to generate and use for radio.',
+    detail:
+      'A radio wave is an electromagnetic wave in the part of the spectrum we can practically generate with a circuit and radiate from an antenna — conventionally from about 3 kHz up to 300 GHz. Launching, shaping, and catching radio waves is the whole craft of radio. Like every electromagnetic wave it travels at the speed of light and carries energy in linked electric and magnetic fields, with a wavelength set by its frequency.',
+    see: ['electromagnetic wave', 'frequency', 'antenna'],
+  },
+  'speed of light': {
+    tip: 'The fixed speed at which every electromagnetic wave travels — about 300 000 km/s in empty space.',
+    detail:
+      'The speed of light, written c, is the speed at which every electromagnetic wave — radio, light, X-rays — travels through empty space: about 3 × 10⁸ metres per second, or 300 000 kilometres per second. It is the same for every frequency, which is exactly why wavelength and frequency are just two views of one wave (λ = c / f). Waves slow a little in materials — to roughly two-thirds of c inside the polyethylene of coaxial cable — but in air and vacuum c is treated as a constant.',
+    see: ['wavelength', 'frequency', 'electromagnetic wave'],
+  },
+  wavelength: {
+    tip: 'The distance from one crest of a wave to the next.',
+    detail:
+      'Wavelength (λ) is the physical distance a wave covers in one complete cycle — crest to crest. For a radio wave it is set by the frequency through λ = c / f, so higher frequencies have shorter wavelengths. Amateur bands are named by wavelength: the «20-metre band» sits near 14 MHz. A handy shortcut is λ in metres ≈ 300 / f in MHz. Antenna sizes scale with wavelength, which is why a 2-metre antenna is small and an 80-metre antenna is huge.',
+    formula: 'λ (m) = 300 / f (MHz)',
+    see: ['frequency', 'speed of light', 'radio wave', 'antenna'],
+  },
+  polarisation: {
+    tip: 'The orientation of the electric field in a radio wave — vertical, horizontal, or rotating (circular).',
+    detail:
+      'Polarisation is the direction in which the electric field of a wave oscillates, relative to the ground. A vertical whip antenna radiates a vertically polarised wave; a horizontal dipole or Yagi radiates a horizontal one; a helical antenna radiates a circularly polarised wave whose field rotates as it travels. It matters because a receiving antenna should match the polarisation of the wave: using a vertical antenna for a horizontally polarised signal, or the reverse — called cross-polarisation — can cut the received signal by more than 20 dB.',
+    see: ['electric field', 'antenna', 'electromagnetic wave'],
+  },
+  'electromagnetic spectrum': {
+    tip: 'The full range of electromagnetic waves ordered by frequency — radio at the low end through to gamma rays.',
+    detail:
+      'The electromagnetic spectrum is the continuum of all electromagnetic waves arranged by frequency (and so by wavelength). Radio occupies the low-frequency end, roughly 3 kHz to 300 GHz, subdivided into VLF, LF, MF, HF, VHF, UHF, SHF and EHF. Above radio come infrared, a narrow band of visible light, ultraviolet, X-rays and gamma rays. They are all the same phenomenon — oscillating electric and magnetic fields — differing only in frequency, and all travel at the speed of light.',
+    see: ['radio wave', 'frequency', 'electromagnetic wave'],
+  },
+
   'input impedance': {
     tip: 'How much an instrument resists the signal it is measuring — higher is better.',
     detail:
