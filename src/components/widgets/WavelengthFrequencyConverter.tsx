@@ -13,9 +13,11 @@
  * 2023 band-plan tables).
  */
 import { useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
+import { MathVar } from '@/components/ui/math'
+import { mathComponents } from '@/lib/trans-defaults'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 
 const C = 3e8 // speed of light, m/s (rounded → matches the 300/f(MHz) shortcut)
@@ -82,6 +84,8 @@ function formatScaled(
 
 interface InputRowProps {
   labelKey: string
+  /** Math symbol for the quantity, rendered italic (KaTeX) after the label. */
+  symbol: string
   disp: string
   setDisp: (s: string) => void
   unit: string
@@ -92,11 +96,11 @@ interface InputRowProps {
   tUnit: (k: string) => string
 }
 
-function InputRow({ labelKey, disp, setDisp, unit, setUnit, units, idSuffix, t, tUnit }: InputRowProps) {
+function InputRow({ labelKey, symbol, disp, setDisp, unit, setUnit, units, idSuffix, t, tUnit }: InputRowProps) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-sm">
       <label htmlFor={`lf-val-${idSuffix}`} className="text-foreground font-medium shrink-0 w-36">
-        {t(labelKey)}
+        {t(labelKey)} <MathVar>{symbol}</MathVar>
       </label>
       <input
         id={`lf-val-${idSuffix}`}
@@ -152,7 +156,7 @@ export default function WavelengthFrequencyConverter() {
   return (
     <Widget
       title={t('ch2_1.widget.lambdaF.title')}
-      description={t('ch2_1.widget.lambdaF.description')}
+      description={<Trans i18nKey="ch2_1.widget.lambdaF.description" ns="ui" components={{ ...mathComponents }} />}
     >
       {/* Mode selector */}
       <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -179,6 +183,7 @@ export default function WavelengthFrequencyConverter() {
         {mode === 'lambda' ? (
           <InputRow
             labelKey="ch2_1.widget.lambdaF.freqLabel"
+            symbol="f"
             disp={fDisp} setDisp={setFDisp}
             unit={fUnit} setUnit={setFUnit}
             units={['khz', 'mhz', 'ghz']}
@@ -187,6 +192,7 @@ export default function WavelengthFrequencyConverter() {
         ) : (
           <InputRow
             labelKey="ch2_1.widget.lambdaF.wavelengthLabel"
+            symbol="λ"
             disp={lDisp} setDisp={setLDisp}
             unit={lUnit} setUnit={setLUnit}
             units={['km', 'm', 'cm', 'mm']}
@@ -210,7 +216,9 @@ export default function WavelengthFrequencyConverter() {
         </ResultBox>
       </div>
 
-      <p className="text-[13px] text-muted-foreground">{t('ch2_1.widget.lambdaF.hint')}</p>
+      <p className="text-[13px] text-muted-foreground">
+        <Trans i18nKey="ch2_1.widget.lambdaF.hint" ns="ui" components={{ ...mathComponents }} />
+      </p>
     </Widget>
   )
 }

@@ -120,6 +120,7 @@ export default function Chapter2_1() {
           <li><Trans i18nKey="ch2_1.keyTakeaway3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
           <li><Trans i18nKey="ch2_1.keyTakeaway4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
           <li><Trans i18nKey="ch2_1.keyTakeaway5" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
+          <li><Trans i18nKey="ch2_1.keyTakeaway6" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></li>
         </ul>
       </Callout>
 
@@ -128,7 +129,7 @@ export default function Chapter2_1() {
         label="2.1"
         goal={<Trans i18nKey="ch2_1.labGoal" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />}
         equipment={[t('ch2_1.labEquip1'), t('ch2_1.labEquip2')]}
-        components={[t('ch2_1.labComp1'), t('ch2_1.labComp2'), t('ch2_1.labComp3')]}
+        components={[t('ch2_1.labComp1'), t('ch2_1.labComp2')]}
         procedure={[
           { text: <Trans i18nKey="ch2_1.labStep1" ns="ui" components={{ em: <em /> }} /> },
           { text: t('ch2_1.labStep2') },

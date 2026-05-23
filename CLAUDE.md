@@ -159,7 +159,7 @@ sentence needs rewriting.
 
 Failure modes (full catalogue + worked examples in `memory/feedback_first_mention_explicitness.md` — run that checklist before drafting any new section):
 
-- **Math symbols** — every `<var>X</var>` defined in prose with meaning + units before its first formula use.
+- **Math symbols** — every `<var>X</var>` defined in prose with meaning + units before its first formula use, AND actually wrapped in `<var>` (even a lone lowercase `c`/`f`/`λ`), never plain text. Enforced by `check:unwrapped-math-var`; see «Every math variable in chapter prose needs `<var>`» under i18n authoring discipline.
 - **Abbreviations** (HT, QRP, HF, UHF, AM, FM, SSB, CW, VNA…) — expand inline on first appearance.
 - **Band-wavelength shorthand** (`2 m`, `70 cm`) — expand to «VHF ≈144 MHz» / «UHF ≈435 MHz» on first use.
 - **`вище` / `above`** as quantity reference — name the SOURCE (`the calculator gives…`), not the textual position.
@@ -230,6 +230,14 @@ The values for `warnSaturated` / `warnCutoff` contained `<strong>` and `<var>` m
 The variable goes straight into `<Trans i18nKey={…}>` — never into `t(...)`. `<Trans>` handles the markup regardless of which key the variable holds, so the dispatch is safe by construction.
 
 **Whenever you write a widget that picks one of several i18n keys at runtime** (status messages, tone variants, validation hints, region labels, multi-state readouts), default to the `<Trans i18nKey={dynamicKey}>` form. Reach for bare `t(varName)` only when you've **manually confirmed every reachable value is markup-free** — and add a comment naming the keys you checked, so future contributors don't have to re-verify.
+
+### Every math variable in chapter prose needs `<var>` — even a lone `c`
+
+Reader-flagged (ch 2.1, 2026-05): the speed of light was written «…written c.» and «λ = c / f» as **bare letters**. The lowercase `c` blended into the surrounding sans-serif prose so the reader couldn't tell it was the variable. Part 1 wraps every variable in `<var>` (→ `<MathVar>` → KaTeX italic, 600+ uses); the new Part-2 symbols (c, f, λ) were authored as plain text and slipped through EVERY existing gate — they all check the RENDER SAFETY of markup that is already present, none checked for the ABSENCE of `<var>` on a bare variable. beginner-review targets clarity, not typography.
+
+Rule: **any math variable or Greek symbol that appears in chapter prose, summaries, quiz, or widget descriptions/hints must be `<var>X</var>`** (rendered via `<Trans>`/`buildQuizFromI18n`, which map `var` → `<MathVar>`). For a symbol that belongs in a JSX control label (e.g. an input label «Frequency 𝑓»), render it as `<MathVar>f</MathVar>` in the `.tsx` and keep the i18n string symbol-free, so `aria-label` stays plain text.
+
+Now enforced by `check:unwrapped-math-var` (in `check:all`). It scans `chN_M` blocks, ignores `<var>` contents, and flags (A) a lone Greek variable letter — Ω/µ excluded as units — and (B) a single Latin letter next to a math operator `= · × ≈ ÷` (slash excluded so units like m/s don't false-flag) and (C) a standalone lowercase Latin letter in prose (excludes the article «a», unit/abbrev/contraction contexts). Part 0–1's pre-existing bare-variable debt is grandfathered in `scripts/unwrapped-math-var-baseline.json`; the gate fails only when a key's count grows or a new key appears. After an intentional, render-verified change to baselined debt, re-snapshot with `node scripts/check-unwrapped-math-var.mjs --update-baseline`.
 
 ### Diagram text labels must not overlap chart shapes
 
