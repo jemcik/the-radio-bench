@@ -76,6 +76,8 @@ const SKIP_FILES = new Set([
   './BlocksDcPassesAcDiagram.tsx', // square waves + RC step responses; their plateaus are the signal
   './BlocksAcPassesDcDiagram.tsx', // same — block diagram with square / step waveforms
   './EMWaveDiagram.tsx', // pure E/B sinusoids — the densely-sampled peaks register as flat rails but are real signal extrema, not clip artifacts
+  './AudioDigitalWaveforms.tsx', // the digital row is a square wave — its flat top/bottom levels ARE the signal; the analog row's sine-sum peak dwells a few samples (real extremum, not a clip)
+  './CarrierKnobs.tsx', // message / FM / PM rows are pure sinusoids — densely-sampled peaks register as flat rails but are real signal extrema (same class as EMWaveDiagram)
 ])
 
 const DIAGRAMS = Object.entries(modules)

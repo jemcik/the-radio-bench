@@ -156,6 +156,10 @@ Common lint-triggered fixes:
 | «1 µF brick» → «цеглина» (not diminutive) | Both | Accept «цеглинка» (diminutive); reject «цеглина» |
 | «permittivity of free space» → «електрична стала» (bare SI name, erasing pedagogical link) | Both | Keep «діелектрична проникність вакууму» as primary noun; «електрична стала» may appear as parenthetical SI-synonym. The reader needs εᵣ ↔ ε₀ connection visible. See glossary. |
 | «forward bias» / «reverse bias» → «пряме/зворотне ввімкнення» | 3.1 Pro consistently (4× in ch 1.11) | Manual: replace with «пряме/зворотне зміщення» (Wikipedia-canonical UA EE term, matches project usage in `varactorTunerCaption`, `energySparkCalloutMechanism`, glossary `base.detail`, `jfet.detail`). «ввімкнення» literally means "switching on" — describes wiring, not the physics. 2.5 Pro usually picks «зміщення» correctly. |
+| «несуча» (carrier) → non-word «несна / несної / несну / несній» | Both (2.5 in ch 2.2 quiz + amPower; 3.1 throughout) | Manual: keep «несуч-». «несн-» is **not a Ukrainian word** and slips every gate (it's a plausible-looking adjective). Caught only by beginner-review in ch 2.2. Scan re-translations for `несн` — but do NOT add a blanket linter rule: «несн-» legitimately appears in «несн**ий** елемент» (load-bearing element, `folded dipole` glossary). |
+| «envelope» → «огинаюча» (also a `-юча` participle landmine) | 2.5 Pro (ch 2.2 `amP4`) | Manual: keep «обвідна» (glossary `envelope` _name, used in `amP1`/`amExplorer`). |
+| «carrier» → «носій / носія» (only in one section) | 2.5 Pro (ch 2.2 `fmP1`, `fmExplorer.description`) | Manual: keep «несуча». «носій» reads as a generic medium and breaks consistency with the `<car>` glossary term used everywhere else. |
+| Cyrillic mode/band abbreviations «АМ/ЧМ/КХ/УКХ/ДВЧ/УВЧ/ШІМ» | Both | Normalize to Latin to match ch 2.1 + glossary `_names` (am/fm/ssb/cw/hf/vhf/uhf/pwm render Latin in prose): АМ→AM, ЧМ→FM, КХ→HF, УКХ→VHF, ДВЧ/УВЧ/НВЧ→UHF, ШІМ→PWM. Careful with paired forms: «УКХ (VHF/UHF)» → «VHF/UHF» (not «VHF (VHF/UHF)»). Formula abbreviations use Latin «BW» (per `bandwidth.formula`). |
 
 ---
 

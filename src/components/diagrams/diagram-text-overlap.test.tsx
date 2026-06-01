@@ -128,6 +128,12 @@ const SKIP_FILES = new Set([
   // Math axis diagram with origin marker — the «0» label sits at the
   // origin circle by convention.
   './SineOriginDiagram.tsx',
+  // ch2_2 waveform diagrams whose curves legitimately reach their bbox
+  // extremes — the "rides chart edge" check (also run from this file)
+  // false-positives on them. Labels are simple row titles + axis captions
+  // kept well clear of the traces; verified visually via Claude-in-Chrome.
+  './AudioDigitalWaveforms.tsx', // digital row is a square wave (flat top/bottom levels are the signal)
+  './CarrierKnobs.tsx',          // message / FM / PM rows are pure sinusoids (real peaks, not clip rails)
 ])
 
 const DIAGRAMS = Object.entries(modules)
