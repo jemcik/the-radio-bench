@@ -67,6 +67,12 @@ const STOPLIST = new Set([
   // Frequently-recurring measurement/RF prefixes that are NOT domain
   // glossary candidates by themselves (they always come with units).
   'NPN', 'PNP', 'OCF',
+  // Sideband mode labels (lower/double sideband). Defined inline in ch2_2
+  // prose («lower sideband (LSB)», «double-sideband (DSB)») and appear as
+  // SVG diagram stickers (SsbSpectrum / AmModulationExplorer) that can't
+  // carry a glossary tooltip. The concept is glossed via the `sideband`
+  // entry. USB is already covered by glossary._names (usb → «USB»).
+  'LSB', 'DSB',
   // English common words frequently CAPITALISED for emphasis in prose —
   // they read as shouting, not as acronyms. Add new entries as the lint
   // surfaces them.
@@ -125,10 +131,12 @@ const STOPLIST = new Set([
 ])
 
 // Component / part-number pattern. Things like `FT-37-43`, `T-50-2`,
-// `2N3904`, `LM741`, `RG-58` are catalogue SKUs — not glossary
-// candidates. Heuristic: contains a hyphen followed by digits, OR
-// contains a digit-letter mix that's not a clean acronym.
-const PART_NUMBER_RE = /-\d|\d[A-Z]/
+// `2N3904`, `LM741`, `RG-58`, `MC1496`, `AD633` are catalogue SKUs —
+// not glossary candidates. Heuristic: contains a hyphen followed by
+// digits, OR a digit-letter mix, OR an IC-style letter(s)-then-3+-digits
+// run (`LM741`, `MC1496`, `AD633` — the documented `LM741` example was
+// not actually caught by the first two alternatives).
+const PART_NUMBER_RE = /-\d|\d[A-Z]|[A-Z]\d{3,}/
 
 function flatten(obj, prefix = '') {
   const out = {}

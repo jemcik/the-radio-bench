@@ -238,7 +238,7 @@ export const PARTS: Part[] = [
         part: 2,
         title: 'Audio, Digital and Modulated Signals',
         subtitle: 'AM, SSB, FM — how your voice rides a radio wave',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['1.4', '1.5'],

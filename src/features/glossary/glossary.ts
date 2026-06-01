@@ -337,6 +337,51 @@ export const glossary: Record<string, GlossaryEntry> = {
       'A carrier (or carrier wave) is the clean sine wave at the transmitter\'s operating frequency (e.g. 14 MHz for a 20-metre amateur-band signal) that conveys information across space. The carrier itself contains no audio or data — it is simply a sine at one specific frequency. Modulation encodes information by varying one of the sine\'s three parameters: amplitude (AM), frequency (FM), or phase (PM). At the receiver the carrier is stripped away («demodulation») to recover the original audio or data. «Clean» means the carrier has no spurious signals (harmonics, noise) — essential both for legal compliance and so the transmitter does not disturb neighbouring bands.',
     see: ['frequency', 'sine wave', 'harmonic', 'am', 'fm'],
   },
+  modulation: {
+    tip: 'Loading information onto a carrier by varying one of its properties — its amplitude, frequency, or phase.',
+    detail:
+      'Modulation is how a radio signal carries information. A bare carrier — a pure sine wave — conveys almost nothing; modulation makes it useful by varying one of its three parameters in step with a message: its amplitude (giving AM), its frequency (FM), or its phase (PM). The original low-frequency message (a voice, Morse, or data) is the «baseband» signal; modulation lifts it onto a high-frequency carrier that an antenna can radiate efficiently and that can be tuned to its own slot in the spectrum. At the receiver the reverse process, demodulation, strips the carrier away to recover the message.',
+    see: ['carrier', 'am', 'fm', 'ssb', 'baseband', 'sideband'],
+  },
+  baseband: {
+    tip: 'The raw, low-frequency message — voice, Morse, or data — before it is modulated onto a carrier.',
+    detail:
+      'Baseband is the original information signal at its natural, low frequencies, before any modulation. For voice it is the audio from a microphone, roughly 300 Hz to 3 kHz; for data it is the stream of bits. Baseband cannot be radiated directly: its wavelength is far too long for a practical antenna, and every source would occupy the same band. Modulation shifts the baseband up onto a carrier for transmission; demodulation brings it back down to baseband at the receiver.',
+    see: ['modulation', 'carrier', 'sideband'],
+  },
+  sideband: {
+    tip: 'A band of frequencies just above or below the carrier, created by modulation — this is where the information actually sits.',
+    detail:
+      'When a carrier is amplitude-modulated by a tone, the result contains three frequencies: the carrier, an upper sideband (carrier + tone) and a lower sideband (carrier − tone). With real speech each sideband is a band of frequencies, not a single tone. The two sidebands are mirror images carrying identical information, and the carrier between them carries none — which is why SSB can keep just one sideband and discard both the carrier and the other sideband with no loss of content. «USB» (upper sideband) keeps the band above the carrier; «LSB» (lower sideband) keeps the band below it.',
+    see: ['carrier', 'am', 'ssb', 'bandwidth'],
+  },
+  envelope: {
+    tip: 'The smooth outline traced by the peaks of a modulated carrier — in AM it is a copy of the original audio.',
+    detail:
+      'The envelope is the slowly-varying outline that connects the peaks of a fast carrier. In amplitude modulation the envelope is a direct copy of the message: as you speak, the carrier\'s peaks swell and shrink, and the curve linking them reproduces your voice. An AM receiver\'s detector recovers the sound simply by tracing this envelope and throwing the fast carrier away. If modulation is pushed past 100 % the envelope distorts («overmodulation»), tearing the signal and splattering interference into neighbouring channels.',
+    see: ['am', 'modulation', 'modulation index'],
+  },
+  'modulation index': {
+    tip: 'How hard a carrier is modulated — for AM, the message height divided by the carrier height (0 to 1, or 0–100 %).',
+    detail:
+      'The modulation index measures how deeply a carrier is modulated. In AM it is the message amplitude divided by the carrier amplitude: 0 means an unmodulated carrier, and 1 (100 %) means the envelope just touches zero at the quietest instant — the maximum without distortion. Beyond 100 % the signal overmodulates and splatters. In FM the modulation index is the peak frequency deviation divided by the highest audio frequency, and it controls how many sidebands appear and therefore how wide the signal becomes.',
+    see: ['am', 'fm', 'envelope', 'deviation'],
+  },
+  deviation: {
+    tip: 'In FM, how far the carrier\'s frequency swings away from its rest value — set by the loudness of the audio.',
+    detail:
+      'Frequency deviation is the amount an FM carrier shifts above and below its rest (centre) frequency. The louder the audio, the larger the deviation; the pitch of the audio sets how fast the frequency wobbles, not how far. Amateur FM on VHF/UHF typically uses about ±5 kHz deviation, with narrowband channels at about ±2.5 kHz. Deviation drives the signal\'s bandwidth: wider deviation means a wider signal (see Carson\'s rule).',
+    unit: 'Hertz (Hz)',
+    see: ['fm', 'modulation index', "carson's rule", 'bandwidth'],
+  },
+  "carson's rule": {
+    tip: 'A quick estimate of an FM signal\'s bandwidth: about twice the sum of the deviation and the highest audio frequency.',
+    detail:
+      'Carson\'s rule estimates how much spectrum an FM (or PM) signal occupies — about 98 % of its power. The formula is bandwidth ≈ 2 × (peak deviation + highest modulating frequency). For an amateur 2-metre FM signal with ±5 kHz deviation and 3 kHz audio, that is 2 × (5 + 3) = 16 kHz. It is only an estimate, looser than the legal occupied-bandwidth definition, but it captures why FM is far wider than SSB and so lives mainly on the roomier VHF/UHF bands.',
+    formula: 'BW ≈ 2 × (deviation + audio)',
+    unit: 'Hertz (Hz)',
+    see: ['fm', 'deviation', 'bandwidth'],
+  },
   reactance: {
     tip: 'AC-only opposition — the frequency-dependent resistance of a capacitor or an inductor.',
     detail:

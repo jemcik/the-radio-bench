@@ -109,7 +109,10 @@ const EXEMPT_PER_CHAPTER = {
   // ch0_2 «diode» — the only mentions are inside `<diode>diode testing</diode>`
   // alias spans (alias maps to the «diode testing» glossary key, not
   // «diode»); the gate's bare-word regex catches the alias name itself.
-  ch0_2: new Set(['diode']),
+  // «modulation» — appears only inside «PWM output (Pulse Width
+  // Modulation)», the inline expansion of PWM; not the radio-modulation
+  // concept (taught in ch2_2).
+  ch0_2: new Set(['diode', 'modulation']),
   // ch0_3: «impedance» and «inductance» occur ONLY in non-wrappable
   // contexts — SI-prefix table examples («50 Ω impedance») driven by
   // src/features/si/prefixes.ts and rendered via a raw t() call, or
@@ -150,7 +153,11 @@ const EXEMPT_PER_CHAPTER = {
   ch1_10: new Set(['capacitance', 'transistor', 'base', 'gate', 'drain']),
   // ch1_2 «drain» — passing reference (parasitic drain on a battery
   // analogy), not a FET drain terminal.
-  ch1_2: new Set(['drain']),
+  // «modulation» — only in the power-ladder label «small AM broadcast
+  // station (amplitude modulation)»; «envelope» — only in the idiom
+  // «back-of-envelope sanity check», not the AM envelope. Both are taught
+  // (and wrapped) in ch2_2, not this Ohm's-Law chapter.
+  ch1_2: new Set(['drain', 'modulation', 'envelope']),
   // ch1_3 «base» — passing reference (e.g. «base of …»), not a BJT
   // base terminal. The English bare word collides.
   ch1_3: new Set(['base']),
@@ -163,10 +170,15 @@ const EXEMPT_PER_CHAPTER = {
   ch1_6: new Set(['time constant', 'transistor', 'base', 'collector']),
   // ch1_7 — transistor/collector/drain in tank-circuit driver context;
   // passing references, not concept-focal.
-  ch1_7: new Set(['solenoid', 'transistor', 'collector', 'drain']),
+  // «sideband» — appears only inside the already-wrapped «<ssb>SSB</ssb>
+  // (single-sideband voice)» expansion; the bare-word regex catches
+  // «sideband» inside that phrase. Concept taught in ch2_2.
+  ch1_7: new Set(['solenoid', 'transistor', 'collector', 'drain', 'sideband']),
   // ch1_8 «gate» — passing reference («gate-keeper» metaphor or logic
   // gate), not a FET gate terminal.
-  ch1_8: new Set(['gate']),
+  // «baseband» — passing reference in the aliasing aside («fold back into
+  // the baseband as aliases»); the baseband concept is taught in ch2_2.
+  ch1_8: new Set(['gate', 'baseband']),
   // ch1_11: «impedance» appears only inside the wrapped «<inI>input
   // impedance</inI>» phrase (mapped to the «input impedance» glossary
   // key — a more specific tooltip target than the bare-word «impedance»
