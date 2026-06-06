@@ -178,7 +178,10 @@ const EXEMPT_PER_CHAPTER = {
   // gate), not a FET gate terminal.
   // «baseband» — passing reference in the aliasing aside («fold back into
   // the baseband as aliases»); the baseband concept is taught in ch2_2.
-  ch1_8: new Set(['gate', 'baseband']),
+  // «linear amplifier» — false substring match: the only occurrence is
+  // «the non-linear amplifier» in quiz_q7_b. The linear-amplifier concept
+  // is taught and wrapped in ch2_3.
+  ch1_8: new Set(['gate', 'baseband', 'linear amplifier']),
   // ch1_11: «impedance» appears only inside the wrapped «<inI>input
   // impedance</inI>» phrase (mapped to the «input impedance» glossary
   // key — a more specific tooltip target than the bare-word «impedance»

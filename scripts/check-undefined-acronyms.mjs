@@ -116,6 +116,10 @@ const STOPLIST = new Set([
   'США',
   // Scope-display verisimilitude labels, not glossary candidates.
   'TRIG',
+  // Transceiver front-panel control label (the «TUNE» button), not an
+  // acronym. Explained inline at first mention in ch2_3.pepP4 («the TUNE
+  // button, which keys a steady carrier…»); the lab step reuses the label.
+  'TUNE',
   // Diagram label for the cylindrical part of a transformer's E-I
   // laminated core («E-I shape» — descriptive, not glossable).
   'E-I',
@@ -128,6 +132,13 @@ const STOPLIST = new Set([
   // that lives ONLY on the diagram. The actual concept is glossed via
   // `choke` in the glossary; the diagram label is just a sticker.
   'RFC',
+  // Digital/teletype mode names used in ch2_3 only as illustrative
+  // high-duty-cycle examples. Described inline in pepP4 («RTTY
+  // (radioteletype)», «FT8 (a digital mode)»), but the descriptive
+  // gloss isn't a letter-for-letter expansion the heuristic detects.
+  // Same rationale as LSB/DSB above — explained in prose, not glossary
+  // candidates in a power chapter.
+  'RTTY', 'FT8',
 ])
 
 // Component / part-number pattern. Things like `FT-37-43`, `T-50-2`,
