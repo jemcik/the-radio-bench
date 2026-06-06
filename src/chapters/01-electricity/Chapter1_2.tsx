@@ -321,7 +321,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.keyTakeaway"
           ns="ui"
-          components={{ var: <MathVar /> }}
+          components={{ var: <MathVar />, dummy: <G k="dummy load" /> }}
         />
       </Callout>
 

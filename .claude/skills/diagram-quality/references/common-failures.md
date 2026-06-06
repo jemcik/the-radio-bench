@@ -428,6 +428,35 @@ See [typography-and-padding.md](typography-and-padding.md) for the full conversi
 
 ---
 
+## 23. Hero illustration: freehand component glyph + ugly path overlaps shipped (ch 2.3)
+
+**Symptom.** User screenshots the chapter hero with three marked defects at once: (a) the thick DC-power arrow looked "clipped" where it met the transmitter box; (b) an unrecognizable "circle with a stick" sitting in the box ("what is this?"); (c) the RF-output line's rounded end-cap poked past the arrowhead triangle. All three were obvious on a close-up, invisible on the full-page overview I "verified" against.
+
+**Root cause (two distinct failures).**
+1. **Geometry by magic numbers.** Coordinates were hand-computed literals (`arrow tip = BOX_X + 2`, `line x2 = 466` while the arrowhead tip was also `466`). A 2 px overlap (arrow tip inside the box fill) and a half-stroke-width cap overhang are invisible in source but visible on screen. No automated gate covers hero geometry — and the hero lives in `chapter-heroes/`, which the `diagram-text-overlap` / `diagram-curve-edge-rail` tests do **not** scan (they only glob `src/components/diagrams/`).
+2. **Freehanded a component symbol that the library already provides.** The "circle with a stick" was a freehand attempt at a transistor. `@/lib/circuit/symbols` exports `TransistorNPN/PNP/NMOS/PMOS`, `OpAmp` (the amplifier triangle), and `Antenna` — the exact symbols needed. Rule 0 says "grep the library first." I never grepped; I let "it's just a hero illustration" justify hand-drawing, and what I drew wasn't even a recognizable symbol.
+
+**Fix.** Aligned the flow axis to the box centre; landed the DC arrow tip exactly on the box's left edge (no overlap → no clipped sliver); replaced the glyph with a clean right-pointing amplifier triangle + leads; gave the RF line `strokeLinecap="butt"` and stopped it at the arrowhead base so nothing overhangs the tip.
+
+**How to avoid.**
+- **Heroes are NOT exempt from Stage 6.** "Looks fine on the full-page overview" is not verification for a hero any more than for a schematic. Close-up-zoom **every** hand-drawn element (arrow tips, joins, caps, glyphs) and read it, because no gate scans hero geometry.
+- **Grep `@/lib/circuit/symbols` before freehanding ANY component symbol** — transistor, amplifier/op-amp, antenna, meter, battery, ground — even inside a hero. The hero's soft illustrative style can justify a *deliberate* clean icon over a precise schematic symbol, but that is a conscious choice to state, never a license to freehand an unrecognizable glyph without checking what exists.
+- **Relate coordinates, don't hardcode them.** Derive the arrow tip from the box edge, the arrowhead base from its tip, the axis from the box centre — so "tip touches edge" and "line ends at arrowhead base" are true by construction, not by a literal you eyeballed.
+
+---
+
+## 24. "Highlighted region" diagram with no visible reference context (ch 2.3 AmplifierClassChart)
+
+**Symptom.** User: "I don't understand these graphs. You write about the shaded part, but I don't see a shaded part — every class except C just looks shaded." The caption promised "the shaded part of each cycle shows when the device conducts," but the diagram drew only the filled conduction *pulse* — four bumps of decreasing width, each uniformly filled, with no full-cycle curve and no threshold line. So there was nothing to read the shading *against*: no "rest of the cycle" to contrast the shaded part with, and no boundary defining where conduction starts. The reader just saw four filled blobs of different sizes.
+
+**Root cause.** The diagram showed the *result* (the clipped current pulse) but not the *reference frame* the caption assumes. When a caption says "the shaded part of X" — part of a cycle, part of a band, part of a range — the diagram must actually draw the WHOLE X and the BOUNDARY that carves out the highlighted sub-part. Drawing only the highlighted sub-part removes the contrast that makes "part of" meaningful, and every panel collapses to "a filled shape."
+
+**Fix.** Redrew each panel as: (1) the full one-cycle signal as a thin curve (the reference frame — "this is one whole cycle"), (2) a dashed threshold line (the boundary — "the device conducts only above this"), (3) the area above the threshold shaded (the highlighted sub-part). Now Class A is shaded across the whole hump, Class C only a thin cap above a high threshold with the rest of the curve visibly *un*shaded — the contrast the caption always assumed.
+
+**How to avoid.** For any "shaded/highlighted part of a whole" diagram (conduction angle, duty-cycle slice, passband of a spectrum, integration region under a curve, selected band of a range): draw the WHOLE first, then the BOUNDARY, then the highlighted sub-region — in that order. Before shipping, ask: "if I cover the caption, can the reader see what the un-highlighted part is?" If the answer is "everything looks highlighted," the reference frame is missing. A highlighted region with no visible complement is not a highlight.
+
+---
+
 ## When adding a new entry
 
 1. Number it sequentially after the last entry.

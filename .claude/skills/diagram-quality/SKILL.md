@@ -37,6 +37,8 @@ Work the checklist in order. Don't skip items because they seem obvious — the 
 
 **Absolute rule, no exceptions.** For any schematic-like content — wires, resistors, capacitors, inductors, diodes, LEDs, transistors, meters, batteries, grounds, switches, fuses, junction dots, named nodes, rail/terminal labels, current arrows, measurement marks — the component comes from `@/lib/circuit`. No raw `<circle>`, `<rect>`, `<line>`, `<path>`, or `<text>` for circuit content in chapter diagram files. None.
 
+**The zero-exception scope is schematic FIGURES in `src/components/diagrams/`.** Chapter **heroes** (`src/components/chapter-heroes/`) are a deliberately soft, illustrative genre — Ch2_1 / Ch2_2 / Ch2_3 heroes draw antennas, amplifier triangles and the like as freehand SVG on purpose, to match the house illustration style. A hero MAY use a deliberate, recognizable freehand icon (an amplifier ▷, a dipole) instead of the precise schematic primitive — but only under two conditions, both decided up front: (1) you **grepped `@/lib/circuit/symbols` first** and consciously chose the icon over the primitive (the library has `TransistorNPN/PNP/NMOS/PMOS`, `OpAmp`, `Antenna`, `Battery`, `Ground`, `Meter`, …); (2) what you draw is a **recognizable** symbol, not an improvised glyph, and it passes the Stage-6 close-up read. The ch 2.3 failure (catalogue #23) was freehanding an unrecognizable "circle with a stick" *without* grepping the library — that is never acceptable, hero or not.
+
 Before starting any schematic, enumerate the primitives:
 
 ```

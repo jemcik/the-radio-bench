@@ -176,6 +176,12 @@ Rationale: these symbols appear in formulas, widgets, diagrams; localizing the s
 | receiver | приймач | m | |
 | antenna | антена | f | |
 | band | діапазон | m | `80-метровий діапазон`, `діапазон 2 м` |
+| RF output power | вихідна радіочастотна потужність / вихідна потужність | f | Matches UA amateur exam program (ERC 1.6) and регламент. Keep `RF` Latin (see hard-rule section); abbrev `RF`, NOT `РЧ`/`ВЧ`. |
+| PEP (peak envelope power) | **keep Latin `PEP`** — do NOT coin a UA noun-term | — | **Verified June 2026 against UA sources:** the calque `пікова потужність обвідної` is UNATTESTED in Ukrainian RF/amateur sources (the exact phrase returns only renewable-energy / engine / grid-load hits; likely a calque of Russian «пиковая мощность огибающей»). UA regulator nominates continuous `вихідна потужність (Рвих)`, not PEP; the exam program uses `вихідна радіочастотна потужність`. So: lead with `PEP`, expand once as `PEP (англ. peak envelope power)`, and where a UA gloss is needed, DESCRIBE functionally — `потужність на гребені обвідної модуляції` / `найвищий пік сигналу` — never present `пікова потужність обвідної` as a fixed term. |
+| envelope (of a modulated wave) | обвідна | f | **Keep `обвідна`** (used throughout ch2_2). NOT `огинаюча` — that's a `-юча` participle calque (though it appears in some UA Wikipedia modulation prose, our house term is `обвідна`). |
+| carrier | несуча | f | **Keep `несуч-`.** NOT `несна` (a non-word that slips every gate), NOT `носій` (reads as generic medium). |
+| conduction angle | кут провідності | m | Translate "conduction angle" as **«кут провідності»** (the FULL angle: 360° = whole cycle, 180° = half), to match ch 2.3's framing. Do NOT render it as «кут відсічки». |
+| cutoff angle (the half-angle θ) | кут відсічки | m | The classic UA/Soviet RF term (`угол отсечки`), but it is the **half** of the conduction angle (A: 180°, B: 90°, C: 60°). Only use «кут відсічки» where the EN literally says "cutoff angle" — it is NOT a synonym for «кут провідності» (they differ by 2×). ch 2.3 mentions it once, in parentheses, as the traditional name for half the conduction angle. |
 
 ## Units
 

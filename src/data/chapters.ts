@@ -249,7 +249,7 @@ export const PARTS: Part[] = [
         part: 2,
         title: 'Power: DC Input vs RF Output',
         subtitle: 'Efficiency, PEP, what the missing watts become',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['1.6'],

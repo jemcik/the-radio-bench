@@ -382,6 +382,25 @@ export const glossary: Record<string, GlossaryEntry> = {
     unit: 'Hertz (Hz)',
     see: ['fm', 'deviation', 'bandwidth'],
   },
+  pep: {
+    tip: 'Peak Envelope Power — the power in the single strongest RF cycle, at the crest of the modulation envelope; the standard way to rate and limit transmitter power.',
+    detail:
+      'Peak envelope power (PEP) is the average power over one RF cycle taken at the crest of the modulation envelope — the most a signal ever reaches. It exists because modes like SSB and AM never hold a steady level: an SSB voice falls to nothing between words and peaks on loud sounds, so a single «power» figure would be meaningless. PEP captures that worst-case peak, which is what matters for interference, so regulators specify limits in PEP (often 1.5 kW) and radios are rated this way («100 W PEP»). The average power that actually heats the amplifier is much lower for voice — only about a fifth of the PEP.',
+    unit: 'Watts (W)',
+    see: ['ssb', 'am', 'envelope', 'efficiency'],
+  },
+  'dummy load': {
+    tip: 'A non-radiating 50 Ω resistor that stands in for an antenna, soaking up a transmitter\'s full output as heat so you can test it without going on the air.',
+    detail:
+      'A dummy load is a resistor — close to 50 Ω so it matches the transmitter\'s output — built to absorb full transmit power and turn it into heat instead of radiating it. It lets you tune up, measure output power, or test a rig without transmitting on a real antenna, and so without interfering with anyone. The two things that matter are its impedance (50 Ω, for a low SWR) and its power rating: a homebrew load of four 200 Ω resistors in parallel makes 50 Ω, while oil-filled «cantenna» loads handle high power. Reading the RF voltage across a dummy load on an oscilloscope is a common way to measure output power.',
+    see: ['impedance', 'swr'],
+  },
+  'linear amplifier': {
+    tip: 'An amplifier that reproduces its input\'s exact shape, only bigger — required for modes like SSB and AM whose information lives in the changing amplitude.',
+    detail:
+      'A linear amplifier produces an output that is a faithful, scaled-up copy of its input. That faithfulness matters whenever the message rides on the signal\'s amplitude: SSB and AM both live in the envelope, so a nonlinear amplifier would distort them and splatter interference into neighbouring channels. Linear amplifiers run in Class A, AB, or B, keeping the device conducting for at least half of each cycle — which buys linearity at the cost of efficiency. Constant-amplitude modes (FM, CW) carry no information in the envelope, so they can use a more efficient nonlinear Class-C amplifier instead.',
+    see: ['efficiency', 'am', 'ssb'],
+  },
   reactance: {
     tip: 'AC-only opposition — the frequency-dependent resistance of a capacitor or an inductor.',
     detail:
