@@ -21,8 +21,8 @@ The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](ht
 
 ## Features
 
-- **Interactive glossary** — hover any highlighted term for a quick tooltip, or click it to pin a full reference card with units, formulas, and related terms (100+ entries)
-- **Interactive widgets** — custom calculators and explorers woven into the prose (SI prefix converter, scientific-notation explorer, formula transposer, with more to come)
+- **Interactive glossary** — hover any highlighted term for a quick tooltip, or click it to pin a full reference card with units, formulas, and related terms (200+ entries)
+- **Interactive widgets** — 40+ custom calculators and explorers woven into the prose: Ohm's-law solvers, an RC-charging animator, AM/FM modulation explorers, an amplifier-efficiency calculator, and many more
 - **End-of-chapter quizzes** — multiple-choice with immediate feedback, per-question explanations, and progress that survives a refresh
 - **Hands-on labs** — optional bench activities with a multimeter, breadboard, Arduino, oscilloscope, or VNA
 - **6 themes** — three light (Paper, Stone, Nordic) and three dark (Dusk, Moonlight, Graphite)
@@ -36,15 +36,15 @@ The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](ht
 
 ## Curriculum
 
-The course is organized into five parts spanning 21 chapters. Three chapters are published so far and more are on the way.
+The course is organized into five parts spanning 28 chapters. 19 are published so far — all of Parts 0, I, and II — with Parts III and IV on the way.
 
-| Part | Title | Chapters |
-|------|-------|----------|
-| 0 | Foundations | How to Use This Site, Lab Bench Setup, Math Toolkit, The Decibel |
-| I | Electricity & Circuits | Ohm's Law, DC/AC, Resistors, Capacitors, Inductors, Resonance, Filters, Transformers, Semiconductors |
-| II | Radio Theory | Radio Waves, Modulation, RF Power |
-| III | Station Equipment | Receivers, Transmitters, Antennas, Measurements |
-| IV | Propagation, Operations & Regulations | Spectrum & Propagation, EMC, Safety, Procedures, Regulations |
+| Part | Title | Chapters | Status |
+|------|-------|----------|--------|
+| 0 | Foundations | How to Use This Site, Lab Bench Setup, Math Toolkit, The Decibel, How to Read a Schematic | ✅ Published |
+| I | Electricity & Circuits | What Is Electricity?, Ohm's Law, DC & AC, Resistors, Capacitors, Inductors, Resonance, Filters, Transformers, Diodes, Transistors | ✅ Published |
+| II | Radio Theory | Radio Waves, Modulation, Power | ✅ Published |
+| III | Station Equipment | Receivers, Transmitters, Antennas, Measurements | 🔜 Coming soon |
+| IV | Propagation, Operations & Regulations | Spectrum & Propagation, EMC, Safety, Operating Procedures, Regulations | 🔜 Coming soon |
 
 ## Getting started
 
@@ -67,8 +67,7 @@ The dev server starts at `http://localhost:5173` with hot module replacement.
 | `npm run lint` | Run ESLint |
 | `npm test` | Run the vitest test suite once |
 | `npm run knip` | Find unused dependencies, exports, and files |
-| `npm run check:i18n` | Fail CI if any English i18n key is missing in Ukrainian |
-| `npm run check:gitignore` | Fail CI if tracked files match `.gitignore` patterns |
+| `npm run check:all` | Run every content gate (i18n parity, glossary, math markup, diagram geometry, and more) |
 
 ## Tech stack
 
