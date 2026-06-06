@@ -17,7 +17,7 @@
 
 The Radio Bench is a free, beginner-friendly learning platform that teaches radio fundamentals and the physics behind them. Every chapter starts with a plain-language explanation and a real-world analogy before introducing a single formula. Labs, interactive diagrams, and glossary terms are woven throughout so concepts stick.
 
-The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](https://docdb.cept.org/document/845), covering everything from Ohm's law to propagation, station equipment, and operating regulations.
+The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](https://docdb.cept.org/document/600), covering everything from Ohm's law to propagation, station equipment, and operating regulations.
 
 ## Features
 
