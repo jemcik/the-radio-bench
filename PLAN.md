@@ -120,6 +120,8 @@ Each chapter folder contains:
 
 The chapters are organized in four **Parts**. Each part corresponds to a knowledge level. Parts 1–2 lay foundations that most radio books assume you already have. Parts 3–4 cover the ERC Report 32 syllabus in depth, going well beyond it where it builds real understanding.
 
+> **Note — this outline has drifted from the shipped chapters; `src/data/chapters.ts` is the source of truth.** Two structural changes landed during build that the prose below does not yet reflect: (a) a new **Ch 0.5 — How to Read a Schematic** was added to Part 0 (it covers ERC 32 preamble (b), reading circuit/component symbols); (b) the planned combined **"1.10 Diodes and Transistors"** shipped as **two** chapters — **1.10 Diodes** and **1.11 Transistors**.
+
 ---
 
 ### PART 0 — FOUNDATIONS (Prerequisites)
@@ -539,8 +541,9 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 - The straight (TRF) receiver: the simplest approach and its limits
 - The superheterodyne: the breakthrough that made modern radios possible
 - Why mixing frequencies is useful: converting to a fixed IF
-- Block-by-block walkthrough:
-  - Antenna → RF amplifier → Mixer + Local Oscillator → IF amplifier → Detector → BFO → AF amplifier → Squelch
+- Block-by-block walkthrough (ERC 32 §4.3 — every stage below must be described):
+  - Antenna → RF (HF) amplifier → Mixer + Local Oscillator (fixed and variable) → IF amplifier → Detector → BFO → AF (LF) amplifier → Squelch
+  - **Power supply** — ERC 32 §4.3 lists the power supply as a required receiver stage; show it feeding the chain (easy to forget on a signal-path block diagram)
 - Receiver for each mode: CW (A1A), AM (A3E), SSB (J3E), FM (F3E)
 - **Diagram:** Interactive block diagram — click any stage for explanation
 - **Quiz:** 10 questions
@@ -560,9 +563,11 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 3.2 — Transmitters: How Your Radio Talks
 *ERC 32: 5.1–5.3 Transmitters*
-- Block-by-block walkthrough: Oscillator → Buffer → Frequency multiplier → Driver → PA → Output filter → Modulator
+- Block-by-block walkthrough — the stages ERC 32 §5.2 requires (block-diagram level only):
+  Oscillator (crystal and VFO) · Buffer · Frequency multiplier · **Mixer** · Driver · Power amplifier (PA) · **Output filter (pi-filter / П-контур)** · **Frequency modulator** and **SSB modulator** (two distinct stages, not one generic "modulator") · **Power supply**
+  - Newly added vs the old outline: **Mixer**, **Power supply**, and the split between the **SSB modulator** and the **frequency modulator** — all three are explicit in ERC 32 §5.2 and were missing here
 - Transmitter types: CW (A1A), SSB (J3E), FM (F3E)
-- Key characteristics: frequency stability, RF bandwidth, spurious emissions, harmonics
+- Key characteristics (ERC 32 §5.3): frequency stability, RF bandwidth, **sidebands**, **output power**, spurious emissions, harmonics
 - **Diagram:** Interactive TX block diagram — click stages for explanation
 - **Quiz:** 10 questions
 - **🔬 Lab Activity — Observe Harmonics with the VNA / Oscilloscope FFT**
@@ -604,7 +609,7 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 3.4 — Measurements: Testing What You Built
 *ERC 32: 8.1–8.2 Measurements*
-- Multimeter: DC/AC voltage, current, resistance
+- Multi-range meter (multimeter) — DC/AC voltage, current, resistance; cover **both digital and analog (moving-coil)** meters, since ERC 32 §8.2 names both and reading an analog scale is its own skill
 - SWR meter: forward and reflected power, what SWR means
 - Absorption wavemeter: finding an unknown frequency
 - Dummy load: testing TX safely
@@ -653,10 +658,9 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 4.2 — Interference and EMC
 *ERC 32: Chapter 9*
-- What interference is and what your TX can interfere with
-- Harmonics, spurious emissions, overloading
-- Interference coupling paths
-- Remedies: filtering, decoupling, shielding, ferrites
+- What interference is and what your TX can interfere with (§9.1): TV, VHF and broadcast reception, and audio systems
+- Causes (§9.2): spurious radiation of the transmitter (parasitic radiation, harmonics); coupling routes — via the receiver antenna input, via mains / speaker / connecting leads, and by direct radiation; overloading
+- Remedies (§9.3): filtering at the amateur station; filtering at the interfered apparatus; decoupling; shielding; ferrites; **separation of transmitting and TV antennas**; **avoiding end-fed antennas**; using **minimum necessary power**; a **good RF earth**; and the **social side — keeping good relations with neighbours**
 - **Diagram:** Interference coupling paths (interactive)
 - **Quiz:** 10 questions
 - **🔬 Lab Activity — Demonstrate and Cure RFI**
@@ -672,11 +676,11 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 4.3 — Safety
 *ERC 32: Chapter 10*
-- Electrical shock: consequences and precautions
-- Mains wiring colour codes and fuses
-- High voltages and charged capacitors
-- RF safety and SAR
-- Lightning protection
+- Electrical shock: consequences and precautions (§10.1)
+- Mains wiring colour codes (line / neutral / earth); importance of good ground connections; **quick vs slow (fast / slow-blow) fuses and how to pick the fuse value** (§10.2)
+- High voltages and charged capacitors (§10.3)
+- RF safety and SAR (beyond ERC 32 §10 — included for modern completeness)
+- Lightning: danger and protection (§10.4)
 - **Checklist:** Pre-operation safety checklist (interactive, printable)
 - **Quiz:** 10 questions
 - **🔬 Lab Activity — Station Grounding and Lightning Protection Inspection**
@@ -712,7 +716,7 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 
 #### Chapter 4.5 — Regulations
 *ERC 32: c) National and International Regulations*
-- ITU, Amateur Service definition, Article 25, Radio Regions
+- ITU; the Amateur Service **and Amateur-Satellite Service** definitions (ERC 32 §c covers both); Article 25, Radio Regions
 - CEPT, HAREC, ECC Recommendation (05)06
 - National licence conditions: bands, power, modes
 - Frequency allocation chart
@@ -852,7 +856,46 @@ One chapter at a time. Each chapter is a GitHub commit + PR.
 | c2 CEPT Regulations | Ch 4.5 |
 | c3 National laws + licence | Ch 4.5 |
 
+> **Coverage-map caveat (June 2026 audit).** This table maps *intended* coverage by chapter. A content audit of the *shipped* chapters found three syllabus bullets that a published chapter omits or under-treats — see «Published-chapter syllabus backfills» below: §2.6 *transistor as oscillator* (absent from Ch 1.11), §1.5 *AM/SSB/FM advantages & disadvantages* (thin in Ch 2.2), and §2.2 *variable capacitors + mica / air dielectrics* (thin in Ch 1.5).
+
 ---
+
+## Published-chapter syllabus backfills (June 2026 audit)
+
+A full ERC 32 audit of the *shipped* content (not just this plan) found three
+places where an already-published chapter omits or under-treats a required
+syllabus bullet. Each needs a real content patch — prose + UA translation
+(`ua-translate` skill) + beginner-review + the full gate — not just a plan edit:
+
+1. **Ch 1.11 Transistors — §2.6 "transistor as oscillator" is ABSENT (highest priority).**
+   ERC 32 §2.6 requires the candidate to "know that a transistor can be used as
+   amplifier **or oscillator**." The shipped chapter teaches the transistor as a
+   switch and as an amplifier only; the oscillator use — positive feedback turning
+   an amplifier into a signal generator, the heart of every VFO and crystal
+   oscillator — is missing. This existed in the original combined "1.10 Diodes and
+   Transistors" outline and was lost when the chapter split into 1.10/1.11.
+   Conceptual / block-diagram depth is enough at novice level (no
+   Barkhausen/Colpitts maths); it is revisited as the oscillator stage in Ch 3.2.
+
+2. **Ch 2.2 Modulated signals — §1.5 "advantages AND disadvantages" is THIN.**
+   ERC 32 §1.5 explicitly asks for the advantages *and disadvantages* of AM, SSB
+   and FM. The chapter teaches the trade-offs narratively but never as an explicit,
+   exam-ready comparison. Add a compact AM-vs-SSB-vs-FM table (noise immunity ·
+   bandwidth · power efficiency · receiver complexity · typical band/use) so the
+   trade-offs are stated, not just implied.
+
+3. **Ch 1.5 Capacitors — §2.2 variable capacitors + mica/air dielectrics are THIN.**
+   ERC 32 §2.2 lists "fixed **and variable**" capacitors and five dielectric types:
+   "air, mica, plastic, ceramic, electrolytic." The shipped chapter covers ceramic
+   / film / electrolytic well but never names the **variable (tuning / trimmer)
+   capacitor** as a category — even though the LC-resonance labs in Ch 1.7 depend on
+   one — and relegates **mica** and **air-gap** dielectrics to the margins. Add a
+   short "variable capacitors" note and pull mica + air into the main
+   dielectric-types list.
+
+*Minor (note for the author, not blocking):* Ch 1.3 covers mains thoroughly but
+never states the explicit ERC 32 §1.2 framing that "battery and mains are the two
+sources of electricity."
 
 ## Reference Books Available
 
