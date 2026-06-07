@@ -1867,7 +1867,8 @@
     "bypassCapChipLabel": "CHIP",
     "bypassCapVplus": "V+",
     "bypassCapGnd": "GND",
-    "blocksHighPassSchematicGnd": "GND"
+    "blocksHighPassSchematicGnd": "GND",
+    "typesVariableIntro": "Everything so far has been a <strong>fixed</strong> capacitor — one value, set at the factory. The other class is the <strong>variable capacitor</strong>, whose value you change by hand. A <strong>tuning capacitor</strong> interleaves two sets of metal plates with <strong>air</strong> as the dielectric; rotating the shaft they sit on slides one set past the other, changing the overlap area <var>A</var> and sweeping the capacitance — exactly how an old radio tunes across a band (in Chapter 1.7 you will pair one with a coil to build a <tunedc>tuned circuit</tunedc>). Its miniature cousin, the <strong>trimmer</strong>, is set once with a screwdriver and then left alone; trimmers use air, mica, or a thin plastic film as the dielectric. On a schematic, a variable capacitor is the usual two plates with an <strong>arrow</strong> drawn through them."
   },
   "chapterFlow": {
     "analogy": "Analogy",
@@ -4051,7 +4052,30 @@
     "quiz_q8_c": "16 kHz",
     "quiz_q8_d": "3 kHz",
     "quiz_q8_correct": "2",
-    "quiz_q8_explanation": "Carson's rule: bandwidth ≈ 2 × (deviation + highest audio) = 2 × (5 + 3) = 16 kHz. That is why FM, despite its noise immunity, is too wide for the crowded HF bands and lives mostly on VHF/UHF."
+    "quiz_q8_explanation": "Carson's rule: bandwidth ≈ 2 × (deviation + highest audio) = 2 × (5 + 3) = 16 kHz. That is why FM, despite its noise immunity, is too wide for the crowded HF bands and lives mostly on VHF/UHF.",
+    "sectionCompare": "Choosing a mode: the trade-offs",
+    "compareIntro": "No mode wins at everything — each buys one strength with a weakness. Set <am>AM</am>, <ssb>SSB</ssb> and <fm>FM</fm> side by side and the right choice for a given band or job becomes clear.",
+    "compareCaption": "AM, SSB and FM at a glance. SSB is the narrowest and most power-efficient; FM shrugs off noise; AM is the simplest to receive. Which one to use depends on the band and the task.",
+    "cmpLabelBw": "Bandwidth",
+    "cmpLabelPower": "Power efficiency",
+    "cmpLabelNoise": "Noise immunity",
+    "cmpLabelRx": "At the receiver",
+    "cmpLabelUse": "Where it is used",
+    "cmpAmBw": "≈ 6 kHz",
+    "cmpSsbBw": "≈ 2.7 kHz — the narrowest voice mode",
+    "cmpFmBw": "≈ 16 kHz (narrowband)",
+    "cmpAmPower": "Low — two-thirds wasted in the carrier",
+    "cmpSsbPower": "High — every watt carries the voice",
+    "cmpFmPower": "Constant envelope — efficient amplifiers",
+    "cmpAmNoise": "Poor — noise rides on amplitude",
+    "cmpSsbNoise": "Poor — the same amplitude weakness",
+    "cmpFmNoise": "Excellent — amplitude ignored; capture effect",
+    "cmpAmRx": "Simplest — an envelope detector",
+    "cmpSsbRx": "Fussy — must reinsert the carrier and tune precisely",
+    "cmpFmRx": "Moderate — clips the signal flat, then reads its frequency",
+    "cmpAmUse": "Broadcast and legacy; rare in ham voice today",
+    "cmpSsbUse": "The HF long-distance voice workhorse",
+    "cmpFmUse": "VHF/UHF — repeaters and local calls"
   },
   "ch2_3": {
     "heroAriaLabel": "A thick arrow of DC power flowing into a transmitter block; out of it, a thin beam becomes a radio wave leaving an antenna while a much wider glow radiates away as heat from a finned heatsink.",

@@ -863,11 +863,17 @@ One chapter at a time. Each chapter is a GitHub commit + PR.
 ## Published-chapter syllabus backfills (June 2026 audit)
 
 A full ERC 32 audit of the *shipped* content (not just this plan) found three
-places where an already-published chapter omits or under-treats a required
-syllabus bullet. Each needs a real content patch — prose + UA translation
-(`ua-translate` skill) + beginner-review + the full gate — not just a plan edit:
+places where an already-published chapter omitted or under-treated a required
+syllabus bullet. **✅ All three are now implemented (June 2026) — EN + UA via the
+`ua-translate` skill, beginner-reviewed, `check:all` green, visually verified.**
+What each gap was and what shipped:
 
-1. **Ch 1.11 Transistors — §2.6 "transistor as oscillator" is ABSENT (highest priority).**
+1. **✅ DONE — Ch 1.11 Transistors — §2.6 "transistor as oscillator" (was ABSENT).**
+   *Shipped:* new «Третє завдання — генерація коливань» section (amplifier +
+   positive feedback → oscillator; LC tank sets the frequency; start-up from noise;
+   VFO vs crystal), an animated `OscillatorFeedbackDiagram`, glossary terms
+   `oscillator` / `crystal oscillator`, intro2 now names the third role, +2 quiz
+   questions.
    ERC 32 §2.6 requires the candidate to "know that a transistor can be used as
    amplifier **or oscillator**." The shipped chapter teaches the transistor as a
    switch and as an amplifier only; the oscillator use — positive feedback turning
@@ -877,21 +883,20 @@ syllabus bullet. Each needs a real content patch — prose + UA translation
    Conceptual / block-diagram depth is enough at novice level (no
    Barkhausen/Colpitts maths); it is revisited as the oscillator stage in Ch 3.2.
 
-2. **Ch 2.2 Modulated signals — §1.5 "advantages AND disadvantages" is THIN.**
-   ERC 32 §1.5 explicitly asks for the advantages *and disadvantages* of AM, SSB
-   and FM. The chapter teaches the trade-offs narratively but never as an explicit,
-   exam-ready comparison. Add a compact AM-vs-SSB-vs-FM table (noise immunity ·
-   bandwidth · power efficiency · receiver complexity · typical band/use) so the
-   trade-offs are stated, not just implied.
+2. **✅ DONE — Ch 2.2 Modulated signals — §1.5 "advantages AND disadvantages" (was THIN).**
+   ERC 32 §1.5 asks for the advantages *and disadvantages* of AM, SSB and FM; the
+   chapter taught the trade-offs only narratively. *Shipped:* a new «Вибір режиму»
+   section with an explicit AM-vs-SSB-vs-FM table (bandwidth · power efficiency ·
+   noise immunity · receiver · typical use) — which also pays off the pre-existing
+   «Compare the modes side by side:» prose promise.
 
-3. **Ch 1.5 Capacitors — §2.2 variable capacitors + mica/air dielectrics are THIN.**
-   ERC 32 §2.2 lists "fixed **and variable**" capacitors and five dielectric types:
-   "air, mica, plastic, ceramic, electrolytic." The shipped chapter covers ceramic
-   / film / electrolytic well but never names the **variable (tuning / trimmer)
-   capacitor** as a category — even though the LC-resonance labs in Ch 1.7 depend on
-   one — and relegates **mica** and **air-gap** dielectrics to the margins. Add a
-   short "variable capacitors" note and pull mica + air into the main
-   dielectric-types list.
+3. **✅ DONE — Ch 1.5 Capacitors — §2.2 variable capacitors + mica/air dielectrics (was THIN).**
+   ERC 32 §2.2 lists "fixed **and variable**" capacitors and the dielectric types
+   "air, mica, plastic, ceramic, electrolytic." *Shipped:* a new `typesVariableIntro`
+   paragraph naming the **variable / tuning capacitor** (air-dielectric, rotating
+   plates → forward-link to the Ch 1.7 tuned circuit) and the **trimmer** (air /
+   mica / plastic film), making the fixed-vs-variable distinction and the air & mica
+   dielectrics explicit.
 
 *Minor (note for the author, not blocking):* Ch 1.3 covers mains thoroughly but
 never states the explicit ERC 32 §1.2 framing that "battery and mains are the two

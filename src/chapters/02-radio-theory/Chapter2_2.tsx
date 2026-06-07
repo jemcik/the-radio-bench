@@ -22,6 +22,16 @@ import BandwidthVisualiser from '@/components/widgets/BandwidthVisualiser'
 const CHAPTER_ID = '2-2'
 const QUIZ_QUESTION_COUNT = 8
 
+// AM/SSB/FM trade-off table — each row is one dimension, the three data
+// columns are the modes. Cell text lives in i18n (ch2_2.cmp*).
+const COMPARE_ROWS = [
+  { label: 'cmpLabelBw', am: 'cmpAmBw', ssb: 'cmpSsbBw', fm: 'cmpFmBw' },
+  { label: 'cmpLabelPower', am: 'cmpAmPower', ssb: 'cmpSsbPower', fm: 'cmpFmPower' },
+  { label: 'cmpLabelNoise', am: 'cmpAmNoise', ssb: 'cmpSsbNoise', fm: 'cmpFmNoise' },
+  { label: 'cmpLabelRx', am: 'cmpAmRx', ssb: 'cmpSsbRx', fm: 'cmpFmRx' },
+  { label: 'cmpLabelUse', am: 'cmpAmUse', ssb: 'cmpSsbUse', fm: 'cmpFmUse' },
+] as const
+
 export default function Chapter2_2() {
   const { t } = useTranslation('ui')
 
@@ -151,6 +161,39 @@ export default function Chapter2_2() {
         <Trans i18nKey="ch2_2.bwP2" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong />, carson: <G k="carson's rule" />, dev: <G k="deviation" /> }} />
       </p>
       <BandwidthVisualiser />
+
+      {/* ── §8 Comparing the modes — the trade-offs ─────────────── */}
+      <Section id="compare" labelKey="ch2_2.sectionCompare" />
+      <p>
+        <Trans i18nKey="ch2_2.compareIntro" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong />, am: <G k="am" />, ssb: <G k="ssb" />, fm: <G k="fm" /> }} />
+      </p>
+      <figure className="my-8 not-prose">
+        <div className="overflow-x-auto rounded-xl border border-border bg-muted/40 p-4">
+          <table className="w-full text-sm border-collapse text-foreground">
+            <thead>
+              <tr className="border-b-2 border-border">
+                <th className="text-left py-2 px-3 font-semibold" aria-label={t('ch2_2.sectionCompare')} />
+                <th className="text-left py-2 px-3 font-semibold">{t('glossary._names.am')}</th>
+                <th className="text-left py-2 px-3 font-semibold">{t('glossary._names.ssb')}</th>
+                <th className="text-left py-2 px-3 font-semibold">{t('glossary._names.fm')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE_ROWS.map((row) => (
+                <tr key={row.label} className="border-b border-border/40 align-top">
+                  <th scope="row" className="text-left py-2 px-3 font-semibold whitespace-nowrap">{t(`ch2_2.${row.label}`)}</th>
+                  <td className="py-2 px-3">{t(`ch2_2.${row.am}`)}</td>
+                  <td className="py-2 px-3">{t(`ch2_2.${row.ssb}`)}</td>
+                  <td className="py-2 px-3">{t(`ch2_2.${row.fm}`)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <figcaption className="mt-2 text-center text-[13px] text-muted-foreground leading-snug">
+          {t('ch2_2.compareCaption')}
+        </figcaption>
+      </figure>
 
       {/* ── Summary ─────────────────────────────────────────────── */}
       <Section id="summary" labelKey="ch2_2.sectionSummary" />
