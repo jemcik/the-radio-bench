@@ -231,9 +231,17 @@ export default function Chapter1_5() {
 
       <p>
         <Trans
+          i18nKey="ch1_5.typesVariableIntro"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong />, lc: <G k="lc" />, tunedc: <G k="tuned circuit" /> }}
+        />
+      </p>
+
+      <p>
+        <Trans
           i18nKey="ch1_5.typesOthers"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, osc: <G k="oscillator" /> }}
         />
       </p>
 

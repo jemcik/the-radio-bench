@@ -13,6 +13,7 @@ import MosfetSwitchSchematic from '@/components/diagrams/MosfetSwitchSchematic'
 import CommonEmitterAmplifierSchematic from '@/components/diagrams/CommonEmitterAmplifierSchematic'
 import BjtBiasingDiagram from '@/components/diagrams/BjtBiasingDiagram'
 import BjtOutputCurves from '@/components/diagrams/BjtOutputCurves'
+import OscillatorFeedbackDiagram from '@/components/diagrams/OscillatorFeedbackDiagram'
 import BjtOperationVisualizer from '@/components/widgets/BjtOperationVisualizer'
 import BjtSwitchDesigner from '@/components/widgets/BjtSwitchDesigner'
 import LoadLinePlotter from '@/components/widgets/LoadLinePlotter'
@@ -21,7 +22,7 @@ import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-11'
-const QUIZ_QUESTION_COUNT = 8
+const QUIZ_QUESTION_COUNT = 10
 
 function nowrapSpan() {
   return <span style={{ whiteSpace: 'nowrap' }} />
@@ -658,6 +659,103 @@ export default function Chapter1_11() {
           />
         </p>
       </Callout>
+
+      {/* ── Section 9: Transistor as an oscillator ─────────────
+           §2.6 backfill (ERC 32): a transistor's third classic job —
+           amplifier + positive feedback = oscillator. Placed after the
+           amplifier/bias sections because an oscillator IS the amplifier
+           with a feedback loop; forward-links to the oscillator stages in
+           Part 3 (receivers / transmitters). ───────────────────────── */}
+      <Section id="oscillator" labelKey="ch1_11.sectionOscillator" />
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscIntro"
+          ns="ui"
+          components={{ strong: <strong />, em: <em />, carrier: <G k="carrier" /> }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscAnalogy"
+          ns="ui"
+          components={{ strong: <strong />, em: <em /> }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscMechanism"
+          ns="ui"
+          components={{
+            strong: <strong />,
+            em: <em />,
+            ce: <G k="common emitter" />,
+            osc: <G k="oscillator" />,
+          }}
+        />
+      </p>
+
+      <OscillatorFeedbackDiagram />
+
+      <Callout variant="key">
+        <p>
+          <Trans
+            i18nKey="ch1_11.oscConditions"
+            ns="ui"
+            components={{ strong: <strong />, em: <em /> }}
+          />
+        </p>
+      </Callout>
+
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscFrequency"
+          ns="ui"
+          components={{
+            ...mathComponents,
+            strong: <strong />,
+            em: <em />,
+            nowrap,
+            lc: <G k="lc" />,
+            tank: <G k="tank" />,
+            reson: <G k="resonant frequency" />,
+            qf: <G k="q-factor" />,
+            sel: <G k="selectivity" />,
+          }}
+        />
+      </p>
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscStartup"
+          ns="ui"
+          components={{ strong: <strong />, em: <em /> }}
+        />
+      </p>
+
+      <Callout variant="tip">
+        <p>
+          <Trans
+            i18nKey="ch1_11.oscCrystalVfo"
+            ns="ui"
+            components={{
+              ...mathComponents,
+              strong: <strong />,
+              vfo: <G k="vfo" />,
+              co: <G k="crystal oscillator" />,
+              qf: <G k="q-factor" />,
+              tr: <G k="transceiver" />,
+              cap: <G k="capacitor" />,
+            }}
+          />
+        </p>
+      </Callout>
+
+      <p>
+        <Trans
+          i18nKey="ch1_11.oscUnify"
+          ns="ui"
+          components={{ strong: <strong />, em: <em />, ar: <G k="active region" /> }}
+        />
+      </p>
 
       {/* ── Lab ────────────────────────────────────────────── */}
       <LabActivity

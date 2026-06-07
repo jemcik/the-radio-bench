@@ -678,6 +678,20 @@ The tell for the dimension clash is **«постійн* струм*» within ~30
 
 **Source-side note:** the EN source keeps "DC to X GHz" because it's idiomatic English RF-speak and English readers parse it correctly. Translation asymmetry is fine — what matters is that each language communicates the same content via its own idiom.
 
+### 13.18. EN "section(s)" as an intra-chapter back-reference → «розділ» (= whole chapter) mistranslation (ch1.11 pushback)
+
+**The trap.** In our vocabulary «розділ» = a whole chapter (the sidebar reads «Розділ 1.11»); a `<Section>` *inside* a chapter is a **підрозділ**. EN prose like "a few sections ago" / "in the previous section" means an earlier **subsection of the same chapter**. Gemini renders "section" → «розділ», so «кілька розділів тому» reads as "several **chapters** ago" — a factual error that sends the reader to a different chapter for something that's right here.
+
+- ❌ «…ту саму стабілізувальну роль, яку **кілька розділів тому** відігравав емітерний резистор» (R_E is introduced in THIS chapter)
+- ✅ «…яку **раніше в цьому розділі** відігравав емітерний резистор»
+- ✅ «…у **попередньому підрозділі**» / «…**кількома підрозділами раніше**»
+
+**The fix.** Translate an intra-chapter back-reference as «раніше в цьому розділі» / «у попередньому підрозділі» / «кількома підрозділами раніше» — **never** «X розділів тому». Reserve «розділ» for cross-references to a *different* chapter (where EN literally says "Chapter N", e.g. «Розділ 1.10»).
+
+**Source-side note:** also prefer authoring the EN as "earlier in this chapter" over "a few sections ago" — it kills the section/chapter ambiguity at the source and reads clearer in EN too. (Both sides fixed in ch1.11 `oscMechanism`.)
+
+**Catchable?** Partially — «\d+ розділ(и|ів)? тому» or «у попередньому розділі» inside a chapter block is suspicious, but legitimate cross-chapter references exist, so this is left to the read-aloud pass rather than a hard rule.
+
 ### 13.9. Meta-rule: the «read-aloud» pass
 
 The critiques caught many of these earlier in the session, but several slipped through because they pass every mechanical check (no forbidden words, correct apostrophes, decimal commas, `<var>` wrapping, none of the catalogued landmines 1–12) AND they're grammatically correct — they just feel translated.

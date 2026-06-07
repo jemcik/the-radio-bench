@@ -1462,7 +1462,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'common emitter': {
     tip: 'The standard single-transistor BJT voltage amplifier: input on the base, output on the collector, emitter grounded (or returned to ground through a small R_E). Gain ≈ −R_C / R_E, with phase inversion.',
     detail:
-      'The common-emitter (CE) amplifier is the BJT amplifier topology you\'ll see most often. Voltage-divider bias (R_1 + R_2) holds the base steady at a chosen DC voltage; the emitter is connected to ground through a small resistor R_E that sets the emitter current by Ohm\'s law (I_E = V_E / R_E); the collector connects through R_C to V_CC. An AC input wiggles the base voltage, the emitter follows it (V_BE is a near-constant 0.7 V drop), R_E converts the emitter wiggle into an emitter-current wiggle, and R_C converts the collector-current wiggle (≈ I_E) into an output voltage wiggle. The result is gain = −R_C / R_E — a clean ratio of resistors, β-independent and temperature-stable. The minus sign is phase inversion: a positive input wiggle becomes a negative output wiggle. Typical gains are 5–100 per stage; for higher gains, cascade stages or use a different topology (cascode, op-amp).',
+      'The common-emitter (CE) amplifier is the BJT amplifier topology you\'ll see most often. Voltage-divider bias (R_1 + R_2) holds the base steady at a chosen DC voltage; the emitter is connected to ground through a small resistor R_E that sets the emitter current by Ohm\'s law (I_E = V_E / R_E); the collector connects through R_C to V_CC. An AC input wiggles the base voltage, the emitter follows it (V_BE is a near-constant 0.7 V drop), R_E converts the emitter wiggle into an emitter-current wiggle, and R_C converts the collector-current wiggle (≈ I_E) into an output voltage wiggle. The result is gain = −R_C / R_E — a clean ratio of resistors, β-independent and temperature-stable. The minus sign is phase inversion: a positive input wiggle becomes a negative output wiggle. Typical gains are 5–100 per stage; for higher gains, several stages are cascaded in series.',
     formula: 'A_v ≈ −R_C / R_E',
     see: ['bjt', 'common source', 'q point', 'load line'],
   },
@@ -1498,5 +1498,17 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'A «logic-level» MOSFET is one whose datasheet quotes R_DS(on) at V_GS values below ~3 V — meaning it turns fully on with a 3.3 V or 5 V microcontroller pin as the gate drive, no booster circuit needed. Standard-level MOSFETs (e.g. IRF540) are designed for V_GS ≥ 10 V to be fully on, and a 3.3 V or 5 V drive will leave them only partially on (high R_DS(on), excessive heat dissipation). The convention in part numbers is the letter L: IRLZ44N is logic-level, IRFZ44N is standard. Always check the datasheet curve of R_DS(on) vs V_GS at your intended V_GS — at room temperature, with V_GS at the value your microcontroller actually outputs.',
     see: ['mosfet', 'fet'],
+  },
+  oscillator: {
+    tip: 'A circuit that generates a steady, repeating signal of its own — with no input — by feeding part of an amplifier\'s output back to its input in phase (positive feedback).',
+    detail:
+      'An oscillator turns DC power into a continuous AC waveform with no input signal. It is an amplifier wrapped in a positive-feedback loop: a fraction of the output is returned to the input in phase, so any tiny disturbance grows. Two conditions sustain a clean oscillation — the round-trip phase shift is 0° (the feedback is in phase) and the loop gain (amplifier gain × feedback fraction) is at least 1, so the amplifier replaces the energy the loop loses each cycle. To start, the loop gain is a touch above 1 and the signal builds out of the amplifier\'s own noise; as the swing grows the gain sags until the loop gain settles at exactly 1 and the amplitude holds. A frequency-selective network in the loop — usually an LC tank or a quartz crystal — fixes the frequency, because it returns the signal in phase at only one frequency. Oscillators generate the carrier in every transmitter and the local oscillator in every superheterodyne receiver.',
+    see: ['vfo', 'crystal oscillator', 'tuned circuit', 'carrier'],
+  },
+  'crystal oscillator': {
+    tip: 'An oscillator whose frequency is set by a thin slice of quartz instead of an LC tank — far steadier, because the crystal behaves like a resonator with an enormous Q.',
+    detail:
+      'A crystal oscillator uses a piezoelectric quartz crystal as the frequency-selective element in the feedback loop. Electrically the crystal behaves like an LC tank with a very high Q factor — typically tens of thousands, against a couple of hundred for a coil-and-capacitor tank — so the oscillation frequency barely drifts with temperature, supply voltage, or mechanical knocks. The trade-off is that a crystal is cut for one fixed frequency and can only be «pulled» a few parts per million, so it is not tunable across a band the way an LC VFO is. Crystals are the timekeeping reference in nearly all digital and radio equipment; the same 32.768 kHz crystal that ticks in a quartz watch keeps time in countless microcontrollers. Common crystal-oscillator circuits include the Pierce and Colpitts topologies.',
+    see: ['oscillator', 'vfo', 'q-factor'],
   },
 }
