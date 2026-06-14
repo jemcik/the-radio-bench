@@ -54,7 +54,7 @@ export {
 } from './types'
 
 // Symbols — passives
-export { Resistor, Capacitor, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
+export { Resistor, Capacitor, CapacitorVariable, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
 export { AcSource, Battery, BatteryMulti, Ground, GroundEarth, AC_SOURCE_RADIUS } from './symbols'
@@ -69,7 +69,7 @@ export {
 } from './symbols'
 
 // Symbols — miscellaneous
-export { Antenna, Crystal, Transformer } from './symbols'
+export { Antenna, Crystal, Speaker, Transformer } from './symbols'
 
 // Symbols — pedagogical annotations (named-node markers, terminal labels)
 export { NodePoint, TerminalLabel } from './symbols'

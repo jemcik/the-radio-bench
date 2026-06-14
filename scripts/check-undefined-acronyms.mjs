@@ -142,12 +142,14 @@ const STOPLIST = new Set([
 ])
 
 // Component / part-number pattern. Things like `FT-37-43`, `T-50-2`,
-// `2N3904`, `LM741`, `RG-58`, `MC1496`, `AD633` are catalogue SKUs —
-// not glossary candidates. Heuristic: contains a hyphen followed by
-// digits, OR a digit-letter mix, OR an IC-style letter(s)-then-3+-digits
+// `2N3904`, `LM741`, `RG-58`, `MC1496`, `AD633`, `BAT43` are catalogue
+// SKUs — not glossary candidates. Heuristic: contains a hyphen followed
+// by digits, OR a digit-letter mix, OR an IC-style letter(s)-then-3+-digits
 // run (`LM741`, `MC1496`, `AD633` — the documented `LM741` example was
-// not actually caught by the first two alternatives).
-const PART_NUMBER_RE = /-\d|\d[A-Z]|[A-Z]\d{3,}/
+// not actually caught by the first two alternatives), OR a multi-letter
+// prefix with a short numeric tail (`BAT43` — a Schottky-diode SKU whose
+// two-digit tail slips the 3+-digit rule).
+const PART_NUMBER_RE = /-\d|\d[A-Z]|[A-Z]\d{3,}|[A-Z]{2,}\d{2,}/
 
 function flatten(obj, prefix = '') {
   const out = {}

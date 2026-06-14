@@ -26,9 +26,12 @@ import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
 
 // ── Geometry ──────────────────────────────────────────────────────
-// viewBox 560 × 220. No scaling: on-screen pixels = viewBox units,
-// so every fontSize renders at the value written.
-const VB_W = 560
+// viewBox 600 × 220. No scaling: on-screen pixels = viewBox units,
+// so every fontSize renders at the value written. Widened from 560 → 600
+// so the time-axis label («time» / «час») at the right end is no longer
+// clipped by the viewBox edge (user-flagged; the label sat at x≈553 and
+// ran past the old 560 boundary).
+const VB_W = 600
 const VB_H = 220
 
 // Circle (left side)
