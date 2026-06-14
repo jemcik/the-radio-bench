@@ -130,6 +130,24 @@ const EXEMPT_PER_CHAPTER = {
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
+  // ch3_1 «passband» occurs only inside the mixing / image-axis aria-labels
+  // (a11y descriptions that can't carry a <G> wrap). «if filter» occurs only
+  // as the literal block label «IF filter» inside SVG diagram text
+  // (mixing.ifFilter, superhet.ifSub) and one quiz explanation — SVG labels
+  // can't carry a <G> wrap, and «filter» itself is wrapped in intro2.
+  // «impedance» — false substring match: the only occurrence is inside the
+  // wrapped «<hze>high-impedance (crystal) earpiece</hze>» phrase (labComp4),
+  // which maps to the «high-impedance earpiece» glossary term, not «impedance».
+  // Same pattern as ch1_11's «impedance» inside «input impedance».
+  ch3_1: new Set(['passband', 'if filter', 'impedance']),
+  // Forward / passing references to receiver concepts that Ch 3.1 introduces
+  // and owns (superheterodyne, mixer, detector, local oscillator,
+  // intermediate frequency, sensitivity, limiter). These chapters name them
+  // in passing — often as a «you'll meet this later» pointer — before 3.1
+  // teaches them; a wrap here is optional, not focal.
+  ch0_4: new Set(['sensitivity']),
+  ch1_9: new Set(['mixer', 'detector']),
+  ch2_2: new Set(['superheterodyne', 'mixer', 'detector']),
   // ch0_5 «How to Read a Schematic» introduces transistor/NPN/PNP/base/
   // collector/emitter as part of its symbol vocabulary, but the chapter
   // is about reading schematics — actual transistor behaviour is taught
@@ -142,7 +160,7 @@ const EXEMPT_PER_CHAPTER = {
   // symbolInductorName (one-word symbol-card heading «Inductor (coil)»;
   // wrapping the entire heading would turn the whole title into a
   // tooltip target and disrupt the symbol-card layout).
-  ch0_5: new Set(['dc', 'inductor', 'transistor', 'npn', 'pnp', 'base', 'collector', 'emitter']),
+  ch0_5: new Set(['dc', 'inductor', 'transistor', 'npn', 'pnp', 'base', 'collector', 'emitter', 'limiter']),
   // ch1_10 «capacitance» — same pattern as ch1_6's «time constant».
   // The varactor entry uses «junction capacitance» (a separate
   // glossary key with its own definition — depletion-region physics,
@@ -150,7 +168,7 @@ const EXEMPT_PER_CHAPTER = {
   // bare-word regex sees «capacitance» inside «junction capacitance»
   // and counts it as unwrapped. The wider phrase IS the correct
   // tooltip target here.
-  ch1_10: new Set(['capacitance', 'transistor', 'base', 'gate', 'drain']),
+  ch1_10: new Set(['capacitance', 'transistor', 'base', 'gate', 'drain', 'detector']),
   // ch1_2 «drain» — passing reference (parasitic drain on a battery
   // analogy), not a FET drain terminal.
   // «modulation» — only in the power-ladder label «small AM broadcast
@@ -173,7 +191,7 @@ const EXEMPT_PER_CHAPTER = {
   // «sideband» — appears only inside the already-wrapped «<ssb>SSB</ssb>
   // (single-sideband voice)» expansion; the bare-word regex catches
   // «sideband» inside that phrase. Concept taught in ch2_2.
-  ch1_7: new Set(['solenoid', 'transistor', 'collector', 'drain', 'sideband']),
+  ch1_7: new Set(['solenoid', 'transistor', 'collector', 'drain', 'sideband', 'superheterodyne', 'intermediate frequency', 'mixer']),
   // ch1_8 «gate» — passing reference («gate-keeper» metaphor or logic
   // gate), not a FET gate terminal.
   // «baseband» — passing reference in the aliasing aside («fold back into
@@ -181,7 +199,7 @@ const EXEMPT_PER_CHAPTER = {
   // «linear amplifier» — false substring match: the only occurrence is
   // «the non-linear amplifier» in quiz_q7_b. The linear-amplifier concept
   // is taught and wrapped in ch2_3.
-  ch1_8: new Set(['gate', 'baseband', 'linear amplifier']),
+  ch1_8: new Set(['gate', 'baseband', 'linear amplifier', 'intermediate frequency', 'mixer']),
   // ch1_11: «impedance» appears only inside the wrapped «<inI>input
   // impedance</inI>» phrase (mapped to the «input impedance» glossary
   // key — a more specific tooltip target than the bare-word «impedance»
@@ -205,7 +223,7 @@ const EXEMPT_PER_CHAPTER = {
   // via the dedicated «transistor saturation» entry (wrapped via the
   // <sat> alias on first occurrence). Magnetic-core saturation is
   // irrelevant in this chapter.
-  ch1_11: new Set(['impedance', 'emi', 'saturation']),
+  ch1_11: new Set(['impedance', 'emi', 'saturation', 'local oscillator']),
 }
 
 function readGlossaryKeys() {

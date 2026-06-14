@@ -131,6 +131,36 @@ Past failure: `FlybackDiodeSchematic.tsx` shipped with `SCHEMATIC_W = 540`, cont
 
 When unsure, place all components, then in the browser DevTools console call `svg.getBBox()` on the schematic SVG to get the actual content extent and size `SCHEMATIC_W` to `bbox.x + bbox.width + ~20 px`.
 
+**Do NOT confuse «hug the content» with «make the canvas as narrow as possible».** The rule above is about not leaving empty space *inside* the viewBox. It is NOT a licence to cram. The content extent INCLUDES every label at a comfortable position — so you size the canvas around well-placed labels, not around bare component bodies with labels jammed into whatever px remain. Past failure (ch 3.1 `CrystalRadioSchematic`, user-flagged twice): I set `SCHEMATIC_W=480`, packed 6 components 70–90 px apart, hung long labels («налаштування», «навушник») to the right of vertical components where they collided with the next symbol, clipped «земля» at the viewBox bottom, and left the schematic as a narrow strip with empty card on both sides. The lab card is ~850 px usable; the fix was 670 px with components spread and labels in their own lanes.
+
+## Schematic labels: lanes, not collisions
+
+- **Long labels go in their own lane.** ABOVE a horizontal component (the diode → «детектор» above it); BELOW a vertical branch (a cap / speaker → label centred under the drop wire, below the bottom rail). NEVER hang a long label to the *side* of a vertical component — it runs into the next symbol. Short side-labels (a coil designator) are fine only when there is a genuinely wide gap to the neighbour.
+- **Every label needs clearance on all four sides** from neighbouring labels, component symbols, and the viewBox edge. Budget the label's rendered width (~7 px/char at the 14 px default) and check it against the gap to whatever is next to it — in BOTH locales (UA runs ~30–60 % wider).
+- **Leave bottom padding for the lowest label.** A `<Ground>` with a «земля»/«earth» label below it needs the label baseline ≥ ~10 px above the viewBox bottom, AFTER the ground stripes. Size `SCHEMATIC_H` accordingly; don't let the label kiss the card's rounded border.
+
+## Verifying a schematic — what the tests do NOT catch
+
+`diagram-text-overlap.test.tsx` is necessary but **not sufficient**. It does NOT catch three whole defect classes:
+
+1. **Text clipped by the viewBox / card edge** (e.g. «земля» half-cut at the bottom) — no test checks a `<text>` bbox is inside the viewBox.
+2. **Text overlapping a component SYMBOL** (e.g. «навушник» across a capacitor's plates) — the overlap test explicitly **skips elements inside `<g transform>`, which is every `@/lib/circuit` primitive**, so text-over-symbol is invisible to it.
+3. **Text-over-text** (cramped/colliding labels) — the test only samples text-vs-`<line>`/`<path>`, never text-vs-text.
+
+So a green `npm test` proves NOTHING about label placement. Process, every schematic:
+
+- **Screenshot the schematic IN ITS CARD at normal zoom FIRST** — to see overall fit, wasted side-space, and any edge clipping. ONLY THEN zoom into the graphic. Verifying by zooming straight into the drawing hides both the wasted-space problem and the card-edge clip.
+- **Read each label's BOUNDARIES** against its neighbours, the nearest symbol, and the viewBox edge — to FIND defects, not to confirm the diagram «looks fine». Legible ≠ well-placed.
+- **Never rationalise an observed defect.** If a label is even slightly clipped or touching, STOP and fix it. Writing «cut off at the very bottom but present» and moving on is the exact failure this section exists to prevent.
+
+**Built: `diagram-label-bounds.test.tsx`** — flags a `<text>` label that spills past the **RIGHT** or **BOTTOM** edge of the viewBox. It caught two real shipped clips: SineOriginDiagram's «time»/«час» axis label (right) and CrystalRadioSchematic's «земля» (bottom).
+
+It checks ALL FOUR edges, but with per-edge tolerances (the first cut dropped top/left after false positives — wrong move; the fix is tuned tolerances, not dropping edges):
+- **jsdom has no text metrics**, so label width is estimated `chars × fontSize × 0.55`, which over-counts a long label by ~25 px. A naive left/right check false-positives on every long label (AtomicDiagram's 38-char labels looked like they spilled when they fit). Fix: LEFT and RIGHT use a LENGTH-AWARE tolerance — allow horizontal overflow up to ~22 % of the label's estimated width + 3 px. Short labels (tight estimate) are still caught; long labels aren't falsely flagged.
+- **Outside-viewBox is NOT always clipped — at the TOP.** A label placed in the viewBox's top padding (RLChargingSchematic's «I» at y=3, glyph ~7 px above the frame) renders fine — top overflow shows in the card's padding instead of being cut. So TOP uses a generous fixed tolerance (16 px) that absorbs that harmless overflow while still catching a label grossly pushed off the top.
+- **BOTTOM** uses a small fixed tolerance (4 px): descender depth (≈0.2·fontSize) is predictable, so the bbox bottom is accurate. RIGHT/BOTTOM are where real clips actually get cut (SineOrigin's «time»/«час» right; CrystalRadio's «земля» bottom).
+- Still NOT gated: text-over-component-symbol. That needs per-primitive geometry and stays the job of the in-card visual review.
+
 ## Schematic junction dots
 
 Only at real T-junctions (three or more wires meeting from distinct directions). NEVER at a wire that simply turns a 90° corner — one continuous path going from horizontal to vertical is NOT a junction. NEVER at a phantom two-wire crossing.

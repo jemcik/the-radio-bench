@@ -53,6 +53,31 @@ export function Crystal({ x, y, orient = 'right', label, value }: SymbolProps) {
   )
 }
 
+/**
+ * Speaker / earpiece — loudspeaker glyph (driver box + flared cone + two
+ * sound-wave arcs). A two-terminal audio-output transducer; in a detector
+ * radio it stands for the high-impedance earpiece.
+ * Pins: (-30, 0) and (+30, 0). Drawn inline; place orient='down' for a
+ * vertical branch (cone then points sideways).
+ */
+export function Speaker({ x, y, orient = 'right', label, value }: SymbolProps) {
+  return (
+    <>
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {/* pin leads */}
+        <path d="M0 75h44M96 75h54" />
+        {/* driver box */}
+        <path d="M44 58h16v34H44z" />
+        {/* cone (flares out to the right) */}
+        <path d="M60 58 96 42v66l-36-16z" />
+        {/* two sound-wave arcs */}
+        <path d="M106 56q14 19 0 38M116 48q20 27 0 54" />
+      </VendoredSymbol>
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} />
+    </>
+  )
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // TRANSFORMER
 // ──────────────────────────────────────────────────────────────────────────────

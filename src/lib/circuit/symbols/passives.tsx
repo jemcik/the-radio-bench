@@ -79,6 +79,27 @@ export function Capacitor({ x, y, orient = 'right', label, value }: SymbolProps)
 }
 
 /**
+ * Capacitor — variable (tuning). The non-polarised plates with a diagonal
+ * arrow drawn through them — the standard «adjustable» convention used for
+ * tuning capacitors in a tuned circuit.
+ * Pins: (-30, 0) and (+30, 0).
+ */
+export function CapacitorVariable({ x, y, orient = 'right', label, value }: SymbolProps) {
+  return (
+    <>
+      <VendoredSymbol x={x} y={y} orient={orient}>
+        {/* plates + pin wires — identical to Capacitor */}
+        <path d="M150 74.97H84.5M0 75.25h66.5M54 44s12.5 12.25 12.5 31S54 106 54 106m30.5-62v62" />
+        {/* adjustability arrow: diagonal shaft through both plates + arrowhead */}
+        <path d="M30 118 113 38" />
+        <path d="M113 38 96 41m17-3-3 17" />
+      </VendoredSymbol>
+      <PassiveLabel x={x} y={y} orient={orient} label={label} value={value} />
+    </>
+  )
+}
+
+/**
  * Capacitor — polarised (electrolytic) with curved plate and «+» marker.
  * Source: Capacitor-IEEE-Polarized.svg
  * Pins: (-30, 0) and (+30, 0).

@@ -822,7 +822,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   selectivity: {
     tip: 'A receiver or filter\'s ability to separate a wanted frequency from a nearby unwanted one — driven by the Q of its tuned circuits.',
     detail:
-      'Selectivity is the qualitative term for how cleanly a circuit picks out one frequency from its neighbours. A highly selective receiver can hear a 14.250 MHz signal while ignoring a much stronger station 5 kHz away on 14.245 MHz; a poorly selective one cannot. Selectivity is not a single number — it depends on the shape of the response curve, not just one bandwidth value. A common quantitative measure is «shape factor»: the ratio of the −60 dB bandwidth to the −6 dB bandwidth. A perfect rectangular filter has a shape factor of 1; cheap LC filters land around 5–10; multi-pole crystal and mechanical filters approach 1.5–2. In practice, a single LC tank gives modest selectivity; cascading several tanks (with the right coupling between them) sharpens the skirts dramatically and is the basis of the IF filter chain in every superhet receiver.',
+      'Selectivity is the qualitative term for how cleanly a circuit picks out one frequency from its neighbours. A highly selective receiver can hear a 14.250 MHz signal while ignoring a much stronger station 5 kHz away on 14.245 MHz; a poorly selective one cannot. Selectivity is not a single number — it depends on the shape of the response curve, not just how wide the passband is. Engineers put a number on that shape with the «shape factor», which says how steep the filter\'s edges are. You measure the passband\'s width near the top — where the signal has dropped by 6 dB, to about half its voltage — and again far down where it has dropped by 60 dB (practically gone), then divide the lower width by the upper one. A perfect «brick-wall» filter is just as narrow at the bottom as at the top, so its shape factor is 1 — perfectly vertical edges; the larger the number, the more the edges slope outward. Cheap LC filters land around 5–10, while multi-pole crystal and mechanical filters approach a steep 1.5–2. In practice, a single LC tank gives modest selectivity; cascading several tanks (with the right coupling between them) sharpens the skirts dramatically and is the basis of the IF filter chain in every superhet receiver.',
     see: ['q-factor', 'bandwidth', 'resonance', 'filter'],
   },
   'characteristic impedance': {
@@ -1510,5 +1510,87 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'A crystal oscillator uses a piezoelectric quartz crystal as the frequency-selective element in the feedback loop. Electrically the crystal behaves like an LC tank with a very high Q factor — typically tens of thousands, against a couple of hundred for a coil-and-capacitor tank — so the oscillation frequency barely drifts with temperature, supply voltage, or mechanical knocks. The trade-off is that a crystal is cut for one fixed frequency and can only be «pulled» a few parts per million, so it is not tunable across a band the way an LC VFO is. Crystals are the timekeeping reference in nearly all digital and radio equipment; the same 32.768 kHz crystal that ticks in a quartz watch keeps time in countless microcontrollers. Common crystal-oscillator circuits include the Pierce and Colpitts topologies.',
     see: ['oscillator', 'vfo', 'q-factor'],
+  },
+
+  // ── Receivers (Chapter 3.1) ──────────────────────────────────────
+  superheterodyne: {
+    tip: 'A receiver design that shifts every incoming station down to one fixed «intermediate» frequency, where a single well-tuned filter and amplifier do all the selecting and amplifying.',
+    detail:
+      'The superheterodyne (or «superhet») mixes each incoming signal with a local oscillator to produce a fixed intermediate frequency (IF), then does almost all of its filtering and amplification at that one frequency. Because the hard work happens at a single fixed frequency, the sharp selectivity and high gain are built and tuned once instead of being re-tuned for every station — tuning the radio just means moving the local oscillator. Invented by Edwin Armstrong in 1918, it is the architecture behind nearly every receiver made since. Its one weakness is the image frequency: a second input frequency, twice the IF away from the wanted one, that maps to the same IF and must be rejected by a filter ahead of the mixer.',
+    see: ['mixer', 'intermediate frequency', 'local oscillator', 'image frequency', 'trf'],
+  },
+  trf: {
+    tip: 'Tuned Radio Frequency receiver — the simplest design, where every stage is tuned to the station\'s own frequency and the signal travels «straight» through to the detector.',
+    detail:
+      'A TRF («tuned radio frequency»), or «straight», receiver amplifies and filters the signal at the station\'s own frequency, with no frequency conversion. Several tuned RF amplifier stages in a row select and boost the signal, then a detector recovers the audio. It works — it was the first practical design — but it has three weaknesses the superheterodyne fixes: every tuned stage must be re-tuned together to change station, the selectivity changes across the band, and high gain at one frequency tends to break into oscillation. A crystal radio is the most basic TRF receiver of all.',
+    see: ['superheterodyne', 'selectivity', 'detector'],
+  },
+  'intermediate frequency': {
+    tip: 'The single fixed frequency a superheterodyne shifts every station down to, where all the sharp filtering and most of the gain happen.',
+    detail:
+      'The intermediate frequency (IF) is the fixed frequency produced when the mixer beats the incoming signal against the local oscillator — the difference between the two. Every station, wherever it sits in the band, is converted to this same IF, so the receiver\'s sharp filter and high-gain amplifier are built and tuned once for all stations. The choice of IF is a trade-off: a higher IF pushes the image frequency further away (easier to reject), while a lower IF makes narrow, sharp selectivity easier to build. Classic values are 455 kHz for AM broadcast and HF sets, 10.7 MHz for FM broadcast receivers, and around 9 MHz in HF amateur rigs.',
+    unit: 'Hz (kHz, MHz)',
+    see: ['superheterodyne', 'mixer', 'image frequency'],
+  },
+  mixer: {
+    tip: 'A stage that combines two frequencies and produces their sum and difference — the heart of the frequency-shifting in a superheterodyne.',
+    detail:
+      'A mixer takes two signals — the incoming station and the local oscillator — and produces new signals at the sum and the difference of their frequencies (this combining is called heterodyning). In a superheterodyne receiver a filter keeps the difference, which is the fixed intermediate frequency, so the mixer is the stage that slides the chosen station down to the IF. The same process, run the other way, shifts a signal up to the transmit frequency in a transmitter. Because only the size of the gap between its two inputs matters, the mixer cannot tell a wanted signal from its image, which sits the same gap away on the other side of the local oscillator.',
+    see: ['superheterodyne', 'local oscillator', 'intermediate frequency', 'image frequency'],
+  },
+  'local oscillator': {
+    tip: 'The oscillator inside a receiver that the mixer beats the incoming signal against; tuning the radio means moving its frequency.',
+    detail:
+      'The local oscillator (LO) generates a clean, steady tone inside the receiver for the mixer to beat the incoming signal against. Its frequency decides which station lands on the fixed intermediate frequency, so the LO is the tuning control: a variable-frequency oscillator (VFO) sweeps it across a band, or a switchable crystal oscillator fixes it on set channels. Keeping the LO clean and stable matters — drift moves the station off the IF filter, and oscillator noise can let strong nearby signals leak in.',
+    see: ['oscillator', 'mixer', 'superheterodyne', 'vfo'],
+  },
+  bfo: {
+    tip: 'Beat Frequency Oscillator — a small oscillator that supplies the carrier CW and SSB leave out, so the detector can turn them back into sound.',
+    detail:
+      'The beat frequency oscillator (BFO) is an extra oscillator used only for CW and SSB reception. CW (Morse) is just a carrier switched on and off, and SSB has had its carrier removed to save power; in both cases the detector needs a carrier to beat against. The BFO supplies it: beating against a Morse carrier turns each dot and dash into an audible tone (typically around 600 Hz), and feeding a product detector lets it rebuild an SSB voice. For AM and FM the BFO is switched off.',
+    see: ['cw', 'ssb', 'detector', 'carrier'],
+  },
+  squelch: {
+    tip: 'A circuit that mutes a receiver\'s audio when no signal is present, so you do not have to listen to background hiss between transmissions.',
+    detail:
+      'Squelch silences the audio amplifier whenever the received signal falls below a set threshold, so an idle channel stays quiet instead of pouring out background noise. It is most associated with FM, where an unused channel hisses loudly; the squelch opens the moment a signal appears and closes again when it ends. A simple «carrier» squelch responds to signal strength; more selective schemes (such as CTCSS sub-audible tones) open only for signals carrying the right tone.',
+    see: ['fm', 'detector'],
+  },
+  'image frequency': {
+    tip: 'An unwanted second frequency, twice the intermediate frequency away from the station you want, that the mixer shifts down to the same IF.',
+    detail:
+      'Because a mixer only knows the size of the gap between the station and the local oscillator, two input frequencies — one on each side of the oscillator — produce the same intermediate frequency. The wanted station is one; the image is the other, sitting twice the IF away. A strong signal on the image frequency lands right on top of the wanted one and cannot be separated after mixing, so it must be rejected before the mixer by the tuned front-end filter. Raising the IF moves the image further away and makes it easier to filter out — one of the main reasons receivers use the IF values they do.',
+    formula: 'f_image = f_RF ± 2 × f_IF',
+    see: ['superheterodyne', 'mixer', 'intermediate frequency'],
+  },
+  detector: {
+    tip: 'The stage that recovers the original message — voice, Morse or data — from the modulated signal; also called a demodulator.',
+    detail:
+      'The detector (or demodulator) undoes what the transmitter\'s modulator did, recovering the audio or data from the radio signal. The circuit depends on the mode: AM uses a diode envelope detector that follows the rising and falling amplitude; SSB and CW use a product detector together with a BFO that supplies the missing carrier; FM uses a limiter followed by a discriminator that converts frequency changes into audio. In a superheterodyne the detector always works at the fixed intermediate frequency, so it never has to change as you tune from one station to another — the only thing that decides which detector you need is the mode, not the frequency.',
+    see: ['envelope', 'am', 'ssb', 'fm', 'bfo'],
+  },
+  'high-impedance earpiece': {
+    tip: 'A crystal or magnetic earpiece with a high impedance (a few kΩ up to tens of kΩ), able to turn the tiny power a detector radio recovers into sound.',
+    detail:
+      'A high-impedance earpiece is the classic output for a crystal (detector) radio, which has no amplifier and pulls only microwatts from the antenna. Its high impedance — a piezo/crystal element runs to tens of kΩ, a sensitive magnetic type is a few kΩ — lets it make sound from very little power. A normal 8 Ω loudspeaker or low-impedance earbud would load the detector right down and stay silent. If all you have is low-impedance headphones, a small audio transformer (high-impedance primary, low-impedance secondary) matches them to the detector.',
+    see: ['impedance', 'detector'],
+  },
+  sensitivity: {
+    tip: 'A receiver\'s ability to hear very weak signals; set by how little noise the receiver\'s own front-end electronics add.',
+    detail:
+      'Sensitivity measures the smallest signal a receiver can pull out of the noise and still present usefully — often just a fraction of a microvolt at the antenna. It is limited not by raw gain (gain is easy) but by the noise the receiver\'s own first stages add: the RF amplifier and mixer at the front end set the floor, which is why the RF amplifier is built to be as quiet as possible. Beyond a point, more gain only amplifies the noise along with the signal, so sensitivity is really about a good signal-to-noise ratio at the front end. It is the natural partner of selectivity — one is about hearing the weak, the other about rejecting the unwanted.',
+    see: ['selectivity', 'detector'],
+  },
+  limiter: {
+    tip: 'An FM stage that flattens the signal to a constant amplitude, clipping off noise spikes before the discriminator recovers the audio.',
+    detail:
+      'A limiter clips the intermediate-frequency signal to a constant amplitude, removing any variation in strength. In an FM receiver this is essential: FM carries its message in frequency, not amplitude, so anything riding on the amplitude — static crashes, ignition noise, fading — is unwanted, and the limiter strips it away before the discriminator. This is a large part of why FM sounds so much cleaner than AM in the presence of noise. AM and SSB, whose information lives in the amplitude, must not be limited.',
+    see: ['fm', 'discriminator', 'detector'],
+  },
+  discriminator: {
+    tip: 'An FM detector that turns the signal\'s frequency changes into an audio voltage.',
+    detail:
+      'A discriminator is the detector used for FM: it produces an output voltage that follows the instantaneous frequency of the signal, so as the carrier swings up and down the output reproduces the original audio. Classic forms exploit the steep slope of a tuned circuit (the Foster–Seeley discriminator and the ratio detector); modern radios often do the same job digitally. It is normally preceded by a limiter, which removes amplitude variations the discriminator would otherwise pass on as noise.',
+    see: ['fm', 'limiter', 'detector'],
   },
 }

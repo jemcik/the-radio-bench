@@ -266,7 +266,7 @@ export const PARTS: Part[] = [
         part: 3,
         title: 'Receivers',
         subtitle: 'TRF, superheterodyne, block diagram stage by stage',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['4.1', '4.2', '4.3'],
