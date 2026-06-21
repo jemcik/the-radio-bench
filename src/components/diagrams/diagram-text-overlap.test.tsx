@@ -36,10 +36,24 @@
  *     family must keep it in that filter regime, otherwise the gate
  *     will flag every label sitting on top of it.
  *
+ * Box overlap (<rect>)
+ * ────────────────────
+ * Block-diagram labels normally sit CENTRED INSIDE their own box, so a
+ * naive text-vs-rect test would flag every «Генерація»-in-a-box title.
+ * The gate instead flags only labels whose bbox overlaps a foreground
+ * <rect> by ≥ 2 px in BOTH dimensions WHILE their centre falls OUTSIDE
+ * that rect — i.e. a caption from elsewhere poking into a box, not a
+ * label living in its container. Added June 2026 after the ch3.2
+ * «ваше повідомлення» caption (left-anchored, wide UA string) ran under
+ * the first job box's lower-left corner. The bug was invisible because
+ * this gate sampled only <line>/<path>/<circle>, never <rect>; the EN
+ * string «your message» was short enough to miss the box, so EN passed
+ * both the gate and the (EN-only) visual pass and the UA overlap shipped.
+ *
  * Not covered
  * ───────────
  *   • Path-on-path overlap (one curve crossing another curve).
- *   • <rect> / <circle> / <polygon> shapes — only <line> and <path>.
+ *   • <polygon> shapes — only <line>, <path>, <circle> and <rect>.
  *   • Animated transforms (CSS transforms) — bboxes are computed from
  *     authoring coordinates, not the visible animated state.
  *
@@ -134,6 +148,7 @@ const SKIP_FILES = new Set([
   // kept well clear of the traces; verified visually via Claude-in-Chrome.
   './AudioDigitalWaveforms.tsx', // digital row is a square wave (flat top/bottom levels are the signal)
   './CarrierKnobs.tsx',          // message / FM / PM rows are pure sinusoids (real peaks, not clip rails)
+  './ClassModeMatch.tsx',        // AM-envelope curves are pure sinusoids (real crests, not clip rails); labels are simple panel titles, verified visually
 ])
 
 const DIAGRAMS = Object.entries(modules)
@@ -307,6 +322,29 @@ function circleCrossesBBox(cx: number, cy: number, r: number, bb: BBox): boolean
   return Math.sqrt(dx * dx + dy * dy) <= r + TOLERANCE_PX
 }
 
+/**
+ * True when a foreground <rect> (a block-diagram box, a bracket frame, …)
+ * overlaps the text bbox by ≥ 2 px in BOTH dimensions WHILE the text's
+ * centre lies OUTSIDE the rect.
+ *
+ * The centre-outside clause is what makes this usable on block diagrams: a
+ * label centred inside its own box (its container) is the norm and must not
+ * flag, whereas a caption whose home is elsewhere but whose edge pokes into
+ * a neighbouring box IS the bug. Validated on the ch3.2 jobs diagram — the
+ * three box titles («Генерація» …) have their centres inside their boxes
+ * (ignored), while «ваше повідомлення» had its centre to the LEFT of the
+ * first box yet overlapped its lower-left corner (flagged).
+ */
+function rectCrossesBBox(rx: number, ry: number, rw: number, rh: number, bb: BBox): boolean {
+  const overlapX = Math.min(bb.x + bb.w, rx + rw) - Math.max(bb.x, rx)
+  const overlapY = Math.min(bb.y + bb.h, ry + rh) - Math.max(bb.y, ry)
+  if (overlapX < 2 || overlapY < 2) return false
+  const cx = bb.x + bb.w / 2
+  const cy = bb.y + bb.h / 2
+  const centreInside = cx >= rx && cx <= rx + rw && cy >= ry && cy <= ry + rh
+  return !centreInside
+}
+
 function pathCrossesBBox(d: string, bb: BBox): boolean {
   // Walk every M / L command; check both endpoints AND interpolate
   // between consecutive points, so a curve segment that spans a label
@@ -374,9 +412,18 @@ function isInsideTransformedGroup(el: Element): boolean {
 
 /* ── The actual test ──────────────────────────────────────────────── */
 
+// Render each diagram in BOTH locales. Rendering only EN was a real blind
+// spot: the ch3.2 «ваше повідомлення» caption overlapped the first job box
+// ONLY in Ukrainian (17 chars, ~124 px) — EN «your message» (12 chars,
+// ~86 px) stopped 2 px short of the box, so an EN-only sweep passed while the
+// UA build shipped the overlap. UA strings are wider far more often than not,
+// so UA is where most label-collision regressions surface; EN stays because a
+// few labels are wider in EN (expanded acronyms, longer English compounds).
+const LOCALES = ['en', 'uk'] as const
+
 describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Component }) => {
-  it('no <text> bbox is crossed by any foreground <line> or <path>', () => {
-    const { container } = renderWithProviders(<Component />)
+  it.each(LOCALES)('no <text> bbox is crossed by a foreground shape (%s)', (language) => {
+    const { container } = renderWithProviders(<Component />, { language })
     const findings: string[] = []
 
     for (const svg of Array.from(container.querySelectorAll('svg'))) {
@@ -384,6 +431,18 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
       const lines = Array.from(svg.querySelectorAll('line')) as SVGLineElement[]
       const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[]
       const circles = Array.from(svg.querySelectorAll('circle')) as SVGCircleElement[]
+      const rects = Array.from(svg.querySelectorAll('rect')) as SVGRectElement[]
+
+      // SVG canvas area, used to tell a CONTENT box (small — a block-diagram
+      // node, ~4 % of canvas) from a FRAME/BACKGROUND rect (a plot-area border
+      // or full-canvas fill, ≥ 50 %). Axis titles legitimately graze the top
+      // edge of a plot frame; only content boxes get the text-vs-rect check.
+      // bboxes here are computed from attributes (jsdom has no getBBox), so the
+      // canvas size comes from the viewBox (preferred) or width/height attrs.
+      const vb = (svg.getAttribute('viewBox') ?? '').split(/[\s,]+/).map(Number).filter(n => !Number.isNaN(n))
+      const svgW = vb.length === 4 ? vb[2] : parseFloat(svg.getAttribute('width') ?? '0')
+      const svgH = vb.length === 4 ? vb[3] : parseFloat(svg.getAttribute('height') ?? '0')
+      const svgArea = svgW * svgH
 
       // Collect every text bbox first so we can do pairwise text-vs-text
       // checks below without rebuilding bboxes inside the inner loops.
@@ -428,6 +487,23 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
               )
             }
           }
+
+          for (const rect of rects) {
+            if (isBackground(rect) || isInsideTransformedGroup(rect)) continue
+            const rx = parseFloat(rect.getAttribute('x') ?? '0')
+            const ry = parseFloat(rect.getAttribute('y') ?? '0')
+            const rw = parseFloat(rect.getAttribute('width') ?? '0')
+            const rh = parseFloat(rect.getAttribute('height') ?? '0')
+            if (!(rw > 0 && rh > 0)) continue
+            // A rect spanning ≥ 50 % of the canvas is a plot frame / background,
+            // not a content box — labels legitimately sit at its edge. Skip it.
+            if (svgArea > 0 && rw * rh >= 0.5 * svgArea) continue
+            if (rectCrossesBBox(rx, ry, rw, rh, bbox)) {
+              findings.push(
+                `text "${bbox.label}" at (${bbox.x.toFixed(0)}, ${bbox.y.toFixed(0)}, ${bbox.w.toFixed(0)}×${bbox.h.toFixed(0)}) pokes into <rect> (${rx.toFixed(0)},${ry.toFixed(0)},${rw.toFixed(0)}×${rh.toFixed(0)}) with its centre outside the box`,
+              )
+            }
+          }
         }
       }
 
@@ -446,6 +522,42 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
               `text "${a.bbox.label}" at (${a.bbox.x.toFixed(0)}, ${a.bbox.y.toFixed(0)}, ${a.bbox.w.toFixed(0)}×${a.bbox.h.toFixed(0)}) overlaps text "${b.bbox.label}" at (${b.bbox.x.toFixed(0)}, ${b.bbox.y.toFixed(0)}, ${b.bbox.w.toFixed(0)}×${b.bbox.h.toFixed(0)})`,
             )
           }
+        }
+      }
+
+      // ── Label fits its own block ─────────────────────────────────────
+      // A label centred INSIDE a content box must not spill past that box's
+      // left/right edge. The neighbour-collision check (text-vs-rect, above)
+      // only fires when a too-wide label reaches an ADJACENT block; a label
+      // that merely overflows its OWN box — its centre still inside it — slips
+      // straight through. ch3.2 shipped this twice on the same PA block (UA
+      // «підсилювач потужності» 133 px, then «кінцевий каскад» 93 px, both
+      // wider than the 82-px block) because nothing compared a label to its
+      // container. Now it does, in both locales.
+      const contentRects = rects
+        .filter(r => !isBackground(r) && !isInsideTransformedGroup(r))
+        .map(r => ({
+          x: parseFloat(r.getAttribute('x') ?? '0'),
+          y: parseFloat(r.getAttribute('y') ?? '0'),
+          w: parseFloat(r.getAttribute('width') ?? '0'),
+          h: parseFloat(r.getAttribute('height') ?? '0'),
+        }))
+        .filter(r => r.w > 0 && r.h > 0 && !(svgArea > 0 && r.w * r.h >= 0.5 * svgArea))
+      const FIT_TOL = 3 // px slack for the char-width approximation
+      for (const { bbox } of textBBoxList) {
+        const cx = bbox.x + bbox.w / 2
+        const cy = bbox.y + bbox.h / 2
+        // the smallest content box whose area contains the label's centre = its container
+        const box = contentRects
+          .filter(r => cx >= r.x && cx <= r.x + r.w && cy >= r.y && cy <= r.y + r.h)
+          .sort((a, b) => a.w * a.h - b.w * b.h)[0]
+        if (!box) continue
+        const spill = Math.max(box.x - bbox.x, bbox.x + bbox.w - (box.x + box.w))
+        if (spill > FIT_TOL) {
+          findings.push(
+            `text "${bbox.label}" (${bbox.w.toFixed(0)} px wide) overflows its own block ` +
+            `<rect> (${box.w.toFixed(0)} px wide) — spills ${spill.toFixed(0)} px past the edge`,
+          )
         }
       }
     }

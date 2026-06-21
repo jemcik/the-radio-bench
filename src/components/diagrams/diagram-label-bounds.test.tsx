@@ -42,6 +42,11 @@ const BOTTOM_TOL = 4 // px — descender estimate is small & predictable
 const TOP_TOL = 16 // px — generous: top overflow renders in the card's padding, not clipped
 const HORIZ_WIDTH_FRACTION = 0.22 // allow left/right overflow up to this × label width
 const HORIZ_TOL_BASE = 3 // px — constant slack on top of the width-aware part
+// Cap on the width-aware allowance: a long label can over-count by ~25 px, but a
+// genuine clip on a long label (the ch3.2 «CW» row: 38 px real / ~56 px estimated)
+// must still be caught. Without the cap, 0.22 × a 416-px label = 91 px of slack
+// swallowed the clip whole. 44 px clears the worst real over-count yet flags the clip.
+const HORIZ_TOL_CAP = 44
 
 const modules = import.meta.glob<{ default: React.FC }>('./*.tsx', { eager: true })
 
@@ -132,9 +137,14 @@ function svgBounds(svg: SVGSVGElement): { w: number; h: number } | null {
   return null
 }
 
+// Render in BOTH locales: a clip is usually UA-only, because UA strings run
+// longer than EN. The ch3.2 emission-designator «CW» row shipped cut off in UA
+// while EN fit — an EN-only sweep saw nothing. (Same lesson as the overlap gate.)
+const LOCALES = ['en', 'uk'] as const
+
 describe.each(DIAGRAMS)('$name — labels stay inside the viewBox', ({ Component }) => {
-  it('no <text> label spills past any edge of the viewBox', () => {
-    const { container } = renderWithProviders(<Component />)
+  it.each(LOCALES)('no <text> label spills past any edge of the viewBox (%s)', (language) => {
+    const { container } = renderWithProviders(<Component />, { language })
     const findings: string[] = []
 
     for (const svg of Array.from(container.querySelectorAll('svg'))) {
@@ -145,7 +155,7 @@ describe.each(DIAGRAMS)('$name — labels stay inside the viewBox', ({ Component
       for (const text of Array.from(svg.querySelectorAll('text')) as SVGTextElement[]) {
         if (isInsideTransformedGroup(text)) continue
         for (const bb of textBBoxes(text)) {
-          const horizTol = bb.w * HORIZ_WIDTH_FRACTION + HORIZ_TOL_BASE
+          const horizTol = Math.min(bb.w * HORIZ_WIDTH_FRACTION + HORIZ_TOL_BASE, HORIZ_TOL_CAP)
           const rightOverflow = bb.x + bb.w - vbW
           if (rightOverflow > horizTol) {
             findings.push(`"${bb.label}" clipped at RIGHT (x+w=${(bb.x + bb.w).toFixed(0)} > viewBox w=${vbW}, overflow ${rightOverflow.toFixed(0)} > tol ${horizTol.toFixed(0)})`)

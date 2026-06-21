@@ -277,7 +277,7 @@ export const PARTS: Part[] = [
         part: 3,
         title: 'Transmitters',
         subtitle: 'CW, SSB, FM block diagrams; harmonics and why filters matter',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['5.1', '5.2', '5.3'],
