@@ -370,7 +370,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   deviation: {
     tip: 'In FM, how far the carrier\'s frequency swings away from its rest value — set by the loudness of the audio.',
     detail:
-      'Frequency deviation is the amount an FM carrier shifts above and below its rest (centre) frequency. The louder the audio, the larger the deviation; the pitch of the audio sets how fast the frequency wobbles, not how far. Amateur FM on VHF/UHF typically uses about ±5 kHz deviation, with narrowband channels at about ±2.5 kHz. Deviation drives the signal\'s bandwidth: wider deviation means a wider signal (see Carson\'s rule).',
+      'Frequency deviation is the amount an FM carrier shifts above and below its rest (centre) frequency. The louder the audio, the larger the deviation — how far the carrier\'s frequency swings from centre; the pitch of the audio sets how fast it swings back and forth around that centre, not how far. Amateur FM on VHF/UHF typically uses about ±5 kHz deviation, with narrowband channels at about ±2.5 kHz. Deviation drives the signal\'s bandwidth: wider deviation means a wider signal (see Carson\'s rule).',
     unit: 'Hertz (Hz)',
     see: ['fm', 'modulation index', "carson's rule", 'bandwidth'],
   },

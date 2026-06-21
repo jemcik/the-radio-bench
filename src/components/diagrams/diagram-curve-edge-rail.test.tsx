@@ -79,6 +79,7 @@ const SKIP_FILES = new Set([
   './AudioDigitalWaveforms.tsx', // the digital row is a square wave — its flat top/bottom levels ARE the signal; the analog row's sine-sum peak dwells a few samples (real extremum, not a clip)
   './CarrierKnobs.tsx', // message / FM / PM rows are pure sinusoids — densely-sampled peaks register as flat rails but are real signal extrema (same class as EMWaveDiagram)
   './AmplifierClassChart.tsx', // filled device-current pulses: the non-conducting part of each cycle sits at the baseline (zero current = device off) along the bbox bottom — a real signal flat (like a square wave's low level), not a clip artifact; the Class-A raised-cosine peak dwells a few samples at the top extremum
+  './ClassModeMatch.tsx', // AM-envelope row: the envelope curves are pure sinusoids whose densely-sampled crests register as flat rails but are real signal extrema (same class as CarrierKnobs / EMWaveDiagram), not a clip artifact
 ])
 
 const DIAGRAMS = Object.entries(modules)
