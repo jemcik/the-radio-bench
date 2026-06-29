@@ -12,11 +12,18 @@
  * while real clips still do (the first cut of this gate dropped top/left
  * entirely; the right move is per-edge tolerances, not dropping edges):
  *   • LEFT / RIGHT — LENGTH-AWARE. jsdom has no real text metrics, so
- *     width is estimated `chars × fontSize × 0.55`, which over-counts a
- *     long label by ~25 px (AtomicDiagram's 38-char labels looked like
- *     they spilled when they fit). Allow horizontal overflow up to
- *     ~22 % of the label's estimated width + 3 px: short labels (tight
- *     estimate) are still caught; long labels aren't falsely flagged.
+ *     width is estimated `chars × fontSize × 0.55`. Allow horizontal
+ *     overflow up to ~10 % of the label's estimated width + 1 px, capped
+ *     at 44 px: short labels (tight estimate) are caught; long labels,
+ *     whose estimate over-counts by a near-constant fraction, aren't
+ *     falsely flagged. **Tightened from 0.22/3 to 0.10/1 (ch3_3, June
+ *     2026)** after CoaxVsTwinLead shipped UA «діелектрик» clipped to
+ *     «іелектрик»: end-anchored at x=60, the Cyrillic word's left edge
+ *     landed at x≈−9, but the old 18 px tolerance swallowed the ~9 px
+ *     overflow. At 0.10/1 the tolerance is ~8 px, so that clip fires,
+ *     and the full suite (every diagram × en/uk) still passes — no new
+ *     false positives. The margin is deliberately tight; the in-card UA
+ *     visual review remains the real backstop for sub-glyph clips.
  *   • BOTTOM — small fixed tolerance (4 px): descender depth
  *     (≈0.2·fontSize) is predictable, so the bbox bottom is accurate.
  *   • TOP — generous fixed tolerance (16 px). TOP overflow is the odd
@@ -40,8 +47,8 @@ const FONT_HEIGHT_RATIO = 1.1
 const ASCENT_RATIO = 0.8
 const BOTTOM_TOL = 4 // px — descender estimate is small & predictable
 const TOP_TOL = 16 // px — generous: top overflow renders in the card's padding, not clipped
-const HORIZ_WIDTH_FRACTION = 0.22 // allow left/right overflow up to this × label width
-const HORIZ_TOL_BASE = 3 // px — constant slack on top of the width-aware part
+const HORIZ_WIDTH_FRACTION = 0.10 // allow left/right overflow up to this × label width
+const HORIZ_TOL_BASE = 1 // px — constant slack on top of the width-aware part
 // Cap on the width-aware allowance: a long label can over-count by ~25 px, but a
 // genuine clip on a long label (the ch3.2 «CW» row: 38 px real / ~56 px estimated)
 // must still be caught. Without the cap, 0.22 × a 416-px label = 91 px of slack

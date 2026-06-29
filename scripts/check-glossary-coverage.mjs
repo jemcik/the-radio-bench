@@ -180,8 +180,39 @@ const EXEMPT_PER_CHAPTER = {
   // base terminal. The English bare word collides.
   ch1_3: new Set(['base']),
   // ch1_5 «drain» — passing reference (charge draining off a cap),
-  // not a FET drain.
-  ch1_5: new Set(['mlcc', 'pcb', 'drain']),
+  // not a FET drain. «radial» — capacitor lead geometry («radial
+  // electrolytic», «two downward radial leads»), NOT an antenna radial
+  // (the ch3_3 glossary term); the bare word collides.
+  ch1_5: new Set(['mlcc', 'pcb', 'drain', 'radial']),
+  // ch2_1 «velocity factor» — forward reference only: speedP2 names it
+  // («a figure called the velocity factor, which you will meet [in ch3_3]»);
+  // the concept is taught and wrapped in ch3_3, not this radio-waves chapter.
+  ch2_1: new Set(['velocity factor']),
+  // ch3_3 — antennas/transmission lines. The chapter wraps its focal terms
+  // (characteristic impedance via <ci>, impedance via <imp>, radiation
+  // resistance, standing wave, reflection coefficient, balun, unun, ATU,
+  // velocity factor, radials, ground plane, monopole, driven/parasitic
+  // element, ladder line, twin-lead, choke, …). The terms below are
+  // passing analogies, false bare-word matches, or widget-only labels:
+  //  – capacitance/capacitor/inductor/inductance — the Z₀ "ladder of tiny
+  //    coils and capacitors" analogy and the «part-capacitor/part-inductor»
+  //    off-resonance aside; the components are taught/wrapped in Part 1.
+  //  – resistor — the radiation-resistance analogy («looks like a resistor»).
+  //  – ferrite/transformer — the choke-balun ferrite ring and the 49:1
+  //    transformer (wrapped as <unun>); passing.
+  //  – filter — the verb «to filter the harmonics» in two quiz distractors.
+  //  – power amplifier — one passing mention (taught/wrapped in ch3_2).
+  //  – resonant frequency — covered here by the <reson> resonance wrap.
+  //  – decibel — the idiom «every decibel you win» (taught in ch0_4).
+  //  – capacitance — «(capacitance to the surroundings)» end-effect aside.
+  //  – base — «spreading from its base» in a diagram aria, not a BJT base.
+  //  – return loss / envelope — appear only in the SWR-explorer widget
+  //    readout label / aria-label (non-wrappable contexts).
+  ch3_3: new Set([
+    'capacitance', 'capacitor', 'inductor', 'inductance', 'resistor',
+    'ferrite', 'transformer', 'filter', 'power amplifier',
+    'resonant frequency', 'decibel', 'base', 'return loss', 'envelope',
+  ]),
   // ch1_6 — transistor/base/collector mentioned in coil-driver lab
   // and ferrite-bead context; passing references, not the chapter's
   // focus (inductors). Concept-focal coverage lives in ch1_11.

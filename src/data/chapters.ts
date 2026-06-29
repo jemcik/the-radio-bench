@@ -288,7 +288,7 @@ export const PARTS: Part[] = [
         part: 3,
         title: 'Antennas and Transmission Lines',
         subtitle: 'Dipole, vertical, Yagi, coax, SWR — build and measure with the VNA',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['6.1', '6.2', '6.3'],
