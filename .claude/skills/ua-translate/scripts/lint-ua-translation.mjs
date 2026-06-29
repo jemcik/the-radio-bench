@@ -332,6 +332,23 @@ const RULES = [
   },
 
   {
+    id: 'forbidden.pronoun-pair-no-antecedent',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // «від одного до іншої» / «з однієї до іншого» — a bare indefinite-pronoun
+    // pair standing in for two UNNAMED nouns ("from one to the other"). Reads
+    // unnatural in UA, forces the reader to hunt for antecedents, and the gender
+    // often mismatches (ч. «одного» + ж. «іншої»). Fix by anchoring the pronoun
+    // to a named noun — «від одного КІНЦЯ до іншого» — or naming the partners
+    // outright — «від трансивера до антени». Discriminator: the pronoun is
+    // IMMEDIATELY followed by «до» (no noun in between), so the anchored form
+    // «від одного кінця до іншого» does NOT match. Flagged by the user on
+    // ch3_3.linesP1 («перенести потужність від одного до іншої»).
+    pattern: /(?<!\p{L})(?:від|з|зі)\s+(?:одного|одної|однієї)\s+до\s+(?:інш\p{L}+|друг\p{L}+)/giu,
+    hint: 'Bare pronoun pair «від одного до іншої» ("from one to the other") with no named antecedent. Anchor to a noun — «від одного кінця до іншого» — or name the partners — «від трансивера до антени».',
+  },
+
+  {
     id: 'style.missing-nbsp-volt',
     category: 'STYLE',
     severity: 'WARN',
@@ -617,13 +634,16 @@ const RULES = [
     // two consecutive dashes — the em-dash and the unary minus
     // visually collide. User-flagged on ch1.8 `keyTakeaway3` /
     // `orderRule` / `glossary.order.detail` («2-го — −40 дБ/декаду»
-    // → reader sees what looks like two minus signs in a row).
-    // Fix: insert a noun (e.g. «спад», «крутість», «це»), restructure
-    // as a full sentence, or use a colon — anything that places a
-    // non-digit/non-minus character between the em-dash and the
-    // minus.
-    pattern: /—\s*−\s*\d/g,
-    hint: 'Em-dash directly before a minus sign reads as two consecutive dashes («— −40» visually mashes the em-dash and the minus). Insert a noun («— спад −40 дБ»), restructure to a full sentence, or use a colon. Never `— −digit`.',
+    // → reader sees what looks like two minus signs in a row), and
+    // again on ch3.3 `transducerP2` («а нижній — <strong>−</strong>»,
+    // an elided-verb dash straight before a charge sign). The minus
+    // may be a number OR a polarity/charge sign, and may sit inside a
+    // <strong> (or other) tag — match all of those.
+    // Fix: place a non-dash character between the em-dash and the
+    // minus — repeat the verb («а нижній стає −»), insert a noun
+    // («— спад −40 дБ»), restructure as a full sentence, or use a colon.
+    pattern: /—\s*(?:<[^>]+>\s*)*−/g,
+    hint: 'Em-dash directly before a minus sign reads as two consecutive dashes — whether the minus is a number («— −40 дБ») or a charge/polarity sign («а нижній — −», even as «— <strong>−</strong>»). Put a non-dash character between them: repeat the verb («а нижній стає −»), insert a noun («— спад −40 дБ»), or use a colon. Never `— −` (even across a tag wrapper).',
   },
 
   {

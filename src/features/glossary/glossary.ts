@@ -772,11 +772,11 @@ export const glossary: Record<string, GlossaryEntry> = {
 
   // ── Resonance ──────────────────────────────────────────────────
   resonance: {
-    tip: 'The state of an LC circuit when X_L = X_C — energy sloshes back and forth between inductor and capacitor at one specific frequency.',
+    tip: 'A system\'s tendency to oscillate hardest at one natural frequency. In an LC circuit that is where the reactances cancel (X_L = X_C); in an antenna or a guitar string it is where the length fits the wave.',
     detail:
-      'Resonance is the condition where the inductive reactance X_L = 2πfL exactly equals the capacitive reactance X_C = 1/(2πfC) — the two reactances cancel each other out. Below resonance the capacitor dominates (the circuit looks capacitive); above resonance the inductor dominates. Exactly at resonance, energy oscillates freely between the inductor\'s magnetic field and the capacitor\'s electric field, transferring back and forth at the natural frequency f = 1/(2π√(LC)). Every radio receiver and transmitter relies on resonance to select a single frequency (or narrow band) out of the noise on the antenna. The behaviour is dramatically different in series versus parallel LC: series resonance gives minimum impedance (a notch / trap); parallel resonance gives maximum impedance (a tank).',
+      'Resonance is the condition where a system exchanges energy most freely at its own natural frequency. In a lumped LC circuit it is where the inductive reactance X_L = 2πfL exactly equals the capacitive reactance X_C = 1/(2πfC): the two cancel, energy oscillates freely between the coil\'s magnetic field and the capacitor\'s electric field at f = 1/(2π√(LC)), and the circuit looks purely resistive. Below resonance the capacitor dominates, above it the inductor does; in series LC that gives minimum impedance (a notch / trap), in parallel LC maximum impedance (a tank). The very same idea governs a DISTRIBUTED resonator — an antenna, a guitar string, an organ pipe — only there the natural frequency is set by geometry: a wave runs along the length and reinforces itself when that length holds a whole number of half-waves (a half-wave dipole is the simplest case). Either way the reactances cancel at resonance and the response peaks — which is how every receiver and transmitter picks one frequency out of the noise on the antenna.',
     formula: 'f = 1 / (2π√(LC))',
-    see: ['lc', 'reactance', 'tank', 'q-factor', 'bandwidth'],
+    see: ['lc', 'reactance', 'standing wave', 'tank', 'q-factor', 'bandwidth'],
   },
   'resonant frequency': {
     tip: 'The natural oscillation frequency of an LC circuit — where X_L = X_C and energy passes freely between L and C.',
@@ -828,7 +828,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'characteristic impedance': {
     tip: 'For an LC tank, Z₀ = √(L/C) — the impedance that appears at the inductor and capacitor at resonance. (The same name and formula reappear for transmission lines.)',
     detail:
-      'The characteristic impedance of an LC tank, Z₀ = √(L/C), is the magnitude of the reactance of either L or C at the resonant frequency (because at f₀ they are equal). It is the «impedance scale» of the tank: a 1 µH × 100 pF tank has Z₀ = 100 Ω; a 100 µH × 100 pF tank has Z₀ = 1 kΩ. For matching purposes Z₀ is what the tank looks like to the source at resonance once its losses are factored in, and the value drives how easily the tank can be coupled to a 50 Ω feedline. The same name and formula appear later in the course for transmission lines (the impedance ratio between the surge voltage and current of a wave travelling down a coax cable) — same maths, different physical context.',
+      'The characteristic impedance of an LC tank, Z₀ = √(L/C), is the magnitude of the reactance of either L or C at the resonant frequency (because at f₀ they are equal). It is the «impedance scale» of the tank: a 1 µH × 100 pF tank has Z₀ = 100 Ω; a 100 µH × 100 pF tank has Z₀ = 1 kΩ. For matching purposes Z₀ is what the tank looks like to the source at resonance once its losses are factored in, and the value drives how easily the tank can be coupled to a 50 Ω feedline. The same name and formula also describe a transmission line\'s characteristic impedance (the ratio of the voltage to the current of a wave travelling down a coax cable) — same maths, different physical context.',
     formula: 'Z₀ = √(L/C)',
     unit: 'Ohm (Ω)',
     see: ['lc', 'reactance', 'impedance'],
@@ -899,8 +899,8 @@ export const glossary: Record<string, GlossaryEntry> = {
   antenna: {
     tip: 'Converts electrical signals to radio waves and vice versa.',
     detail:
-      'An antenna is a conductor sized to efficiently radiate or receive electromagnetic waves at a particular frequency. A half-wave dipole (the most fundamental antenna) has a total length of approximately half the wavelength. Impedance matching between the antenna and feedline is critical — poor matching means reflected power and reduced range.',
-    formula: 'λ/2 dipole length ≈ 143 / f(MHz) metres',
+      'An antenna is a conductor sized to efficiently radiate or receive electromagnetic waves at a particular frequency. A half-wave dipole — the most fundamental antenna — has a total length of about half the wavelength, and that is where the 143/f rule comes from: since λ = c/f with c ≈ 3×10⁸ m/s, a full wavelength is 300/f metres, half of that is 150/f, and a real wire is cut roughly 5% shorter (end effect) to ≈ 143/f. Impedance matching between the antenna and feedline is critical — poor matching means reflected power and reduced range.',
+    formula: 'λ/2 dipole ≈ 143 / f(MHz) m  (= 0.95 × ½λ, with λ = c/f)',
     see: ['impedance', 'swr', 'frequency'],
   },
 
@@ -1592,5 +1592,103 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'A discriminator is the detector used for FM: it produces an output voltage that follows the instantaneous frequency of the signal, so as the carrier swings up and down the output reproduces the original audio. Classic forms exploit the steep slope of a tuned circuit (the Foster–Seeley discriminator and the ratio detector); modern radios often do the same job digitally. It is normally preceded by a limiter, which removes amplitude variations the discriminator would otherwise pass on as noise.',
     see: ['fm', 'limiter', 'detector'],
+  },
+
+  // ── Chapter 3.3 — antennas and transmission lines ────────────────
+  'radiation resistance': {
+    tip: 'The part of an antenna\'s feed-point resistance that stands for power actually radiated as radio waves, rather than lost as heat.',
+    detail:
+      'From the feedline\'s side, an antenna\'s feed point looks like a resistor absorbing power. The portion of that resistance which represents energy leaving as radio waves — the useful part — is the radiation resistance. For a half-wave dipole in the clear it is about 73 Ω. A small loss resistance (warm conductors, lossy ground) always adds to it; an efficient antenna keeps its radiation resistance much larger than its loss resistance, so most of the power radiates instead of heating the surroundings.',
+    see: ['dipole', 'impedance', 'antenna'],
+  },
+  'radiation pattern': {
+    tip: 'A map of the directions in which an antenna radiates strongly and weakly.',
+    detail:
+      'The radiation pattern shows how an antenna spreads its energy in space. A dipole\'s is a broadside figure-of-eight with deep nulls off its ends; a vertical\'s, seen from above, is a uniform circle; a Yagi\'s is a single forward lobe with a small rear lobe. Two numbers describe a directional pattern: the beamwidth (how wide the main lobe is) and the front-to-back ratio (how much weaker the rear is than the front). Being reciprocal, the pattern is the same on transmit and receive.',
+    see: ['dipole', 'yagi', 'isotropic'],
+  },
+  'velocity factor': {
+    tip: 'The fraction of the free-space speed of light at which a wave travels along a particular feedline.',
+    detail:
+      'Radio waves move more slowly inside a cable than in free space, because the insulation (dielectric) slows the field. The velocity factor is that fraction: about 0.66 for solid-polyethylene coax, 0.80 for foam coax, and over 0.90 for open ladder line. It matters whenever you cut a line to a fraction of a wavelength — a quarter-wave matching stub made of 0.66 coax is only 66 % as long as a quarter-wave in air.',
+    see: ['coax', 'feeder', 'wavelength'],
+  },
+  'standing wave': {
+    tip: 'The fixed pattern of high and low voltage along a feedline when a forward wave and a reflected wave overlap.',
+    detail:
+      'When a load does not absorb all the power a line delivers, the reflected wave travels back and interferes with the forward wave. Where they add you get a voltage maximum, where they cancel a minimum, and because those points stay put, the pattern is called a standing wave. The ratio of the maximum to the minimum is the SWR. The very same effect produces the current and voltage distribution along a resonant antenna.',
+    see: ['swr', 'reflection coefficient', 'feeder'],
+  },
+  'reflection coefficient': {
+    tip: 'How much of a wave bounces back from a mismatched load, as a fraction of the wave arriving — written Γ.',
+    detail:
+      'The reflection coefficient Γ is the ratio of the reflected wave to the forward wave at the load: Γ = (Z − Z₀) / (Z + Z₀), where Z is the load impedance and Z₀ the line impedance. It is 0 for a perfect match and reaches 1 for a total reflection (an open or short circuit). The fraction of power reflected is |Γ|², and Γ ties directly to SWR through SWR = (1 + |Γ|) / (1 − |Γ|).',
+    see: ['swr', 'return loss', 'impedance'],
+  },
+  'return loss': {
+    tip: 'The reflected power expressed in decibels below the forward power; a bigger number means a better match.',
+    detail:
+      'Return loss is another way to state how well a load is matched: RL(dB) = −20·log₁₀|Γ|. A perfect match reflects nothing, so its return loss is infinite; a 2:1 SWR is about 9.5 dB, and a 1.5:1 SWR about 14 dB. Where SWR counts upward as the match worsens, return loss counts downward — high return loss is good. A VNA usually plots return loss (as S11) directly.',
+    see: ['swr', 'reflection coefficient', 's11'],
+  },
+  erp: {
+    tip: 'Effective Radiated Power — the power your station behaves as if it were radiating, measured against a dipole.',
+    detail:
+      'ERP starts from the transmitter output, subtracts feedline and component losses, and adds the antenna\'s gain in dBd: ERP = P × 10^((G − L) / 10). It answers “how strong is my signal in the favoured direction, compared with feeding a plain dipole?” A 100 W rig, a 1 dB feedline and a 6 dBd Yagi give +5 dB of system gain, so an ERP of about 316 W. Licence and band-plan limits are often written as ERP rather than raw transmitter watts.',
+    see: ['dbd', 'eirp', 'power'],
+  },
+  eirp: {
+    tip: 'Effective Isotropic Radiated Power — like ERP, but measured against an isotropic source instead of a dipole.',
+    detail:
+      'EIRP is the same idea as ERP, only referenced to the isotropic radiator and so using antenna gain in dBi. Because a dipole is 2.15 dB stronger than isotropic, the EIRP of any station is always 2.15 dB (a factor of about 1.64) larger than its ERP. EIRP is the form most used at VHF/UHF and for satellite and regulatory work; if a limit just says “radiated power” with no reference stated, a dipole (ERP) is usually meant.',
+    see: ['dbi', 'erp', 'isotropic'],
+  },
+  'ground plane': {
+    tip: 'A conducting surface beneath a vertical antenna that supplies the antenna\'s missing other half by reflection.',
+    detail:
+      'A quarter-wave vertical is electrically half a dipole; the ground plane provides the other half as a mirror image. It can be the earth itself, a metal vehicle roof, or — most often — a set of radial wires. A poor ground plane wastes power as heat in the soil and raises the feed impedance, which is why ground-mounted verticals use many radials. The better the ground plane, the more efficient the vertical.',
+    see: ['monopole', 'radial', 'antenna'],
+  },
+  radial: {
+    tip: 'One of the wires that together form the ground plane of a vertical antenna.',
+    detail:
+      'Radials are wires spread out from the base of a vertical antenna to make its ground plane. Laid on or under the ground they give the return currents a low-loss path instead of the lossy soil; for a ground-mounted vertical their exact length and thickness are not critical — many radials (a few dozen) beat a few long ones, so number and coverage matter most. Raised off the ground the radials instead act as a tuned counterpoise: as few as four work well, but each must be resonant, about a quarter-wave long — the same length as the element (L ≈ 71 / f(MHz) in metres). Drooping the four radials about 30° raises the feed impedance from roughly 36 Ω (radials horizontal) toward the 50 Ω that matches common coax.',
+    see: ['ground plane', 'monopole'],
+  },
+  monopole: {
+    tip: 'A single-element vertical antenna a quarter-wave tall, working against a ground plane — half a dipole stood on end.',
+    detail:
+      'A monopole is the quarter-wave vertical: one rod or wire about a quarter-wavelength long, fed against a ground plane that supplies its missing half. It radiates equally in all horizontal directions (omnidirectional), is vertically polarised, and has a feed impedance around 36 Ω over perfect ground, nearer 50 Ω in practice. Its low takeoff angle suits distant contacts and its small footprint suits tight spaces — at the price of needing a good radial system.',
+    see: ['dipole', 'ground plane', 'polarisation'],
+  },
+  'driven element': {
+    tip: 'The element of a multi-element antenna that is actually connected to the feedline.',
+    detail:
+      'In a Yagi or similar beam, only one element — the driven element — is fed by the transmitter; it is essentially a dipole. The other elements (the reflector and directors) are parasitic: connected to nothing, they are energised only by the driven element\'s field and re-radiate it. The driven element sets the feed impedance and the operating frequency; the parasitic elements shape the beam.',
+    see: ['yagi', 'parasitic element', 'dipole'],
+  },
+  'parasitic element': {
+    tip: 'An antenna element with no feedline of its own, energised only by a nearby driven element, used to shape the beam.',
+    detail:
+      'Parasitic elements are the reflector and directors of a Yagi: they connect to nothing, but the driven element\'s field induces a current in them and they re-radiate it. A slightly longer element behind the driven one acts as a reflector; slightly shorter elements in front act as directors. Their lengths and spacings are chosen so the re-radiated waves add up forwards and cancel backwards, turning a bare dipole\'s figure-of-eight into a forward beam.',
+    see: ['yagi', 'driven element'],
+  },
+  'ladder line': {
+    tip: 'A low-loss balanced feedline of two parallel conductors held apart by an insulating web, with an impedance near 450 Ω.',
+    detail:
+      'Ladder line (or window line) is a balanced feedline whose two conductors are spaced by a plastic strip with regular cut-outs — the “windows” that name it. Its characteristic impedance is around 450 Ω and its velocity factor about 0.90. Because most of its field is in open air, it loses far less power than coax even at high SWR, which makes it the classic feeder for a tuner-fed multiband doublet — but it must be kept clear of metal and run to a balanced tuner or a balun.',
+    see: ['feeder', 'twin-lead', 'balun'],
+  },
+  'twin-lead': {
+    tip: 'A flat balanced feedline of two parallel wires moulded in a plastic ribbon, typically 300 Ω.',
+    detail:
+      'Twin-lead is the flat “ribbon” feeder once common for television aerials: two conductors moulded a fixed distance apart in a plastic strip, giving a characteristic impedance around 300 Ω. Like all balanced lines it loses little power and does not radiate when its currents stay balanced, but its performance suffers when it is wet or run near metal. It belongs to the same parallel-line family as ladder line and open-wire feeder.',
+    see: ['feeder', 'ladder line', 'characteristic impedance'],
+  },
+  'common-mode current': {
+    tip: 'Unwanted current flowing on the outside of a coax shield, which makes the feedline radiate and brings RF back into the shack.',
+    detail:
+      'Coax is meant to carry equal and opposite currents on its inner conductor and the inside of its shield, so its fields stay sealed inside. But skin effect lets a separate current flow on the outside of the shield — the common-mode current. Fed straight to a balanced antenna such as a dipole, the coax takes up this current: it radiates (distorting the pattern and filling nulls), flows back to the equipment as RF in the shack, and upsets SWR readings. A choke (current) balun blocks it.',
+    see: ['balun', 'coax', 'feeder'],
   },
 }
