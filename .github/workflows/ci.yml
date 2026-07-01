@@ -32,3 +32,28 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  visual:
+    # Real-browser diagram-geometry gate (e2e/diagram-geometry.spec.ts): opens
+    # every published chapter in Chromium and fails if any diagram's labels
+    # overlap a symbol / each other / the canvas beyond its committed baseline.
+    # Catches the label-on-symbol + oversized-text class that jsdom cannot see.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Diagram-geometry gate
+        run: npm run test:visual

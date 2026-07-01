@@ -38,3 +38,9 @@ Thumbs.db
 .claude/worktrees/
 # Runtime lock for scheduled-tasks MCP — recreated per session.
 .claude/scheduled_tasks.lock
+
+# Playwright (diagram-geometry gate) output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
