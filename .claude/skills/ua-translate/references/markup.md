@@ -50,3 +50,24 @@ Then the chapter file uses `<Trans i18nKey="…" components={{ ham: <G k="ham ra
 ## No HTML entities in i18n JSON
 
 `&quot;`, `&amp;`, `&nbsp;` render verbatim through react-i18next. Use real characters — curly quotes `"…"` / `«…»`, a real non-breaking space, etc.
+
+## Render-or-die: bare subscripts (`X_yyy`) and dynamic `t(varName)`
+
+A value containing markup (`<var>`, `<strong>`, subscripts) MUST reach a renderer, or it ships as literal text (`<strong>відсічки</strong>`, `V_pp` with a raw underscore). Recurring reader-flagged bugs (ch1.10, ch1.11).
+
+**Subscripts — use one of these paths (never a bare `X_y` in JSX/i18n):**
+- `{withSubscripts(t('key'))}` — HTML / prose
+- `{withSubscriptsSvg(t('key'))}` — SVG `<text>` content
+- `<MathText>{t('key')}</MathText>` — when the value uses LaTeX-braced `X_{Y}`
+- `<var>X_{Y}</var>` in the i18n value, rendered via `<Trans components={{ var: <MathVar /> }} />`
+
+Variable names stay **Latin** everywhere, even inside UA prose — only the unit symbol switches script (`5 В`, `100 кГц`). A Cyrillic base (`В_pp`) slips the Latin-only `withSubscripts` matcher and renders the underscore literally.
+
+**Dynamic key — a runtime-chosen key goes into `<Trans i18nKey={key}>`, NEVER `t(varName)`:**
+```tsx
+// widget picks one of several markup-bearing keys at runtime:
+<Trans i18nKey={computed.warnKey} ns="ui" components={{ strong: <strong />, var: <MathVar /> }} />
+```
+Bare `t(varName)` only when every reachable value is markup-free (add a comment naming the keys checked).
+
+**Enforced by** `check:bare-subscript-renders`, `check:hardcoded-jsx-subscript`, `check:tag-renders` (traces `t(identifier)` back to its literal keys), `markup.cyrillic-base-subscript` (UA linter) — all in `check:all`. When one fires, the default fix is «move the literal into i18n + wrap», not an opt-out comment.

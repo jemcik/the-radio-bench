@@ -1,300 +1,73 @@
 # Claude working notes for The Radio Bench
 
-Short-form guidance to keep future work consistent. If you change a
-convention here, update this file in the same commit.
+Terse always-on rules. The detail behind each lives in the skills (load on
+demand) and is enforced by the gates in `check:all` — this file is the index,
+not the manual. Deep rules: `.claude/skills/{diagram-quality,ua-translate,beginner-review}/`.
+If you change a convention here, update this file in the same commit.
 
-## Workflow — read before starting work
+## Authorization — never touch shared state without an explicit ask
 
-### Authorization — never act on shared state without an explicit ask
+- **Never `git commit` / `git push` without a specific user request.** Editing files, running gates, reporting findings — fine; stop there. One approval does not extend to the next commit/push.
+- **Never commit to `main`** — create a feature branch first if HEAD is on main.
+- **Never use git worktrees** (no `isolation: "worktree"`, no `git worktree add`) — a stray one once served the user a stale dev snapshot.
 
-- **Never `git commit` or `git push` without an explicit user request** for the specific action. Editing files, running gates, and reporting findings is fine — stop there. A user approval for one commit/push does not extend to the next one.
-- **Never commit to `main`.** Create a feature branch first if HEAD is on main.
-- **Never use git worktrees.** Don't pass `isolation: "worktree"` to the Agent tool; don't suggest `git worktree add`. A stray worktree once made the user's dev server serve a stale snapshot.
-- **Don't start a local dev server when one is already running, but DO verify visually via Claude-in-Chrome.** User normally runs `npm run dev` locally on `:5173`; never invoke `preview_start` for this repo (port conflict makes it useless anyway). If the user's server isn't up (navigate fails / blank chapter), start `npm run dev` yourself in the background — there's no port conflict if the user's server isn't running. Leave it running and mention it next time the user replies. For visual verification, use the `mcp__Claude_in_Chrome__*` MCP tools to connect to the user's already-running browser — the Chrome extension is installed there. Standard flow: `list_connected_browsers` → `select_browser` → `tabs_create_mcp` (or reuse existing via `tabs_context_mcp`) → `navigate` to `http://localhost:5173/#/chapter/<id>` → `find` / `screenshot` / `zoom`. **Use this proactively for any change that affects rendering** — schematic primitives, SVG diagrams, i18n prose with markup, glossary popovers, layout. Multiple landmines have cost a session each because «code lints clean» got mistaken for «renders correctly»: rotated `Ground` symbol pointing sideways, dangling wire stub from a removed label, glossary popover clipped above viewport, `<strong>` tags shipping as literal text, an `IronCore` icon that took three attempts before browser-checking. Trust the gates for code correctness, but trust your eyes (via Claude-in-Chrome) for visual correctness — they're different things.
+## Verify rendering with your eyes (via Claude-in-Chrome), not just gates
 
-### Per-edit i18n gate — run after EVERY i18n string edit (not just pre-PR)
+Gates prove *code* correctness, not *visual* correctness — a rotated symbol, a literal `<strong>`, a clipped popover, oversized/overlapping labels all lint clean. After ANY change that renders (SVG/diagrams, i18n prose with markup, glossary popovers, layout), look at it in the user's browser:
 
-**Non-negotiable after any change to `src/i18n/locales/**/ui.json`.** Most recurring
-pain has been: I edit a string, say «готово», and the user catches a landmine
-class we've already addressed 3+ times — em-dash before math variable, raw `<`
-comparison, bare generic noun, `<em>` on a technical term without tooltip, etc.
-Memory notes alone do not prevent this. Running the linter does.
+- The user runs `npm run dev` on `:5173`; **never `preview_start`** (port conflict). If their server is down, start `npm run dev` yourself in the background and mention it.
+- Connect via `mcp__Claude_in_Chrome__*`: `list_connected_browsers` → `select_browser` → `tabs_context_mcp`/`tabs_create_mcp` → `navigate` `http://localhost:5173/#/chapter/<id>` → `find`/`screenshot`/`zoom`.
+- For diagrams, trust **measured geometry over a screenshot glance** — run the `getBoundingClientRect` overlap audit (diagram-quality Stage 7) or `npm run test:visual`.
 
+## Gates — run before every «done» / PR (non-negotiable)
+
+`npm run check:all` runs **every** gate — it auto-discovers `scripts/check-*.mjs` (plus the UA linter + gitignore) and runs them in parallel, so nothing is hand-maintained and no gate can be forgotten. Then run the rest: `npm run lint`, `npm test`, `npm run build`, `npm run knip`, `npx tsc --noEmit`. All green before saying done. (`npm run check:all <substring>` runs a subset; `npm run test:visual` is the browser diagram-geometry gate.)
+
+**After ANY `ui.json` edit — even a single string —** also run the UA linter for just that block to **0 errors** for fast feedback (the #1 recurring-landmine source; `check:all` covers the whole file, this is the targeted mid-edit run):
 ```bash
-# After ANY edit to a chapter's i18n block:
 node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locales/uk/ui.json ch{N}_{M}
 ```
+After a push, verify CI (`gh pr checks <PR>`, `gh run view <id> --log-failed`); CI uses `npm ci` + pinned Node, so a local build passing ≠ CI green.
 
-Must exit with **0 errors** before saying "готово", "виправлено", or equivalent.
-The linter catches:
-- `forbidden.emdash-before-math-var` — «— <var>X</var>» pattern (minus-sign confusion)
-- `forbidden.raw-lt-gt-in-i18n` — raw `<` / `>` as comparison (renders as `&lt;`)
-- `forbidden.playground-verbs` — дитячі дієслова на величинах («гойдається»)
-- `forbidden.miryaty-measure` — розмовне «міряти» замість «вимірювати»
-- `forbidden.raza-multiplier` — «у √2 раза» (русизм)
-- `forbidden.personify-quantity` — «спокійна напруга»
-- `forbidden.pry-verbal-noun` — «при + віддієслівний іменник» (русизм)
-- `forbidden.oscilogram-generic` — «осцилограма» для generic waveform
-- …and ~25 more. Every user-flagged landmine that can be mechanically detected
-  should end up here — if you see a new recurring class, add a rule.
+## Commit cadence
 
-**After EVERY text-level edit** (adding a new callout, rewriting a paragraph,
-changing a quiz answer — not just bulk translation), run the linter for the
-affected block. Pasting/editing by memory doesn't scale — the machine remembers
-so you don't have to.
+On request, batch related changes into one reviewable commit — not one per fix, not a save point.
 
-### Pre-PR quality gate — non-negotiable
+## Chapter workflow
 
-Before opening a PR or saying «done» / «ready», enumerate scripts and run them all — don't curate from memory:
+**Pre-flight — before ANY prose/visual (fires at every new chapter/section; no reminder needed):**
+1. Re-read the structure contract: `ch0_1.sectionStructure` + «Notes on Content Philosophy» in `PLAN.md` (analogy-before-formula, every formula → worked example + calculator widget, visual density throughout).
+2. Consult the reference books to fact-check every number and borrow the clearest framing — pre-authorised, paths + pdftotext how-to in `memory/reference_research_pdfs.md` and `reference_large_pdfs.md` (ARRL Handbook 2023; Art of Electronics 3rd ed.). Cite the book when a claim depends on it.
+3. Web-search current specs / datasheets / regulator pages / prices as needed (pre-authorised).
 
-```bash
-jq -r '.scripts | keys[]' package.json | grep -E '^(check|lint|test|build|knip)'
-# Run each match. Plus `npx tsc --noEmit` (not an npm script).
-```
+Only then: outline → visuals → prose. (Jumping straight to building is the ch2.1 first-attempt failure.)
 
-All must exit green. Past failure: a gate run missed `knip` (it wasn't in the curated list at the time) and shipped a PR with 5 unused exports — that's why the rule is «enumerate, don't recite».
+**A chapter is «done» only when ALL hold** — not just «prose written»:
+1. Hero illustration renders (never a TODO placeholder for hero or primary widget).
+2. Visual density throughout — every section has a widget/illustration/scale, planned at outline time.
+3. Five i18n touchpoints, in BOTH `en` and `uk`: `chapterTitles.{id}`, `chapterSubtitles.{id}`, `ch{id}.*`, new `glossary.*`, new `units.*`. (Titles/subtitles silently fall back to EN — cross-check manually.)
+4. Test pair for every widget (`renderWithProviders` from `src/test/render`; assert the exact `.toFixed(2)` string, `"20.00"` not `"20"`).
+5. Prose promises paid off — every «the … table/diagram» has the artefact rendered; `npm run check:i18n-usage` catches orphan keys.
+6. Every circuit diagram built from `@/lib/circuit` primitives only (zero hand-drawn SVG).
+7. Status flip `'coming-soon'` → `'published'` in `src/data/chapters.ts` LAST, after 1–6 and gates are green.
 
-After every `git push`, verify CI:
+## Invoke the right skill before the work (they hold the detailed rules)
 
-```bash
-gh pr checks <PR_NUMBER>
-gh run view <run-id> --log-failed   # if red
-```
+- **`diagram-quality`** — before touching `src/components/diagrams/`, `src/components/chapter-heroes/`, or inline SVG in a chapter, or fixing any diagram issue (font/padding/overlap/scaling/translation). Source of truth for typography, rough.js, plotted curves, circuit schematics, and common failures. **Every `<Circuit>` needs `maxWidth`** or it scales ~2× and inflates text (`check:circuit-maxwidth`).
+- **`ua-translate`** — before ANY EN→UA content (chapter, widget, diagram labels). Never hand-author UA beyond a clause — Claude calques even short sentences; Gemini-primary cut landmines tenfold. Writing EN+UA in one authoring pass silently bypasses the skill: write EN only, then invoke it. When the user corrects a UA phrasing, decide convention-vs-regression and update `references/glossary.md` (or add a linter rule) — never fix the same class twice.
+- **`beginner-review`** (spawn as a subagent — independent context is the point) — MANDATORY before saying «done» on any task that wrote/rewrote `ch{N}_{M}` prose, and before any commit touching those keys. `check:uk` catches mechanical patterns; only a fresh reader catches ambiguous pronouns, comparatives without a baseline, or prose that contradicts an on-screen widget.
 
-Local `npm run build` ≠ CI green. CI uses `npm ci` (strict peer deps; worked around via `.npmrc legacy-peer-deps=true`) and pins a Node version (`.github/workflows/*.yml`). Wait for CI to complete before saying «ready for review».
+## Prose & i18n discipline (mostly gate-enforced — skills hold the how-to)
 
-### Commit cadence
+- **Schematic before prose.** Every circuit described in prose needs a schematic above the first paragraph that names its components. Authoring rules: `diagram-quality/references/circuit-schematics.md` (working example: `RCChargingSchematic.tsx`).
+- **Introduce every symbol/abbreviation before use.** Prose must stand alone for a non-specialist. Wrap EVERY math variable / Greek letter (even a lone `c`) in `<var>` (`check:unwrapped-math-var`); expand abbreviations (HT/QRP/HF/AM/FM/SSB/CW/VNA…) and band shorthand (`2 m` → «VHF ≈144 MHz») on first use; name the source for «above», the quantity for comparatives, concrete partners for vague pronouns. Full catalogue: `memory/feedback_first_mention_explicitness.md`.
+- **Units via `units.*`**, never inline `kHz`/`dBm` (`check:hardcoded-units`); extend the namespace before first use of a new family; when you fix one hardcoded unit, grep the whole widget + sibling widgets.
+- **Markup / subscripts / dynamic `t()`** — any markup-bearing value must reach a renderer: subscripts via `withSubscripts`/`withSubscriptsSvg`/`<MathText>`/`<Trans var>`; a runtime-chosen key goes into `<Trans i18nKey={key}>`, never `t(varName)`; variable names stay Latin even in UA prose. Details: `ua-translate/references/markup.md`. Enforced by `check:bare-subscripts`, `check:hardcoded-jsx-subscript`, `check:tag-renders`.
+- **Don't cargo-cult** a label / SVG attr / `<Trans>` map from another file without checking its rendered output first — «it's in the codebase» ≠ «it works».
 
-When the user does ask for a commit: batch related changes into one. Don't commit after every single fix — a commit is a unit of reviewable work, not a save point.
+## Conventions & non-derivable facts
 
-### Chapter pre-flight — MANDATORY before drafting ANY chapter prose/visuals
-
-**This fires automatically at the START of every new chapter or new section — the user should never have to remind me.** Before writing a single i18n string, designing a widget, or drafting an outline, do ALL of these, in order:
-
-1. **Re-read the structure contract.** Read «How a chapter is structured» in chapter 0.1 (`ch0_1.sectionStructure` and the keys under it: concept-first/analogy-before-formula, interactive widgets, lab activities, quiz, callouts, recommended path, the «understanding not exam-prep» goal) AND the «Notes on Content Philosophy» in `PLAN.md`. Every chapter must obey these — analogy lands before any math, every formula has a worked example + calculator widget, visual density throughout.
-2. **Consult the reference books to ground and groom the content.** Pre-authorised, use without asking (paths in `memory/reference_research_pdfs.md`):
-   - **ARRL Handbook 2023** — `/Users/jemcik/Downloads/ham_26/ARRL handbook 100th/The ARRL Handbook for Radio Communications 2023.pdf` (268 MB → `Read` rejects it; use `pdftotext "<path>" -f <start> -l <end> -` via Bash). Canonical for ham topics: band plans, propagation, antennas, operating practice, radio-wave physics.
-   - **The Art of Electronics** (Horowitz & Hill 3rd ed.) — `/Users/jemcik/Downloads/The Art of Electronics/The Art of Electronics.pdf` (use `Read` with `pages:"N-M"`, max 20 pp/call). Canonical for circuit/component/signal fundamentals and any quantitative claim.
-   - Read the relevant sections for the chapter's topic to fact-check every number, borrow the clearest framing/analogies, and avoid shipping folklore. Cite the book in the commit/PR when a claim depends on it.
-3. **Web-search as needed** (WebSearch / WebFetch, pre-authorised) — current specs, datasheets, regulator pages (ITU, УДЦР…), Wikipedia reality-checks, modern prices/part availability.
-
-Only after 1–3 do outline → visuals → prose. Skipping straight to building is the failure this block exists to prevent (ch 2.1, first attempt).
-
-## New chapter checklist
-
-**Step 0 happens before any of this** — see «Chapter pre-flight» above (re-read 0.1 structure + content philosophy, consult the ARRL Handbook / Art of Electronics, web-search). Don't draft until it's done.
-
-A chapter is done when ALL of these are true, not just "prose is
-written":
-
-1. **Hero illustration renders.** Never hand the user a prose-only preview with a TODO placeholder for the hero or primary widget.
-2. **Visual density throughout.** Every section has something to look
-   at — widget, illustration, magnitude scale. A chapter that's 2/3
-   prose before the first visual fails review. Plan visuals at
-   outline time, not after prose is written.
-3. **Five i18n touchpoints**, each in BOTH `en/ui.json` AND
-   `uk/ui.json`:
-   - `chapterTitles.{id}`
-   - `chapterSubtitles.{id}`
-   - `ch{id}.*` translation block
-   - New glossary terms in `glossary.*`
-   - New unit symbols in `units.*`
-
-   `chapterTitles` / `chapterSubtitles` are separate namespaces that
-   silently fall back to English via `defaultValue` when missing —
-   parity scripts can't catch that. Cross-check manually.
-4. **Test pairs.** Every interactive widget has a `*.test.tsx`
-   sibling using `renderWithProviders` from `src/test/render`.
-   Numeric outputs asserted on the exact `.toFixed(2)` format
-   (`"20.00"`, not `"20"`).
-5. **Prose promises paid off.** Read top-to-bottom for phrasings like
-   `"The … table:"` / `"The … diagram:"` — every such promise has
-   the referenced artefact actually rendered. Run
-   `npm run check:i18n-usage` to catch orphan keys too.
-6. **Schematic consistency.** Every circuit diagram composed entirely from `@/lib/circuit` primitives — zero hand-drawn SVG. Detailed rules in `.claude/skills/diagram-quality/references/circuit-schematics.md`.
-7. **Status flip last.** `'coming-soon'` → `'published'` in
-   `src/data/chapters.ts` only after 1–6 and the full gate above
-   are green.
-
-## SVG diagrams / rough.js — use the `diagram-quality` skill
-
-Before touching any file under `src/components/diagrams/` or `src/components/chapter-heroes/`, or any inline SVG inside a chapter page, invoke the `diagram-quality` skill at `.claude/skills/diagram-quality/`. Same when fixing a reader-reported diagram issue (font, padding, overlap, clipped labels, missing translations, scaling hacks). The skill is the source of truth — typography/padding, rough.js patterns, plotted curves, i18n-in-diagrams, common failures, and circuit schematics all live there.
-
-## Ukrainian translation — use the `ua-translate` skill
-
-Before translating any EN → UK content (new chapter, new widget, new diagram labels), invoke the `ua-translate` skill at `.claude/skills/ua-translate/`. Never hand-author UA, even for inline mid-conversation rewrites longer than a clause — Claude produces calques even on short sentences (ch 1.5: `найчесніше взяти нову деталь` from EN "honest move" — UA `найчесніше` reads as ethically honest, nonsense in context). The skill's SKILL.md owns the workflow (Gemini 2.5 + 3.1 Pro side-by-side via `gemini-translate.py`, Claude reviewer, linter); references/ holds glossary, landmines, style, markup. Background: Intento 2025 ranks Gemini 2.5 Pro #1 for EN→UA; Claude isn't in the top tier. Claude-only translation of ch 1.1–1.4 cost ~30 landmines per chapter; switching to Gemini-primary in ch 1.5 cut that tenfold.
-
-**Recurring failure mode (logged ch 1.11):** writing EN and UA in the same authoring pass — e.g. a Python script that sets `data['ch1_X'][key] = '<UA prose>'` alongside `data_en['ch1_X'][key] = '<EN prose>'` — silently bypasses the skill. The `ua-translate` skill is not triggered by my own «I'm just dropping in some i18n» framing; it's triggered by «there exists EN prose I want to render in UA». **Hard rule: any UA value longer than a clause MUST come from Gemini side-by-side via the skill, period.** When tempted to «just write the UA too while I'm here», STOP, write only EN, then invoke `ua-translate` for the UA. Hand-writing the UA in the same script wastes the user's review cycles and reverses the tenfold cost reduction the skill exists to deliver.
-
-**Evergreen rule.** Every time the user pushes back on a UA phrasing, decide if Gemini was right (our convention was wrong → update `references/glossary.md`) or wrong (regression → log in `SKILL.md` + add a linter rule if mechanically catchable). Never fix the same class twice across different chapters.
-
-For genuinely one-word swaps (case fix, single glossary term) Gemini is overkill — but any rewrite touching idiom or sentence structure goes through the workflow.
-
-## Beginner-reader review — MANDATORY before declaring chapter prose done
-
-Before saying «готово» / «done» on any task that wrote or rewrote chapter prose (anything under `ch{N}_{M}` in `src/i18n/locales/{en,uk}/ui.json`), invoke the **`beginner-review`** skill at `.claude/skills/beginner-review/`. Spawn it as a subagent — its independent context is the whole point; the subagent must NOT have the rest of the chapter loaded the way you do.
-
-The mechanical UA linter (`check:uk`) catches known bad patterns: bare «вхід» / «вихід» followed by a verb, bare «рівень» without «логічний» qualifier, bare «лінійно» without object. **It does NOT catch context-dependent ambiguity** — pronouns with multiple antecedents, comparatives without baseline, symbols introduced too far back, prose that contradicts a widget visible on the same page.
-
-Pattern that triggered this rule (ch 1.11, May 2026): user caught ~10 prose-clarity issues across one chapter in a single review session — «лінійно» without object, «через нього» ambiguous, «V_BE завжди» contradicting the V_BE slider, «вище» without referring to a screen element, etc. Each was obvious in retrospect, none were caught by self-review. Beginner-review is the structural fix.
-
-**Hard rule:** No `git commit` that touches `ch{N}_{M}.*` keys may proceed without the beginner-review subagent reporting either «No issues found» or a list of issues that have all been addressed and re-verified.
-
-## If the prose describes a circuit — the schematic goes BEFORE the prose
-
-**PR gate.** For every new chapter and every new section in an existing chapter: inventory the circuits described in prose, and gate the PR on each having a schematic above the first paragraph that names its components. Readers without engineering backgrounds cannot build a mental circuit from prose — that's exactly what a schematic is for.
-
-Authoring rules for circuit schematics (zero hand-drawn SVG; voltmeter not floating label; battery designator vs value; ground vs battery; coordinate-source-of-truth; junction-dot rules) live in `.claude/skills/diagram-quality/references/circuit-schematics.md`. Read it before touching any file in `src/components/diagrams/` that depicts a circuit. Working reference: `src/components/diagrams/RCChargingSchematic.tsx`.
-
-## Writing discipline — introduce every concept before using it
-
-**Non-negotiable rule.** Do not use any symbol, abbreviation, or domain
-shorthand in chapter prose, formulas, widget labels, or worked examples
-*before* it has been introduced with an explicit inline definition.
-
-Chapter prose must stand on its own for a reader who does NOT share the
-specific sub-domain background (ham radio / RF / embedded / DSP). If
-the author has to pause and think "a beginner would not get this", the
-sentence needs rewriting.
-
-Failure modes (full catalogue + worked examples in `memory/feedback_first_mention_explicitness.md` — run that checklist before drafting any new section):
-
-- **Math symbols** — every `<var>X</var>` defined in prose with meaning + units before its first formula use, AND actually wrapped in `<var>` (even a lone lowercase `c`/`f`/`λ`), never plain text. Enforced by `check:unwrapped-math-var`; see «Every math variable in chapter prose needs `<var>`» under i18n authoring discipline.
-- **Abbreviations** (HT, QRP, HF, UHF, AM, FM, SSB, CW, VNA…) — expand inline on first appearance.
-- **Band-wavelength shorthand** (`2 m`, `70 cm`) — expand to «VHF ≈144 MHz» / «UHF ≈435 MHz» on first use.
-- **`вище` / `above`** as quantity reference — name the SOURCE (`the calculator gives…`), not the textual position.
-- **Ambiguous comparatives** on components — attach to the QUANTITY (`resistor with lower resistance`), not the part.
-- **Bare generic nouns** (`значення`, `рівень`, `параметр`, `величина`) — always qualify (`значення опору`).
-- **Vague back-reference pronouns** (`те саме`, «it», «that», «the same») — rewrite concretely, name the partners.
-- **«Three numbers / these two values»** when fewer are visible — name the quantities instead.
-- **Spatial direction as pedagogical scaffolding** — only when the diagram is on screen AND the direction isn't load-bearing. Teach the dimensional rule first; spatial metaphor is a mnemonic, never the primary explanation.
-
-## Don't cargo-cult — verify rendered output before copying a pattern
-
-When adopting a label string, SVG attribute, or `<Trans>` map from another file, look at the rendered output before committing the copy. Two ch 1.5 examples: `value="V_in"` rendered with a literal underscore in both source and copy; `<em>` was bug-styled to look like a glossary term and got copy-pasted everywhere. «It's in the codebase» ≠ «it works.»
-
-## i18n authoring discipline
-
-Markup conventions (subscripts inside `<var>X_{…}</var>`, `<G>` vs `<strong>` vs `<em>`, `<Trans>` placeholder parity, no HTML entities — the last is now enforced by `check:i18n`) live in `.claude/skills/ua-translate/references/markup.md`. Per-locale label-width budgeting for SVG diagrams lives in `.claude/skills/diagram-quality/references/typography-and-padding.md`. Read those before authoring i18n strings. The two rules below stay here because they cross-cut the whole codebase.
-
-### Unit symbols live in `units.*`, not inline
-
-`src/i18n/locales/{en,uk}/ui.json` exposes a top-level `units` namespace (`hz`, `khz`, `mhz`, `w`, `mw`, `uw`, `kw`, `nw`, `pw`, `fw`, `db`, `dbm`). Use `t('units.<key>')` everywhere a unit symbol would otherwise be a string literal — never inline `kHz` / `dBm`. When adding a new unit family (currents, lengths, times), extend the namespace before the first use.
-
-### When you spot a hardcoded string, audit the WHOLE widget
-
-The recurring failure was fixing only what the user screenshot, then missing siblings in the same widget. After any unit-symbol fix, grep the file for `Hz` / `dB` / `mW` / `µ` and convert every occurrence in one pass; then check sibling widgets in the same chapter.
-
-### Bare subscripts (`X_yyy`) need a renderer — every single time
-
-Two recurring landmines in this class shipped to readers in ch 1.10 and required user-screenshot rescue:
-
-1. **Cyrillic-base in glossary unit field** — `Вольти розмаху (В_pp)` shipped because the renderer (`withSubscripts()`, used for `unit` / `formula` / popovers / SVG label helpers) only matches a Latin one-letter base. Cyrillic `В` slipped through and rendered the underscore literally. Project convention: variable names stay Latin everywhere — even inside Ukrainian prose — and only the unit symbol switches script (`5 В`, `100 кГц`). Now enforced by `markup.cyrillic-base-subscript` (ERROR) in the UA linter.
-2. **Hardcoded JSX literal with bare subscripts** — `<p>ΔV ≈ I_load · t_period / C = …</p>` shipped without going through `t()` or any renderer, so all five subscripts printed as literal underscores. The existing `check:bare-subscript-renders` only scans i18n keys → call sites; a hardcoded JSX literal is invisible to it. Now enforced by `check:hardcoded-jsx-subscript` (ERROR), which scans every `.tsx` under widgets / diagrams / chapter-heroes / chapters / features for multi-token JSX text literals containing `[A-Za-z]_[A-Za-z0-9]+`.
-
-The right rendering path is always one of:
-- `{withSubscripts(t('key'))}` for HTML / prose
-- `{withSubscriptsSvg(t('key'))}` for SVG `<text>` content
-- `<MathText>{t('key')}</MathText>` when the value uses LaTeX-braced form `X_{Y}` (KaTeX handles both)
-- Canonical `<var>X_{Y}</var>` markup in the i18n value rendered via `<Trans components={{ var: <MathVar /> }} />`
-
-The two new gates are both wired into `check:all`, so they run before every PR. They WILL fire on attempted regressions — when one does, do NOT silence with an opt-out comment unless the literal has been visually verified to render correctly through some other path. The default action is «move it to i18n + wrap.»
-
-### Markup-bearing i18n key reached via dynamic `t(varName)` — same render-or-die rule
-
-Recurring failure (ch 1.11 `CeGainCalculator`, reader-flagged): the widget computes which warn message to show in a `useMemo`, assigning the i18n key to a variable through if/else branches, then renders via plain `t(varName)`:
-
-```tsx
-let warnKey: string
-if (saturated)      warnKey = 'ch1_11.widget.ceGain.warnSaturated'
-else if (cutoff)    warnKey = 'ch1_11.widget.ceGain.warnCutoff'
-else                warnKey = 'ch1_11.widget.ceGain.warnGood'
-
-<p>{t(computed.warnKey)}</p>   // ← bug: `<strong>` / `<var>` ship as literal text
-```
-
-The values for `warnSaturated` / `warnCutoff` contained `<strong>` and `<var>` markup. Without `<Trans>` to map those tags to React components, they printed as `<strong>відсічки</strong>` in the reader's UI.
-
-**Why `check:tag-renders` missed it initially**: the gate scanned for `t('literal-key')` calls. A dynamic call `t(varName)` doesn't have a literal key the AST can resolve — for the old gate the key was invisible. After this regression, the gate now ALSO scans `t(identifier)` call sites: for each, it traces backwards through file-local literal-string assignments to that identifier (including dotted access like `computed.warnKey`), and if any reachable key has non-safe-wrapper markup AND the call site isn't inside `<Trans>` / `<MathText>` / other tier-appropriate wrapper, it fails.
-
-**Right pattern for dynamic keys**:
-
-```tsx
-<Trans
-  i18nKey={computed.warnKey}
-  ns="ui"
-  components={{ strong: <strong />, var: <MathVar />, ... }}
-/>
-```
-
-The variable goes straight into `<Trans i18nKey={…}>` — never into `t(...)`. `<Trans>` handles the markup regardless of which key the variable holds, so the dispatch is safe by construction.
-
-**Whenever you write a widget that picks one of several i18n keys at runtime** (status messages, tone variants, validation hints, region labels, multi-state readouts), default to the `<Trans i18nKey={dynamicKey}>` form. Reach for bare `t(varName)` only when you've **manually confirmed every reachable value is markup-free** — and add a comment naming the keys you checked, so future contributors don't have to re-verify.
-
-### Every math variable in chapter prose needs `<var>` — even a lone `c`
-
-Reader-flagged (ch 2.1, 2026-05): the speed of light was written «…written c.» and «λ = c / f» as **bare letters**. The lowercase `c` blended into the surrounding sans-serif prose so the reader couldn't tell it was the variable. Part 1 wraps every variable in `<var>` (→ `<MathVar>` → KaTeX italic, 600+ uses); the new Part-2 symbols (c, f, λ) were authored as plain text and slipped through EVERY existing gate — they all check the RENDER SAFETY of markup that is already present, none checked for the ABSENCE of `<var>` on a bare variable. beginner-review targets clarity, not typography.
-
-Rule: **any math variable or Greek symbol that appears in chapter prose, summaries, quiz, or widget descriptions/hints must be `<var>X</var>`** (rendered via `<Trans>`/`buildQuizFromI18n`, which map `var` → `<MathVar>`). For a symbol that belongs in a JSX control label (e.g. an input label «Frequency 𝑓»), render it as `<MathVar>f</MathVar>` in the `.tsx` and keep the i18n string symbol-free, so `aria-label` stays plain text.
-
-Now enforced by `check:unwrapped-math-var` (in `check:all`). It scans `chN_M` blocks, ignores `<var>` contents, and flags (A) a lone Greek variable letter — Ω/µ excluded as units — and (B) a single Latin letter next to a math operator `= · × ≈ ÷` (slash excluded so units like m/s don't false-flag) and (C) a standalone lowercase Latin letter in prose (excludes the article «a», unit/abbrev/contraction contexts). Part 0–1's pre-existing bare-variable debt is grandfathered in `scripts/unwrapped-math-var-baseline.json`; the gate fails only when a key's count grows or a new key appears. After an intentional, render-verified change to baselined debt, re-snapshot with `node scripts/check-unwrapped-math-var.mjs --update-baseline`.
-
-### Diagram text labels must not overlap chart shapes
-
-ZenerIVCurve shipped with FOUR overlap bugs at once (forward curve through «пряме», top clip through «I (mA)», breakdown curve through «−V_Z», dashed marker through «пробій — стабілізація»). All four were geometric, none were visible in the JSX source or i18n strings — they only appeared once you computed the actual coordinate of the label vs the actual coordinate of the curve.
-
-Now enforced by `src/components/diagrams/diagram-text-overlap.test.tsx` — a Vitest test that auto-discovers every diagram via `import.meta.glob`, renders it, computes an approximate bbox for each `<text>` (handles single-line and multi-tspan multi-line, and percent-form `font-size="70%"` for subscripts), then samples every foreground `<line>` and `<path>` in the same SVG to check for crossings. Background elements (gridlines, highlight bands — opacity < 0.7 or stroke-width < 1) are filtered out, as are elements inside `<g transform>` (Circuit primitives use local coordinate systems that aren't comparable to the global SVG frame). 95 of 103 diagrams currently pass; the 8 in `SKIP_FILES` are documented one-by-one with the specific intentional close-placement that caused the noise.
-
-When authoring a new chart-style diagram with manually-positioned axis labels, region labels, or marker labels: **always run `npx vitest run src/components/diagrams/diagram-text-overlap.test.tsx` after the first render**. The geometric bug class doesn't show up in code review and isn't always obvious on screen unless you know to look for it.
-
-### Curve-rides-chart-edge: never clamp y at sample-time
-
-Recurring class — has shipped in at least Zener I-V, half-wave waveform, filter response, and (almost) several others. Symptom in source:
-
-```js
-const yClipped = Math.max(yMin, Math.min(yMax, raw))
-```
-
-at sample-time, mapped to a path d-string. The visible result is a curve that LITERALLY follows the top or bottom border of the chart for the entire span past the clip point — a flat horizontal rail glued to the plot edge. Pedagogically reads as «the quantity saturates at this value» (it doesn't — real diodes don't saturate at 20 mA, real filters don't bottom out at −60 dB).
-
-**The fix is universally the same:**
-1. Stop clamping at the sample. Apply only a SOFT cap (~3× plot range) so y doesn't go to ±10⁷ for `exp` overflow.
-2. Wrap the curve `<path>` in an SVG `<clipPath>` whose rectangle matches the plot bounds. Use `useId()` so multiple instances on the same page don't collide.
-3. The visible curve now exits the chart with its real slope; anything past the bounds is hidden by the clip.
-
-Now enforced by `src/components/diagrams/diagram-curve-edge-rail.test.tsx`. The gate auto-discovers every diagram, parses each foreground `<path>`'s sample points, and flags ≥ 5 consecutive samples at the path's bbox extreme y. Paths with `clipPath` (any ancestor) are skipped — the author has explicitly handled the clip. Curves whose top/bottom plateaus are real signal (square waves, step functions, normalized-Bode 0-dB passband) are listed in `SKIP_FILES` with one-line notes.
-
-## Lab activity content
-
-- **Battery preference is AA (1.5 V), not 9 V.** AA cells are universally available and cheap; 9 V batteries are a niche format in many countries. Ratio-based experiments work just as well at 1.5 V — switch the multimeter to the 2 V range / autorange for three decimal places of resolution.
-- **Card primitives**: `LabActivity` (and any new sibling) must apply `not-prose` on the wrapper plus explicit `text-foreground` / `text-card-foreground` on body text — the chapter wrapper's prose styles otherwise dominate. The bullet-flex pattern (`flex items-start gap-2 leading-6`, `shrink-0` marker, `flex-1 min-w-0` text) is already encoded in `src/components/lab/LabActivity.tsx`; copy from there for new card types.
-
-## Glossary entries — describe WHO/WHAT directly
-
-When a term refers to a person (or any concrete noun the reader can
-point at), the `tip` must answer "what is this thing" in the first
-clause. Example: `ham` is a person, so `tip` opens "A ham is a
-licensed amateur radio operator…", not "Amateur radio is the activity
-of…". The reader clicked on a noun; lead with the noun.
-
-`see` references are first-class — every new entry should link to at
-least one related term so the tooltip's "see also" chain works.
-
-## Ukraine-specific facts
-
-- **Amateur radio callsigns** in Ukraine are issued by **УДЦР**
-  (Український державний центр радіочастот / Ukrainian State Centre
-  of Radio Frequencies, a.k.a. UCRF). УДЦР is the licensing body;
-  the regulator ABOVE УДЦР is **НКЕК** (Національна комісія, що
-  здійснює державне регулювання у сферах електронних комунікацій,
-  радіочастотного спектра та надання послуг поштового зв'язку) —
-  НКЕК replaced НКРЗІ in 2022. If you need to mention the regulator,
-  use НКЕК (not НКРЗІ). Any glossary entry, lab callout, or prose
-  about the licensing process must use УДЦР for the issuing body.
-- **Decimal separator** in Ukrainian is a **comma**, not a period: `1,55 В`, `−2,5 дБ`, `0,1`. Every numeric value in `uk/ui.json` follows this. For runtime-generated numbers (widget output, SVG tick labels, anything involving `.toFixed()`), use `formatDecimal` / `formatNumber` from `src/lib/format.ts` — its JSDoc covers the rules including the `<input type="number">` caveat (inputs need raw `.toFixed()` with a period; the helpers are display-only). Section numbers (`Розділ 0.2`, `3.3`) keep the period — they're IDs, not decimals.
-
-## Other recurring conventions
-
-- **Test pairs**: every interactive widget needs a `*.test.tsx` next to it using `renderWithProviders` from `src/test/render`. dB / numeric outputs use `.toFixed(2)` — assert on that exact format (`"20.00"`, not `"20"`).
-- **Glossary terms**: wrap first occurrence of each technical term in `<G k="termKey">` so the tooltip works. Don't sprinkle `<G>` on every occurrence — once per chapter section is enough. Markup details (`<G>` tag span, `<Trans>` placeholder parity) live in `.claude/skills/ua-translate/references/markup.md`.
-- **Chapter status**: flip `'coming-soon'` → `'published'` in `src/data/chapters.ts` only after the full pre-PR gate (see top) is green.
+- **Glossary entries** — `tip` leads with WHAT the noun is (`ham` → «A ham is a licensed amateur radio operator…», not «Amateur radio is the activity of…»); every entry links ≥1 `see`; wrap the first occurrence per section in `<G k="…">` (not every occurrence).
+- **Lab activities** — prefer AA (1.5 V) batteries, not 9 V (a niche format in many countries). `LabActivity` cards need `not-prose` + explicit `text-foreground`; copy the bullet-flex pattern from `src/components/lab/LabActivity.tsx`.
+- **Ukraine — the licensing body is УДЦР** (issues callsigns); the regulator above it is **НКЕК** (replaced НКРЗІ in 2022) — never write «НКРЗІ».
+- **Ukrainian decimals use a comma**: `1,55 В`, `−2,5 дБ`. Runtime numbers → `formatDecimal`/`formatNumber` from `src/lib/format.ts` (an `<input type="number">` still needs a raw `.toFixed()` with a period). Section IDs (`Розділ 3.3`) keep the period — they're not decimals.

@@ -457,6 +457,19 @@ See [typography-and-padding.md](typography-and-padding.md) for the full conversi
 
 ---
 
+## 25. Text label overlaps a chart curve / axis / symbol (geometric, invisible in source)
+
+**Symptom.** ZenerIVCurve shipped with FOUR overlaps at once (forward curve through «пряме», top clip through «I (mA)», breakdown curve through «−V_Z», dashed marker through «пробій»). None were visible in the JSX or i18n — they appear only when you compute the label's actual coordinate vs the curve's actual coordinate.
+
+**Root cause.** Manually-positioned axis / region / marker labels placed by eye against a curve whose path is generated, not eyeballed. Also: a `TerminalLabel` set too close to a symbol so its rendered box descends onto the meter/diode (ch3.4 — the box math is at the detection threshold, so a small overlap slips the jsdom gate).
+
+**Fix / avoid.**
+- After the first render of any chart-style diagram, run `npx vitest run src/components/diagrams/diagram-text-overlap.test.tsx` (auto-discovers every diagram, samples each foreground `<line>`/`<path>` vs each `<text>` bbox; background = opacity < 0.7 or stroke-width < 1; `<g transform>` elements excluded).
+- The jsdom gate has no layout engine, so it under-catches shallow label-on-symbol grazes. For schematics, also run the real-browser `getBoundingClientRect` audit (SKILL.md Stage 7 / `npm run test:visual`).
+- Intentional close placements go in the test's `SKIP_FILES` with a one-line reason.
+
+---
+
 ## When adding a new entry
 
 1. Number it sequentially after the last entry.
