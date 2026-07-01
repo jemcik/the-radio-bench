@@ -148,25 +148,43 @@ function AmmeterSeries({
   )
 }
 
+/* ── Meter glyph for the legend ────────────────────────────────────────── *
+ * A miniature of the on-schematic meter (a lettered circle in the accent
+ * colour), so the legend swatch reads as the same object — a component
+ * circle, clearly larger than a connection dot — not a generic tiny ring.
+ * `data-overlap-allowed` marks it legend artwork so the text-overlap gate
+ * doesn't treat the centred letter as a label-on-symbol collision. */
+function MeterGlyph({ letter, color }: { letter: string; color: string }) {
+  return (
+    <svg width="22" height="18" viewBox="0 0 22 18" aria-hidden data-overlap-allowed="" className="shrink-0">
+      <circle cx="11" cy="9" r="7" fill="none" stroke={color} strokeWidth={1.6} />
+      <text x="11" y="9" fontSize="9.5" fontWeight={600} textAnchor="middle" dominantBaseline="central" fill={color}>
+        {letter}
+      </text>
+    </svg>
+  )
+}
+
 /* ── exported component ────────────────────────────────────────────────── */
 
 export default function MultimeterDiagram() {
   const { t } = useTranslation('ui')
 
+  // No «electrical connection» (junction-dot) entry: a dot = a join is
+  // self-evident, and the ammeter loop below has no junction dots at all,
+  // so listing it there described something not on the diagram.
   const voltmeterLegend: LegendItem[] = [
     { kind: 'line',     label: t('ch0_2.legendMainLoop') },
     { kind: 'battery',  label: t('ch0_2.legendBattery') },
     { kind: 'resistor', label: t('ch0_2.legendResistor') },
     { kind: 'line',     color: VOLT_ACCENT, label: t('ch0_2.legendVoltmeterProbes') },
-    { kind: 'dot',      label: t('ch0_2.legendJunction') },
   ]
 
   const ammeterLegend: LegendItem[] = [
     { kind: 'line',     label: t('ch0_2.legendMainLoop') },
     { kind: 'battery',  label: t('ch0_2.legendBattery') },
     { kind: 'resistor', label: t('ch0_2.legendResistor') },
-    { kind: 'circle',   color: AMP_ACCENT, label: t('ch0_2.legendAmmeterInline') },
-    { kind: 'dot',      label: t('ch0_2.legendJunction') },
+    { swatch: <MeterGlyph letter="A" color={AMP_ACCENT} />, label: t('ch0_2.legendAmmeterInline') },
   ]
 
   return (

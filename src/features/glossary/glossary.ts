@@ -395,6 +395,18 @@ export const glossary: Record<string, GlossaryEntry> = {
       'A dummy load is a resistor — close to 50 Ω so it matches the transmitter\'s output — built to absorb full transmit power and turn it into heat instead of radiating it. It lets you tune up, measure output power, or test a rig without transmitting on a real antenna, and so without interfering with anyone. The two things that matter are its impedance (50 Ω, for a low SWR) and its power rating: a homebrew load of four 200 Ω resistors in parallel makes 50 Ω, while oil-filled «cantenna» loads handle high power. Reading the RF voltage across a dummy load on an oscilloscope is a common way to measure output power.',
     see: ['impedance', 'swr'],
   },
+  wavemeter: {
+    tip: 'A passive tuned circuit (coil + variable capacitor) held near a transmitter; tune it for a meter peak at resonance and read the approximate frequency off its dial.',
+    detail:
+      'An absorption wavemeter is the simplest frequency indicator there is: a coil and a variable capacitor forming a tuned circuit, with a diode and a small meter (or a lamp). Hold its coil near the transmitter so the two couple loosely, then turn the capacitor until the circuit resonates at the transmitter\'s frequency — at resonance it absorbs the most energy and the meter peaks. You read the frequency off the capacitor\'s calibrated dial. Because the resonance is broad (low Q), the reading is only approximate; a frequency counter has long since replaced it for precise work, but the wavemeter survives as a teaching tool and a quick band check.',
+    see: ['frequency counter', 'resonance', 'frequency'],
+  },
+  'frequency counter': {
+    tip: 'A digital instrument that counts a signal\'s cycles over a precise time interval and displays the frequency directly, to many digits.',
+    detail:
+      'A frequency counter measures frequency by counting how many cycles of the input occur during a precisely known gate time, then displaying the result directly in Hz, kHz or MHz. Its accuracy comes from a stable internal time base (a crystal or oven-controlled oscillator), so a good counter is far more precise than an absorption wavemeter and needs no tuning or interpretation. It is the modern answer to «what frequency is this?» — the wavemeter\'s digital replacement.',
+    see: ['wavemeter', 'frequency', 'oscillator'],
+  },
   'linear amplifier': {
     tip: 'An amplifier that reproduces its input\'s exact shape, only bigger — required for modes like SSB and AM whose information lives in the changing amplitude.',
     detail:
