@@ -299,7 +299,7 @@ export const PARTS: Part[] = [
         part: 3,
         title: 'Measurements',
         subtitle: 'Multimeter, SWR meter, dummy load, oscilloscope, VNA — a full session',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['8.1', '8.2'],

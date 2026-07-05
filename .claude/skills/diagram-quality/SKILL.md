@@ -279,6 +279,14 @@ If at step 2 you can't actually READ a label because the screenshot is too small
 
 **Never substitute «I see the diagram exists» for «I read the labels».** «Looks fine on the overview» fails this stage every time.
 
+### Stage 7 — Objective browser-geometry overlap audit (mandatory; eyeballing is not enough)
+
+Reader-flagged TWICE on ch3.4 (July 2026): I shipped `ShuntMultiplierSchematic` with 2×-oversized text overlapping the meter symbol, "verified" it by screenshot glance (Stage 6), and STILL missed it — twice. Screenshots lie at a glance; the reliable check is **measured geometry from the real browser**. Two root causes, two guards:
+
+**A. `<Circuit>` MUST have `maxWidth` (now gated).** Without it, `SVGDiagram` sets `width="100%"` and a small viewBox scales up ~2× to fill the column, inflating every `TerminalLabel` (user-space fontSize) so text renders huge and descends onto symbols. `check:circuit-maxwidth` (in `check:all`) fails any non-`legend` Circuit missing `maxWidth`. Always pass `maxWidth={W}`.
+
+**B. Run the getBoundingClientRect detector in the browser — the jsdom gate can't catch this class.** `diagram-text-overlap.test.tsx` renders in jsdom (no layout engine): it uses a char-width heuristic at the *attribute* fontSize (14), models `dominant-baseline="central"` as baseline, and only partially covers `@/lib/circuit` symbols — so a `TerminalLabel` descending a few px onto a meter circle lands right at its detection threshold and slips through. Ground truth is `getBoundingClientRect` in the real page. After building/editing ANY diagram, via Claude-in-Chrome (`javascript_tool` on the running dev page) run a detector over every `<svg>` using real client rects: flag text∩text, text∩circle (exclude the symbol's own centred letter via a centre-in-circle test), text∩compact-path (symbol bodies, bbox both dims < ~90), text∩component-rect, and text spilling the svg rect. Also report `scale = clientWidth / viewBox.width` and `getComputedStyle(text).fontSize` per svg — any scale > 1 on a Circuit diagram means oversized text. Require **"ZERO OVERLAPS"** and all fonts 13–16 px (larger only for an intentional display readout). The working detector snippet is in the memory note `feedback_diagram_overlap_browser_geometry`; trust its output over a screenshot and over green jsdom gates.
+
 ## References — fetched on demand
 
 The root-level checklist above is loaded every invocation. Dig into these when the task warrants it:

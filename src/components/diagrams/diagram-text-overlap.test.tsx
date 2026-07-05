@@ -117,6 +117,7 @@ const SKIP_FILES = new Set([
   './BodePlotReadingGuide.tsx',    // «−20 dB/decade» annotation sits ON the slope it labels
   './CapacitorTypeGallery.tsx',    // «+» plate-sign labels abut electrolytic-cap symbol stroke
   './DividerSchematic.tsx',        // voltmeter «A» designator inside the meter circle
+  './BenchMeasurementSchematic.tsx', // NodePoint «S» scope-probe letter sits inside its own node circle (by design); descriptive labels verified overlap-free via the browser getBoundingClientRect detector (see CLAUDE.md)
   './FilterTypeGallery.tsx',       // tiny in-cell waveform paths intentionally pass close to the «in» / «out» labels
   // FlybackDiodeSchematic was previously skipped citing «Q1 inside the
   // transistor circle» — that overlap was fixed at the primitive level
