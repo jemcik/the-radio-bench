@@ -16,7 +16,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { globSync } from 'node:fs'
 
 const localeFile = 'src/i18n/locales/uk/ui.json'
 const data = JSON.parse(fs.readFileSync(localeFile, 'utf8'))
@@ -116,7 +115,19 @@ function tagsInQuiz(chBlock) {
   return tags
 }
 
-const chapterFiles = globSync('src/chapters/**/Chapter*.tsx')
+// Recursive walk (no fs.globSync — that export lands only in Node 22; CI
+// runs Node 20, where importing it is a hard SyntaxError). readdirSync +
+// path.join is Node 18+ safe.
+function findChapterFiles(dir) {
+  const out = []
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) out.push(...findChapterFiles(full))
+    else if (/^Chapter.*\.tsx$/.test(entry.name)) out.push(full)
+  }
+  return out
+}
+const chapterFiles = findChapterFiles('src/chapters')
 let failed = false
 
 for (const file of chapterFiles) {
