@@ -25,6 +25,11 @@
  * A brand-new chapter has no baseline entry (treated as 0), so it must ship
  * clean. Regenerate after an intentional, browser-verified change:
  *   UPDATE_BASELINE=1 npm run test:visual
+ *
+ * IMPORTANT: font metrics differ between macOS/local and CI's Linux Chromium,
+ * so a locally-captured baseline flips borderline overlaps and reddens CI.
+ * Capture the baseline in CI's environment: run the `Re-baseline visual gate`
+ * workflow (.github/workflows/rebaseline-visual.yml) and commit its artifact.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'

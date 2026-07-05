@@ -1,0 +1,46 @@
+name: Re-baseline visual gate
+
+# Regenerate e2e/diagram-geometry.baseline.json in the SAME environment the CI
+# `visual` job runs in (ubuntu-latest + Linux Chromium). Font metrics differ
+# between local (macOS) and CI, so a locally-captured baseline flips borderline
+# overlaps and fails CI — the baseline MUST be captured here.
+#
+# Usage:
+#   gh workflow run rebaseline-visual.yml --ref <branch>
+#   gh run watch <id>                       # wait for it
+#   gh run download <id> -n diagram-geometry-baseline -D e2e/
+#   git add e2e/diagram-geometry.baseline.json && git commit && git push
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rebaseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Regenerate baseline (records CI-true overlap counts)
+        run: npm run test:visual:update
+
+      - name: Show baseline
+        run: cat e2e/diagram-geometry.baseline.json
+
+      - name: Upload baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagram-geometry-baseline
+          path: e2e/diagram-geometry.baseline.json
