@@ -170,18 +170,17 @@ function MeterGlyph({ letter, color }: { letter: string; color: string }) {
 export default function MultimeterDiagram() {
   const { t } = useTranslation('ui')
 
-  // No «electrical connection» (junction-dot) entry: a dot = a join is
-  // self-evident, and the ammeter loop below has no junction dots at all,
-  // so listing it there described something not on the diagram.
+  // Deliberately terse legends. No «electrical connection» (junction-dot)
+  // entry — a dot = a join is self-evident (and the ammeter loop has no
+  // junctions at all). No «main circuit» entry — a plain wire needs no
+  // explaining. No battery voltage — irrelevant to HOW a meter connects.
   const voltmeterLegend: LegendItem[] = [
-    { kind: 'line',     label: t('ch0_2.legendMainLoop') },
     { kind: 'battery',  label: t('ch0_2.legendBattery') },
     { kind: 'resistor', label: t('ch0_2.legendResistor') },
     { kind: 'line',     color: VOLT_ACCENT, label: t('ch0_2.legendVoltmeterProbes') },
   ]
 
   const ammeterLegend: LegendItem[] = [
-    { kind: 'line',     label: t('ch0_2.legendMainLoop') },
     { kind: 'battery',  label: t('ch0_2.legendBattery') },
     { kind: 'resistor', label: t('ch0_2.legendResistor') },
     { swatch: <MeterGlyph letter="A" color={AMP_ACCENT} />, label: t('ch0_2.legendAmmeterInline') },

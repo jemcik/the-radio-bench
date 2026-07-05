@@ -69,7 +69,7 @@ export default function Chapter3_4() {
       <p><Trans i18nKey="ch3_4.analogMeterCaptionLead" ns="ui" components={{ ...mathComponents }} /></p>
       <p><Trans i18nKey="ch3_4.anP2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em /> }} /></p>
       <ShuntMultiplierSchematic />
-      <p><Trans i18nKey="ch3_4.anP3" ns="ui" components={{ ...mathComponents, strong: <strong />, sens: <G k="sensitivity" /> }} /></p>
+      <p><Trans i18nKey="ch3_4.anP3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <p><Trans i18nKey="ch3_4.anP4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <Callout variant="key">
         <p><Trans i18nKey="ch3_4.anKey" ns="ui" components={{ ...mathComponents, em: <em /> }} /></p>
@@ -80,9 +80,13 @@ export default function Chapter3_4() {
       <p><Trans i18nKey="ch3_4.swrP1" ns="ui" components={{ ...mathComponents, strong: <strong />, swr: <G k="swr" /> }} /></p>
       <p><Trans i18nKey="ch3_4.crossNeedleLead" ns="ui" components={{ ...mathComponents }} /></p>
       <CrossNeedleMeter />
-      <p><Trans i18nKey="ch3_4.swrP2" ns="ui" components={{ ...mathComponents, gamma: <G k="reflection coefficient" /> }} /></p>
+      <p><Trans i18nKey="ch3_4.swrP2" ns="ui" components={{ ...mathComponents, strong: <strong />, gamma: <G k="reflection coefficient" /> }} /></p>
       <Callout variant="math">
-        <p><Trans i18nKey="ch3_4.swrFormula" ns="ui" components={{ ...mathComponents, rl: <G k="return loss" /> }} /></p>
+        <div className="space-y-1.5">
+          <p><Trans i18nKey="ch3_4.swrFormula1" ns="ui" components={{ ...mathComponents }} /></p>
+          <p><Trans i18nKey="ch3_4.swrFormula2" ns="ui" components={{ ...mathComponents }} /></p>
+          <p><Trans i18nKey="ch3_4.swrFormula3" ns="ui" components={{ ...mathComponents, rl: <G k="return loss" /> }} /></p>
+        </div>
       </Callout>
       <p><Trans i18nKey="ch3_4.swrP3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <DiagramFigure caption={t('ch3_4.swrTable.caption')}>

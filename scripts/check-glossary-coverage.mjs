@@ -146,6 +146,10 @@ const EXEMPT_PER_CHAPTER = {
   // in passing — often as a «you'll meet this later» pointer — before 3.1
   // teaches them; a wrap here is optional, not focal.
   ch0_4: new Set(['sensitivity']),
+  // ch3_4 «sensitivity» always means the moving-coil meter's ohms-per-volt /
+  // full-scale figure of merit — a different concept from the glossary's
+  // RECEIVER sensitivity, so it must NOT be wrapped as that glossary term.
+  ch3_4: new Set(['sensitivity']),
   ch1_9: new Set(['mixer', 'detector']),
   ch2_2: new Set(['superheterodyne', 'mixer', 'detector']),
   // ch0_5 «How to Read a Schematic» introduces transistor/NPN/PNP/base/
