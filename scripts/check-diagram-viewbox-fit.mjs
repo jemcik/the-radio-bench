@@ -60,6 +60,9 @@ const SKIP_FILES = new Set([
   'AtomicDiagram.tsx',         // verified runtime: nucleus + electrons fill 560×400
   'MaterialsComparison.tsx',   // verified runtime: 3-column layout fills 620 width
   'EmSpectrumLadder.tsx',      // verified runtime: spectrum bands + ticks fill 820 width; all x coords are computed via x(exp) so the parser only sees the lone 788 literal
+  'IonosphereLayersDiagram.tsx', // two day/night panels; content x via NIGHT_X+PW derived exprs (parser sees only x={NIGHT_X}=388) — fills 680 width
+  'SunspotCycleDiagram.tsx',   // plotted curve; all x via xOf(year) calls (parser sees only the lone 16 axis-label literal) — plot fills 54..654 of 680
+  'ThreeModesDiagram.tsx',     // scene; far antenna at x={FAR}=605 + ionosphere Q-arc to 640 are invisible to the M/L parser (sees max 500) — content fills 40..640 of 680, verified in browser
   // Visually acceptable (runtime padding < 90 px each side, within the
   // typical SVG-label slop budget).
   'BypassCapSchematic.tsx',
