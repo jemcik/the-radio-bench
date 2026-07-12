@@ -80,7 +80,8 @@ const EXEMPT_KEYS = new Set([
   // ch1_9 quiz: EN «(DC)» translated as «(постійна напруга)» —
   // expanding the acronym in UA prose was the chosen strategy
   // for quiz answers (compactness over symbol-symmetry).
-  'ch1_9.quiz_q1_b',
+  // (Option moved b→d in the 2026-07 quiz-position rebalance.)
+  'ch1_9.quiz_q1_d',
   // ch1_9 quiz: EN «(E-I)» refers to E-I shape; UA uses the
   // Cyrillic-equivalent «Ш-подібне» (since Cyrillic Ш visually
   // matches the laminate shape better than Latin E-I in UA prose).

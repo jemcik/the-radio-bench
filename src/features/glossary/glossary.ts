@@ -1040,6 +1040,91 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Skywave (also called skip propagation) occurs when HF signals travel upward at an angle, refract off the ionosphere, and return to earth hundreds or thousands of kilometres away. The signal can then bounce off the ground and repeat the process (multi-hop), reaching the other side of the planet. The skip zone is the area between the end of ground wave coverage and where the first skywave hop lands.',
     see: ['ionosphere', 'hf', 'ground wave'],
   },
+  'space wave': {
+    tip: 'The line-of-sight radio wave that travels in a near-straight line to the horizon — the main VHF/UHF mode.',
+    detail:
+      'The space wave travels directly from transmitting to receiving antenna in an almost straight line, bent only slightly downward by the lower atmosphere so it reaches about 15% past the visual horizon. It dominates at VHF and UHF, where the ionosphere no longer returns signals to earth. Its range is set mainly by antenna height — the radio horizon grows with the square root of height — which is why VHF/UHF operators mount antennas as high as they can.',
+    see: ['vhf', 'uhf', 'troposphere'],
+  },
+  'critical frequency': {
+    tip: 'The highest frequency the ionosphere still sends straight back when a wave is fired vertically upward.',
+    detail:
+      'Point a transmitter straight up and slowly raise the frequency: above a certain point the wave no longer returns — it passes through the layer into space. That threshold is the critical frequency (for the F2 layer, written foF2). It gauges how strongly the layer is ionised, rising by day and with solar activity and falling at night. Waves sent at a shallow angle can still be returned at frequencies well above the critical frequency (up to the MUF, the maximum usable frequency), because a glancing wave needs less bending to be turned back.',
+    see: ['ionosphere', 'muf'],
+  },
+  'skip distance': {
+    tip: 'The ground distance from the transmitter to where the first sky-wave hop returns to earth.',
+    detail:
+      'A sky wave launched at a given angle is refracted by the ionosphere and comes back to earth some distance away — that distance is the skip distance. Lower take-off angles give longer skip distances (up to about 4000 km for a single F2 hop); steeper angles come down closer. It depends on the layer height, the take-off angle and the frequency, and it sets the inner edge of where the signal can be heard.',
+    see: ['skywave', 'skip zone', 'muf'],
+  },
+  'skip zone': {
+    tip: 'The silent ring of ground beyond ground-wave range but nearer than the first sky-wave landing.',
+    detail:
+      'Between the point where the ground wave has faded and the point where the first sky-wave hop returns to earth, neither wave reaches the ground — this silent ring is the skip zone (or dead zone). It is why a station 2000 km away can be perfectly readable while one 200 km away hears nothing. Raising the frequency toward the MUF (the maximum usable frequency), or using a higher take-off angle, shrinks the skip zone.',
+    see: ['skip distance', 'skywave'],
+  },
+  muf: {
+    tip: 'Maximum Usable Frequency — the highest frequency an ionospheric path will return to earth.',
+    detail:
+      'The MUF is the top of the usable window for a sky-wave path: above it the wave bends too little and passes through the ionosphere into space. It is the critical frequency multiplied by a factor that grows as the path lengthens (the take-off angle lowers), so long DX paths can use higher bands than short ones. The MUF rises by day and with solar activity and falls at night; operators aim just below it, where absorption is least.',
+    see: ['critical frequency', 'luf', 'skywave'],
+  },
+  luf: {
+    tip: 'Lowest Usable Frequency — below it, D-layer absorption swallows a sky-wave signal before it can return.',
+    detail:
+      'The LUF is the bottom of the usable window: frequencies below it are absorbed by the D layer (strongest at low frequencies and in daylight) before they can complete the path. Together with the MUF (the maximum usable frequency) it brackets the band of frequencies that actually work on a given path at a given time. The LUF climbs during the day as D-layer absorption strengthens, and falls at night when the D layer fades.',
+    see: ['muf', 'ionosphere'],
+  },
+  hop: {
+    tip: 'One up-and-down bounce of a sky wave off the ionosphere and back to earth.',
+    detail:
+      'A single hop is one refraction off the ionosphere that returns the wave to the ground, spanning up to about 4000 km off the F2 layer. For greater distances the wave reflects off the ground and repeats — two-hop, three-hop and so on — chaining across the world. Each hop loses energy to ground reflection and absorption, so multi-hop signals arrive weaker.',
+    see: ['skywave', 'skip distance'],
+  },
+  fading: {
+    tip: 'The slow rise and fall of a received signal\'s strength — known by the Morse abbreviation QSB.',
+    detail:
+      'Fading (QSB) is the ever-changing strength of a sky-wave signal. Most often it is multipath fading: the signal arrives by two or more paths of slightly different length through a moving ionosphere, and as they drift in and out of phase they alternately reinforce and cancel. Polarisation fading (the ionosphere twisting the wave\'s polarisation) and absorption fading also occur. Automatic gain control and spaced (diversity) antennas help counter it.',
+    see: ['multipath', 'skywave', 'ionosphere'],
+  },
+  qsb: {
+    tip: 'QSB — the Morse/Q-code abbreviation for fading, a signal rising and falling in strength.',
+    detail:
+      'QSB is the Q-code operators use for fading: the received signal swelling and sinking over seconds or minutes, usually because a sky wave arrives by several drifting paths. Like other Q-codes it works as both a question and a statement — "QSB?" asks "is my signal fading?", "QSB" reports "your signal is fading". It is a compact shorthand inherited from the CW era and still used on every mode.',
+    see: ['fading', 'multipath'],
+  },
+  multipath: {
+    tip: 'A signal arriving by more than one path at once, the paths having slightly different lengths.',
+    detail:
+      'When a wave reaches the receiver by several routes — for example a two-hop and a three-hop sky-wave path — the copies arrive at slightly different times. Depending on the exact path-length difference they add up or partly cancel, and as the ionosphere drifts this balance keeps changing, producing multipath fading. Multipath also smears digital signals in time, which is why data modes use error correction and guard intervals.',
+    see: ['fading', 'skywave'],
+  },
+  troposphere: {
+    tip: 'The lowest layer of the atmosphere — the bottom ~12 km where weather happens.',
+    detail:
+      'The troposphere is where clouds, wind and temperature changes live. For radio it matters mainly at VHF and UHF: normally these bands pass straight through it line-of-sight, but a temperature inversion can bend or trap them, producing tropospheric ducting that carries signals far past the horizon. Unlike the ionosphere, the troposphere\'s effects follow the weather rather than the sun.',
+    see: ['tropospheric ducting', 'vhf', 'space wave'],
+  },
+  'tropospheric ducting': {
+    tip: 'A weather effect that traps VHF/UHF signals in a layer and guides them far beyond the horizon.',
+    detail:
+      'When a temperature inversion puts warm air above cooler air (typical of stable high pressure, or a warm evening over the sea), radio waves bend toward the denser cool air and can become trapped in a duct between the warm lid and the surface. VHF and UHF signals then travel hundreds — occasionally over a thousand — kilometres past the normal line-of-sight horizon. A "tropo opening" follows the weather map and is prime time for VHF/UHF DX.',
+    see: ['troposphere', 'vhf', 'uhf'],
+  },
+  sunspot: {
+    tip: 'A dark, cooler patch on the sun whose count tracks solar activity over an ~11-year cycle.',
+    detail:
+      'Sunspots are regions of intense magnetic activity that look darker because they are slightly cooler than the surrounding surface. Their number rises and falls over roughly eleven years — the sunspot (solar) cycle. More sunspots mean more ultraviolet output, which more strongly ionises the F2 layer, raises the MUF (the maximum usable frequency) and opens the high HF bands for worldwide work. Sunspot counts have been recorded since the 1600s, one of the longest scientific data series we have.',
+    see: ['solar flux', 'ionosphere', 'muf'],
+  },
+  'solar flux': {
+    tip: 'The Solar Flux Index (SFI) — the sun\'s 10.7 cm radio output, a daily gauge of how well HF will propagate.',
+    detail:
+      'The solar flux index measures the sun\'s radio noise at a wavelength of 10.7 cm and closely tracks the ultraviolet that ionises the ionosphere. It runs from about 65 at a quiet solar minimum to over 200 at an active maximum; the higher it is, the higher the MUF (the maximum usable frequency) and the better the high HF bands. It is quoted alongside the A and K indices (which measure geomagnetic disturbance) on DX-cluster and space-weather pages — you want the flux high and the K index low.',
+    unit: 'sfu',
+    see: ['sunspot', 'muf', 'hf'],
+  },
   cw: {
     tip: 'Continuous Wave — Morse-code transmission, an unmodulated carrier keyed on and off.',
     detail:

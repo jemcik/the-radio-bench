@@ -316,7 +316,7 @@ export const PARTS: Part[] = [
         part: 4,
         title: 'Frequency Spectrum and Propagation',
         subtitle: 'Ionosphere, HF skip, VHF/UHF, sunspot cycle',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['7'],
