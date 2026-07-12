@@ -49,7 +49,8 @@ Only then: outline → visuals → prose. (Jumping straight to building is the c
 4. Test pair for every widget (`renderWithProviders` from `src/test/render`; assert the exact `.toFixed(2)` string, `"20.00"` not `"20"`).
 5. Prose promises paid off — every «the … table/diagram» has the artefact rendered; `npm run check:i18n-usage` catches orphan keys.
 6. Every circuit diagram built from `@/lib/circuit` primitives only (zero hand-drawn SVG).
-7. Status flip `'coming-soon'` → `'published'` in `src/data/chapters.ts` LAST, after 1–6 and gates are green.
+7. Quiz is fair — spread `_correct` across a/b/c/d (≤40 % on any one letter, use all four), keep the four options length-parallel (the «why» goes in `_explanation`, never padded into the correct option), and keep en/uk `_correct` identical. Build it balanced from the start; `check:quiz-balance` enforces length + position + parity but reordering after the fact churns the UA translation.
+8. Status flip `'coming-soon'` → `'published'` in `src/data/chapters.ts` LAST, after 1–7 and gates are green.
 
 ## Invoke the right skill before the work (they hold the detailed rules)
 

@@ -1049,7 +1049,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'critical frequency': {
     tip: 'The highest frequency the ionosphere still sends straight back when a wave is fired vertically upward.',
     detail:
-      'Point a transmitter straight up and slowly raise the frequency: above a certain point the wave no longer returns — it passes through the layer into space. That threshold is the critical frequency (for the F2 layer, written foF2). It gauges how strongly the layer is ionised, rising by day and with solar activity and falling at night. Waves sent at a shallow angle can still be returned at frequencies well above the critical frequency (up to the MUF), because a glancing wave needs less bending to be turned back.',
+      'Point a transmitter straight up and slowly raise the frequency: above a certain point the wave no longer returns — it passes through the layer into space. That threshold is the critical frequency (for the F2 layer, written foF2). It gauges how strongly the layer is ionised, rising by day and with solar activity and falling at night. Waves sent at a shallow angle can still be returned at frequencies well above the critical frequency (up to the MUF, the maximum usable frequency), because a glancing wave needs less bending to be turned back.',
     see: ['ionosphere', 'muf'],
   },
   'skip distance': {
@@ -1061,7 +1061,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'skip zone': {
     tip: 'The silent ring of ground beyond ground-wave range but nearer than the first sky-wave landing.',
     detail:
-      'Between the point where the ground wave has faded and the point where the first sky-wave hop returns to earth, neither wave reaches the ground — this silent ring is the skip zone (or dead zone). It is why a station 2000 km away can be perfectly readable while one 200 km away hears nothing. Raising the frequency toward the MUF, or using a higher take-off angle, shrinks the skip zone.',
+      'Between the point where the ground wave has faded and the point where the first sky-wave hop returns to earth, neither wave reaches the ground — this silent ring is the skip zone (or dead zone). It is why a station 2000 km away can be perfectly readable while one 200 km away hears nothing. Raising the frequency toward the MUF (the maximum usable frequency), or using a higher take-off angle, shrinks the skip zone.',
     see: ['skip distance', 'skywave'],
   },
   muf: {
@@ -1073,7 +1073,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   luf: {
     tip: 'Lowest Usable Frequency — below it, D-layer absorption swallows a sky-wave signal before it can return.',
     detail:
-      'The LUF is the bottom of the usable window: frequencies below it are absorbed by the D layer (strongest at low frequencies and in daylight) before they can complete the path. Together with the MUF it brackets the band of frequencies that actually work on a given path at a given time. The LUF climbs during the day as D-layer absorption strengthens, and falls at night when the D layer fades.',
+      'The LUF is the bottom of the usable window: frequencies below it are absorbed by the D layer (strongest at low frequencies and in daylight) before they can complete the path. Together with the MUF (the maximum usable frequency) it brackets the band of frequencies that actually work on a given path at a given time. The LUF climbs during the day as D-layer absorption strengthens, and falls at night when the D layer fades.',
     see: ['muf', 'ionosphere'],
   },
   hop: {
@@ -1115,13 +1115,13 @@ export const glossary: Record<string, GlossaryEntry> = {
   sunspot: {
     tip: 'A dark, cooler patch on the sun whose count tracks solar activity over an ~11-year cycle.',
     detail:
-      'Sunspots are regions of intense magnetic activity that look darker because they are slightly cooler than the surrounding surface. Their number rises and falls over roughly eleven years — the sunspot (solar) cycle. More sunspots mean more ultraviolet output, which more strongly ionises the F2 layer, raises the MUF and opens the high HF bands for worldwide work. Sunspot counts have been recorded since the 1600s, one of the longest scientific data series we have.',
+      'Sunspots are regions of intense magnetic activity that look darker because they are slightly cooler than the surrounding surface. Their number rises and falls over roughly eleven years — the sunspot (solar) cycle. More sunspots mean more ultraviolet output, which more strongly ionises the F2 layer, raises the MUF (the maximum usable frequency) and opens the high HF bands for worldwide work. Sunspot counts have been recorded since the 1600s, one of the longest scientific data series we have.',
     see: ['solar flux', 'ionosphere', 'muf'],
   },
   'solar flux': {
     tip: 'The Solar Flux Index (SFI) — the sun\'s 10.7 cm radio output, a daily gauge of how well HF will propagate.',
     detail:
-      'The solar flux index measures the sun\'s radio noise at a wavelength of 10.7 cm and closely tracks the ultraviolet that ionises the ionosphere. It runs from about 65 at a quiet solar minimum to over 200 at an active maximum; the higher it is, the higher the MUF and the better the high HF bands. It is quoted alongside the A and K indices (which measure geomagnetic disturbance) on DX-cluster and space-weather pages — you want the flux high and the K index low.',
+      'The solar flux index measures the sun\'s radio noise at a wavelength of 10.7 cm and closely tracks the ultraviolet that ionises the ionosphere. It runs from about 65 at a quiet solar minimum to over 200 at an active maximum; the higher it is, the higher the MUF (the maximum usable frequency) and the better the high HF bands. It is quoted alongside the A and K indices (which measure geomagnetic disturbance) on DX-cluster and space-weather pages — you want the flux high and the K index low.',
     unit: 'sfu',
     see: ['sunspot', 'muf', 'hf'],
   },
