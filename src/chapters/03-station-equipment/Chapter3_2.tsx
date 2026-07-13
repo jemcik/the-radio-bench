@@ -118,7 +118,7 @@ export default function Chapter3_2() {
 
       {/* ── §8 What makes a transmitter good ───────────────────── */}
       <Section id="characteristics" labelKey="ch3_2.sectionChar" />
-      <p><Trans i18nKey="ch3_2.charP1" ns="ui" components={{ ...mathComponents, strong: <strong />, harmonic: <G k="harmonic" />, bw: <G k="bandwidth" /> }} /></p>
+      <p><Trans i18nKey="ch3_2.charP1" ns="ui" components={{ ...mathComponents, strong: <strong />, harmonic: <G k="harmonic" />, bw: <G k="bandwidth" />, spur: <G k="spurious" /> }} /></p>
       <p><Trans i18nKey="ch3_2.charP2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, cw: <G k="cw" />, ssb: <G k="ssb" />, fm: <G k="fm" /> }} /></p>
       <EmissionDesignatorDecoder />
       <p><Trans i18nKey="ch3_2.charP3" ns="ui" components={{ ...mathComponents }} /></p>

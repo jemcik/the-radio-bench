@@ -717,7 +717,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   balun: {
     tip: 'BALanced–UNbalanced — a transformer or choke that matches a balanced antenna feed (like a dipole) to an unbalanced coaxial cable, also blocking common-mode current from running on the outside of the coax shield.',
     detail:
-      'A balun sits between an antenna whose feed point is balanced — both feed wires carry equal currents 180° out of phase, like a dipole\'s two legs — and a coaxial transmission line, where the inner conductor and the grounded shield are not symmetric. Without one, common-mode current flows on the outside of the coax shield: the cable becomes part of the antenna, the radiation pattern distorts, RF appears in the shack (causing computer glitches and «RF in the audio»), and SWR readings become inconsistent. Two functional types are common in amateur radio. (1) Current / choke baluns (1:1) — pass the differential signal but choke off common-mode current with high impedance; built as a few turns of coax through a ferrite toroid, or as a stack of ferrite beads on the cable. (2) Voltage baluns (typically 4:1) — true transformers with a turns ratio that also transforms impedance, used for folded dipoles (≈ 200 Ω feed) and OCF (off-centre-fed) dipoles. Mix #43 ferrite is the standard below 30 MHz for 100 W-class work; #61 above. SWR alone does NOT detect a missing balun — even a perfectly matched antenna will radiate from the cable.',
+      'A balun sits between an antenna whose feed point is balanced — both feed wires carry equal currents 180° out of phase, like a dipole\'s two legs — and a coaxial transmission line, where the inner conductor and the grounded shield are not symmetric. Without one, common-mode current flows on the outside of the coax shield: the cable becomes part of the antenna, the radiation pattern distorts, RF appears in the shack (causing computer glitches and «RF in the audio»), and SWR readings become inconsistent. Two functional types are common in amateur radio. (1) Current / choke baluns (1:1) — pass the differential signal but choke off common-mode current with high impedance; built as a few turns of coax through a ferrite toroid, or as a stack of ferrite beads on the cable. (2) Voltage baluns (typically 4:1) — true transformers with a turns ratio that also transforms impedance, used for folded dipoles (≈ 200 Ω feed) and OCF (off-centre-fed) dipoles. Core material follows the job, and the two types want opposite things. A voltage/transformer balun for 100 W-class HF work is traditionally wound on mix 43, whose high permeability gives ample winding reactance with few turns. A choke (current) balun instead wants a lossy, resistive impedance, and there mix 31 is the best all-round performer across the HF bands — clearly the material of choice at 5 MHz and below, where it offers several dB more choking impedance than mix 43. Between 5 and 20 MHz mix 43 is about 1 dB ahead and above 20 MHz the two are equivalent, so that single decibel rarely decides anything and one mix 31 core covers every HF band — the HF transmitting chokes currently recommended in the ARRL Handbook are wound on mix 31 toroids. Mix 43 suppresses from roughly 20 MHz to 250 MHz, so it suits the upper HF and VHF end; mix 61 only suppresses above about 200 MHz, and below that it serves as an inductor material, useful up to about 25 MHz. SWR alone does NOT detect a missing balun — even a perfectly matched antenna will radiate from the cable.',
     see: ['transformer', 'toroid', 'ferrite', 'antenna', 'coax'],
   },
   unun: {
@@ -1350,7 +1350,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'band-stop': {
     tip: 'A filter that blocks one band of frequencies and lets everything else through — also called a notch.',
     detail:
-      'A band-stop filter (also called a notch) is the dual of the band-pass: it attenuates signals inside one frequency band and passes everything outside. A typical LC implementation is a parallel-LC tank shunted to ground in the signal path — at f_0 the tank has very high impedance, so it draws no current from the signal path and the signal at f_0 passes through unaffected; off-resonance the tank impedance drops and forms a divider with the source impedance that crushes those frequencies. Notch filters are used to remove specific unwanted carriers — broadcast-band rejection at the front of an HF receiver, mains-hum traps in audio, and the RF-trap that keeps a strong nearby station from desensing your receiver.',
+      'A band-stop filter (also called a notch) is the dual of the band-pass: it attenuates signals inside one frequency band and passes everything outside. A typical LC implementation is a series-LC pair wired from the signal line to ground — at f_0 the series pair has near-zero impedance, so it drains f_0 straight to ground and the output collapses into a deep notch; off-resonance the pair is high-impedance, draws almost no current, and everything else passes through untouched. (The mirror topology wires a parallel-LC tank in series with the line, where its near-infinite impedance at f_0 blocks that frequency instead.) Notch filters are used to remove specific unwanted carriers — broadcast-band rejection at the front of an HF receiver, mains-hum traps in audio, and the RF-trap that keeps a strong nearby station from desensing your receiver.',
     see: ['filter', 'band-pass', 'notch', 'resonance'],
   },
   notch: {
@@ -1787,5 +1787,71 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'Coax is meant to carry equal and opposite currents on its inner conductor and the inside of its shield, so its fields stay sealed inside. But skin effect lets a separate current flow on the outside of the shield — the common-mode current. Fed straight to a balanced antenna such as a dipole, the coax takes up this current: it radiates (distorting the pattern and filling nulls), flows back to the equipment as RF in the shack, and upsets SWR readings. A choke (current) balun blocks it.',
     see: ['balun', 'coax', 'feeder'],
+  },
+  rfi: {
+    tip: 'Radio-Frequency Interference — the disturbance an unwanted radio signal causes in a receiver or electronic device.',
+    detail:
+      'RFI is the everyday, ham-radio face of EMI: your transmitter getting into a neighbour\'s television, a switch-mode charger hashing across your receiver, a plasma screen wiping out a whole band. Every case has three parts — a source of radio energy, a path that carries it, and a victim that reacts — and breaking any one of them cures it. The standard fixes are filters, ferrite chokes, shielding, bonding, and simply more distance or less power.',
+    see: ['emi', 'emc', 'harmonic', 'common-mode current', 'ferrite'],
+  },
+  emc: {
+    tip: 'ElectroMagnetic Compatibility — the engineering discipline of getting equipment to coexist without interfering with each other.',
+    detail:
+      'EMC has two halves: emission (your device must not radiate more electromagnetic energy than the rules allow) and immunity (it must keep working while bathed in everyone else\'s). A radio station sits squarely in both — a clean transmitter is good emission behaviour, and a receiver that rejects strong out-of-band signals is good immunity. When compatibility breaks down the result is interference (RFI/EMI). Good EMC is designed in with shielding, filtering, grounding and bonding, and sensible layout.',
+    see: ['emi', 'rfi', 'shielding', 'rf earth'],
+  },
+  tvi: {
+    tip: 'TeleVision Interference — interference caused to a television receiver, historically the classic amateur-radio complaint.',
+    detail:
+      'TVI was the signature interference problem of the analogue-TV era: harmonics of a short-wave transmitter landing on a television channel, or a strong signal overloading the set\'s front end and putting herringbone patterns or rolling bars across the picture. The cures split by cause — a low-pass filter at the transmitter for harmonics, a high-pass filter at the television for overload, and ferrite chokes for common-mode pickup on the aerial lead. Digital television is more robust but not immune; strong overload can still freeze or break up the picture.',
+    see: ['rfi', 'bci', 'harmonic', 'front-end overload'],
+  },
+  bci: {
+    tip: 'Broadcast Interference — interference caused to a broadcast radio receiver, such as an AM or FM set.',
+    detail:
+      'BCI is the audio-broadcast cousin of TVI: a strong nearby transmitter breaking through into an AM or FM receiver, often heard as your speech appearing faintly under the station the listener is tuned to. Cheap sets with poor front-end selectivity are the usual victims (fundamental overload), so the cure is frequently at the receiver — a filter at its antenna input — rather than at your, possibly perfectly clean, transmitter.',
+    see: ['rfi', 'tvi', 'front-end overload', 'am'],
+  },
+  spurious: {
+    tip: 'A spurious emission is any signal a transmitter radiates outside its intended channel — harmonics, mixer products, or noise.',
+    detail:
+      'No transmitter is perfectly clean. Alongside the wanted signal it radiates weaker spurious emissions: harmonics at integer multiples of the operating frequency (the most common), mixer and multiplier products, broadband noise, and parasitic oscillations. Regulations set limits on how strong these may be, because they land on other users\' frequencies. The cure is at the transmitter — a well-designed output filter and a properly adjusted, un-overdriven amplifier.',
+    see: ['harmonic', 'parasitic oscillation', 'filter', 'rfi'],
+  },
+  'parasitic oscillation': {
+    tip: 'A parasitic oscillation is an unwanted, self-sustaining oscillation in an amplifier at a frequency unrelated to the wanted signal.',
+    detail:
+      'An amplifier stage has enough gain to oscillate if stray feedback finds a path — through lead inductance, inter-electrode capacitance, or a poorly-decoupled supply. When it does, it breaks into a parasitic oscillation, often far from the operating frequency (sometimes at VHF in a short-wave amplifier). The result is wasted power, distortion, spurious emissions, and sometimes a destroyed device. Cures include parasitic-suppressor resistors, neutralisation, and better layout and decoupling.',
+    see: ['spurious', 'harmonic', 'filter'],
+  },
+  'front-end overload': {
+    tip: 'Front-end overload is a receiver being swamped by a signal too strong for its input stage to reject — even a perfectly clean one.',
+    detail:
+      'A receiver is supposed to select the wanted signal and reject everything else, but a strong enough nearby transmitter can overwhelm its first (front-end) stage regardless of frequency — this is fundamental overload. Nothing need be wrong with the offending signal; it is simply too strong and too close. The give-away is that reducing the transmitter\'s power makes the interference vanish abruptly. Because the weakness is in the victim, the cure goes there: a filter or attenuator at its antenna input, or more distance.',
+    see: ['rfi', 'bci', 'tvi', 'filter'],
+  },
+  'common-mode choke': {
+    tip: 'A common-mode choke is a ferrite core around a cable that blocks common-mode RF while passing the wanted differential signal.',
+    detail:
+      'Wind a cable through a ferrite core and any common-mode current (flowing the same way on every conductor) sees the core\'s full impedance — its fields add and the core presents hundreds to thousands of ohms in series. The differential signal inside (out and back on the pair) makes fields that cancel in the core, so it passes untouched. Impedance rises with the square of the number of turns, so a few turns through one core beat a single pass through several. It is the workhorse cure for cable-borne interference.',
+    see: ['ferrite', 'common-mode current', 'choke', 'inductor'],
+  },
+  shielding: {
+    tip: 'Shielding is a conductive enclosure that stops electromagnetic energy radiating into or out of a circuit.',
+    detail:
+      'A conductive box, braid, or mesh reflects and absorbs radio waves, keeping them from reaching sensitive circuitry or from escaping a noisy one. Reflection does most of the work for radio-frequency and electric-field coupling, so even thin metal or fine mesh is effective; low-frequency magnetic fields are far harder and need thick, high-permeability material. Shields only work if they are continuous — a seam left un-bonded, or a gap a fair fraction of a wavelength long, leaks like a slot antenna. Coax braid, the can around a tuner, and the lid over an oscillator are all shields.',
+    see: ['emc', 'coax', 'rf earth'],
+  },
+  'rf earth': {
+    tip: 'An RF earth is a low-impedance reference that keeps a station\'s equipment at the same voltage at radio frequencies — not a drain for noise.',
+    detail:
+      'Beginners often imagine earth as a sink that swallows unwanted signals; it is not. Ground is a shared voltage reference, and a good RF earth means every box in the station sits at the same potential, achieved by bonding them together with short, heavy straps. Length is everything: a long wire to a ground rod is, at radio frequencies, simply an antenna — it will radiate your harmonics around the house and can make interference worse. Bonding, not a longer wire, is what cures RF-earth problems.',
+    see: ['emc', 'shielding', 'end-fed'],
+  },
+  'end-fed': {
+    tip: 'An end-fed antenna is a wire fed at one end rather than the middle — convenient, but prone to putting RF on the station and its earth.',
+    detail:
+      'An end-fed wire is fed at a high-voltage, high-impedance point, usually through a matching unit. Bring it straight into the shack and the return current has to flow on whatever is to hand — the equipment cases, the mains earth, the feed lines — so the whole station can end up with RF on it, a classic self-inflicted interference source. Fed properly, with a good counterpoise or a common-mode choke on the feed line and solid bonding, end-fed antennas work well; fed carelessly they are an EMC headache.',
+    see: ['rf earth', 'common-mode choke', 'antenna', 'rfi'],
   },
 }

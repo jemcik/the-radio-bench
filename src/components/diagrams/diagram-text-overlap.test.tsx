@@ -544,7 +544,27 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
           h: parseFloat(r.getAttribute('height') ?? '0'),
         }))
         .filter(r => r.w > 0 && r.h > 0 && !(svgArea > 0 && r.w * r.h >= 0.5 * svgArea))
-      const FIT_TOL = 3 // px slack for the char-width approximation
+      // A label must not merely FIT its block — a CENTRED label must also clear
+      // the border by a small margin on each side, or it reads as «text jammed
+      // against the box». Two refinements over the old no-overflow check:
+      //   1. the flat 0.55 char-width average UNDER-measures short, wide-glyph
+      //      strings (мережа: м, ж are wide) and OVER-measures narrow ones. A
+      //      flat fatten would over-flag long labels, so weight glyphs
+      //      individually and judge the fit against that per-string width.
+      //   2. for a centred label, require ≥ MIN_CLEARANCE px of breathing room,
+      //      not just «edge not crossed». Edge-anchored labels (a scope readout
+      //      hugging its panel's left edge) are exempt from the clearance rule —
+      //      only the genuine overflow check applies to them.
+      // Shipped July 2026: UK «мережа» rendered flush against a 48-px block and
+      // the old check (centre-inside, spill ≤ 3) waved it through. Now it fails.
+      const WIDE = /[мшщжфюъыёМШЩЖФЮЪЫWMmw@%&]/
+      const NARROW = /[іїjlItr.,:;'’!|() -]/
+      const fitFactor = (s: string) => {
+        let u = 0
+        for (const ch of s) u += WIDE.test(ch) ? 0.72 : NARROW.test(ch) ? 0.36 : 0.55
+        return u / ((s.length || 1) * 0.55) // ratio vs the flat 0.55 baseline
+      }
+      const MIN_CLEARANCE = 2 // px gap required on each side for a CENTRED label
       for (const { bbox } of textBBoxList) {
         const cx = bbox.x + bbox.w / 2
         const cy = bbox.y + bbox.h / 2
@@ -553,11 +573,19 @@ describe.each(DIAGRAMS)('$name — text labels do not overlap shapes', ({ Compon
           .filter(r => cx >= r.x && cx <= r.x + r.w && cy >= r.y && cy <= r.y + r.h)
           .sort((a, b) => a.w * a.h - b.w * b.h)[0]
         if (!box) continue
-        const spill = Math.max(box.x - bbox.x, bbox.x + bbox.w - (box.x + box.w))
-        if (spill > FIT_TOL) {
+        const halfW = (bbox.w * fitFactor(bbox.label)) / 2
+        const overflow = Math.max(box.x - (cx - halfW), cx + halfW - (box.x + box.w))
+        const centred = Math.abs(cx - (box.x + box.w / 2)) < box.w * 0.15
+        if (overflow > 1) {
           findings.push(
-            `text "${bbox.label}" (${bbox.w.toFixed(0)} px wide) overflows its own block ` +
-            `<rect> (${box.w.toFixed(0)} px wide) — spills ${spill.toFixed(0)} px past the edge`,
+            `text "${bbox.label}" (~${(halfW * 2).toFixed(0)} px wide) overflows its own block ` +
+            `<rect> (${box.w.toFixed(0)} px wide) by ${overflow.toFixed(0)} px`,
+          )
+        } else if (centred && -overflow < MIN_CLEARANCE) {
+          findings.push(
+            `text "${bbox.label}" (~${(halfW * 2).toFixed(0)} px wide) has only ` +
+            `${(-overflow).toFixed(0)} px clearance inside its own block <rect> ` +
+            `(${box.w.toFixed(0)} px wide) — needs ≥ ${MIN_CLEARANCE} px on each side`,
           )
         }
       }

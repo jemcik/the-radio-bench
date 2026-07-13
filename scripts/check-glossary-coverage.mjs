@@ -150,7 +150,10 @@ const EXEMPT_PER_CHAPTER = {
   // full-scale figure of merit — a different concept from the glossary's
   // RECEIVER sensitivity, so it must NOT be wrapped as that glossary term.
   ch3_4: new Set(['sensitivity']),
-  ch1_9: new Set(['mixer', 'detector']),
+  // «end-fed» — false substring of «end-fed half-wave» (wrapped via <efhw>,
+  // a distinct glossary key); the general end-fed-antenna EMC term (ch4_2)
+  // is not what this chapter discusses.
+  ch1_9: new Set(['mixer', 'detector', 'end-fed']),
   ch2_2: new Set(['superheterodyne', 'mixer', 'detector']),
   // ch0_5 «How to Read a Schematic» introduces transistor/NPN/PNP/base/
   // collector/emitter as part of its symbol vocabulary, but the chapter
@@ -216,7 +219,22 @@ const EXEMPT_PER_CHAPTER = {
     'capacitance', 'capacitor', 'inductor', 'inductance', 'resistor',
     'ferrite', 'transformer', 'filter', 'power amplifier',
     'resonant frequency', 'decibel', 'base', 'return loss', 'envelope',
+    // «end-fed» — false substring of «end-fed half-wave» (wrapped via <efhw>);
+    // a distinct concept from ch4_2's general end-fed-antenna EMC term.
+    'end-fed',
   ]),
+  // ch4_2 (Interference & EMC). Focal terms (impedance, choke, low-pass,
+  // high-pass, inductance, tuned circuit) ARE wrapped in prose. The set
+  // below are passing / false / concept-covered matches:
+  //  – «capacitor» / «capacitance» — the don't-bypass-speaker warning aside
+  //    and the ferrite «stray capacitance» note; taught/wrapped in Part 1.
+  //  – «power amplifier» — one passing mention (taught/wrapped in ch3_2).
+  //  – «band-stop» — same concept as «notch», which IS wrapped (via <notch>)
+  //    in the same paragraph; band-stop is its parenthetical synonym.
+  //  – «detector» — labTrouble3 uses it colloquially («an AM radio is an
+  //    even more sensitive detector» of the interference), not the
+  //    demodulator-detector glossary concept (taught/wrapped in ch3_1).
+  ch4_2: new Set(['capacitor', 'capacitance', 'power amplifier', 'band-stop', 'detector']),
   // ch1_6 — transistor/base/collector mentioned in coil-driver lab
   // and ferrite-bead context; passing references, not the chapter's
   // focus (inductors). Concept-focal coverage lives in ch1_11.

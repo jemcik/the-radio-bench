@@ -340,7 +340,7 @@ export default function Chapter1_8() {
         <Trans
           i18nKey="ch1_8.lcIntro"
           ns="ui"
-          components={{ strong: <strong />, reso: <G k="resonance" /> }}
+          components={{ strong: <strong />, reso: <G k="resonance" />, shield: <G k="shielding" /> }}
         />
       </p>
 
