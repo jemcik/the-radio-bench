@@ -252,6 +252,8 @@ export default function Chapter1_7() {
             strong: <strong />,
             var: <MathVar />,
             trap: <G k="trap" />,
+            tvi: <G k="tvi" />,
+            rfi: <G k="rfi" />,
           }}
         />
       </p>

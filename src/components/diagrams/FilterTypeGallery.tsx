@@ -255,32 +255,29 @@ function Schematic({ shape, inLabel, outLabel }: SchematicProps) {
       )
     }
     case 'bsf': {
-      // Parallel LC tank in shunt to ground
-      const node = inX + 14
-      const tankL = node + 18
-      const tankR = node + 50
-      const tankTopY = SCH_RAIL_Y + 12
-      const tankBotY = SCH_GND_Y - 18
+      // Series L–C in shunt to ground: the trap. At f_0 the series pair is a
+      // near-short, dumping f_0 to ground → notch. (A parallel tank in shunt
+      // would be a band-PASS — that was the earlier bug here.)
+      const legX = inX + 50
+      const lTopY = SCH_RAIL_Y + 8
+      const cCenterY = SCH_RAIL_Y + 44
       return (
         <g>
-          <path d={`M ${inX} ${SCH_RAIL_Y} L ${node} ${SCH_RAIL_Y} L ${outX} ${SCH_RAIL_Y}`} {...wireProps} />
-          {/* drop from rail-node to top of tank */}
-          <path d={`M ${node} ${SCH_RAIL_Y} L ${node} ${tankTopY} L ${tankL} ${tankTopY} L ${tankR} ${tankTopY}`} {...wireProps} />
-          {/* L (vertical solenoid bumps) */}
+          <path d={`M ${inX} ${SCH_RAIL_Y} L ${outX} ${SCH_RAIL_Y}`} {...wireProps} />
+          {/* drop from the signal rail to the top of L */}
+          <path d={`M ${legX} ${SCH_RAIL_Y} L ${legX} ${lTopY}`} {...wireProps} />
+          {/* L — vertical solenoid bumps */}
           {Array.from({ length: 4 }).map((_, i) => {
-            const yc = tankTopY + 3 + i * 6
-            return <path key={i} d={`M ${tankL} ${yc} A 3 3 0 0 1 ${tankL} ${yc + 6}`} {...wireProps} />
+            const yc = lTopY + i * 6
+            return <path key={i} d={`M ${legX} ${yc} A 3 3 0 0 1 ${legX} ${yc + 6}`} {...wireProps} />
           })}
-          <path d={`M ${tankL} ${tankTopY + 27} L ${tankL} ${tankBotY}`} {...wireProps} />
-          {/* C (vertical, two horizontal plates) */}
-          <path d={`M ${tankR} ${tankTopY} L ${tankR} ${(tankTopY + tankBotY) / 2 - 3}`} {...wireProps} />
-          <path d={capPlatesV(tankR, (tankTopY + tankBotY) / 2)} {...heavyWire} />
-          <path d={`M ${tankR} ${(tankTopY + tankBotY) / 2 + 3} L ${tankR} ${tankBotY}`} {...wireProps} />
-          {/* tank bottom rail + drop to GND */}
-          <path d={`M ${tankL} ${tankBotY} L ${tankR} ${tankBotY}`} {...wireProps} />
-          <path d={`M ${node} ${tankBotY} L ${tankL} ${tankBotY}`} {...wireProps} />
-          <path d={`M ${node} ${tankBotY} L ${node} ${SCH_GND_Y - 6}`} {...wireProps} />
-          <path d={gndSymbol(node, SCH_GND_Y - 6)} {...wireProps} />
+          {/* wire from L bottom to C top */}
+          <path d={`M ${legX} ${lTopY + 24} L ${legX} ${cCenterY - 3}`} {...wireProps} />
+          {/* C — two horizontal plates */}
+          <path d={capPlatesV(legX, cCenterY)} {...heavyWire} />
+          {/* wire from C bottom to GND */}
+          <path d={`M ${legX} ${cCenterY + 3} L ${legX} ${SCH_GND_Y - 6}`} {...wireProps} />
+          <path d={gndSymbol(legX, SCH_GND_Y - 6)} {...wireProps} />
           {labels}
         </g>
       )

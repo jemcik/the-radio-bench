@@ -1,28 +1,29 @@
 /**
- * Chapter 1.8 §7 — parallel-LC notch (band-stop) filter.
+ * Chapter 1.8 §7 — series-LC notch (band-stop) filter, a.k.a. the trap.
  *
- * Topology (left → right):
- *   V_in → R_source in series → V_out node → parallel-LC tank to GND
- *                                            │
- *                                       L  ‖  C   (tank)
- *                                            │
- *                                           GND
+ * Topology (left → right, with a shunt leg down to ground):
+ *   V_in → R_source in series → V_out node ──┐
+ *                                             L   (series)
+ *                                             C   (series)
+ *                                             │
+ *                                            GND
  *
- * The parallel LC sits in shunt from the signal node to ground.
- *   – At resonance (f_0): the tank looks like a near-open, so the
- *     signal node sees no shunt and the input passes through to the
- *     output. (It is the *opposite* of what a beginner expects — the
- *     fact that it's a parallel tank does not mean it «picks» f_0;
- *     in shunt it «hides» f_0 from the divider.)
- *   – Off-resonance: the tank impedance drops and forms a divider
- *     with the source resistance R that crushes those frequencies.
+ * A SERIES LC pair sits in shunt from the signal node to ground.
+ *   – At resonance (f_0): the series pair is a near-SHORT, so it dumps
+ *     f_0 straight to ground — the node (and the output) collapses to a
+ *     deep notch.
+ *   – Off-resonance: the series pair is high-impedance (a near-open), so
+ *     it draws almost no current and every other frequency passes
+ *     through untouched.
  *
- * Result: a deep notch centred on f_0, flat passband everywhere else.
+ * This is the correct band-STOP. (A *parallel* LC in shunt is the
+ * band-PASS — high-Z at f_0 means f_0 is NOT shunted, so it passes. That
+ * dual is exactly what the earlier version of this schematic got wrong.)
+ * The mirror of this trap is the LcBandPassSchematic: the SAME series LC,
+ * but wired IN THE LINE instead of to ground, passes f_0 instead.
  *
- * R_source is drawn as a series resistor at the input. In a real
- * receiver this is the antenna or feedline impedance (typically
- * 50 Ω); we draw it explicitly because without it the notch has no
- * divider to work against.
+ * R_source is drawn as a series resistor at the input. Without it the
+ * shunt has nothing to form a divider against and the notch cannot bite.
  *
  * Uses `@/lib/circuit` primitives only.
  */
@@ -43,31 +44,25 @@ import { MathVar } from '@/components/ui/math'
 
 const SCHEMATIC_W = 560
 
-// Parallel-LC tank needs vertical room — give a deeper rail than the
-// other ch1.8 schematics so the L and C inside the shunt sit cleanly
-// without crowding either rail.
-const TOP_Y = SCHEMATIC_PAD_TOP + 10
+// The shunt leg stacks L above C (each a 60 px two-terminal part) with a
+// short lead between them, so it needs a deep rail.
+const TOP_Y = SCHEMATIC_PAD_TOP + 10 // 45
 const RAIL_SPAN = 150
-const BOT_Y = TOP_Y + RAIL_SPAN
+const BOT_Y = TOP_Y + RAIL_SPAN // 195
 const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + 10
 
 const IN_X = 60
 const R_X = 170
-// V_out node (signal rail tap-off into the tank)
+// V_out node = the shunt tap-off on the signal rail
 const NODE_X = 320
-const TANK_TOP_Y = TOP_Y + 30
-const TANK_BOT_Y = BOT_Y - 10
-
-// Two tank columns — L on the left of the shunt, C on the right
-const TANK_LEFT_X = 280
-const TANK_RIGHT_X = 360
 const OUT_X = 480
 
 const rSrc = pins2(R_X, TOP_Y)
 
-// L and C oriented vertically (down) — both span TANK_TOP_Y..TANK_BOT_Y
-const l = pins2(TANK_LEFT_X, (TANK_TOP_Y + TANK_BOT_Y) / 2, 'down')
-const c = pins2(TANK_RIGHT_X, (TANK_TOP_Y + TANK_BOT_Y) / 2, 'down')
+// Series L–C in the shunt leg, both centred on NODE_X, C stacked below L.
+// pins2 span is 60 (±30): L pins 65..125, C pins 135..195 (= BOT_Y).
+const l = pins2(NODE_X, 95, 'down')
+const c = pins2(NODE_X, 165, 'down')
 
 export default function LcNotchSchematic() {
   const { t } = useTranslation('ui')
@@ -94,27 +89,21 @@ export default function LcNotchSchematic() {
       <Wire points={[{ x: IN_X, y: TOP_Y }, rSrc.p1]} />
       <Wire points={[rSrc.p2, { x: NODE_X, y: TOP_Y }, { x: OUT_X, y: TOP_Y }]} />
 
-      {/* Wires from signal-rail node down to top of tank, branching to L and C */}
-      <Wire points={[{ x: NODE_X, y: TOP_Y }, { x: NODE_X, y: TANK_TOP_Y }]} />
-      <Wire points={[{ x: TANK_LEFT_X, y: TANK_TOP_Y }, { x: TANK_RIGHT_X, y: TANK_TOP_Y }]} />
-      <Wire points={[{ x: TANK_LEFT_X, y: TANK_TOP_Y }, l.p1]} />
-      <Wire points={[{ x: TANK_RIGHT_X, y: TANK_TOP_Y }, c.p1]} />
+      {/* Series-LC shunt: node → L → C → GND rail */}
+      <Wire points={[{ x: NODE_X, y: TOP_Y }, l.p1]} />
+      <Wire points={[l.p2, c.p1]} />
+      <Wire points={[c.p2, { x: NODE_X, y: BOT_Y }]} />
 
-      {/* Bottom of tank — both legs join, then drop to GND rail */}
-      <Wire points={[l.p2, { x: TANK_LEFT_X, y: TANK_BOT_Y }, { x: TANK_RIGHT_X, y: TANK_BOT_Y }, c.p2]} />
-      <Wire points={[{ x: NODE_X, y: TANK_BOT_Y }, { x: NODE_X, y: BOT_Y }]} />
-
-      {/* GND rail under the load */}
+      {/* GND rail under the output */}
       <Wire points={[{ x: NODE_X, y: BOT_Y }, { x: OUT_X, y: BOT_Y }]} />
 
       {/* Components */}
       <Resistor x={R_X} y={TOP_Y} label="R" />
-      <Inductor x={TANK_LEFT_X} y={(TANK_TOP_Y + TANK_BOT_Y) / 2} orient="down" label="L" />
-      <Capacitor x={TANK_RIGHT_X} y={(TANK_TOP_Y + TANK_BOT_Y) / 2} orient="down" label="C" />
+      <Inductor x={NODE_X} y={95} orient="down" label="L" />
+      <Capacitor x={NODE_X} y={165} orient="down" label="C" />
 
-      {/* Junctions on signal rail (tank tap-off) and on the tank bus bars */}
+      {/* Junction at the shunt tap-off (T-joint on the signal rail) */}
       <Junction x={NODE_X} y={TOP_Y} />
-      <Junction x={NODE_X} y={TANK_BOT_Y} />
 
       {/* Terminal labels */}
       <TerminalLabel x={IN_X - 6} y={TOP_Y} anchor="end">

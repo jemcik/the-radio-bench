@@ -327,7 +327,7 @@ export const PARTS: Part[] = [
         part: 4,
         title: 'Interference and EMC',
         subtitle: 'Harmonics, coupling paths, ferrites, filters — demonstrate and cure RFI',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['9.1', '9.2', '9.3'],
