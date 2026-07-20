@@ -107,7 +107,7 @@ export default function Chapter4_2() {
       {/* ── §6 The rest of the toolkit ─────────────────────────── */}
       <Section id="toolkit" labelKey="ch4_2.sectionToolkit" />
       <p><Trans i18nKey="ch4_2.toolkitP1" ns="ui" components={{ ...mathComponents, strong: <strong />, shield: <G k="shielding" /> }} /></p>
-      <p><Trans i18nKey="ch4_2.toolkitP2" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong />, earth: <G k="rf earth" /> }} /></p>
+      <p><Trans i18nKey="ch4_2.toolkitP2" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong />, earth: <G k="rf earth" />, bond: <G k="bonding" /> }} /></p>
       <p><Trans i18nKey="ch4_2.toolkitP3" ns="ui" components={{ ...mathComponents, strong: <strong />, endfed: <G k="end-fed" /> }} /></p>
       <RemedyMatrix />
       <Callout variant="note">

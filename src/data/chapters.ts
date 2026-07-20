@@ -338,7 +338,7 @@ export const PARTS: Part[] = [
         part: 4,
         title: 'Safety',
         subtitle: 'Shock, mains, high voltage, RF, lightning — station grounding inspection',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['10.1', '10.2', '10.3', '10.4'],

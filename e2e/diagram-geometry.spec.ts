@@ -96,6 +96,50 @@ function pageDetector(minPen: number) {
       if (t.r.left < sr.left - 6 || t.r.right > sr.right + 6 || t.r.top < sr.top - 6 || t.r.bottom > sr.bottom + 6)
         details.push(`SPILL "${t.x}"`)
     }
+    // ── GRAPHICAL frame-spill — HEROES ONLY ────────────────────────────────
+    // The text block above only checks whether TEXT pokes past the frame. A
+    // chapter hero is a pure illustration with zero <text>, so it was invisible
+    // to this gate: that is exactly how ch4.3's hero shipped with its lightning
+    // cloud sliced by the top edge (getBoundingClientRect top −1.4, every gate
+    // green). A hero is a self-contained illustration that MUST fit its frame
+    // entirely, so here we check every graphical element against it.
+    //
+    // Scoped to heroes (svg inside the ChapterHero `[data-hero]` wrapper) on
+    // purpose: in-chapter diagrams legitimately bleed past the viewBox —
+    // dipole/antenna radiation arcs (ch2.1, ch2.2) sweep out of frame as an
+    // intentional "waves propagating outward" fade, clipped by the svg
+    // viewport. Running this everywhere flagged all of them. A hero never does
+    // that. Tolerance 2px: a path bbox is real ink + half its stroke, so a
+    // glyph genuinely sliced by the frame clips by more; sub-2px is jitter.
+    const isHero = !!s.closest('[data-hero]')
+    if (isHero) {
+      // Skip clipPath'd elements: a clip-path is explicit authorial intent, and
+      // getBoundingClientRect reports UN-clipped geometry — e.g. ch4.2's hero
+      // draws the TV's herringbone (RFI) pattern with a bbox 3px past the frame,
+      // but it is clipped to the TV screen and renders perfectly.
+      const clipped = (el: Element): boolean => {
+        let n: Element | null = el
+        while (n && n !== s) {
+          const a = n.getAttribute('clip-path')
+          const st = (n as SVGElement).style?.clipPath
+          if ((a && a !== 'none') || (st && st !== 'none')) return true
+          n = n.parentElement
+        }
+        return false
+      }
+      const GFX = [...s.querySelectorAll('path, circle, rect, line, polygon, polyline')]
+        .filter(el => !clipped(el))
+        .map(el => ({ r: el.getBoundingClientRect(), tag: el.tagName }))
+        .filter(o => o.r.width > 6 && o.r.height > 6)
+      for (const g of GFX) {
+        const over: string[] = []
+        if (g.r.top < sr.top - 2) over.push('top')
+        if (g.r.bottom > sr.bottom + 2) over.push('bottom')
+        if (g.r.left < sr.left - 2) over.push('left')
+        if (g.r.right > sr.right + 2) over.push('right')
+        if (over.length) details.push(`HERO-SPILL <${g.tag}> ${over.join(',')}`)
+      }
+    }
   }
   return { count: details.length, details }
 }

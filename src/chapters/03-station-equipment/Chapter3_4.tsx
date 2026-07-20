@@ -51,7 +51,7 @@ export default function Chapter3_4() {
       <p><Trans i18nKey="ch3_4.mmP2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <MultimeterDiagram />
       <Callout variant="danger">
-        <p><Trans i18nKey="ch3_4.mmDanger" ns="ui" components={{ ...mathComponents, em: <em /> }} /></p>
+        <p><Trans i18nKey="ch3_4.mmDanger" ns="ui" components={{ ...mathComponents, em: <em />, fuse: <G k="fuse" /> }} /></p>
       </Callout>
       <p><Trans i18nKey="ch3_4.mmP3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <p><Trans i18nKey="ch3_4.mmP4" ns="ui" components={{ ...mathComponents, strong: <strong />, ii: <G k="input impedance" />, vd: <G k="voltage divider" /> }} /></p>

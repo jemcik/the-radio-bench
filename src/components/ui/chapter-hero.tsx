@@ -34,6 +34,12 @@ export function ChapterHero({ ariaLabel, children }: ChapterHeroProps) {
     <div
       role="img"
       aria-label={ariaLabel}
+      // data-hero marks this as a self-contained illustration that must fit
+      // its frame entirely. The e2e diagram-geometry gate keys on it to run a
+      // graphical frame-spill check here (heroes have no <text>, so the text
+      // detector can't see them) WITHOUT flagging in-chapter diagrams whose
+      // radiation arcs / fields intentionally bleed past the viewBox.
+      data-hero=""
       className="not-prose mt-6 mb-0 flex justify-center text-[hsl(var(--sketch-stroke))] [&>svg]:max-w-full [&>svg]:h-auto"
     >
       {children}

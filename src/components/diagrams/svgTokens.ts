@@ -66,6 +66,10 @@ export const svgTokens = {
   termAccent: 'hsl(var(--term-accent))',
 
   // Callout family — match the semantic tones used by <Callout> and <ResultBox>.
+  /** Red — "danger" tone. Safety-critical only (ch 4.3): shock zones, live
+   *  conductors, lethal stored charge. Red carries real meaning in this course
+   *  — don't spend it on ordinary emphasis, or it stops meaning anything. */
+  danger: 'hsl(var(--callout-danger))',
   /** Teal — used for "experiment / result" tone. */
   experiment: 'hsl(var(--callout-experiment))',
   /** Amber — "key takeaway" tone. */

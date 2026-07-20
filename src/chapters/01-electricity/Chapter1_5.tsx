@@ -458,7 +458,7 @@ export default function Chapter1_5() {
         <Trans
           i18nKey="ch1_5.rcSafetyCallout"
           ns="ui"
-          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap }}
+          components={{ ...mathComponents, strong: <strong />, nowrap: nowrap , bleed: <G k="bleeder resistor" /> }}
         />
       </Callout>
 

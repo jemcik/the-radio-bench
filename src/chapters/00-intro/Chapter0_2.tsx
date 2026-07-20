@@ -44,7 +44,13 @@ export default function Chapter0_2() {
         />
       </p>
 
-      <Callout variant="danger">{t('ch0_2.multimeterDanger')}</Callout>
+      <Callout variant="danger">
+        <Trans
+          i18nKey="ch0_2.multimeterDanger"
+          ns="ui"
+          components={{ ...mathComponents, fuse: <G k="fuse" /> }}
+        />
+      </Callout>
 
       <MultimeterDiagram />
 
@@ -152,7 +158,7 @@ export default function Chapter0_2() {
           components={{ ...mathComponents, pwm: <G k="pwm" />,
             square: <G k="square wave" />,
             freq: <G k="frequency" />,
-            ac: <G k="ac" />, }}
+            ac: <G k="ac" />, duty: <G k="duty cycle" /> }}
         />
       </p>
 
