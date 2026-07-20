@@ -168,7 +168,7 @@ export default function Chapter1_2() {
         <Trans
           i18nKey="ch1_2.powerDangerNote"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar /> }}
+          components={{ strong: <strong />, var: <MathVar />, fuse: <G k="fuse" /> }}
         />
       </Callout>
 

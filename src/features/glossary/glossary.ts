@@ -424,7 +424,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   filter: {
     tip: 'A circuit that lets some frequencies through and blocks others.',
     detail:
-      'A filter is a circuit designed to pass certain frequencies while blocking others — the four canonical types are low-pass (passes DC and low frequencies, blocks high), high-pass (opposite), band-pass (passes a band in the middle), and band-stop / notch (blocks a band). Filters are built from the frequency-dependent behaviour of capacitors and inductors (and sometimes resistors, op-amps, crystals). Every radio transmitter and receiver contains filters: to clean up harmonics at the transmitter, to select a single station at the receiver, to remove noise, to split frequency bands. We design filters properly in Chapter 1.8.',
+      'A filter is a circuit designed to pass certain frequencies while blocking others — the four canonical types are low-pass (passes DC and low frequencies, blocks high), high-pass (opposite), band-pass (passes a band in the middle), and band-stop / notch (blocks a band). Filters are built from the frequency-dependent behaviour of capacitors and inductors (and sometimes resistors, op-amps, crystals). Every radio transmitter and receiver contains filters: to clean up harmonics at the transmitter, to select a single station at the receiver, to remove noise, to split frequency bands. Filter design is the subject of Chapter 1.8.',
     see: ['reactance', 'capacitor', 'inductor'],
   },
   ripple: {
@@ -444,7 +444,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   rectification: {
     tip: 'Folding the negative half of an AC waveform up above zero — so the signal no longer changes direction.',
     detail:
-      'Rectification turns an alternating signal into a pulsating one-direction signal. Mathematically it is the |V(t)| operation: the negative half of the wave is flipped up, so both halves point the same way. For a pure sine, rectification produces a series of half-cycle humps; the average of that rectified sine is 2/π ≈ 0.637 of the peak — which is what an averaging-type multimeter responds to in its AC mode. Physical rectification is done by diodes inside a power supply; a bridge rectifier uses four diodes to flip both halves of the AC input. The diode itself is introduced in Chapter 1.10; in Chapter 1.3 we use the word «rectified» only to name the |·| operation on a waveform.',
+      'Rectification turns an alternating signal into a pulsating one-direction signal. Mathematically it is the |V(t)| operation: the negative half of the wave is flipped up, so both halves point the same way. For a pure sine, rectification produces a series of half-cycle humps; the average of that rectified sine is 2/π ≈ 0.637 of the peak — which is what an averaging-type multimeter responds to in its AC mode. Physical rectification is done by diodes inside a power supply; a bridge rectifier uses four diodes to flip both halves of the AC input. The diode that does this physically is the subject of Chapter 1.10; the word «rectified» is also used in a purely mathematical sense — the |·| operation on a waveform, with no diode implied.',
     see: ['diode', 'rms'],
   },
   hertz: {
@@ -698,13 +698,13 @@ export const glossary: Record<string, GlossaryEntry> = {
   'self-inductance': {
     tip: 'The induction effect a coil produces on itself by its own changing current — distinct from mutual inductance between two separate coils.',
     detail:
-      'Self-inductance is the inductance L of an isolated coil — the voltage it induces in itself when its own current changes, V = L · dI/dt. It contrasts with mutual inductance M, which describes the voltage one coil induces in a second nearby coil through magnetic coupling. In Chapter 1.6 we work entirely with self-inductance; mutual inductance is the key concept behind transformers (Chapter 1.9). Every wire has some self-inductance, even straight pieces — a 10 cm length of bare wire has roughly 100 nH, which becomes important above 100 MHz.',
+      'Self-inductance is the inductance L of an isolated coil — the voltage it induces in itself when its own current changes, V = L · dI/dt. It contrasts with mutual inductance M, which describes the voltage one coil induces in a second nearby coil through magnetic coupling. Self-inductance is the single-coil quantity; mutual inductance — the key concept behind transformers (Chapter 1.9) — is the two-coil one. Every wire has some self-inductance, even straight pieces — a 10 cm length of bare wire has roughly 100 nH, which becomes important above 100 MHz.',
     see: ['inductance', 'inductor', 'transformer', 'back-emf'],
   },
   transformer: {
     tip: 'Two coils sharing a magnetic core — energy passes between circuits through the magnetic field, with voltage stepped up or down by the turns ratio.',
     detail:
-      'A transformer is two inductors wound on the same magnetic core so their fields are tightly coupled. AC current in the primary winding produces a changing flux in the core; that flux induces a voltage in the secondary winding. The voltage ratio equals the turns ratio (Vsec/Vpri = Nsec/Npri); the current ratio is its inverse. Transformers transfer power between circuits at different impedance levels, isolate them galvanically, and step voltages up or down — they are the workhorse of mains power distribution and RF impedance matching. We cover them in detail in Chapter 1.9.',
+      'A transformer is two inductors wound on the same magnetic core so their fields are tightly coupled. AC current in the primary winding produces a changing flux in the core; that flux induces a voltage in the secondary winding. The voltage ratio equals the turns ratio (Vsec/Vpri = Nsec/Npri); the current ratio is its inverse. Transformers transfer power between circuits at different impedance levels, isolate them galvanically, and step voltages up or down — they are the workhorse of mains power distribution and RF impedance matching. Chapter 1.9 covers them in detail.',
     formula: 'V₂/V₁ = N₂/N₁',
     see: ['inductor', 'inductance', 'self-inductance'],
   },
@@ -879,7 +879,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'forward voltage drop': {
     tip: 'The voltage that develops across a conducting diode — roughly constant (≈ 0.6 V for silicon) over a wide range of currents.',
     detail:
-      'The forward voltage drop V_F is the (almost) flat voltage that a diode pushes back when current flows through it in the conducting direction. It depends on the semiconductor material, not on the current level: small-signal silicon diodes (1N4148) sit at ≈ 0.6–0.7 V over the entire 1–100 mA range; Schottky diodes (1N5819) at ≈ 0.2–0.3 V; LEDs at ≈ 1.8 V (red), ≈ 2.1 V (green), ≈ 3.0 V (blue/white). For circuit design the rule is «treat the diode as a constant battery in series with the wire»: a 5 V supply driving a series silicon diode + load resistor only delivers 4.3 V to the resistor. The drop varies a little with current — about 60 mV per decade — which is the «slope of the I–V curve past the knee» you see in the chapter widget.',
+      'The forward voltage drop V_F is the (almost) flat voltage that a diode pushes back when current flows through it in the conducting direction. It depends on the semiconductor material, not on the current level: small-signal silicon diodes (1N4148) sit at ≈ 0.6–0.7 V over the entire 1–100 mA range; Schottky diodes (1N5819) at ≈ 0.2–0.3 V; LEDs at ≈ 1.8 V (red), ≈ 2.1 V (green), ≈ 3.0 V (blue/white). For circuit design the rule is «treat the diode as a constant battery in series with the wire»: a 5 V supply driving a series silicon diode + load resistor only delivers 4.3 V to the resistor. The drop varies a little with current — about 60 mV per decade — which is the «slope of the I–V curve past the knee».',
     formula: 'V_F ≈ 0.7 V (Si) | 0.3 V (Schottky) | 1.8–3.0 V (LED)',
     see: ['diode', 'schottky diode', 'led'],
   },
@@ -926,7 +926,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'magnetic field': {
     tip: 'The region of influence around anything carrying an electric current.',
     detail:
-      'A magnetic field is a region of space that exerts a force on moving charge (current) and on magnets. It appears whenever current flows — the field you wound into a coil in Chapter 1.6 — and stores energy that is released when the current is allowed to change. In an electromagnetic wave the magnetic field sits at a perfect right angle to the electric field and oscillates in step with it; its strength is measured in amperes per metre (A/m).',
+      'A magnetic field is a region of space that exerts a force on moving charge (current) and on magnets. It appears whenever current flows — the field around a current-carrying coil (Chapter 1.6) — and stores energy that is released when the current is allowed to change. In an electromagnetic wave the magnetic field sits at a perfect right angle to the electric field and oscillates in step with it; its strength is measured in amperes per metre (A/m).',
     unit: 'Amperes per metre (A/m)',
     see: ['electric field', 'electromagnetic wave', 'current', 'inductor'],
   },
@@ -1853,5 +1853,174 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'An end-fed wire is fed at a high-voltage, high-impedance point, usually through a matching unit. Bring it straight into the shack and the return current has to flow on whatever is to hand — the equipment cases, the mains earth, the feed lines — so the whole station can end up with RF on it, a classic self-inflicted interference source. Fed properly, with a good counterpoise or a common-mode choke on the feed line and solid bonding, end-fed antennas work well; fed carelessly they are an EMC headache.',
     see: ['rf earth', 'common-mode choke', 'antenna', 'rfi'],
+  },
+  // ── Ch 4.3 — Safety ──────────────────────────────────────────────
+  'ventricular fibrillation': {
+    tip: 'Ventricular fibrillation is a state in which the heart muscle quivers instead of beating, so it stops pumping blood — this is what electrocution actually is.',
+    detail:
+      'The heart pumps because its muscle fibres contract together, in a coordinated wave. A current passing through the chest can scramble that coordination, leaving the fibres twitching independently: the muscle is still moving, but it no longer squeezes, so no blood is pushed anywhere. IEC 60479-1 puts the threshold near 40 mA of alternating current lasting more than a second or two — a level a 230 V mains contact exceeds several times over. It rarely stops on its own; a defibrillator works by shocking the whole muscle into stopping at once, in the hope that it restarts in step.',
+    see: ['current', 'mains', 'rcd'],
+  },
+  'protective earth': {
+    tip: 'The protective earth (PE) is the third conductor in a mains cable, coloured yellow-green, whose job is to blow the fuse if a live wire ever touches an equipment case.',
+    detail:
+      'It is not a drain for stray electricity, which is the usual misconception. It is a trigger. It provides a fat, low-resistance path from the metal case back to the supply, so a live-to-case fault draws hundreds of amps and clears the fuse in milliseconds. Without it the case simply sits at mains voltage, looking entirely normal, drawing no current and alerting nobody — until a person completes the circuit. On cable cores it is yellow-green; be warned that inside a Ukrainian switchboard those same colours mean live phases.',
+    see: ['fuse', 'mains', 'bonding', 'rcd'],
+  },
+  fuse: {
+    tip: 'A fuse is a deliberately weak conductor that melts and disconnects the supply before a fault can start a fire.',
+    detail:
+      'Two numbers describe it. The rating is how much current it passes indefinitely — under IEC 60127 that is simply the equipment’s normal running current, unlike the American UL convention of rating at 125–150 %. The letter is its speed: F (flink) is quick-acting, T (träge) is time-lag. Neither type is required to blow at 1.5× its rating for a full hour, which tells you what a fuse is really for: it protects against short circuits and fire, not against working equipment hard. Fitting a larger fuse to stop it blowing removes the protection and hands the fusing job to your wiring.',
+    see: ['time-lag fuse', 'inrush current', 'protective earth', 'mains'],
+  },
+  'time-lag fuse': {
+    tip: 'A time-lag (T, slow-blow) fuse tolerates a brief overload before melting, so a transformer’s switch-on surge does not blow it every time.',
+    detail:
+      'The letter comes from the German träge, sluggish; F for flink, nimble, is the quick-acting opposite. The difference is large where it matters: at ten times its rating an F fuse clears in 20–40 ms, a T fuse tolerates up to 300 ms. That tolerance exists because a mains transformer draws ten to twelve times its running current for the first few cycles at switch-on, while the reservoir capacitor behind it is still empty and looks like a short. An F fuse would clear inside that window, every single power-up. A T fuse rides it out and still clears a genuine fault.',
+    see: ['fuse', 'inrush current', 'transformer'],
+  },
+  'inrush current': {
+    tip: 'Inrush current is the large, brief surge a transformer or power supply draws in the first few cycles after switch-on, before it settles to its normal current.',
+    detail:
+      'Two things cause it. A transformer’s core has to be magnetised from scratch, which briefly draws ten to twelve times the running current — and up to twenty-five times in the first half-cycle. Meanwhile the reservoir capacitor behind the rectifier is empty, and an empty capacitor is electrically indistinguishable from a short circuit. Both effects last only a few cycles, but they are the reason a linear supply needs a time-lag fuse: a quick-acting fuse cannot tell this perfectly normal surge from a fault.',
+    see: ['time-lag fuse', 'transformer', 'psu', 'capacitor'],
+  },
+  rcd: {
+    tip: 'An RCD (ПЗВ in Ukraine, GFCI in the US) is a device that compares the current going out along the line with the current returning on the neutral, and disconnects if they differ.',
+    detail:
+      'In a healthy circuit the two are equal. If some current is going missing it must be leaking somewhere it should not — through the earth, or through a person — and the device trips. For personal protection the threshold is 30 mA, acting within 300 ms at that current or 40 ms at five times it. Note carefully what that means: it does not prevent the shock, it ends it. And it has a blind spot — hold the line in one hand and the neutral in the other and your current returns on the neutral, perfectly balanced, so the device sees an ordinary load and never trips. In Ukraine ПУЕ forbids fitting one to a TN-C installation.',
+    see: ['tn-c', 'protective earth', 'mains', 'ventricular fibrillation'],
+  },
+  'tn-c': {
+    tip: 'TN-C is an earthing arrangement in which one conductor does the job of both neutral and protective earth along the whole installation — the norm in Soviet-era housing.',
+    detail:
+      'The combined conductor is called PEN. It is cheaper by one wire, and its weakness is total: if the PEN conductor ever breaks, every earthed case downstream rises to mains voltage, because the thing that was supposed to be earth was also carrying the return current. This is why an RCD cannot be used on TN-C — there is no separate earth for a leakage current to flow through, so there is nothing for the device to detect. ПУЕ 1.7.81 forbids it outright. Modern practice is TN-C-S, splitting PEN into separate PE and N near the point of supply.',
+    see: ['rcd', 'protective earth', 'mains'],
+  },
+  'high tension': {
+    tip: 'High tension (HT) is the high-voltage supply rail inside valve equipment and power amplifiers — hundreds to thousands of volts.',
+    detail:
+      'The name is old British usage; American sources say B+ or simply HV. It is produced by rectifying and smoothing a transformer’s secondary, and the smoothing capacitors are what make it dangerous long after the plug is out: at 4 kV an ordinary 50 µF reservoir holds 400 joules. Because stored energy goes as the square of the voltage, an HT supply is not merely a worse version of a 12 V rail — it is in a different category, and it is why bleeder resistors, shorting sticks and metering-before-touching are standard practice around valve gear.',
+    see: ['bleeder resistor', 'shorting stick', 'power amplifier', 'psu'],
+  },
+  'bleeder resistor': {
+    tip: 'A bleeder resistor is a resistor left permanently across a power supply’s reservoir capacitor to drain its charge once the supply is switched off.',
+    detail:
+      'It is sized to pull the rail down to a safe level within about thirty seconds — slow enough not to waste power in normal use, fast enough that the supply disarms itself while you fetch a screwdriver. It costs a few cents and is the difference between a supply that makes itself safe and one that waits for you. The essential caveat is that you must never trust one: bleeders fail open, and a failed bleeder is visually identical to a working one. Always meter the rail, and discharge it yourself anyway.',
+    see: ['high tension', 'shorting stick', 'capacitor', 'psu'],
+  },
+  'shorting stick': {
+    tip: 'A shorting stick is an insulated rod with an earthed lead on the end, used to discharge a capacitor deliberately rather than hoping it is already empty.',
+    detail:
+      'For anything holding more than a few joules the right tool is a discharge stick — the same thing with a high-wattage, low-value resistor in series, limiting the discharge to roughly 5–10 amps. The resistor is there for the capacitor’s sake as much as yours: a dead short across a large charged capacitor can damage it through internal thermal and magnetic stress. Never substitute a screwdriver. It brings your hand far closer to the live part than an insulated rod does, and it wrecks the blade.',
+    see: ['bleeder resistor', 'high tension', 'capacitor', 'dielectric absorption'],
+  },
+  'dielectric absorption': {
+    tip: 'Dielectric absorption, or soakage, is the tendency of a discharged capacitor to charge itself partly back up after the short is removed.',
+    detail:
+      'Charge does not only sit on the plates; some of it becomes trapped in the dielectric, and it seeps back out over seconds to minutes once you stop shorting the terminals. A non-solid aluminium electrolytic recovers 10–15 % of the voltage it started at. On a 400 V supply that is a 40–60 V surprise — a spark and a swear word. On a 4 kV valve supply the same percentage is several hundred volts, appearing by itself in a rig you have already made safe. This is why discharged capacitors are left shorted, and why large ones are shipped with their terminals tied together.',
+    see: ['shorting stick', 'capacitor', 'electrolytic', 'high tension'],
+  },
+  'non-ionising': {
+    tip: 'Non-ionising radiation is electromagnetic energy whose photons are too weak to knock electrons off atoms — which includes every radio wave, however powerful the transmitter.',
+    detail:
+      'Whether radiation can ionise depends on the energy per photon, which depends on frequency, not on how much of it there is. X-rays and gamma rays are ionising: a single photon can break a chemical bond and damage DNA directly. Radio photons are millions of times too weak for that, and no amount of transmitter power changes the energy of an individual photon. That does not make radio harmless — it heats tissue, which is what SAR measures — but it does mean the hazard is thermal, and quite different from what the word radiation usually suggests.',
+    see: ['sar', 'radio wave', 'electromagnetic spectrum'],
+  },
+  sar: {
+    tip: 'SAR (specific absorption rate) is the rate at which body tissue absorbs radio energy, in watts per kilogram — the quantity RF exposure limits are actually written in.',
+    detail:
+      'Because radio waves heat tissue rather than ionise it, the meaningful measure of exposure is a heating rate per unit mass. ICNIRP’s general-public limits are 0.08 W/kg averaged over the whole body and 2 W/kg averaged over any 10 g of head or torso. The practical problem is that you cannot measure watts per kilogram inside your own head, so the guidelines restate the limits as reference levels — field strengths in the air chosen so that meeting them guarantees meeting the SAR limit.',
+    see: ['reference level', 'whole-body resonance', 'non-ionising', 'duty cycle'],
+  },
+  'reference level': {
+    tip: 'A reference level is an RF field strength in the air — volts per metre, or watts per square metre — set so that staying under it guarantees staying under the SAR limit inside the body.',
+    detail:
+      'The real limit is SAR, and SAR is unmeasurable in practice, so the guidelines translate it into something you can measure or model. Meeting the reference level always means meeting the SAR limit; exceeding it does not automatically mean you have exceeded the SAR limit, only that a proper assessment is now needed. The levels are frequency-dependent, dipping to their strictest across 30–400 MHz where the body is resonant. Below 30 MHz ICNIRP deliberately defines no power-density level at all, and requires the electric and magnetic fields to be checked separately.',
+    see: ['sar', 'whole-body resonance', 'near field'],
+  },
+  'whole-body resonance': {
+    tip: 'Whole-body resonance is the frequency range where a human body couples most efficiently to a radio field — roughly 30–200 MHz — because the body is about half a wavelength long there.',
+    detail:
+      'A body is an antenna, and like any antenna it absorbs best when resonant. A standing adult is around half a wavelength near 70 MHz, dropping to about 35 MHz when standing on conductive ground. Across that range a given field produces far more heating than the same field would at HF or at 70 cm, so the exposure limit has to come down to compensate: it flattens out at 27.7 V/m from 30 to 400 MHz, its strictest anywhere. The 4 m and 2 m bands sit in that trough.',
+    see: ['sar', 'reference level', 'resonance', 'dipole'],
+  },
+  'duty cycle': {
+    tip: 'Duty cycle is the fraction of the time a transmitter is actually putting out full power — about 20 % for ordinary SSB speech, 100 % for FM and digital modes.',
+    detail:
+      'RF exposure limits are averaged over minutes, so what matters is not peak envelope power but the average. Two independent factors reduce it: the duty cycle of the mode, and the fraction of the time you transmit rather than listen. Ordinary SSB speech only reaches peak power on the loudest syllables (about 20 %); CW is about 40 %, SSB with heavy processing about 50 %, and anything with a constant carrier — FM, RTTY, FT8 — is 100 %. So 100 W of SSB in a normal conversation averages about 10 W, while the same 100 W of FM averages five times that. The mode matters more than the amplifier.',
+    see: ['sar', 'pep', 'ssb', 'fm'],
+  },
+  'near field': {
+    tip: 'The near field is the region close to an antenna — within roughly a sixth of a wavelength — where the wave has not yet settled into its far-field form and simple distance formulas do not apply.',
+    detail:
+      'Out in the far field, energy travels as a plane wave and power density falls predictably with distance, which is what the usual safe-distance formula assumes. Closer in, the electric and magnetic fields are not yet in the fixed relationship that assumption requires. This matters practically on HF: at 14 MHz the reactive near field extends about 3.4 m, while the plane-wave formula would put the compliance distance at around 1.5 m — an answer computed from a region where the equation is invalid. It is why ICNIRP defines no power-density limit below 30 MHz.',
+    see: ['reference level', 'sar', 'wavelength', 'antenna'],
+  },
+  'ground potential rise': {
+    tip: 'Ground potential rise is the voltage an earth electrode reaches above true earth while a large current — a lightning strike — flows into it.',
+    detail:
+      'It is simply V = I·R, and the numbers are brutal: 30 kA into a typical 25 Ω rod puts that rod 750 kV above true earth, and even a heroic 1 Ω rod would sit at 30 kV. No achievable earth resistance keeps the ground near zero. The danger appears when a station has two separate electrodes — one under the mast, one for the mains. A strike lifts the mast electrode to hundreds of kilovolts while the mains electrode, a few metres away, stays near true earth — and that difference appears across whatever bridges the two, which is your coax, through your radio. The cure is bonding, not a better earth.',
+    see: ['bonding', 'lightning arrestor', 'rf earth', 'protective earth'],
+  },
+  bonding: {
+    tip: 'Bonding means connecting every piece of equipment together electrically so that no voltage difference can appear between them — as distinct from earthing, which is a connection to the ground itself.',
+    detail:
+      'The distinction matters because you cannot hold anything near zero volts during a lightning strike. What you can do is make sure the whole station rises together: bond the mast, the feedline shield and every chassis to one single point, and a surge lifts them all in step, so nothing appears across the equipment. Nothing is drained away — the rod may still be at 750 kV — but damage comes from the difference, not the rise. Bonding conductors should be short, heavy and straight, because at the frequencies in a strike it is inductance, not resistance, that develops the voltage.',
+    see: ['ground potential rise', 'rf earth', 'lightning arrestor', 'inductance'],
+  },
+  'lightning arrestor': {
+    tip: 'A lightning arrestor is a device fitted in the feedline at the point it enters the building, which clamps a surge to the bonded entrance panel instead of letting it reach the radio.',
+    detail:
+      'Two kinds are common. A gas discharge tube is broadband and passes DC — necessary if the coax also feeds a masthead preamplifier or remote switch — but takes about a hundred nanoseconds to fire and lets a few hundred volts through first. A quarter-wave stub is a DC short to ground that is invisible at the operating frequency, has no turn-on delay because it is always connected, and lets through roughly forty times less; the price is that it works on one band only. Neither replaces the single most effective measure: unplugging the feedline from the radio and putting that loose end outside the building, not on the operating desk.',
+    see: ['bonding', 'ground potential rise', 'coax', 'feeder'],
+  },
+  iec: {
+    tip: 'The IEC (International Electrotechnical Commission) is the body that writes the international standards for electrical equipment — including the ones on fuses and on what current does to a human body.',
+    detail:
+      'It is not a regulator and cannot fine anyone; it publishes standards that national bodies then adopt, often word for word. Ukraine adopts them as ДСТУ IEC or ДСТУ EN documents. Three IEC standards bear on electrical safety: IEC 60479 on the effects of current on human beings, IEC 60127 on miniature fuses, and IEC 62305 on lightning protection. They are the ones to follow rather than American sources because they describe the equipment actually sold in Ukraine and the EU, and the conventions differ in ways that change the answer.',
+    see: ['fuse', 'ventricular fibrillation'],
+  },
+  icnirp: {
+    tip: 'ICNIRP (the International Commission on Non-Ionizing Radiation Protection) is the independent scientific body whose exposure guidelines the EU and most of the world use for radio fields.',
+    detail:
+      'It reviews the research and publishes limits — most recently in 2020 — expressed as SAR, with reference levels derived from them. Like the IEC it has no enforcement power; the EU adopted its 1998 guidelines as a Council Recommendation, and national regulators apply them. The important difference from the American FCC is who counts as occupationally exposed: under ICNIRP a hobbyist is not, so the general-public limits — five times stricter in SAR — apply to you in your own shack.',
+    see: ['sar', 'reference level', 'non-ionising', 'fcc'],
+  },
+  fcc: {
+    tip: 'The FCC (Federal Communications Commission) is the American communications regulator — worth knowing about mainly because most English-language radio writing assumes its rules, which differ from Europe’s.',
+    detail:
+      'Two divergences matter to a reader outside the United States. On RF exposure the FCC lets a licence-holder apply the looser occupational limits to themselves and their household; ICNIRP does not. On fuses the American UL convention marks a fuse at about 135 % of what it carries continuously, so US sources say to rate at 125–150 % of the running current — advice that fits an oversized fuse to IEC-rated equipment.',
+    see: ['icnirp', 'sar', 'fuse'],
+  },
+  nfpa: {
+    tip: 'The NFPA (National Fire Protection Association) is an American standards body whose electrical-safety document, NFPA 70E, is widely cited for stored-energy work thresholds.',
+    detail:
+      'Its Article 360 is the source of a voltage-dependent capacitor rule for stored-energy work: a stored energy above 100 J counts as hazardous below 100 V, above 1 J from 100 V, and above just 0.25 J from 400 V. The thresholds are work-control limits — the point at which you should treat a capacitor as live and use proper procedure — not predictions about electrocution. It is worth knowing that at the tightest tier the injury being prevented is largely the startle reaction and what you do in the quarter-second afterwards.',
+    see: ['bleeder resistor', 'shorting stick', 'high tension'],
+  },
+  rsgb: {
+    tip: 'The RSGB (Radio Society of Great Britain) is the British national amateur radio society, whose EMF guidance is the most usable practical RF-exposure material in Europe.',
+    detail:
+      'Its best-known contribution is a rule of thumb: for time-averaged powers up to 100 W, keeping people about 2.4 m from anything that radiates has been validated by a wide range of assessments and measurements. That matters because the alternative — computing a compliance distance — is invalid on HF, where the formula’s far-field assumption does not hold. The RSGB works to ICNIRP, so its conclusions transfer to a Ukrainian station in a way that American ones do not.',
+    see: ['icnirp', 'duty cycle', 'near field'],
+  },
+  'пуе': {
+    tip: 'ПУЕ (Правила улаштування електроустановок) is Ukraine’s own electrical installation code — the rules that actually govern the wiring in a Ukrainian building.',
+    detail:
+      'The 2017 edition replaced the Soviet ПУЭ of 1986, which is why so much older housing stock does not match it. One clause matters here and has no EU equivalent: ПУЕ 1.7.81 forbids fitting an RCD to a TN-C installation, which is what most Soviet-era two-wire wiring is.',
+    see: ['protective earth', 'rcd', 'tn-c', 'mains'],
+  },
+  'дсту': {
+    tip: 'ДСТУ is the prefix on a Ukrainian national standard; ДСТУ EN or ДСТУ IEC means Ukraine has adopted a European or international standard as its own.',
+    detail:
+      'The relevant one here is ДСТУ EN 60445:2022, which is where the harmonised conductor colours come from: brown for line, light blue for neutral, yellow-green for protective earth. Note the division of labour, because Ukrainian sources routinely get it wrong: the colour code is ДСТУ’s, not ПУЕ’s — the word «коричневий» does not appear anywhere in ПУЕ. ПУЕ mandates only the protective-earth and neutral colours.',
+    see: ['пуе', 'protective earth', 'iec'],
+  },
+  'пзв': {
+    tip: 'ПЗВ (пристрій захисного вимкнення) is the Ukrainian name for a residual-current device — the same thing called an RCD in Europe and a GFCI in the United States.',
+    detail:
+      'It compares the current flowing out along the line with the current returning on the neutral and disconnects if they differ, on the reasoning that the missing current must be leaking through the earth — or through a person. For personal protection the threshold is 30 mA. ПУЕ classes it as an additional protective measure that can never be the only one, and forbids it entirely on TN-C wiring. It does not prevent a shock; it ends one.',
+    see: ['rcd', 'tn-c', 'пуе', 'protective earth'],
   },
 }

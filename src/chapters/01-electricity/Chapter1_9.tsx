@@ -522,7 +522,7 @@ export default function Chapter1_9() {
             text: <Trans i18nKey="ch1_9.labStep2" ns="ui" components={{ strong: <strong /> }} />,
             diagram: <TransformerLabSchematic />,
           },
-          { text: <Trans i18nKey="ch1_9.labStep3" ns="ui" components={{ ...mathComponents, nowrap: nowrap, code: <code className="bg-muted/50 rounded px-1 font-mono" /> }} /> },
+          { text: <Trans i18nKey="ch1_9.labStep3" ns="ui" components={{ ...mathComponents, nowrap: nowrap, code: <code className="bg-muted/50 rounded px-1 font-mono" />, duty: <G k="duty cycle" /> }} /> },
           { text: t('ch1_9.labStep4') },
           { text: <Trans i18nKey="ch1_9.labStep5" ns="ui" components={{ strong: <strong /> }} /> },
           { text: t('ch1_9.labStep6') },

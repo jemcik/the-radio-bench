@@ -35,5 +35,9 @@ export const STORAGE_KEYS = {
 
   // Quiz progress — one entry per chapter
   quizProgress: (chapterId: string) => `trb-quiz-${chapterId}`,
+
+  // Ch 4.3 station safety checklist — persists so the reader can tick items
+  // off across visits while they actually walk round the station.
+  safetyChecklist: 'trb-safety-checklist',
 } as const
 

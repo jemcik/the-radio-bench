@@ -183,7 +183,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolResistorName')}
           description={
-            <Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui" components={{ var: <MathVar />, arrl: <G k="arrl" /> }} />
+            <Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui" components={{ var: <MathVar />, arrl: <G k="arrl" />, iec: <G k="iec" /> }} />
           }
         >
           <Resistor x={55} y={28} />

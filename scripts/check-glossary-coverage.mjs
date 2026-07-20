@@ -126,7 +126,12 @@ const EXEMPT_PER_CHAPTER = {
   // them apart.
   // «transistor» — forward-reference in the conductor/semiconductor
   // introduction; passing mention, not concept-focal.
-  ch1_1: new Set(['tank', 'transistor']),
+  // «fuse» (added with the ch4.3 glossary entry) — the only mention is
+  // `currentLadderFuse`, a magnitude-ladder row description passed to
+  // CurrentLadder as a raw `t()` string (Chapter1_1.tsx:161). It is a
+  // diagram data label, not prose, so a `<G>` wrap would render as
+  // literal text. The term is taught and wrapped in ch4.3 §2.
+  ch1_1: new Set(['tank', 'transistor', 'fuse']),
   // ch1_4 «potentiometer» — only in heroAriaLabel; aria-label is a
   // plain-string attribute and can't carry a `<G>` wrap.
   ch1_4: new Set(['potentiometer']),
@@ -276,7 +281,13 @@ const EXEMPT_PER_CHAPTER = {
   // via the dedicated «transistor saturation» entry (wrapped via the
   // <sat> alias on first occurrence). Magnetic-core saturation is
   // irrelevant in this chapter.
-  ch1_11: new Set(['impedance', 'emi', 'saturation', 'local oscillator']),
+  // «bonding» — false-sense match, added with the ch4.3 glossary entry.
+  // The only mention is «the missing bonding spot» in `insideDopingNote`,
+  // about COVALENT bonds in a silicon lattice — not the electrical
+  // equipotential bonding of ch4.3 §5. Wrapping it would pop a
+  // lightning-protection card onto a semiconductor-doping paragraph.
+  // (The UA translation says «зв’язку» and has no matching word at all.)
+  ch1_11: new Set(['impedance', 'emi', 'saturation', 'local oscillator', 'bonding']),
 }
 
 function readGlossaryKeys() {

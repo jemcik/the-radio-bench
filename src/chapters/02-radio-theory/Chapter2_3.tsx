@@ -112,7 +112,7 @@ export default function Chapter2_3() {
       <SsbEnvelopePep />
       <PepCalculator />
       <p>
-        <Trans i18nKey="ch2_3.pepP4" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong /> }} />
+        <Trans i18nKey="ch2_3.pepP4" ns="ui" components={{ ...mathComponents, em: <em />, strong: <strong />, duty: <G k="duty cycle" /> }} />
       </p>
       <Callout variant="note">
         <Trans i18nKey="ch2_3.calloutHistory" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
