@@ -62,8 +62,12 @@ const PLOT_H = BOT_Y - TOP_Y
 const AXIS_X = 52
 const TICK_LABEL_X = AXIS_X - 8 // end-anchored
 const BAND_X0 = 64
-const BAND_X1 = 210
-const LABEL_X = 222 // start-anchored zone labels
+// The band column is deliberately narrower than the labels need: every pixel
+// taken from it is a pixel of headroom for the label column, and the labels are
+// what actually runs out of room. Narrowing this (210 → 180) was the fix for a
+// CI-only spill — see the label budget note below.
+const BAND_X1 = 180
+const LABEL_X = 192 // start-anchored zone labels
 
 /** Log position of a current in mA. */
 function yFor(ma: number): number {
@@ -75,13 +79,20 @@ function yFor(ma: number): number {
 //   LEFT  tick «1000» / «мА» — left edge at x≈14. That sets VB_W's left
 //         margin; the axis sits at AXIS_X=52.
 //   RIGHT the binding constraint. Zone labels are START-anchored at
-//         x=222; the widest rendered (UA «Відчувається — ще можна
-//         відпустити») reaches x≈469 — 17 px clear of the 486 edge.
+//         x=192; the widest (UA «Відчувається — ще можна відпустити»)
+//         renders ≈247 px on macOS, ending at ≈439 — 47 px clear of 486.
+//   That clearance is NOT slack to reclaim. An earlier version anchored the
+//   labels at x=222, which cleared the edge by 17 px on macOS and PASSED
+//   `npm run test:visual` locally — then failed the same gate in CI, where
+//   Linux Chromium falls back to a different face and renders the same
+//   string wider. Local measurement only bounds one platform; keep ≥10 %
+//   headroom on the widest label so the other one fits too.
 //   Keep zone labels terse: SVG text does not wrap and clips SILENTLY at
-//   the canvas edge (the first draft shipped «…from person to per»). Any
-//   label that would pass x≈470 must be shortened OR VB_W widened to
-//   match it — the nuance belongs in the figcaption, which is HTML and
-//   wraps.
+//   the canvas edge (the first draft shipped «…from person to per»). A
+//   label that outgrows the budget gets shortened, or buys room from
+//   BAND_X1 — widening VB_W re-opens the dead space on the right that made
+//   this figure look left-indented. The nuance belongs in the figcaption,
+//   which is HTML and wraps.
 
 interface Zone {
   lo: number
