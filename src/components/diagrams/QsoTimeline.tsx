@@ -12,23 +12,25 @@
  * the step belongs to. Nothing is hand-placed, so adding or removing a step
  * cannot desynchronise the blocks from the spine that connects them.
  *
- * Width budget for the block text (BLOCK_W = 330, 12 px inner padding each
- * side → 306 px usable):
- *   spoken line, EN «UR5HAA, this is W1AW»        20 ch × 6.5 ≈ 130 px
- *   spoken line, UA «UR5HAA, тут W1AW»            17 ch × 7.0 ≈ 119 px
- *   purpose line, EN «who you are calling, and who you are»
- *                                                 38 ch × 6.0 ≈ 228 px
- *   purpose line, UA (~60 % wider than EN)        ≈ 300 px  ← the binding case
- * → 306 px usable clears the worst case with ~6 px to spare. Purpose strings
- *   must stay under ~40 EN characters; longer belongs in the prose, not here.
+ * Width budget for the block text (BLOCK_W = 360, 12 px inner padding each
+ * side → 336 px usable).
+ *
+ * MEASURE THIS ON CI, NOT ON macOS. The first version budgeted 306 px from
+ * local Chrome metrics; the sign-off line measured 17 px of clearance here and
+ * still SPILLED on the CI runner, because Linux Chromium renders the same
+ * string wider. Both locales failed the diagram-geometry gate on exactly that
+ * line. The block was widened by 30 px and the longest line shortened, so the
+ * budget now has real headroom rather than a couple of pixels of it.
+ *
+ * Keep spoken lines under ~36 characters and purpose lines under ~40.
  */
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
 
-const VB_W = 760
+const VB_W = 820
 const VB_H = 556
 
-const BLOCK_W = 330
+const BLOCK_W = 360
 const BLOCK_H = 66
 const PITCH = 84
 const TOP = 44

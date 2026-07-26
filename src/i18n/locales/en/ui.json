@@ -6627,8 +6627,8 @@
       "exchangeBackWhy": "the same three, in return",
       "closeSaid": "Thanks John, 73! W1AW this is UR5HAA",
       "closeWhy": "thanks, 73 — and both call signs again",
-      "closeBackSaid": "Thanks Ivan, 73! UR5HAA this is W1AW clear",
-      "closeBackWhy": "the same in return, and both call signs"
+      "closeBackSaid": "Thanks Ivan, 73! W1AW clear",
+      "closeBackWhy": "thanks and 73 in return, then my call"
     },
     "callsignAnatomy": {
       "aria": "Two call signs broken into lettered boxes. Both have a prefix, a digit and a suffix, but the highlighted box is in a different place: for the Ukrainian call sign it is the first letter of the suffix, which gives the oblast, while for the United States call sign it is the digit, which gives the call area.",
