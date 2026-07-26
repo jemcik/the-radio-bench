@@ -1245,7 +1245,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['antenna', 'impedance', 'decibel'],
   },
   qso: {
-    tip: 'A two-way radio contact between two amateur stations — the basic unit of activity on the bands.',
+    tip: 'A QSO is a two-way radio contact between two amateur stations — the basic unit of activity on the bands.',
     detail:
       'QSO is one of the old Q-codes from the telegraphy era; the literal meaning was the question "can you communicate with X?", but today it is used as a noun for the contact itself ("I had a nice QSO with a station in Japan last night"). A typical QSO exchanges callsigns, signal reports, location, name, and equipment, then closes with 73 (best regards). QSOs can last seconds (a quick contest exchange) or hours (a relaxed ragchew). Hams log every QSO they make — date, time, frequency, mode, signal report — both for personal records and for awards that require proof of contact with specific places.',
     see: ['ham radio', 'transceiver'],
@@ -2022,5 +2022,133 @@ export const glossary: Record<string, GlossaryEntry> = {
     detail:
       'It compares the current flowing out along the line with the current returning on the neutral and disconnects if they differ, on the reasoning that the missing current must be leaking through the earth — or through a person. For personal protection the threshold is 30 mA. ПУЕ classes it as an additional protective measure that can never be the only one, and forbids it entirely on TN-C wiring. It does not prevent a shock; it ends one.',
     see: ['rcd', 'tn-c', 'пуе', 'protective earth'],
+  },
+
+  // ── Ch 4.4 — Operating procedures ────────────────────────────────
+  callsign: {
+    tip: 'A call sign is the unique identifier a station transmits to say who it is.',
+    detail:
+      'Every amateur station has one, assigned by its national administration out of blocks the ITU allocates by treaty. It normally reads as three parts: a prefix of one or two letters identifying the country, a single digit, and a suffix of one to four letters identifying the individual station. What the digit and the suffix carry varies by country — in some systems the digit marks the region, in others the geography sits in the first letter of the suffix and the digit means nothing at all.',
+    see: ['call sign prefix', 'itu', 'ham radio'],
+  },
+  'call sign prefix': {
+    tip: 'The prefix is the leading letters of a call sign, and they identify the country that issued it.',
+    detail:
+      'Appendix 42 of the ITU Radio Regulations divides the whole letter-and-digit space into blocks and hands each block to an administration — UR–UZ and EM–EO to Ukraine, for instance, and AA–AL together with K, N and W to the United States. The blocks cover every radio service, not only the amateur one, which is why some broadcast stations carry the same leading letters. A prefix therefore names the country before the operator has said anything about where they are.',
+    see: ['callsign', 'itu'],
+  },
+  itu: {
+    tip: 'The ITU (International Telecommunication Union) is the United Nations agency that divides the radio spectrum between services by international treaty.',
+    detail:
+      'Its Radio Regulations are what let radio work across borders: they define the services, split the world into three regions with their own frequency allocations, hand call-sign blocks to each administration, and set the framework every national regulator then fills in. Article 25 is the part covering the amateur and amateur-satellite services. National rules may be stricter than the ITU baseline, never looser.',
+    see: ['cept', 'call sign prefix', 'callsign'],
+  },
+  cq: {
+    tip: 'CQ is the call you send when you want to talk to anyone at all, rather than to one particular station.',
+    detail:
+      'It is the general call: «CQ CQ CQ, this is …» followed by your call sign, and then a listen. Answering someone else’s CQ is the ordinary way a contact begins. A CQ can be narrowed by naming what you are looking for — one country, or one contest — and the habit of listening before you send it is what keeps it off a frequency already in use.',
+    see: ['qso', 'callsign'],
+  },
+  dx: {
+    tip: 'DX means a distant station, or a contact with one.',
+    detail:
+      'No fixed distance qualifies. On the HF bands it usually means another continent; on VHF and above, anything reaching well past the normal horizon counts, because those openings are rare and brief. Chasing DX is one of the oldest pursuits in the hobby, and most award programmes are built around it.',
+    see: ['hf', 'vhf', 'qso'],
+  },
+  'q-code': {
+    tip: 'A Q-code is a three-letter group beginning with Q that stands for a whole sentence.',
+    detail:
+      'The set comes from telegraphy, where every character cost time and operators needed to understand one another without a shared language. Each code works as both question and answer: QTH? asks «what is your location», QTH states it. A few dozen are in everyday amateur use, and they survive on voice for the same reason they started on Morse — one short group carries what would otherwise be a sentence.',
+    see: ['cw', 'qso'],
+  },
+  qsl: {
+    tip: 'QSL means «I acknowledge receipt» — and a QSL card is the written confirmation of a contact.',
+    detail:
+      'On air it is the shortest way to say that a message arrived. Off air the same letters name the card operators exchange as proof of the contact, carrying the date, time, band, mode and signal reports. Those cards are what award and contest claims are checked against, which is why the details written on them matter.',
+    see: ['qso', 'rst'],
+  },
+  qth: {
+    tip: 'QTH is a station’s location.',
+    detail:
+      'Asked as a question it means «where are you»; sent as a statement it gives your own position. In casual contacts it is usually a town or region. In contests and award work it is often a grid locator instead, because a square on a map is unambiguous where a place name may not be.',
+    see: ['q-code', 'qso'],
+  },
+  qrm: {
+    tip: 'QRM is interference from other transmitters.',
+    detail:
+      'It is the man-made half of what makes a signal hard to copy: another station on or near your frequency, a transmitter splattering outside its own channel, or simply a crowded band. Natural noise from atmospherics and static is QRN instead. The distinction is practical rather than academic — QRM often yields to a change of frequency, QRN usually does not.',
+    see: ['qsb', 'q-code'],
+  },
+  qrn: {
+    tip: 'QRN is natural radio noise — static from atmospherics and lightning rather than from another transmitter.',
+    detail:
+      'It rises and falls with the weather and the season, is worst on the low bands and in summer, and cannot be tuned away from the way interference from another station can. Distinguishing it from QRM matters because the two call for different responses: moving frequency escapes a neighbouring transmitter, but takes the atmosphere with you.',
+    see: ['qrm', 'q-code'],
+  },
+  qrz: {
+    tip: 'QRZ asks «who is calling me?»',
+    detail:
+      'You send it when you heard someone call but could not read the call sign, and it is a request to repeat rather than a general call. Sent on an empty frequency it asks a question nobody was posed, which is why CQ and QRZ are not interchangeable.',
+    see: ['q-code', 'cq'],
+  },
+  rst: {
+    tip: 'RST is the three-number signal report: Readability, Strength and Tone.',
+    detail:
+      'Readability runs 1 to 5 and says how much of the transmission can actually be made out. Strength runs 1 to 9 and says how loud it is. Tone runs 1 to 9 and describes the purity of a Morse note, so it carries meaning only on telegraphy — voice contacts send two numbers, and «59» is the everyday report. Readability and tone are judged by ear, so the same signal can draw different reports from different operators. Strength has an instrument behind it — the receiver’s S-meter — but those are calibrated differently from radio to radio.',
+    see: ['qso', 'cw', 'qsl'],
+  },
+  repeater: {
+    tip: 'A repeater is an automatic station that listens on one frequency and retransmits what it hears on another, as it arrives.',
+    detail:
+      'It sits somewhere with height — a hill, a mast, a tall building — so two stations who cannot hear each other directly can both reach it. Its receive and transmit frequencies are separated by a fixed offset, which is what lets it listen and talk at the same time without deafening itself. Repeaters are the reason a handheld with a short antenna can cover a whole city.',
+    see: ['duplex', 'simplex', 'vhf'],
+  },
+  beacon: {
+    tip: 'A beacon is an unattended transmitter that sends a known signal from a known place, so listeners can tell whether a band is open.',
+    detail:
+      'It repeats its call sign and location endlessly on a fixed frequency at a stated power. Hearing one is direct evidence that a path exists between its site and yours at that moment — stronger evidence than any forecast. Networks of beacons spread around the world let an operator sweep a band and hear which directions are workable right now.',
+    see: ['hf', 'ionosphere'],
+  },
+  simplex: {
+    tip: 'Simplex means both stations use one frequency, transmitting in turn.',
+    detail:
+      'One talks while the other listens, then they swap. Nothing sits in between, there is no offset to set, and the range is whatever the two stations can reach directly. Most contacts on the HF bands work this way.',
+    see: ['duplex', 'repeater'],
+  },
+  duplex: {
+    tip: 'Duplex means transmitting on one frequency while receiving on another.',
+    detail:
+      'The two are far enough apart that a station can listen and talk at once without its own transmitter swamping its receiver. Working through a repeater is the everyday case: the radio sends on the repeater’s input frequency and listens on its output, with the pair stored together as one memory channel.',
+    see: ['simplex', 'repeater'],
+  },
+  'phonetic alphabet': {
+    tip: 'A phonetic alphabet replaces each letter with a whole word, so letters that sound alike cannot be mistaken for one another.',
+    detail:
+      'B, D, E, P, T and V collapse into nearly the same sound once noise and a narrow receiver filter have finished with them; Bravo, Delta, Echo, Papa, Tango and Victor do not. The set in international use is the ITU one, published as Appendix 14 of the Radio Regulations. For amateur contacts it is recommended rather than required — it is near-universal because it works, not because a rule compels it.',
+    see: ['callsign', 'itu'],
+  },
+  logbook: {
+    tip: 'A log is the record a station keeps of the contacts it makes.',
+    detail:
+      'Each entry holds at least the date, the time, the band or frequency, the mode, the call sign worked and the reports exchanged. Times are kept in UTC so stations in different time zones agree on when something happened. What a log must contain, and how long it must be kept, is set nationally; beyond any requirement it is the evidence behind award claims and contest scores.',
+    see: ['qso', 'qsl'],
+  },
+  'radio net': {
+    tip: 'A net is a scheduled on-air meeting of stations, run by one station acting as controller.',
+    detail:
+      'The net control station calls the roll, decides who transmits next and keeps the order, which is what lets a dozen operators share one frequency without talking over each other. Nets run for passing traffic, for emergency practice, for technical discussion, or simply as a regular gathering.',
+    see: ['qso', 'simplex'],
+  },
+  'third-party traffic': {
+    tip: 'Third-party traffic is a message carried on behalf of someone who is not a licensed operator at either end.',
+    detail:
+      'Handing the microphone to a visitor counts, and so does relaying a message from one non-operator to another. The ITU default is that amateurs may carry such traffic internationally only for emergencies and disaster relief; anything more needs the two administrations involved to have agreed to it beforehand. That is why the countries a station may exchange third-party traffic with form a patchwork rather than a single rule.',
+    see: ['itu', 'qso'],
+  },
+  'band plan': {
+    tip: 'A band plan is the agreement on which part of a band is used for which mode and purpose.',
+    detail:
+      'Inside the frequencies a licence allows, it sorts telegraphy, narrow digital modes, voice and beacons into their own segments, so a wide signal does not land on top of a narrow one. In most countries band plans are drawn up by amateur organisations rather than imposed by the regulator, which makes them voluntary in law and near-universal in practice: a signal in the wrong segment can be entirely legal and still unwelcome.',
+    see: ['bandwidth', 'cw', 'ssb'],
   },
 }

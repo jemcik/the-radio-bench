@@ -701,6 +701,22 @@ const RULES = [
   // is reserved for scalar/math contexts (`додатне число`, `від'ємна
   // півхвиля`) — not for physical polarity labels. See landmine (row in
   // section 3) «Polarity of POLES/TERMINALS — always позитивний/негативний».
+  // «static» (atmospheric radio noise) has ONE settled rendering in this course:
+  // «атмосферні завади», used 7× including the `qrn` glossary entry. Gemini
+  // produced two other forms in ch4.4 and both shipped past every gate:
+  //   – «атмосферики» — a transliteration of English «atmospherics» via Russian.
+  //     Reads as a non-word to a native technical reader (user-flagged).
+  //   – «статичні завади» — a bare calque of «static».
+  // Neither is mechanically distinguishable from real terminology by a
+  // blocklist unless the specific form is listed, so it is listed here.
+  {
+    id: 'forbidden.atmospherics-calque',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    pattern: /(?<!\p{L})(атмосферик\S*|статичн\S*\s+завад\S*)(?!\p{L})/giu,
+    hint: 'Atmospheric radio noise is «атмосферні завади» (or «атмосферні розряди» for the discharges themselves). Never «атмосферики» (transliterated non-word) and never «статичні завади» (calque of «static»).',
+  },
+
   {
     id: 'forbidden.dodatny-polarity',
     category: 'FORBIDDEN',

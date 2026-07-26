@@ -29,6 +29,13 @@ node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locale
 ```
 After a push, verify CI (`gh pr checks <PR>`, `gh run view <id> --log-failed`); CI uses `npm ci` + pinned Node, so a local build passing ≠ CI green.
 
+## Technical debt
+
+`TECH_DEBT.md` is the register of accepted, deferred quality work — each entry says what
+it is, why it was deferred, and how to work it off. Every item is held green by a gate
+baseline, so **new work cannot add to it**. Read it before proposing a sweep; when you
+clear an item, delete its section and its baseline entries in the same commit.
+
 ## Commit cadence
 
 On request, batch related changes into one reviewable commit — not one per fix, not a save point.
@@ -56,7 +63,7 @@ Only then: outline → visuals → prose. (Jumping straight to building is the c
 
 - **`diagram-quality`** — before touching `src/components/diagrams/`, `src/components/chapter-heroes/`, or inline SVG in a chapter, or fixing any diagram issue (font/padding/overlap/scaling/translation). Source of truth for typography, rough.js, plotted curves, circuit schematics, and common failures. **Every `<Circuit>` needs `maxWidth`** or it scales ~2× and inflates text (`check:circuit-maxwidth`).
 - **`ua-translate`** — before ANY EN→UA content (chapter, widget, diagram labels). Never hand-author UA beyond a clause — Claude calques even short sentences; Gemini-primary cut landmines tenfold. Writing EN+UA in one authoring pass silently bypasses the skill: write EN only, then invoke it. When the user corrects a UA phrasing, decide convention-vs-regression and update `references/glossary.md` (or add a linter rule) — never fix the same class twice.
-- **`beginner-review`** (spawn as a subagent — independent context is the point) — MANDATORY before saying «done» on any task that wrote/rewrote `ch{N}_{M}` prose, and before any commit touching those keys. `check:uk` catches mechanical patterns; only a fresh reader catches ambiguous pronouns, comparatives without a baseline, or prose that contradicts an on-screen widget.
+- **`beginner-review`** (spawn as a subagent — independent context is the point) — MANDATORY before saying «done» on any task that wrote/rewrote `ch{N}_{M}` prose, and before any commit touching those keys. `check:uk` catches mechanical patterns; only a fresh reader catches ambiguous pronouns, comparatives without a baseline, or prose that contradicts an on-screen widget. **Chapters 0.1–1.10 predate this skill and have never been through it** — see `TECH_DEBT.md` §2.
 
 ## Prose & i18n discipline (mostly gate-enforced — skills hold the how-to)
 

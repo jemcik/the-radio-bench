@@ -42,7 +42,7 @@ const EXEMPT_TERMS = new Set([
   'arrl', 'cept', 'erc',
   'qrp', 'qso',
   'rms', 'pwm', 'esr',
-  'ham radio',
+  'ham radio',   // course-wide vocabulary: mentioned in 10+ chapters
   'mains',
   'sine wave', 'square wave',
   'volt/div', 'time/div',
@@ -113,6 +113,13 @@ const EXEMPT_PER_CHAPTER = {
   // Modulation)», the inline expansion of PWM; not the radio-modulation
   // concept (taught in ch2_2).
   ch0_2: new Set(['diode', 'modulation']),
+  // ch4_4 — all five occur ONLY inside strings that cannot carry a <G> wrap:
+  // «modulation» and «ripple» are RST tone definitions rendered by the
+  // RstReportBuilder widget through a plain t() call; «bandwidth», «fading»
+  // and «squelch» appear only in quiz options and explanations, which are
+  // built by buildQuizFromI18n with a components map limited to
+  // strong/em/var. A <G> in any of them would ship as literal text.
+  ch4_4: new Set(['modulation', 'ripple', 'bandwidth', 'fading', 'squelch']),
   // ch0_3: «impedance» and «inductance» occur ONLY in non-wrappable
   // contexts — SI-prefix table examples («50 Ω impedance») driven by
   // src/features/si/prefixes.ts and rendered via a raw t() call, or

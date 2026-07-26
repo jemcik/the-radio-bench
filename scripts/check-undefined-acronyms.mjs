@@ -67,6 +67,9 @@ const STOPLIST = new Set([
   // Frequently-recurring measurement/RF prefixes that are NOT domain
   // glossary candidates by themselves (they always come with units).
   'NPN', 'PNP', 'OCF',
+  // Call-sign block designators, not acronyms: «UR0» names the Ukrainian
+  // block reserved for repeaters and beacons. It expands to nothing.
+  'UR0',
   // Sideband mode labels (lower/double sideband). Defined inline in ch2_2
   // prose («lower sideband (LSB)», «double-sideband (DSB)») and appear as
   // SVG diagram stickers (SsbSpectrum / AmModulationExplorer) that can't

@@ -53,7 +53,7 @@ export default function Chapter4_1() {
       <Callout variant="math">
         <p><Trans i18nKey="ch4_1.horizonFormula" ns="ui" components={{ ...mathComponents }} /></p>
       </Callout>
-      <p><Trans i18nKey="ch4_1.horizonP1" ns="ui" components={{ ...mathComponents, strong: <strong />, vhf: <G k="vhf" /> }} /></p>
+      <p><Trans i18nKey="ch4_1.horizonP1" ns="ui" components={{ ...mathComponents, strong: <strong />, vhf: <G k="vhf" />, rp: <G k="repeater" /> }} /></p>
       <RadioHorizonCalculator />
       <p><Trans i18nKey="ch4_1.modesP4" ns="ui" components={{ ...mathComponents, em: <em />, hf: <G k="hf" />, sw: <G k="skywave" /> }} /></p>
       <Callout variant="key">
@@ -111,7 +111,7 @@ export default function Chapter4_1() {
       {/* ── §6 The sun ─────────────────────────────────────────── */}
       <Section id="sun" labelKey="ch4_1.sectionSun" />
       <p><Trans i18nKey="ch4_1.sunP1" ns="ui" components={{ ...mathComponents, strong: <strong />, sun: <G k="sunspot" /> }} /></p>
-      <p><Trans i18nKey="ch4_1.sunP2" ns="ui" components={{ ...mathComponents, strong: <strong />, sfi: <G k="solar flux" /> }} /></p>
+      <p><Trans i18nKey="ch4_1.sunP2" ns="ui" components={{ ...mathComponents, strong: <strong />, sfi: <G k="solar flux" />, dx: <G k="dx" /> }} /></p>
       <SunspotCycleDiagram />
       <p><Trans i18nKey="ch4_1.sunP3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
       <p><Trans i18nKey="ch4_1.conditionsLead" ns="ui" components={{ ...mathComponents }} /></p>
@@ -126,7 +126,7 @@ export default function Chapter4_1() {
       {/* ── §7 HF / VHF / UHF ranges ───────────────────────────── */}
       <Section id="ranges" labelKey="ch4_1.sectionRanges" />
       <p><Trans i18nKey="ch4_1.rangesP1" ns="ui" components={{ ...mathComponents, hf: <G k="hf" />, uhf: <G k="uhf" />, vhf: <G k="vhf" /> }} /></p>
-      <p><Trans i18nKey="ch4_1.rangesLead" ns="ui" components={{ ...mathComponents }} /></p>
+      <p><Trans i18nKey="ch4_1.rangesLead" ns="ui" components={{ ...mathComponents, itu: <G k="itu" /> }} /></p>
       <DiagramFigure caption={t('ch4_1.bandTable.caption')}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse text-foreground">
@@ -134,6 +134,7 @@ export default function Chapter4_1() {
               <tr className="border-b-2 border-border">
                 <th className="text-left py-2 px-3 font-semibold">{t('ch4_1.bandTable.hBand')}</th>
                 <th className="text-left py-2 px-3 font-semibold">{t('ch4_1.bandTable.hFreq')}</th>
+                <th className="text-left py-2 px-3 font-semibold">{t('ch4_1.bandTable.hFreqR2')}</th>
                 <th className="text-left py-2 px-3 font-semibold">{t('ch4_1.bandTable.hProp')}</th>
                 <th className="text-left py-2 px-3 font-semibold">{t('ch4_1.bandTable.hUse')}</th>
               </tr>
@@ -143,6 +144,7 @@ export default function Chapter4_1() {
                 <tr key={r} className="border-b border-border/40 align-top">
                   <th scope="row" className="text-left py-2 px-3 font-mono font-semibold whitespace-nowrap">{t(`ch4_1.bandTable.${r}Band`)}</th>
                   <td className="py-2 px-3 font-mono whitespace-nowrap">{t(`ch4_1.bandTable.${r}Freq`)}</td>
+                  <td className="py-2 px-3 font-mono whitespace-nowrap">{t(`ch4_1.bandTable.${r}FreqR2`)}</td>
                   <td className="py-2 px-3">{t(`ch4_1.bandTable.${r}Prop`)}</td>
                   <td className="py-2 px-3">{t(`ch4_1.bandTable.${r}Use`)}</td>
                 </tr>
@@ -152,6 +154,9 @@ export default function Chapter4_1() {
         </div>
       </DiagramFigure>
       <p><Trans i18nKey="ch4_1.rangesP2" ns="ui" components={{ ...mathComponents }} /></p>
+      <Callout variant="onair">
+        <p><Trans i18nKey="ch4_1.rangesRegionOnair" ns="ui" components={{ ...mathComponents, cs: <G k="callsign" /> }} /></p>
+      </Callout>
       <Callout variant="key">
         <p><Trans i18nKey="ch4_1.rangesKey" ns="ui" components={{ ...mathComponents }} /></p>
       </Callout>
@@ -161,7 +166,11 @@ export default function Chapter4_1() {
         label="4.1"
         goal={<Trans i18nKey="ch4_1.labGoal" ns="ui" components={{ ...mathComponents }} />}
         equipment={[t('ch4_1.labEquip1'), t('ch4_1.labEquip2')]}
-        components={[t('ch4_1.labComp1'), t('ch4_1.labComp2'), t('ch4_1.labComp3')]}
+        components={[
+          <Trans key="c1" i18nKey="ch4_1.labComp1" ns="ui" components={{ ...mathComponents, lb: <G k="logbook" /> }} />,
+          t('ch4_1.labComp2'),
+          t('ch4_1.labComp3'),
+        ]}
         procedure={[
           { text: <Trans i18nKey="ch4_1.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch4_1.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },

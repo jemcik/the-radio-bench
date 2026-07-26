@@ -301,3 +301,15 @@ Source English idioms that translate literally into awkward Ukrainian. Use these
 
    **Hard rule**: «прилад» is correct ONLY when the referent is a measuring / lab instrument. Anything that lives ON a schematic as a circuit element is `компонент` / `пристрій` / `елемент`. Past fix in ch 1.11: `transistor.detail` and four other glossary entries shipped as «трививідний прилад» (Gemini default) — caught only by user review. Now enforced by `forbidden.prylad-as-component` in the UA linter (see `scripts/lint-ua-translation.mjs`).
 - **«fading» / QSB → `завмирання`** (NOT `загасання` / `затухання`). This is the ionospheric/short-wave signal *fluctuation* — the strength rising and falling, the ham Q-code QSB. Confirmed against sources on the ch4.1 proofread (user-checked, July 2026): uk.wikipedia **«Короткі хвилі»** describes exactly this as «завмирання … у радіоаматорській термінології часто позначається як QSB … пов'язане з поширенням через іоносферу», with multipath interference as the cause. `загасання`/`затухання` mean *attenuation / damping* (a monotonic decrease) and carry the general/cellular-telecom sense; the uk.wikipedia **«Загасання радіосигналу»** page is that cellular-fading article and itself lists «завмирання» as the synonym. So for HF sky-wave fading keep `завмирання` everywhere (ch4.1 `fading`/`qsb` glossary + `<fad>` prose). Related: `multipath → багатопроменеве поширення`.
+
+## On-air closing (ch 4.4, operator-supplied 2026-07)
+
+- **«out» / «clear» (ending a contact)** → **«кінець зв’язку»**. Attested by the user from real
+  Ukrainian on-air practice: «…Тут UT1ZZ, кінець зв’язку». Do NOT use «відбій» (invented in an
+  early ch4.4 draft) and do NOT leave the English «clear» in Ukrainian text — the user has never
+  heard it used in the Ukrainian ether. «clear» stays in the EN locale, where the IARU operating
+  guide’s own sample QSO uses it.
+- **Final sign-off names ONLY your own call sign** in Ukrainian practice, not both — unlike the
+  IARU written sample, which names both. Mid-contact turns still name both.
+- Order is **73 → pleasantries → call sign → «кінець зв’язку»**; 73 is not last.
+
