@@ -42,6 +42,7 @@ const CHAPTER_COMPONENTS: Record<string, React.LazyExoticComponent<() => React.J
   '4-1': lazy(() => import('./04-propagation/Chapter4_1')),
   '4-2': lazy(() => import('./04-propagation/Chapter4_2')),
   '4-3': lazy(() => import('./04-propagation/Chapter4_3')),
+  '4-4': lazy(() => import('./04-propagation/Chapter4_4')),
 }
 
 // ─── Adjacent chapter nav ─────────────────────────────────────────────────────

@@ -198,7 +198,7 @@ export default function Chapter3_3() {
       {/* ── §8 The whole system ────────────────────────────────── */}
       <Section id="system" labelKey="ch3_3.sectionSystem" />
       <p><Trans i18nKey="ch3_3.systemP1" ns="ui" components={{ ...mathComponents, strong: <strong />, atu: <G k="antenna tuner" />, balun: <G k="balun" />, ci: <G k="characteristic impedance" /> }} /></p>
-      <p><Trans i18nKey="ch3_3.systemP2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
+      <p><Trans i18nKey="ch3_3.systemP2" ns="ui" components={{ ...mathComponents, strong: <strong />, dx: <G k="dx" /> }} /></p>
       <DiagramFigure caption={t('ch3_3.chooseTable.caption')}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse text-foreground">

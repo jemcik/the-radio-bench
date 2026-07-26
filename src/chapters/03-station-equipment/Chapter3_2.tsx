@@ -93,7 +93,7 @@ export default function Chapter3_2() {
       <ClassModeMatch />
       <p><Trans i18nKey="ch3_2.ampP3" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, pep: <G k="pep" /> }} /></p>
       <Callout variant="onair">
-        <p><Trans i18nKey="ch3_2.ampOnair" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
+        <p><Trans i18nKey="ch3_2.ampOnair" ns="ui" components={{ ...mathComponents, strong: <strong />, cs: <G k="callsign" /> }} /></p>
       </Callout>
 
       {/* ── §6 The output filter ───────────────────────────────── */}
@@ -119,7 +119,7 @@ export default function Chapter3_2() {
       {/* ── §8 What makes a transmitter good ───────────────────── */}
       <Section id="characteristics" labelKey="ch3_2.sectionChar" />
       <p><Trans i18nKey="ch3_2.charP1" ns="ui" components={{ ...mathComponents, strong: <strong />, harmonic: <G k="harmonic" />, bw: <G k="bandwidth" />, spur: <G k="spurious" /> }} /></p>
-      <p><Trans i18nKey="ch3_2.charP2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, cw: <G k="cw" />, ssb: <G k="ssb" />, fm: <G k="fm" /> }} /></p>
+      <p><Trans i18nKey="ch3_2.charP2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, cw: <G k="cw" />, ssb: <G k="ssb" />, fm: <G k="fm" />, itu: <G k="itu" /> }} /></p>
       <EmissionDesignatorDecoder />
       <p><Trans i18nKey="ch3_2.charP3" ns="ui" components={{ ...mathComponents }} /></p>
       <MagnitudeLadder

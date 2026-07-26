@@ -349,7 +349,7 @@ export const PARTS: Part[] = [
         part: 4,
         title: 'Operating Procedures',
         subtitle: 'Phonetic alphabet, Q-codes, QSO structure, call signs',
-        status: 'coming-soon',
+        status: 'published',
         hasLab: true,
         hasQuiz: true,
         erc32: ['b1', 'b2', 'b3', 'b4', 'b5'],

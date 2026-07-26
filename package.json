@@ -29,6 +29,7 @@
     "check:glossary-markup": "node scripts/check-glossary-markup.mjs",
     "check:glossary-completeness": "node scripts/check-glossary-completeness.mjs",
     "check:glossary-compound-mismatch": "node scripts/check-glossary-compound-mismatch.mjs",
+    "check:widget-prose": "node scripts/check-widget-prose-duplication.mjs",
     "check:diagram-fontsize": "node scripts/check-diagram-fontsize.mjs",
     "check:svg-diagram-fontsize-units": "node scripts/check-svg-diagram-fontsize-units.mjs",
     "check:junction-placement": "node scripts/check-junction-placement.mjs",

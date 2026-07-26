@@ -288,7 +288,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.recogniseIntro" ns="ui"
-          components={{ ...mathComponents, qso: <G k="qso" /> }}
+          components={{ ...mathComponents, qso: <G k="qso" />, bp: <G k="band plan" /> }}
         />
       </p>
 
