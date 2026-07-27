@@ -70,6 +70,11 @@ const STOPLIST = new Set([
   // Call-sign block designators, not acronyms: «UR0» names the Ukrainian
   // block reserved for repeaters and beacons. It expands to nothing.
   'UR0',
+  // Distress signals, and neither is an acronym: «SOS» was chosen as an
+  // unmistakable Morse pattern rather than as initials, and «MAYDAY» is a
+  // phonetic rendering of the French «m'aidez». Expanding them would invent
+  // an etymology the reader would then have to unlearn.
+  'SOS', 'MAYDAY',
   // Sideband mode labels (lower/double sideband). Defined inline in ch2_2
   // prose («lower sideband (LSB)», «double-sideband (DSB)») and appear as
   // SVG diagram stickers (SsbSpectrum / AmModulationExplorer) that can't

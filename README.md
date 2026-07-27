@@ -21,30 +21,32 @@ The curriculum follows the [CEPT Novice Examination Syllabus (ERC Report 32)](ht
 
 ## Features
 
-- **Interactive glossary** — hover any highlighted term for a quick tooltip, or click it to pin a full reference card with units, formulas, and related terms (200+ entries)
-- **Interactive widgets** — 40+ custom calculators and explorers woven into the prose: Ohm's-law solvers, an RC-charging animator, AM/FM modulation explorers, an amplifier-efficiency calculator, and many more
-- **End-of-chapter quizzes** — multiple-choice with immediate feedback, per-question explanations, and progress that survives a refresh
-- **Hands-on labs** — optional bench activities with a multimeter, breadboard, Arduino, oscilloscope, or VNA
+- **Interactive glossary** — hover any highlighted term for a quick tooltip, or click it to pin a full reference card with units, formulas, and related terms (340+ entries, all bilingual)
+- **Interactive widgets** — 70+ custom calculators and explorers woven into the prose: Ohm's-law solvers, an RC-charging animator, AM/FM modulation explorers, an amplifier-efficiency calculator, a band-privilege lookup for your licence qualification, and many more
+- **End-of-chapter quizzes** — 250+ multiple-choice questions with immediate feedback, per-question explanations, and progress that survives a refresh
+- **Hands-on labs** — 26 optional bench activities with a multimeter, breadboard, Arduino, oscilloscope, or VNA
 - **6 themes** — three light (Paper, Stone, Nordic) and three dark (Dusk, Moonlight, Graphite)
 - **Typography** — choose a reading font and text size from the theme popover (preferences persist)
 - **Full-text search** — press `Cmd+K` / `Ctrl+K` to search chapters and glossary from anywhere
 - **Bookmarks** — save any section heading and get back to it from the sidebar
 - **Guided tour** — a pip-boy mascot walks first-time visitors through the interface
-- **Circuit diagrams** — a custom SVG symbol library for inline schematics
+- **Diagrams** — 130+ figures, drawn from a custom SVG symbol library for inline schematics and gated on measured geometry so nothing overlaps in either language
 - **Bilingual** — full English and Ukrainian translations, switchable at any time
 - **Resumes where you left off** — your last location is remembered between visits
 
 ## Curriculum
 
-The course is organized into five parts spanning 28 chapters. 19 are published so far — all of Parts 0, I, and II — with Parts III and IV on the way.
+The course is organized into five parts spanning 28 chapters, and **all 28 are published** — the syllabus is covered end to end, from what a volt is to the treaty that governs who may transmit.
 
 | Part | Title | Chapters | Status |
 |------|-------|----------|--------|
 | 0 | Foundations | How to Use This Site, Lab Bench Setup, Math Toolkit, The Decibel, How to Read a Schematic | ✅ Published |
 | I | Electricity & Circuits | What Is Electricity?, Ohm's Law, DC & AC, Resistors, Capacitors, Inductors, Resonance, Filters, Transformers, Diodes, Transistors | ✅ Published |
 | II | Radio Theory | Radio Waves, Modulation, Power | ✅ Published |
-| III | Station Equipment | Receivers, Transmitters, Antennas, Measurements | 🔜 Coming soon |
-| IV | Propagation, Operations & Regulations | Spectrum & Propagation, EMC, Safety, Operating Procedures, Regulations | 🔜 Coming soon |
+| III | Station Equipment | Receivers, Transmitters, Antennas, Measurements | ✅ Published |
+| IV | Propagation, Operations & Regulations | Spectrum & Propagation, EMC, Safety, Operating Procedures, Regulations | ✅ Published |
+
+Ukrainian readers get one thing the syllabus does not provide on its own: national rules are covered alongside the international ones, sourced from the Regulations of the Amateur Radio Service approved by НКЕК in 2023 — qualifications, band and power limits, the station log, and what the examination actually involves.
 
 ## Getting started
 

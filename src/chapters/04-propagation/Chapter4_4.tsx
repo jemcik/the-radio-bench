@@ -53,7 +53,7 @@ export default function Chapter4_4() {
       {/* ── §2 The phonetic alphabet ───────────────────────────── */}
       <Section id="phonetics" labelKey="ch4_4.sectionPhonetics" />
       <p><Trans i18nKey="ch4_4.phonP1" ns="ui" components={{ ...mathComponents, flt: <G k="filter" /> }} /></p>
-      <p><Trans i18nKey="ch4_4.phonP2" ns="ui" components={{ ...mathComponents, ph: <G k="phonetic alphabet" />, itu: <G k="itu" /> }} /></p>
+      <p><Trans i18nKey="ch4_4.phonP2" ns="ui" components={{ ...mathComponents, ph: <G k="phonetic alphabet" />, itu: <G k="itu" /> , rr: <G k="radio regulations" />}} /></p>
       <DiagramFigure caption={t('ch4_4.alphabetTableCaption')}>
         <PhoneticAlphabetTable />
       </DiagramFigure>
@@ -67,7 +67,7 @@ export default function Chapter4_4() {
       <p><Trans i18nKey="ch4_4.phonP6" ns="ui" components={{ ...mathComponents }} /></p>
       <p><Trans i18nKey="ch4_4.phonP7" ns="ui" components={{ ...mathComponents }} /></p>
       <Callout variant="onair">
-        <p><Trans i18nKey="ch4_4.phonOnair" ns="ui" components={{ ...mathComponents, em: <em /> }} /></p>
+        <p><Trans i18nKey="ch4_4.phonOnair" ns="ui" components={{ ...mathComponents, em: <em /> , iaru: <G k="iaru" />}} /></p>
       </Callout>
       <Callout variant="note" title={t('ch4_4.phonUaTitle')}>
         <p><Trans i18nKey="ch4_4.phonUa" ns="ui" components={{ ...mathComponents, em: <em /> }} /></p>
