@@ -717,13 +717,19 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 #### Chapter 4.5 — Regulations
 *ERC 32: c) National and International Regulations*
 - ITU; the Amateur Service **and Amateur-Satellite Service** definitions (ERC 32 §c covers both); Article 25, Radio Regions
-- CEPT, HAREC, ECC Recommendation (05)06
-- National licence conditions: bands, power, modes
-- Frequency allocation chart
-- Station log: purpose, content, retention
-- **Diagram:** World map — click a region to see its amateur bands
-- **Quiz:** 10 questions
+- CEPT: T/R 61-02 → HAREC, ECC Recommendation (05)06 → NOVICE, T/R 61-01 → operating abroad
+- **Allocation vs band plan vs licence conditions** — three different things on one band axis (treaty / voluntary / legal). Primary vs secondary status
+- National licence conditions: classes, bands, power, modes
+- Station log: purpose, content, retention — **note it is *recommended*, not mandatory, in Ukraine** (Регламент розділ VII п.15); the mandatory part is the field list and the ≥1-year retention *if* a log is kept. QSL likewise optional
+- Ukraine's emergency service (РАС): assigned frequencies, and the one case where third-party traffic is expressly permitted — pays off the promise made in 4.4
+- Exam mechanics and the route to a licence: КТК, ≥3/4 pass mark, interview format for classes B and C, ≥10-year validity, accessibility provisions per ECC (14)05
+- **Diagram:** the three ITU Radio Regions compared on ONE shared frequency axis — 40 m reaches 7.300 MHz in Region 2, stops at 7.200 in Regions 1 and 3, with the reader's row marked. Not a map: a first attempt drew three empty schematic fields and they were decoration, because a map earns its space only by being recognised, and every wrappable label had to live in HTML anyway. Rows run 2·1·3 (world-map order), geography in the figcaption. If §2 should be geographic after all, the only version worth building is a real low-detail world map
+- **Widget:** band-privilege explorer, driven by Таблиця 12 (band + class → power, modes, primary/secondary)
+- **Widget:** log-entry builder — the required fields if you keep a log
+- **Quiz:** 15 questions
+- Closes the course: short «what next» block after the quiz (the exam this prepares you for, first time on air, where to grow)
 - No lab activity for this chapter — the "lab" is your local regulator's website and your own licence conditions document.
+- Source of record for every Ukrainian fact: постанова НКЕК від 10.05.2023 № 173 + додатки 1–33. **The current classes are A (HAREC) / B (NOVICE) / C (Entry-Level)**; розділ XII п.4 gives the equivalence with the superseded 1/2/3 categories, and permits issued under the 2010 Регламент stay valid until expiry. Most Ukrainian web sources still describe the dead scheme — verify against the PDFs, never a mirror. This course's syllabus (ERC 32) is the **class B** programme (додаток 4)
 
 ---
 
@@ -747,6 +753,8 @@ The chapters are organized in four **Parts**. Each part corresponds to a knowled
 | dBm ↔ Watts ↔ dBW converter | Ch 0.4, 3.3 |
 | Phonetic alphabet speller | Ch 4.4 |
 | Q-code flashcards | Ch 4.4 |
+| Band-privilege explorer (band + licence class) | Ch 4.5 |
+| Log-entry builder | Ch 4.5 |
 | TX efficiency calculator | Ch 2.3 |
 
 ---

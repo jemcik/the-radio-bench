@@ -2005,6 +2005,54 @@ export const glossary: Record<string, GlossaryEntry> = {
       'Its best-known contribution is a rule of thumb: for time-averaged powers up to 100 W, keeping people about 2.4 m from anything that radiates has been validated by a wide range of assessments and measurements. That matters because the alternative — computing a compliance distance — is invalid on HF, where the formula’s far-field assumption does not hold. The RSGB works to ICNIRP, so its conclusions transfer to a Ukrainian station in a way that American ones do not.',
     see: ['icnirp', 'duty cycle', 'near field'],
   },
+  'radio regulations': {
+    tip: 'The Radio Regulations are the ITU treaty that divides the radio spectrum between services and binds the states that have signed it.',
+    detail:
+      'Revised every few years at a World Radiocommunication Conference, the Radio Regulations are the top of the stack every other radio rule hangs from: national law narrows them, it cannot widen them. Article 5 is the allocation table — which service gets which band in which of the three regions. Article 25 is the amateur chapter, and Appendix 42 hands each country its call-sign prefix blocks.',
+    see: ['itu', 'band plan', 'cept'],
+  },
+  'amateur-satellite service': {
+    tip: 'The amateur-satellite service is a separate radiocommunication service for amateur work carried out through space stations on satellites.',
+    detail:
+      'The Radio Regulations define it alongside the amateur service and for the same purposes — self-training, intercommunication and technical investigation — but it is its own service with its own allocations, rather than an extension of the terrestrial one. That is why an amateur satellite is not simply a repeater that happens to be in orbit: some bands are shared with the amateur service and some are not. Article 25 applies to both, with one carve-out written for satellites — the command signals sent to control a spacecraft may be encoded, which would otherwise be prohibited.',
+    see: ['itu', 'radio regulations', 'repeater'],
+  },
+  'primary allocation': {
+    tip: 'A primary allocation gives a service first claim on a band: others must not interfere with it, and it need not accept interference from them.',
+    detail:
+      'Ranking exists because most bands are shared. Where the amateur service is primary, other users of that band have to work around it. Where it is secondary, the obligation runs the other way. The rank is set in the Radio Regulations region by region and can then be narrowed nationally — which is why the same band can be primary for you and secondary a border away.',
+    see: ['secondary allocation', 'radio regulations', 'band plan'],
+  },
+  'secondary allocation': {
+    tip: 'A secondary allocation means you must not disturb the band\u2019s primary users, and you get no protection from the interference they cause you.',
+    detail:
+      'Secondary status is a statement about legal standing, not about your equipment or your signal. If a primary user appears on the frequency, you stop; if their transmissions make the band unusable for you, that is a situation you have to accept rather than a fault to report. Several amateur bands are secondary, so it is worth knowing which of yours are before wondering why a band sometimes fills with something else.',
+    see: ['primary allocation', 'radio regulations', 'band plan'],
+  },
+  harec: {
+    tip: 'HAREC (Harmonised Amateur Radio Examination Certificate) is the CEPT certificate showing you passed a full amateur examination to the agreed common syllabus.',
+    detail:
+      'Its point is portability. Because every participating country tests the same syllabus — the one in CEPT Recommendation T/R 61-02 — a pass in one of them is evidence in all of them, so an operator moving abroad can be licensed without sitting a second examination. In Ukraine the HAREC corresponds to qualification A, the full class; the novice level below it has its own harmonised certificate based on ERC Report 32.',
+    see: ['cept', 'itu', 'callsign'],
+  },
+  iaru: {
+    tip: 'The IARU (International Amateur Radio Union) is the worldwide federation of national amateur radio societies, and it speaks for the service at the ITU.',
+    detail:
+      'It is not a regulator and issues nothing: no licence, no call sign, no legal obligation. What it does is represent amateur interests when the Radio Regulations are revised, and publish the band plans that divide each amateur band by mode. Those plans are voluntary agreements between amateurs rather than law, which is exactly why they work — and why ignoring one can be entirely legal and still ruin several contacts. The IARU splits its own work along the ITU\u2019s three regions.',
+    see: ['band plan', 'itu', 'radio regulations'],
+  },
+  'нкек': {
+    tip: 'НКЕК is Ukraine\u2019s regulator for electronic communications and the radio spectrum \u2014 the body that makes the amateur radio rules and supervises compliance with them.',
+    detail:
+      'Its full name is the National Commission for State Regulation of Electronic Communications, Radio Frequency Spectrum and the Provision of Postal Services. It replaced НКРЗІ in 2022. For an amateur it is the body behind the Regulations of the Amateur Radio Service: it approves them, it can restrict a permission by a separate decision, and its authorised officials carry out inspections. It does not issue call signs \u2014 that is УДЦР.',
+    see: ['удцр', 'radio regulations', 'itu'],
+  },
+  'удцр': {
+    tip: 'УДЦР (the Ukrainian State Centre of Radio Frequencies) is the state enterprise that examines amateurs, assigns call signs and issues operating documents.',
+    detail:
+      'Where НКЕК writes the rules, УДЦР applies them. It forms the qualification and technical commissions that run the examinations together with the amateur societies, assigns each station its call sign, issues the harmonised operating document and the HAREC or novice certificates, and publishes the public register of valid documents. It also carries out the technical radio monitoring of how the spectrum is actually used.',
+    see: ['нкек', 'callsign', 'harec'],
+  },
   'пуе': {
     tip: 'ПУЕ (Правила улаштування електроустановок) is Ukraine’s own electrical installation code — the rules that actually govern the wiring in a Ukrainian building.',
     detail:

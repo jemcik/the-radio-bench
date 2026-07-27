@@ -134,7 +134,7 @@ export default function Chapter3_2() {
           { value: 150, label: t('ch3_2.bwLadder.cwLabel'), description: t('ch3_2.bwLadder.cwDesc') },
         ]}
       />
-      <p><Trans i18nKey="ch3_2.charP4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /></p>
+      <p><Trans i18nKey="ch3_2.charP4" ns="ui" components={{ ...mathComponents, strong: <strong /> , rr: <G k="radio regulations" />}} /></p>
       <Callout variant="key">
         <p><Trans i18nKey="ch3_2.charKey" ns="ui" components={{ ...mathComponents, strong: <strong />, harmonic: <G k="harmonic" /> }} /></p>
       </Callout>

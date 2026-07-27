@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import i18next from 'i18next'
 import enUi from '@/i18n/locales/en/ui.json'
+import { getAllChapters } from '@/data/chapters'
 import { buildIndex, matchScore, searchIndex, type SearchResult } from './buildIndex'
 
 /** Stand up a tiny i18next instance synchronously for the tests. */
@@ -62,10 +63,21 @@ describe('buildIndex', () => {
     expect(term.entry?.tip).toBeTruthy()
   })
 
-  it('coming-soon chapters have href: null (not navigable)', () => {
-    const comingSoon = index.filter(r => r.type === 'chapter' && r.href === null)
-    // The bench has many coming-soon chapters; at least one is expected.
-    expect(comingSoon.length).toBeGreaterThan(0)
+  it('a chapter is navigable exactly when it is published', () => {
+    // This used to assert that at least one coming-soon chapter existed. That
+    // stopped being an invariant when 4.5 shipped and completed the course —
+    // and it was never the property worth testing anyway. What matters is the
+    // correspondence itself, which holds whether or not anything is unwritten.
+    const chapters = index.filter(r => r.type === 'chapter')
+    expect(chapters.length).toBeGreaterThan(0)
+
+    const publishedIds = new Set(
+      getAllChapters().filter(c => c.status === 'published').map(c => c.id),
+    )
+    for (const row of chapters) {
+      const isPublished = publishedIds.has(row.id)
+      expect(row.href === null).toBe(!isPublished)
+    }
   })
 
   it('glossary entries always have href: null (they expand in-place)', () => {
