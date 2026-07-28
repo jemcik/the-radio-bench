@@ -168,7 +168,12 @@ const offending = all.filter(i => (perKey[`${i.file}:${i.key}`] ?? 0) > (baselin
 
 if (offending.length === 0) {
   const grandfathered = Object.keys(baseline).length
-  console.log(`check-unwrapped-math-var OK: no new unwrapped math variables (${grandfathered} pre-existing key(s) baselined).`)
+  console.log(
+    `check-unwrapped-math-var OK: no new unwrapped math variables` +
+      (grandfathered
+        ? ` (${grandfathered} pre-existing key(s) baselined — see TECH_DEBT.md §3).`
+        : '.'),
+  )
   process.exit(0)
 }
 
@@ -193,4 +198,5 @@ console.error('Fix: wrap the variable — c → <var>c</var>, λ → <var>λ</va
 console.error('and render the value via <Trans> (prose/summary) or buildQuizFromI18n (quiz),')
 console.error('both of which map `var` → <MathVar>. After an intentional, verified change to')
 console.error('pre-existing debt, re-snapshot with:  node scripts/check-unwrapped-math-var.mjs --update-baseline')
+console.error('The pre-existing backlog is tracked as TECH_DEBT.md §3.')
 process.exit(1)

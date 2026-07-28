@@ -145,9 +145,22 @@ const allPatterns = [
   ...extractTemplatePatterns(source),
 ]
 
+/* i18next plural forms. `t('welcome.chapters', { count })` resolves to
+ * `welcome.chapters_one` / `_few` / `_many` / `_other` via Intl.PluralRules,
+ * so the suffixed keys never appear in src/ literally. Treat a plural form
+ * as referenced when its BASE key is referenced — that keeps orphan
+ * detection alive for the base (delete the t() call and all forms flag). */
+const PLURAL_SUFFIXES = ['_zero', '_one', '_two', '_few', '_many', '_other']
+const pluralBase = key => {
+  const s = PLURAL_SUFFIXES.find(sfx => key.endsWith(sfx))
+  return s ? key.slice(0, -s.length) : null
+}
+
 const orphans = keys.filter(key => {
   if (allPatterns.some(({ prefix, suffix }) => key.startsWith(prefix) && key.endsWith(suffix))) return false
-  return !source.includes(key)
+  if (source.includes(key)) return false
+  const base = pluralBase(key)
+  return !(base && source.includes(base))
 })
 
 if (orphans.length === 0) {

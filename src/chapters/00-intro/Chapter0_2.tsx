@@ -27,7 +27,7 @@ export default function Chapter0_2() {
           components={{ ...mathComponents, multimeter: <G k="multimeter" />,
             oscilloscope: <G k="oscilloscope" />,
             vna: <G k="vna" />,
-            strong: <strong />, }}
+            strong: <strong /> }}
         />
       </p>
 
@@ -66,11 +66,27 @@ export default function Chapter0_2() {
         </li>
       </ul>
 
-      <p>
-        <Trans i18nKey="ch0_2.multimeterBuying" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
-        />
-      </p>
+      <p>{t('ch0_2.multimeterBuying')}</p>
+
+      <ul>
+        <li>
+          <Trans i18nKey="ch0_2.multimeterBuyCount" ns="ui"
+            components={{ ...mathComponents, strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.multimeterBuyAutorange" ns="ui"
+            components={{ ...mathComponents, strong: <strong /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_2.multimeterBuyCat" ns="ui"
+            components={{ ...mathComponents, strong: <strong /> }}
+          />
+        </li>
+      </ul>
+
+      <p>{t('ch0_2.multimeterBuyBrands')}</p>
 
       <p>
         <Trans i18nKey="ch0_2.multimeterTrueRms" ns="ui"
@@ -85,7 +101,7 @@ export default function Chapter0_2() {
       <p>
         <Trans i18nKey="ch0_2.scopeControls" ns="ui"
           components={{ ...mathComponents, timediv: <G k="time/div" />,
-            voltdiv: <G k="volt/div" />, }}
+            voltdiv: <G k="volt/div" /> }}
         />
       </p>
 
@@ -99,7 +115,7 @@ export default function Chapter0_2() {
 
       <p>
         <Trans i18nKey="ch0_2.scopeSpecs" ns="ui"
-          components={{ ...mathComponents, strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" />, bw: <G k="bandwidth" /> }}
+          components={{ ...mathComponents, strong: <strong />, hf: <G k="hf" />, vhf: <G k="vhf" />, bw: <G k="bandwidth" />, vna: <G k="vna" /> }}
         />
       </p>
 
@@ -155,16 +171,15 @@ export default function Chapter0_2() {
 
       <p>
         <Trans i18nKey="ch0_2.arduinoIntro" ns="ui"
-          components={{ ...mathComponents, pwm: <G k="pwm" />,
+          components={{ ...mathComponents,
             square: <G k="square wave" />,
-            freq: <G k="frequency" />,
-            ac: <G k="ac" />, duty: <G k="duty cycle" /> }}
+            freq: <G k="frequency" />, duty: <G k="duty cycle" /> }}
         />
       </p>
 
       <p>
         <Trans i18nKey="ch0_2.arduinoPins" ns="ui"
-          components={{ ...mathComponents, pwm: <G k="pwm" /> }}
+          components={{ ...mathComponents }}
         />
       </p>
 
@@ -181,7 +196,11 @@ export default function Chapter0_2() {
       <BreadboardDiagram />
 
       <ul>
-        <li>{t('ch0_2.breadboardRails')}</li>
+        <li>
+          <Trans i18nKey="ch0_2.breadboardRails" ns="ui"
+            components={{ ...mathComponents, continuity: <G k="continuity" /> }}
+          />
+        </li>
         <li>{t('ch0_2.breadboardRows')}</li>
         <li>
           <Trans i18nKey="ch0_2.breadboardGap" ns="ui"
@@ -226,7 +245,8 @@ export default function Chapter0_2() {
         </li>
         <li>
           <Trans i18nKey="ch0_2.accessoriesEsd" ns="ui"
-            components={{ ...mathComponents, strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong />,
+              mosfet: <G k="mosfet" />, transistor: <G k="transistor" /> }}
           />
         </li>
         <li>
@@ -241,7 +261,7 @@ export default function Chapter0_2() {
       <p>
         <Trans i18nKey="ch0_2.safetyIntro" ns="ui"
           components={{ ...mathComponents, strong: <strong />,
-            dc: <G k="dc" />, }}
+            dc: <G k="dc" /> }}
         />
       </p>
 
@@ -270,12 +290,12 @@ export default function Chapter0_2() {
         ]}
         procedure={[
           {
-            text: <Trans i18nKey="ch0_2.labStep1" ns="ui" components={{ ...mathComponents, dc: <G k="dc" /> }} />,
+            text: <Trans i18nKey="ch0_2.labStep1" ns="ui" components={{ ...mathComponents }} />,
             note: t('ch0_2.labStep1Note'),
           },
           {
             text: <Trans i18nKey="ch0_2.labStep2" ns="ui"
-              components={{ ...mathComponents, arduino: <G k="arduino" />, usb: <G k="usb" />, ide: <G k="ide" />, led: <G k="led" /> }}
+              components={{ ...mathComponents, ide: <G k="ide" />, led: <G k="led" /> }}
             />,
           },
           {
@@ -284,28 +304,28 @@ export default function Chapter0_2() {
           },
           {
             text: <Trans i18nKey="ch0_2.labStep4" ns="ui"
-              components={{ ...mathComponents, arduino: <G k="arduino" />, arduino2: <G k="arduino" />, gnd: <G k="gnd" />, timediv: <G k="time/div" />, voltdiv: <G k="volt/div" /> }}
+              components={{ ...mathComponents, gnd: <G k="gnd" />, timediv: <G k="time/div" />, voltdiv: <G k="volt/div" /> }}
             />,
           },
           {
             text: <Trans i18nKey="ch0_2.labStep5" ns="ui"
-              components={{ ...mathComponents, square: <G k="square wave" />, cursor: <G k="cursor" /> }}
+              components={{ ...mathComponents, cursor: <G k="cursor" /> }}
             />,
           },
           {
             text: <Trans i18nKey="ch0_2.labStep6" ns="ui"
-              components={{ ...mathComponents, ac: <G k="ac" />, ac2: <G k="ac" />, gnd: <G k="gnd" />, rms: <G k="rms" />, rms2: <G k="rms" />, square: <G k="square wave" /> }}
+              components={{ ...mathComponents, rms: <G k="rms" /> }}
             />,
           },
           {
             text: <Trans i18nKey="ch0_2.labStep7" ns="ui"
-              components={{ ...mathComponents, gnd: <G k="gnd" />, breadboard: <G k="breadboard" />, inputz: <G k="input impedance" /> }}
+              components={{ ...mathComponents, breadboard: <G k="breadboard" />, inputz: <G k="input impedance" /> }}
             />,
           },
         ]}
         expectedResult={
           <Trans i18nKey="ch0_2.labExpected" ns="ui"
-            components={{ ...mathComponents, square: <G k="square wave" />, pp: <G k="peak-to-peak" />, ac: <G k="ac" />, pwm: <G k="pwm" /> }}
+            components={{ ...mathComponents, pp: <G k="peak-to-peak" /> }}
           />
         }
         connectionToTheory={
@@ -315,11 +335,11 @@ export default function Chapter0_2() {
         }
         troubleshooting={[
           <Trans key="t1" i18nKey="ch0_2.labTrouble1" ns="ui"
-            components={{ ...mathComponents, arduino: <G k="arduino" />, gnd: <G k="gnd" />, voltdiv: <G k="volt/div" /> }}
+            components={{ ...mathComponents }}
           />,
           t('ch0_2.labTrouble2'),
           <Trans key="t3" i18nKey="ch0_2.labTrouble3" ns="ui"
-            components={{ ...mathComponents, dc: <G k="dc" /> }}
+            components={{ ...mathComponents }}
           />,
         ]}
       />

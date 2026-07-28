@@ -138,7 +138,7 @@ It is a filter, not a guarantee.
 
 | Done | Chapter |
 |---|---|
-| [ ] | `0.1` |
+| [x] | `0.1` — 2026-07-27. 12 findings fixed (see below); 6 further calls made at review. |
 | [ ] | `0.2` |
 | [ ] | `0.3` |
 | [ ] | `0.4` |
@@ -153,3 +153,271 @@ It is a filter, not a guarantee.
 | [ ] | `1.8` |
 | [ ] | `1.9` |
 | [ ] | `1.10` |
+
+---
+
+## 3. Math variables in prose that are not wrapped in `<var>`
+
+**Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
+(`da1c413`). **Scale:** 533 keys across 14 chapters (0.2 – 1.11).
+**Gate:** `check:unwrapped-math-var` (green — all 533 are grandfathered in
+`scripts/unwrapped-math-var-baseline.json`).
+
+### What the defect is
+
+A math variable is written as a plain letter in prose instead of `<var>c</var>`, so it
+ships as upright body text rather than the KaTeX math-italic glyph. The reader cannot
+tell the letter is a variable — it blends into the surrounding sans-serif sentence.
+
+The reader-flagged case that created the gate is the shape to remember: ch 2.1 wrote the
+speed of light as «…written c.» and «λ = c / f» with bare letters. It slipped through
+every pre-existing `<var>` gate, because `check:tag-renders`,
+`check:bare-subscript-renders` and `check:var-multichar-subscripts` all check the *render
+safety of markup that is already present* — none of them check for the **absence** of
+`<var>` on a bare variable. `beginner-review` did not catch it either: it targets
+clarity, not typography.
+
+### Why it was deferred
+
+The gate was written mid-chapter-2.1. Wrapping 533 keys across fourteen already-published
+chapters at that moment would have buried that chapter's work, and every edited Ukrainian
+string has to go back through the `ua-translate` pipeline. The baseline stops the problem
+growing; the backlog can be worked off a chapter at a time.
+
+### How to work it off
+
+Per chapter, wrap each flagged variable — `c` → `<var>c</var>`, `λ` → `<var>λ</var>` —
+and make sure the value actually reaches a renderer that maps `var` → `<MathVar>`:
+`<Trans>` for prose and summaries, `buildQuizFromI18n` for quiz strings. A wrapped
+variable in a string rendered as raw text ships a literal `<var>` to the reader, so
+verify the render path, not just the markup.
+
+Two traps specific to this item:
+
+- **Variable names stay Latin in Ukrainian prose** — do not let a UA pass transliterate
+  `f` into `ч` or similar. Wrap first, then translate.
+- **The baseline is position-keyed by occurrence count**, so it also moves when prose is
+  merely reordered. After an intentional, verified change re-snapshot with
+  `node scripts/check-unwrapped-math-var.mjs --update-baseline`, and read the resulting
+  diff — a count that *dropped* is the work; a count that *grew* is a new bug.
+
+Then remove those keys from the baseline so the gate holds the chapter to the new state.
+
+### The backlog
+
+Ordered by chapter. Counts are baselined keys per locale; a key can hold more than one
+unwrapped variable.
+
+| Chapter | `en` | `uk` | Total |
+|---|---|---|---|
+| `ch0_2` | 2 | 2 | 4 |
+| `ch0_3` | 20 | 12 | 32 |
+| `ch0_4` | 3 | 1 | 4 |
+| `ch1_1` | 3 | 2 | 5 |
+| `ch1_2` | 16 | 16 | 32 |
+| `ch1_3` | 13 | 13 | 26 |
+| `ch1_4` | 6 | 8 | 14 |
+| `ch1_5` | 35 | 35 | 70 |
+| `ch1_6` | 43 | 43 | 86 |
+| `ch1_7` | 43 | 43 | 86 |
+| `ch1_8` | 29 | 28 | 57 |
+| `ch1_9` | 2 | 2 | 4 |
+| `ch1_10` | 13 | 13 | 26 |
+| `ch1_11` | 44 | 43 | 87 |
+| **Total** | **272** | **261** | **533** |
+
+Note that `ch1_11` carries the largest share despite post-dating the `beginner-review`
+rule — the two backlogs are independent, and a chapter can be clear of one and not the
+other.
+
+### Known false-positive shape
+
+Rule B flags a single Latin letter next to `=`, `·`, `×`, `≈` or `÷`. A chemical formula,
+a musical note, or a single-letter component designator sitting beside one of those
+operators is not a math variable. Judge each hit; if a flagged letter is genuinely not a
+variable, leave it baselined rather than wrapping it.
+
+**SI prefix symbols are the trap to know about.** Wrapping the `k` of `kHz` or the `p` of
+`pF` in `<var>` is *wrong*: SI prefix symbols are set upright, and `<var>` → `<MathVar>`
+renders math-italic. Rule B flagged exactly this in ch 0.1 (`maths2`, «the k in kHz, the
+M in MHz»). The fix is neither to wrap nor to baseline — it is to name the prefixes as
+words («kilo in kHz, mega in MHz»), which is also what a beginner needs and what the
+`scientific notation` glossary popover already says.
+
+---
+
+## 4. «ланцюг» used for *circuit* in Ukrainian prose
+
+**Found** 2026-07-27, while working ch 0.1 off §2. **Scale:** ~7 strings across 5 chapters.
+**Gate:** none — see the trap below for why a linter rule would do more harm than good.
+
+### What the defect is
+
+Ukrainian uses «коло» for an electrical circuit; «ланцюг» in that sense is a calque. The
+course already settled on «коло» — `parts.1` is «Електрика та електричні кола», and
+«електричне коло» appears throughout — but a handful of strings still say «ланцюг».
+
+Circuit-sense hits, all Ukrainian-only: `glossary.calibrated.detail` («розімкнутий
+ланцюг»), `ch1_11.oscFrequency` and `ch1_11.quiz_q10_explanation`
+(«частотно-вибірковий ланцюг»), `ch1_11.quiz_q9_explanation` («ланцюгом зворотного
+зв'язку»), `ch3_2.txBlocks.bufferDesc` («наступних ланцюгів» — here «каскадів» is the
+right word), `ch4_3.quiz_q9_explanation` («на кінцях усього ланцюга»).
+
+### The trap — do NOT sweep this with a regex
+
+«ланцюг» is a perfectly good Ukrainian word meaning *chain*, and the course uses it
+correctly in that sense in at least six places: «ланцюг блоків» and «ланцюг каскадів»
+(ch 3.2), «сигнальний ланцюг» (ch 0.4), «в один ланцюг» (ch 1.4), «ланцюг із трьох
+ланок» (ch 4.2), «ланцюг "трансформатор–випрямляч–стабілізатор"» (`glossary.psu`).
+A blanket replace would corrupt every one of them. Each hit has to be read for sense.
+This is also why no linter rule is proposed: the word itself is not the defect.
+
+### Deliberately excluded: «векторний аналізатор ланцюгів»
+
+The VNA's Ukrainian name appears in 12 strings across 6 chapters and is currently
+**consistent**. It was left alone on purpose: the Ukrainian abbreviation «ВАЛ» is built
+from that expansion, so changing it to «кіл» also forces «ВАЛ» → «ВАК» in four glossary
+entries and several chapters. That is a deliberate course-wide terminology migration, not
+a side-effect of a chapter review. The course's primary term is the Latin «VNA» in any
+case (`glossary._names.vna` = «VNA»). If it is ever migrated, do the name and the
+abbreviation in the same commit.
+
+### How to work it off
+
+Fold it into each chapter's §2 pass — the affected chapters (1.11, 3.2, 4.3) are on that
+backlog anyway, and the strings are already being re-read there. Judge each hit for
+chain-vs-circuit sense before touching it.
+
+---
+
+## 5. The landing page sits outside five gates
+
+**Found** 2026-07-27, while reviewing the landing page after ch 0.1.
+**Scale:** 6 gates, ~90 strings (`welcome`, `hero`, `tour`, `guidedTour`, `site`, `parts`,
+`sidebar`, `chapterTitles`, `chapterSubtitles`).
+**Gate:** none — this item *is* the missing gate coverage.
+
+### What the gap is
+
+Six gates restrict themselves to chapter blocks and therefore never scan the first page
+every visitor sees:
+
+| Gate | Restriction |
+|---|---|
+| `check-unwrapped-math-var` | `:137` — `/^ch\d+_\d+$/` |
+| `check-widget-prose-duplication` | `:109` — `/^ch\d+_\d+$/` |
+| `check-undefined-acronyms` | `:359` — `/^ch\d+_\d+\./` |
+| `check-glossary-coverage` | `:326` — `/^ch\d+_\d+$/` |
+| `check-acronym-parity` | `:110` — `/^(ch\d+_\d+\|glossary)\b/` |
+| `check-hardcoded-jsx-text` | `SCAN_DIRS` omits the `src/components` root |
+
+The landing page is also absent from §2 — that backlog lists chapters only.
+
+### Measured cost of closing it
+
+Each gate was copied to a scratch dir, widened, and run. Results:
+
+- **`acronym-parity`** — passes clean when widened. A one-line regex change, free.
+- **`unwrapped-math-var`** — clean on `welcome`. Widening surfaces exactly one real key,
+  `chapterSubtitles["1-2"]` (`V = I·R, P = V·I — …`, six bare variables in both locales).
+  **Blocked:** subtitles render as flat text (`{meta.subtitle}`, `ChapterPage.tsx:162`) and
+  also feed the search index, so `<var>` would ship literally. The render path has to
+  change first.
+- **`glossary-coverage`** — **cannot be widened by regex alone.** It locates a block's TSX
+  via ``chId.replace('ch', 'Chapter') + '.tsx'`` (`:329`), so for `welcome` it looks for
+  `welcome.tsx`, misses `Welcome.tsx`, resolves no alias tags, and reports every wrapped
+  term as unwrapped. A naive widening produced three false positives (`swr`, `impedance`,
+  `filter`) that are in fact correctly wrapped. Fix the TSX lookup before the scope.
+- **`undefined-acronyms`** — widening yields 5 hits, 4 of them false: `hero.title` is set
+  in capitals, and the gate reads every all-caps word as an acronym. Needs an all-caps-
+  title exemption first.
+- **`hardcoded-jsx-text`** — adding the `src/components` root finds two real untranslated
+  `aria-label`s (`WelcomeBuddy.tsx`, fixed 2026-07-27 by making the decorative mascot
+  `aria-hidden`; `layout/ThemeToggle.tsx:85` — "Font size", still open). But the root
+  overlaps the four subdirectories already listed, so every existing finding is reported
+  twice — the scan needs de-duplication in the same change.
+- **`widget-prose-duplication`** — not applicable; it needs the widget/prose split that
+  only chapter blocks have.
+
+### Known blind spot no gate covers
+
+`HeroStations.tsx` draws `MIC`, `AF`, `MIX`, `PA`, `RF` as literal English text nodes
+(`:53,58,65,87,131,138,160`). They are outside i18n entirely, and widening
+`hardcoded-jsx-text` does **not** catch them — the gate skips short all-caps tokens. They
+render at 5.5 px and 0.5–0.7 opacity, i.e. as texture rather than as reading matter, and
+the legend beneath explains the symbols the reader actually needs. Left alone
+deliberately; recorded so a future reader knows it was a decision, not an oversight.
+
+### How to work it off
+
+In order, cheapest first: `acronym-parity` (regex), then `hardcoded-jsx-text` (root +
+de-dup), then `undefined-acronyms` (all-caps exemption), then `glossary-coverage` (TSX
+lookup), and `unwrapped-math-var` last, behind the subtitle render-path change.
+
+---
+
+## 6. Ukrainian glossary entries that lost content in translation
+
+**Found** 2026-07-28, on the fifth review round of ch 0.2. **Scale:** 1 entry remaining
+(6 cleared on discovery). **Gate:** `check:glossary-locale-parity` (green — the one
+survivor is grandfathered in `scripts/glossary-locale-parity-baseline.json`).
+
+### What the defect is
+
+A Ukrainian glossary entry silently carries less than its English original — usually a
+dropped trailing sentence, sometimes a whole paragraph. Nothing about the result reads as
+wrong. It reads as *complete*, which is why four consecutive `beginner-review` passes over
+the chapter prose found none of it.
+
+The three that mattered most, all reachable from ch 0.2:
+
+- **`duty cycle`** lost its entire general lead paragraph in Ukrainian — in the very round
+  that added that lead to English. A reader hovering the term in ch 0.2 landed straight in
+  Part-4 RF-exposure limits with the term never defined in the entry at all.
+- **`power rails`** lost the sentence warning that large boards break each rail at the
+  midpoint, so the popover flatly contradicted the prose that opens it.
+- **`breadboard`** lost the only sentence in either locale explaining *why* a leg pushed
+  into a hole stays put (spring contacts).
+
+### Why no existing gate saw it
+
+`check:glossary-completeness` checks that keys exist. `check:glossary-markup` checks that
+markup renders. `check:glossary-coverage` and `check:glossary-overwrap` check wrapping in
+prose. **None of them compares what the two locales actually say.**
+
+### How the gate decides
+
+Sentence count alone is not a signal: a translator legitimately merges two English
+sentences into one Ukrainian sentence. Character count alone is not either: a terser but
+complete translation dips below 1.0 without losing anything.
+
+The calibration that separates them: across the 340 translated entries the **median
+Ukrainian field is 1.10× the English one** by character count — Ukrainian simply runs
+longer. So the gate flags a field only when it is **both** shorter in sentences **and**
+below 0.85× the English character count. At that threshold it found 7 entries, every one
+of which was a real omission on inspection, and no false positives.
+
+### How to work it off
+
+Translate the missing sentences through the `ua-translate` pipeline — never by hand. If
+the English sentence is genuinely redundant, cut it there instead, so both locales say the
+same thing. Then re-snapshot with
+`node scripts/check-glossary-locale-parity.mjs --update-baseline` and read the diff.
+
+### The backlog
+
+| Entry | Gap | Belongs to |
+|---|---|---|
+| `skywave.detail` | en 3 sentences / 400 chars → uk 2 / 291 | ch 4.1 (propagation) |
+
+### Two traps for whoever works on the glossary next
+
+- **`extract-glossary.mjs` fails silently into a stale dump.** An unescaped apostrophe in
+  `glossary.ts` makes it throw; `gemini-translate.py` only checks that
+  `/tmp/glossary-en.json` *exists*, so the next translation run silently translates the
+  **previous** English. Always read the extractor's output line before trusting a
+  translation. (Hit again 2026-07-28, on `power rails`: `the multimeter's continuity
+  setting` needed `\'`.)
+- **`gemini-translate.py` cannot write entries whose key contains a slash** (`time/div`,
+  `volt/div`) — it derives the output filename from the key and the intermediate directory
+  does not exist. `mkdir -p /tmp/gemini-section/time /tmp/gemini-section/volt` first.

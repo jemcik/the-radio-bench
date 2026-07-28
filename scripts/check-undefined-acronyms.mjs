@@ -123,7 +123,10 @@ const STOPLIST = new Set([
   // expanding inline would patronise.
   'США',
   // Scope-display verisimilitude labels, not glossary candidates.
-  'TRIG',
+  // `TRIGGER` is the marking on the scope's trigger block; ch0_2.scopeTriggering
+  // names it precisely so the reader can find the control on a real instrument,
+  // and explains what triggering does in the same sentence.
+  'TRIG', 'TRIGGER',
   // Transceiver front-panel control label (the «TUNE» button), not an
   // acronym. Explained inline at first mention in ch2_3.pepP4 («the TUNE
   // button, which keys a steady carrier…»); the lab step reuses the label.

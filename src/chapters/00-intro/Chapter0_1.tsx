@@ -59,11 +59,11 @@ export default function Chapter0_1() {
       <p>{t('ch0_1.calloutsIntro')}</p>
 
       <Callout variant="danger">
-        <Trans i18nKey="ch0_1.calloutDanger" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
+        {t('ch0_1.calloutDanger')}
       </Callout>
 
       <Callout variant="key">
-        <Trans i18nKey="ch0_1.calloutKey" ns="ui" components={{ ...mathComponents, strong: <strong /> }} />
+        {t('ch0_1.calloutKey')}
       </Callout>
 
       <Callout variant="tip">
