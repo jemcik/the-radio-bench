@@ -17,6 +17,7 @@
     "check:diagram-viewbox-fit": "node scripts/check-diagram-viewbox-fit.mjs",
     "check:quiz-trans": "node scripts/check-quiz-trans-components.mjs",
     "check:glossary-coverage": "node scripts/check-glossary-coverage.mjs",
+    "check:glossary-locale-parity": "node scripts/check-glossary-locale-parity.mjs",
     "check:glossary-overwrap": "node scripts/check-glossary-overwrap.mjs",
     "check:bare-subscripts": "node scripts/check-bare-subscript-renders.mjs",
     "check:tag-renders": "node scripts/check-tag-renders.mjs",

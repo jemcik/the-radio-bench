@@ -70,6 +70,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Universal Serial Bus — standard connector for data transfer and power.',
     detail:
       'USB (Universal Serial Bus) is the most common way to connect peripherals to a computer. In electronics prototyping, USB provides both a data connection (for programming microcontrollers like Arduino) and a 5V power supply. USB-A is the rectangular plug; USB-B and USB-C are other shapes you\'ll see on development boards.',
+    see: ['arduino', 'ide'],
   },
   si: {
     tip: 'Système International — the modern metric system used worldwide for scientific measurements.',
@@ -94,6 +95,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'Integrated Development Environment — software for writing and uploading code.',
     detail:
       'An IDE (Integrated Development Environment) is an application where you write, edit, and upload code to a microcontroller. The Arduino IDE is a simple, beginner-friendly IDE that lets you write sketches (programs), compile them, and upload them to your Arduino board over USB with a single click.',
+    see: ['arduino', 'usb'],
   },
   arrl: {
     tip: 'American Radio Relay League — the main ham radio organisation in the US.',
@@ -251,13 +253,13 @@ export const glossary: Record<string, GlossaryEntry> = {
   'time/div': {
     tip: 'Oscilloscope control: how much time each horizontal grid division represents.',
     detail:
-      'Turning the time/div knob stretches or compresses the horizontal axis. A setting of 1 ms/div means each of the (usually 10) grid squares spans 1 millisecond, so the full screen shows 10 ms. To see a 1 kHz signal (1 ms period) comfortably, set time/div so 2–3 complete cycles fill the screen — around 0.5 ms/div.',
+      'Turning the time/div knob stretches or compresses the horizontal axis. A setting of 1 ms/div means each of the (usually 10) grid squares spans 1 millisecond, so the full screen shows 10 ms. A 1 kHz signal has a 1 ms period. At 0.5 ms/div the screen spans 5 ms, so five complete cycles fit across it. That is a comfortable setting: enough repeats to show the shape, wide enough to measure one period.',
     see: ['oscilloscope', 'volt/div', 'frequency'],
   },
   'volt/div': {
     tip: 'Oscilloscope control: how many volts each vertical grid division represents.',
     detail:
-      'Adjusting volt/div scales the vertical axis. A 5 V peak-to-peak signal at 2 V/div will span 2.5 divisions on screen. If the waveform is clipped (flat top/bottom), increase volt/div. If it\'s too small to read, decrease it. Most probes have a 10× attenuation switch that effectively multiplies your volt/div setting by 10.',
+      'Adjusting volt/div scales the vertical axis. A 5 V peak-to-peak signal at 2 V/div will span 2.5 divisions on screen. If the waveform is clipped (flat top/bottom), increase volt/div. If it\'s too small to read, decrease it. Most probes have a ×1 / ×10 switch. In ×10 the probe divides the signal by ten before the scope sees it. Tell the scope which position the switch is in, and the volt/div figure on screen already accounts for it.',
     see: ['oscilloscope', 'time/div'],
   },
   calibrated: {
@@ -276,7 +278,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   s11: {
     tip: 'VNA reflection parameter — how much of the signal sent into a port comes back.',
     detail:
-      'S11 is the first of the four S-parameters (S = "scattering") that a VNA measures. It is the ratio of the wave reflected from port 1 back to the source, expressed in decibels. A perfect match swallows everything: S11 plunges to −∞ dB. A short or open reflects everything: S11 ≈ 0 dB. In practice, an antenna or filter input is "good enough" when S11 sits below −10 dB across the band of interest (about 10 % of the power reflected, equivalent to SWR ≈ 2:1). On a Smith chart S11 is the dot itself; on a magnitude-vs-frequency plot it is the curve filter designers stare at.',
+      'S11 is the first of the four S-parameters (S = "scattering") that a VNA measures. S11 compares the wave that comes back out of port 1 with the wave you sent in. That comparison is expressed in decibels. A perfect match sends nothing back: S11 plunges to −∞ dB. A short or open reflects everything: S11 ≈ 0 dB. In practice, an antenna or filter input is "good enough" when S11 sits below −10 dB across the frequencies you actually transmit on — about 11 % of the power reflected, equivalent to SWR ≈ 2:1. The −20 dB the chapter mentions is comfortably better than it needs to be. On a Smith chart S11 is the dot itself; on a magnitude-vs-frequency plot it is the curve that shows how the match changes across the band.',
     see: ['vna', 'swr', 'impedance', 's21'],
   },
   s21: {
@@ -293,7 +295,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   },
 
   arduino: {
-    tip: 'A small, inexpensive microcontroller board popular for electronics projects.',
+    tip: 'An Arduino is a small microcontroller board popular for electronics projects.',
     detail:
       'An Arduino is an open-source circuit board with a programmable chip. You write simple programs (called sketches) on your computer and upload them via USB. The board can then generate signals, read sensors, and control outputs. In this course we use it purely as a handy signal source — its PWM pins produce square waves at controllable frequencies, which is all we need for bench experiments.',
     see: ['pwm', 'ide', 'usb'],
@@ -303,8 +305,8 @@ export const glossary: Record<string, GlossaryEntry> = {
   pwm: {
     tip: 'Pulse Width Modulation — square wave with controllable on/off ratio.',
     detail:
-      'PWM rapidly switches a pin between high and low voltage. The duty cycle (percentage of time spent high) controls the average output voltage. At 50% duty cycle, a 5 V PWM signal averages 2.5 V. Arduino uses PWM for analogWrite() and tone(). It\'s useful for dimming LEDs, controlling motors, and generating test signals.',
-    see: ['square wave', 'frequency'],
+      'PWM rapidly switches an output pin of a microcontroller between high and low voltage. The duty cycle (percentage of time spent high) controls the average output voltage. At 50% duty cycle, a 5 V PWM signal averages 2.5 V. Arduino uses PWM for analogWrite() and tone(). It\'s useful for dimming LEDs, controlling motors, and generating test signals.',
+    see: ['square wave', 'frequency', 'duty cycle'],
   },
   'square wave': {
     tip: 'A signal that alternates sharply between two voltage levels.',
@@ -459,9 +461,9 @@ export const glossary: Record<string, GlossaryEntry> = {
   rms: {
     tip: 'Root Mean Square — the effective DC-equivalent value of an AC signal.',
     detail:
-      'RMS is the value of AC voltage or current that delivers the same power as an equivalent DC value. For a sine wave, RMS = peak × 0.707. For a 50% duty cycle square wave, RMS = peak × 0.707 as well. Most multimeters display RMS readings. True-RMS meters measure the actual waveform; cheaper meters are calibrated for sine waves only and can give wrong readings for non-sinusoidal signals.',
+      'RMS is the value of AC voltage or current that delivers the same power as an equivalent DC value. For a sine wave, RMS = peak × 0.707. For a square wave that swings symmetrically about zero, RMS = peak. Most multimeters display RMS readings. True-RMS meters measure the actual waveform; cheaper meters are calibrated for sine waves only and can give wrong readings for non-sinusoidal signals.',
     formula: 'V_rms = V_peak / √2  (sine wave)',
-    see: ['voltage', 'oscilloscope'],
+    see: ['voltage', 'oscilloscope', 'true rms'],
   },
 
   'sine wave': {
@@ -825,7 +827,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['decibel', 'bode plot', 's21', 'bandwidth'],
   },
   bandwidth: {
-    tip: 'The width in frequency between the two −3 dB (half-power) points of a resonant response — bandwidth = f₀ / Q.',
+    tip: 'How wide a span of frequencies something handles without noticeable loss. For an oscilloscope it is the frequency above which readings start going wrong.',
     detail:
       'Bandwidth (BW) of a resonant circuit is the frequency span between the two points where the response has fallen to half its peak power (−3 dB on a log scale, 0.707 of peak amplitude on a linear scale). For a parallel tank the response is the impedance versus frequency curve; for a series-LC the response is the current versus frequency curve. The bandwidth-Q relationship BW = f₀ / Q is universal: a 1 MHz tank with Q = 100 has a bandwidth of 10 kHz. Wider radio applications use deliberately low-Q (broad) tuned circuits — an FM broadcast stage needs ≈ 200 kHz bandwidth at 100 MHz, so Q ≈ 500 is plenty. Narrow applications (CW filters, crystal filters) demand Q in the thousands or tens of thousands. The same word «bandwidth» is also used in entirely different contexts (signal occupied bandwidth, oscilloscope analogue bandwidth, data-transmission bandwidth) — always check what the speaker actually means.',
     formula: 'BW = f₀ / Q',
@@ -994,20 +996,20 @@ export const glossary: Record<string, GlossaryEntry> = {
   breadboard: {
     tip: 'Prototyping board for building circuits without soldering.',
     detail:
-      'A breadboard has a grid of holes with internal metal clips that connect groups of holes together. The long edge rails run the full length (used for power and ground). The main area has short rows of 5 holes connected vertically, split by a center gap sized for DIP IC packages. Components push into the holes and are held by spring contacts.',
+      'A breadboard has a grid of holes with internal metal clips that connect groups of holes together. Long rails run along the top and bottom edges, used for power and ground. A centre gap splits the main area in two. On each side of that gap, every column carries a group of five holes joined vertically. The gap is exactly wide enough for a DIP chip to straddle. Components push into the holes and are held by spring contacts.',
     see: ['power rails', 'dip chip'],
   },
   'power rails': {
     tip: 'Long horizontal strips on a breadboard for supply voltage and ground.',
     detail:
-      'Power rails (also called bus strips) run along the top and bottom edges, marked with red (+) and blue (−) lines. They are connected horizontally for the full length of the board. Connect your power supply to one end and every point along the rail has the same voltage. Some breadboards have a break in the middle — use a jumper wire to bridge it if needed.',
+      'Power rails (also called bus strips) run along the top and bottom edges, marked with red (+) and blue (−) lines. On a small board a rail is joined for its whole length: connect the supply at one end and every hole on that rail sits at the same voltage. Larger boards often break each rail at the midpoint. Check with the multimeter\'s continuity setting, and bridge the break with a jumper wire if there is one.',
     see: ['breadboard'],
   },
   'dip chip': {
-    tip: 'Dual Inline Package — IC with two rows of pins for breadboard use.',
+    tip: 'Dual Inline Package — an integrated circuit (IC) with two rows of pins for breadboard use.',
     detail:
-      'DIP (Dual Inline Package) is the classic through-hole IC format with pins spaced 0.1" (2.54 mm) apart in two parallel rows. The center gap on a breadboard is exactly the right width for a DIP chip to straddle it, putting each pin in its own isolated row for easy wiring. DIP packages are being replaced by surface-mount in production, but remain ideal for prototyping.',
-    see: ['breadboard'],
+      'DIP (Dual Inline Package) is the classic through-hole IC format with pins spaced 0.1" (2.54 mm) apart in two parallel rows. The centre gap on a breadboard is exactly the right width for a DIP chip to straddle it, so each pin lands in its own group of five holes, with four holes free beside it for wiring. DIP packages are being replaced by surface-mount in production, but remain ideal for prototyping.',
+    see: ['breadboard', 'surface mount'],
   },
 
   // ── Radio / propagation ──────────────────────────────────────────
@@ -1021,7 +1023,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     tip: 'High Frequency — the 3–30 MHz range used for long-distance radio.',
     detail:
       'The HF band is the backbone of amateur long-distance (DX) communication. Signals in this range can refract off the ionosphere and bounce back to earth, repeating multiple times to reach worldwide distances. Propagation depends heavily on solar activity, time of day, and season. Lower HF bands (3–7 MHz) work better at night; higher bands (14–28 MHz) during the day.',
-    see: ['ionosphere', 'skywave'],
+    see: ['ionosphere', 'skywave', 'vhf'],
   },
   ionosphere: {
     tip: 'Charged upper atmosphere layers that refract HF radio waves back to earth.',
@@ -1224,7 +1226,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   vhf: {
     tip: 'Very High Frequency — the 30–300 MHz range, home of the 2-metre amateur band, FM broadcast, and most handheld radios.',
     detail:
-      'VHF (Very High Frequency) covers 30–300 MHz. In amateur radio the headline VHF band is 2 metres (144–148 MHz in most countries), where handheld and mobile FM rigs operate through local repeaters. VHF signals travel mostly line-of-sight — they don\'t bounce off the ionosphere the way HF does — so typical range is 30–60 km on flat terrain, much further from a hilltop or with a directional antenna. Commercial FM broadcast radio (88–108 MHz) and old analogue TV channels also live in VHF.',
+      'VHF (Very High Frequency) covers 30–300 MHz. In amateur radio the headline VHF band is 2 metres — 144–146 MHz in Ukraine and the rest of ITU Region 1, and 144–148 MHz in the Americas, where handheld and mobile FM rigs operate through local repeaters. VHF signals travel mostly line-of-sight — they don\'t bounce off the ionosphere the way HF does — so typical range is 30–60 km on flat terrain, much further from a hilltop or with a directional antenna. Commercial FM broadcast radio (88–108 MHz) and old analogue TV channels also live in VHF.',
     see: ['hf', 'fm', 'uhf'],
   },
   uhf: {
@@ -1871,7 +1873,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   fuse: {
     tip: 'A fuse is a deliberately weak conductor that melts and disconnects the supply before a fault can start a fire.',
     detail:
-      'Two numbers describe it. The rating is how much current it passes indefinitely — under IEC 60127 that is simply the equipment’s normal running current, unlike the American UL convention of rating at 125–150 %. The letter is its speed: F (flink) is quick-acting, T (träge) is time-lag. Neither type is required to blow at 1.5× its rating for a full hour, which tells you what a fuse is really for: it protects against short circuits and fire, not against working equipment hard. Fitting a larger fuse to stop it blowing removes the protection and hands the fusing job to your wiring.',
+      'Two markings describe it. The rating is how much current it passes indefinitely — under IEC 60127 that is simply the equipment’s normal running current, unlike the American UL convention of rating at 125–150 %. The letter is its speed: F (from German flink, quick) blows fast, T (träge, sluggish) tolerates a brief surge. Neither type is required to blow at 1.5× its rating for a full hour, which tells you what a fuse is really for: it protects against short circuits and fire, not against working equipment hard. Fitting a larger fuse to stop it blowing removes the protection and hands the fusing job to your wiring.',
     see: ['time-lag fuse', 'inrush current', 'protective earth', 'mains'],
   },
   'time-lag fuse': {
@@ -1947,10 +1949,10 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['sar', 'reference level', 'resonance', 'dipole'],
   },
   'duty cycle': {
-    tip: 'Duty cycle is the fraction of the time a transmitter is actually putting out full power — about 20 % for ordinary SSB speech, 100 % for FM and digital modes.',
+    tip: 'Duty cycle is the fraction of each cycle a signal spends switched on. A square wave that is high half the time has a 50 % duty cycle. For a transmitter it is the fraction of the time it puts out full power: about 20 % for ordinary SSB speech, 100 % for FM and digital modes.',
     detail:
-      'RF exposure limits are averaged over minutes, so what matters is not peak envelope power but the average. Two independent factors reduce it: the duty cycle of the mode, and the fraction of the time you transmit rather than listen. Ordinary SSB speech only reaches peak power on the loudest syllables (about 20 %); CW is about 40 %, SSB with heavy processing about 50 %, and anything with a constant carrier — FM, RTTY, FT8 — is 100 %. So 100 W of SSB in a normal conversation averages about 10 W, while the same 100 W of FM averages five times that. The mode matters more than the amplifier.',
-    see: ['sar', 'pep', 'ssb', 'fm'],
+      'Duty cycle is the on-time divided by the whole cycle. A 5 V square wave at 50 % duty cycle averages 2.5 V; halve the duty cycle and the average halves with it. That is how a microcontroller dims an LED or sets a motor speed without changing the supply voltage. The same idea matters for a transmitter, where the duty cycle decides average power rather than average voltage. RF exposure limits are averaged over minutes, so what matters is not peak envelope power but the average. Two independent factors reduce it: the duty cycle of the mode, and the fraction of the time you transmit rather than listen. Ordinary SSB speech only reaches peak power on the loudest syllables (about 20 %); CW is about 40 %, SSB with heavy processing about 50 %, and anything with a constant carrier — FM, RTTY, FT8 — is 100 %. So 100 W of SSB in a normal conversation averages about 10 W, while the same 100 W of FM averages five times that. The mode matters more than the amplifier.',
+    see: ['pwm', 'square wave', 'sar', 'pep', 'ssb', 'fm'],
   },
   'near field': {
     tip: 'The near field is the region close to an antenna — within roughly a sixth of a wavelength — where the wave has not yet settled into its far-field form and simple distance formulas do not apply.',

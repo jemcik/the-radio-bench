@@ -353,3 +353,71 @@ deliberately; recorded so a future reader knows it was a decision, not an oversi
 In order, cheapest first: `acronym-parity` (regex), then `hardcoded-jsx-text` (root +
 de-dup), then `undefined-acronyms` (all-caps exemption), then `glossary-coverage` (TSX
 lookup), and `unwrapped-math-var` last, behind the subtitle render-path change.
+
+---
+
+## 6. Ukrainian glossary entries that lost content in translation
+
+**Found** 2026-07-28, on the fifth review round of ch 0.2. **Scale:** 1 entry remaining
+(6 cleared on discovery). **Gate:** `check:glossary-locale-parity` (green — the one
+survivor is grandfathered in `scripts/glossary-locale-parity-baseline.json`).
+
+### What the defect is
+
+A Ukrainian glossary entry silently carries less than its English original — usually a
+dropped trailing sentence, sometimes a whole paragraph. Nothing about the result reads as
+wrong. It reads as *complete*, which is why four consecutive `beginner-review` passes over
+the chapter prose found none of it.
+
+The three that mattered most, all reachable from ch 0.2:
+
+- **`duty cycle`** lost its entire general lead paragraph in Ukrainian — in the very round
+  that added that lead to English. A reader hovering the term in ch 0.2 landed straight in
+  Part-4 RF-exposure limits with the term never defined in the entry at all.
+- **`power rails`** lost the sentence warning that large boards break each rail at the
+  midpoint, so the popover flatly contradicted the prose that opens it.
+- **`breadboard`** lost the only sentence in either locale explaining *why* a leg pushed
+  into a hole stays put (spring contacts).
+
+### Why no existing gate saw it
+
+`check:glossary-completeness` checks that keys exist. `check:glossary-markup` checks that
+markup renders. `check:glossary-coverage` and `check:glossary-overwrap` check wrapping in
+prose. **None of them compares what the two locales actually say.**
+
+### How the gate decides
+
+Sentence count alone is not a signal: a translator legitimately merges two English
+sentences into one Ukrainian sentence. Character count alone is not either: a terser but
+complete translation dips below 1.0 without losing anything.
+
+The calibration that separates them: across the 340 translated entries the **median
+Ukrainian field is 1.10× the English one** by character count — Ukrainian simply runs
+longer. So the gate flags a field only when it is **both** shorter in sentences **and**
+below 0.85× the English character count. At that threshold it found 7 entries, every one
+of which was a real omission on inspection, and no false positives.
+
+### How to work it off
+
+Translate the missing sentences through the `ua-translate` pipeline — never by hand. If
+the English sentence is genuinely redundant, cut it there instead, so both locales say the
+same thing. Then re-snapshot with
+`node scripts/check-glossary-locale-parity.mjs --update-baseline` and read the diff.
+
+### The backlog
+
+| Entry | Gap | Belongs to |
+|---|---|---|
+| `skywave.detail` | en 3 sentences / 400 chars → uk 2 / 291 | ch 4.1 (propagation) |
+
+### Two traps for whoever works on the glossary next
+
+- **`extract-glossary.mjs` fails silently into a stale dump.** An unescaped apostrophe in
+  `glossary.ts` makes it throw; `gemini-translate.py` only checks that
+  `/tmp/glossary-en.json` *exists*, so the next translation run silently translates the
+  **previous** English. Always read the extractor's output line before trusting a
+  translation. (Hit again 2026-07-28, on `power rails`: `the multimeter's continuity
+  setting` needed `\'`.)
+- **`gemini-translate.py` cannot write entries whose key contains a slash** (`time/div`,
+  `volt/div`) — it derives the output filename from the key and the intermediate directory
+  does not exist. `mkdir -p /tmp/gemini-section/time /tmp/gemini-section/volt` first.

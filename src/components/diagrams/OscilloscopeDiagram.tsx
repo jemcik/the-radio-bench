@@ -107,11 +107,18 @@ export default function OscilloscopeDiagram() {
   //   500 Hz; both the waveform and the "= 1 kHz" labels lied about
   //   each other. Fixed by using periodDivs = 2 and scaling the cycle
   //   count so the wave still fills the full 10-div screen.
-  // Amplitude = 2.5 div at 2 V/div = 5 Vpp.
+  // Amplitude: the signal this figure depicts is the lab's Arduino tone()
+  // output on pin 9 — a 0–5 V square that never goes negative. So the trace
+  // runs from the 0 V line UP by 2.5 div, and 2.5 div × 2 V/div = 5 V is the
+  // full peak-to-peak swing, which is what the bracket, the "= 5V" callout,
+  // scopeDiagramCaption2 and scopeDiagramAria all claim.
+  // Previously yLow was midY + ampDivs*cellH, i.e. ±2.5 div = 5 div = 10 Vpp
+  // drawn while every label said 5 Vpp, and a signal symmetric about ground
+  // that the lab cannot produce.
   const ampDivs = 2.5
   const periodDivs = 2
   const yHigh = midY - ampDivs * cellH
-  const yLow  = midY + ampDivs * cellH
+  const yLow  = midY
   const xStart = scrX + cellW * 0.5
 
   // Build square wave path — extended by 2 full cycles before xStart
@@ -216,8 +223,10 @@ export default function OscilloscopeDiagram() {
             </g>
           </g>
 
-          {/* 0V reference label */}
-          <text x={scrX + 4} y={midY - 4} fontSize="0.687em"
+          {/* 0V reference label — BELOW the line. The trace's low shelf now sits
+              exactly on the 0 V line (the signal is 0–5 V, not ±5 V), so a label
+              above it is struck through by the waveform. Below is clear. */}
+          <text x={scrX + 4} y={midY + 13} fontSize="0.687em"
             fill={c.zero}>0V</text>
 
           {/* ── Right-side annotations ──────────────────────────── */}

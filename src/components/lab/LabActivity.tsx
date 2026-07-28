@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlaskConical, ChevronDown, Zap, Wrench, ListOrdered, Eye, Link2, AlertTriangle } from 'lucide-react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
-import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
@@ -70,8 +69,11 @@ export default function LabActivity({
             <FlaskConical className="w-4 h-4 text-teal-500" />
           </div>
           <div className="flex-1 min-w-0">
+            {/* No «optional» badge here. That labs are voluntary is stated once, in
+                ch0_1 and on the landing page; repeating it on every lab in the course
+                was noise, not information. Per-step and per-component «optional» markers
+                stay — those say which part you may skip, which the badge never did. */}
             <div className="flex items-center gap-2 mb-0.5">
-              <Badge variant="lab" className="text-[10px]">{t('lab.optional')}</Badge>
               <span className="text-sm font-semibold text-foreground">{title}</span>
             </div>
             <p className={cn('text-sm text-muted-foreground', !open && 'truncate')}>{goal}</p>
