@@ -7,6 +7,10 @@ import type { SVGProps } from 'react'
  * eyebrows, toothy grin, voluminous wavy hair, winking eye,
  * proper body with jumpsuit, thick limbs, and boots.
  * Monochrome — uses currentColor for full theme adaptability.
+ *
+ * Decorative: it sits beside the <h1> it would otherwise duplicate, so it is
+ * aria-hidden rather than labelled (a label here was untranslated English in
+ * every locale).
  */
 export default function WelcomeBuddy({
   size = 120,
@@ -21,7 +25,7 @@ export default function WelcomeBuddy({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="Friendly mascot waving hello"
+      aria-hidden="true"
       {...rest}
     >
       <style>{`

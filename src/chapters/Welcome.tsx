@@ -161,7 +161,7 @@ export default function Welcome() {
                   {['0', 'I', 'II', 'III', 'IV'][part.number]}
                 </span>
                 <span className="text-base font-semibold text-card-foreground">{part.title}</span>
-                <span className="ml-auto text-[13px] text-muted-foreground">{part.chapters.length} {t('welcome.chapters')}</span>
+                <span className="ml-auto text-[13px] text-muted-foreground">{part.chapters.length} {t('welcome.chapters', { count: part.chapters.length })}</span>
               </div>
               <div className="px-4 py-2 flex flex-wrap gap-1.5">
                 {part.chapters.map(ch => {
@@ -196,7 +196,7 @@ export default function Welcome() {
               <Trans
                 i18nKey="welcome.ercDetail"
                 ns="ui"
-                components={{ ...mathComponents, cept: <G k="cept" /> }}
+                components={{ ...mathComponents, cept: <G k="cept" />, erc: <G k="erc" /> }}
               />
             </p>
           </div>

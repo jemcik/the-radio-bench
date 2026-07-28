@@ -101,9 +101,10 @@ export const glossary: Record<string, GlossaryEntry> = {
       'The ARRL (American Radio Relay League) is the national association for amateur radio in the United States, founded in 1914. They publish The ARRL Handbook, one of the most comprehensive references for radio and electronics. They also administer licence exams, represent amateurs to regulators, and run contests and award programs.',
   },
   cept: {
-    tip: 'European Conference of Postal and Telecommunications Administrations.',
+    tip: 'CEPT is the European body that coordinates telecoms policy — its Novice syllabus defines what a beginner licence exam covers.',
     detail:
       'CEPT (Conférence Européenne des administrations des Postes et des Télécommunications) is a European organisation that coordinates telecommunications policy. For ham radio operators, the CEPT licence is important because it allows European amateurs to operate in other CEPT member countries without obtaining a separate licence. The CEPT Novice syllabus defines what beginner radio operators need to learn.',
+    see: ['erc'],
   },
   erc: {
     tip: 'European Radiocommunications Committee — sets radio regulation guidelines.',
@@ -168,7 +169,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['power', 'transformer'],
   },
   impedance: {
-    tip: 'Total opposition to AC current, combining resistance and reactance.',
+    tip: 'Total opposition to alternating current (AC), combining resistance and reactance.',
     detail:
       'Impedance extends the concept of resistance to AC circuits. It has two parts: resistance (energy lost as heat) and reactance (energy stored and returned by capacitors and inductors). Impedance is a complex number — its magnitude tells you how much the circuit opposes current, and its angle tells you how much voltage and current are out of step.',
     unit: 'Ohm (Ω)',
