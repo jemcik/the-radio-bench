@@ -7,7 +7,7 @@ describe('FormulaTriangleDiagram', () => {
     const { container } = renderWithProviders(<FormulaTriangleDiagram />)
     const text = container.querySelector('svg')?.textContent ?? ''
     expect(text).toContain('V = I × R')
-    expect(text).toContain('I = V ÷ R')
-    expect(text).toContain('R = V ÷ I')
+    expect(text).toContain('I = V / R')
+    expect(text).toContain('R = V / I')
   })
 })

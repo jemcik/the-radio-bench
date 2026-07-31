@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSiLabels } from '@/features/si/useSiLabels'
 import { ArrowRight } from 'lucide-react'
 import Widget from '@/components/ui/widget'
 import { Input } from '@/components/ui/input'
@@ -18,7 +19,8 @@ const DEFAULT_TARGET = UNITY_PREFIX_INDEX + 1  // 'kilo'
 
 interface PrefixConverterProps {
   /** Base unit symbol (e.g., "Ω" for ohms) */
-  baseUnit?: string
+  /** `units.*` key for the base unit (`ohm`, `hz`, …), so it localises with the prefix. */
+  baseUnitKey?: string
 }
 
 type Result =
@@ -30,8 +32,14 @@ type Result =
       decimalMovement: number
     }
 
-export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProps) {
+export default function PrefixConverter({ baseUnitKey = 'ohm' }: PrefixConverterProps) {
   const { t } = useTranslation('ui')
+  const { sym, symBoth, nameOnly, unit } = useSiLabels()
+  const baseUnit = unit(baseUnitKey)
+  /** Render a signed integer with a real minus sign, parenthesised when negative. */
+  const fmtSigned = (n: number) => (n < 0 ? `(−${Math.abs(n)})` : String(n))
+  /** Same minus sign, no parentheses — for a result, which needs no bracketing. */
+  const signed = (n: number) => (n < 0 ? `−${Math.abs(n)}` : String(n))
   const { locale } = useLocaleFormatter()
   const [inputValue, setInputValue] = useState('')
   const [sourceIndex, setSourceIndex] = useState(DEFAULT_SOURCE)
@@ -39,6 +47,18 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
 
   const source = PREFIXES[sourceIndex]
   const target = PREFIXES[targetIndex]
+
+  /**
+   * Reader-flagged: the step said «зсунути кому на 3 позиції вправо» over
+   * «47 МОм → 47000 кОм» — and 47 has no comma to move. Printing one («47,»)
+   * only swapped the problem: in Ukrainian a comma followed by a space reads as
+   * an enumeration. So the numbers stay as typed and the step says where the
+   * separator is instead, and only when it is not already on screen.
+   * MUST stay below the `useState` above it — reading `inputValue` before its
+   * declaration is a temporal-dead-zone crash that `tsc`, the gates and the unit
+   * tests all pass clean.
+   */
+  const pointIsImplicit = !/[.,]/.test(inputValue)
 
   const result = useMemo<Result>(() => {
     // Normalise: comma decimal separators (Ukrainian-style "1,5") are
@@ -107,7 +127,7 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
               {PREFIXES.map((prefix, idx) => (
                 <option key={idx} value={idx}>
                   {t(`ch0_3.prefixName_${prefix.name}`)}
-                  {prefix.exponent !== 0 && ` 10^${prefix.exponent}`}
+                  {prefix.exponent !== 0 && ` ${prefix.powerLabel}`}
                 </option>
               ))}
             </Select>
@@ -124,7 +144,7 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
               {PREFIXES.map((prefix, idx) => (
                 <option key={idx} value={idx}>
                   {t(`ch0_3.prefixName_${prefix.name}`)}
-                  {prefix.exponent !== 0 && ` 10^${prefix.exponent}`}
+                  {prefix.exponent !== 0 && ` ${prefix.powerLabel}`}
                 </option>
               ))}
             </Select>
@@ -137,9 +157,9 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
         <div className="space-y-4 pt-2 border-t border-border">
           <ResultBox tone="success" label={t('ch0_3.prefixConverterResult')}>
             <p className="text-2xl font-mono font-bold text-foreground">
-              {result.formatted}
-              <span className="text-callout-experiment ml-1">
-                {target.symbol}{baseUnit}
+              {result.formatted}{' '}
+              <span className="text-callout-experiment">
+                {sym(target)}{baseUnit}
               </span>
             </p>
           </ResultBox>
@@ -148,7 +168,7 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
           <ResultBox tone="info" label={t('ch0_3.prefixConverterSteps')}>
             <div className="flex flex-wrap items-center justify-start gap-3">
               <span className="font-mono bg-callout-note/10 px-2 py-1 rounded border border-callout-note/30 text-sm">
-                {inputValue}{source.symbol}{baseUnit}
+                {inputValue} {sym(source)}{baseUnit}
               </span>
 
               {result.decimalMovement !== 0 && (
@@ -166,13 +186,18 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
                         ),
                       })}
                     </span>
+                    {pointIsImplicit && (
+                      <span className="block text-[11px] leading-tight opacity-80">
+                        {t('ch0_3.prefixConverterImplicitPoint')}
+                      </span>
+                    )}
                   </div>
                 </>
               )}
 
               <ArrowRight className="w-4 h-4 text-muted-foreground" />
               <span className="font-mono bg-callout-experiment/10 px-2 py-1 rounded border border-callout-experiment/30 text-sm">
-                {result.formatted}{target.symbol}{baseUnit}
+                {result.formatted} {sym(target)}{baseUnit}
               </span>
             </div>
           </ResultBox>
@@ -184,7 +209,10 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
                 <span className="font-semibold text-foreground">
                   {t('ch0_3.prefixConverterExponentDiff')}
                 </span>{' '}
-                {source.exponent} − ({target.exponent}) = {result.decimalMovement}
+                {/* All three numbers use U+2212 MINUS; a bare `-3` from JS number
+                    formatting put an ASCII hyphen next to a real minus in the same
+                    nine-character expression. Parentheses only where a sign needs them. */}
+                {fmtSigned(source.exponent)} − {fmtSigned(target.exponent)} = {signed(result.decimalMovement)}
               </p>
             </ResultBox>
           )}
@@ -226,11 +254,12 @@ export default function PrefixConverter({ baseUnit = 'Ω' }: PrefixConverterProp
                       : 'bg-muted border-border',
                 )}
               >
-                <div className="font-mono text-foreground">{prefix.symbol}</div>
+                <div className="font-mono text-foreground">{symBoth(prefix)}</div>
                 <div className="text-muted-foreground text-[10px] leading-tight mt-0.5">
-                  {t(`ch0_3.prefixName_${prefix.name}`)}
+                  {/* Name only — the symbol is already the line above. */}
+                  {nameOnly(prefix)}
                 </div>
-                <div className="text-muted-foreground">10^{prefix.exponent}</div>
+                <div className="text-muted-foreground">{prefix.powerLabel}</div>
               </div>
             )
           })}

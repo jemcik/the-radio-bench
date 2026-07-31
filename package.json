@@ -13,6 +13,7 @@
     "check:i18n-void-tags": "node scripts/check-i18n-void-tags.mjs",
     "check:var-multichar-subscripts": "node scripts/check-var-multichar-subscripts.mjs",
     "check:unwrapped-math-var": "node scripts/check-unwrapped-math-var.mjs",
+    "check:course-part-numbering": "node scripts/check-course-part-numbering.mjs",
     "check:circuit-maxwidth": "node scripts/check-circuit-maxwidth.mjs",
     "check:diagram-viewbox-fit": "node scripts/check-diagram-viewbox-fit.mjs",
     "check:quiz-trans": "node scripts/check-quiz-trans-components.mjs",

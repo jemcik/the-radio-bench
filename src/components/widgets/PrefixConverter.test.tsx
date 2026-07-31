@@ -3,8 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@/test/render'
 import PrefixConverter from './PrefixConverter'
 
-function setup(baseUnit?: string) {
-  return renderWithProviders(<PrefixConverter baseUnit={baseUnit} />)
+// The prop takes a `units.*` KEY, not a literal symbol — that is what stops the
+// widget rendering «4,7 кΩ» (Cyrillic prefix, Greek unit) in the uk locale.
+function setup(baseUnitKey?: string) {
+  return renderWithProviders(<PrefixConverter baseUnitKey={baseUnitKey} />)
 }
 
 describe('PrefixConverter', () => {
@@ -40,16 +42,32 @@ describe('PrefixConverter', () => {
     expect(screen.getAllByText(/0\.5/).length).toBeGreaterThan(0)
   })
 
+  // Reader-flagged: the step-by-step said «зсунути кому на 3 позиції вправо»
+  // over «47 МОм → 47000 кОм», and 47 has no comma in it to move. The hint
+  // appears only when the separator is not already on screen.
+  it('says where the decimal point is when the input has none', () => {
+    const { container } = setup()
+    fireEvent.change(container.querySelector('input') as HTMLInputElement, { target: { value: '47' } })
+    expect(screen.getByText(/whole number the point sits after the last digit/i)).toBeInTheDocument()
+  })
+
+  it('drops that hint once the input already shows a point', () => {
+    const { container } = setup()
+    fireEvent.change(container.querySelector('input') as HTMLInputElement, { target: { value: '4.7' } })
+    expect(screen.queryByText(/whole number the point sits after the last digit/i)).toBeNull()
+  })
+
   it('shows the empty-state hint when input is blank', () => {
     setup()
     // Rendered in the muted ResultBox body — the key itself lives in ui.json.
     // We assert on the English default text via i18n test provider.
     // (If the hint text changes, update locales/*/ui.json and this assertion together.)
-    expect(screen.getByText(/enter a number/i)).toBeInTheDocument()
+    // The field label is now «Enter a number» too, so match the hint specifically.
+    expect(screen.getByText(/enter a number above/i)).toBeInTheDocument()
   })
 
   it('localizes the converted decimal to the uk locale (500 mA → "0,5")', () => {
-    renderWithProviders(<PrefixConverter baseUnit="A" />, { language: 'uk' })
+    renderWithProviders(<PrefixConverter baseUnitKey="a" />, { language: 'uk' })
     const input = screen.getByRole('textbox') as HTMLInputElement
     const [fromSelect, toSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[]
     fireEvent.change(fromSelect, { target: { value: '3' } })  // milli

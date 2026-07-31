@@ -26,7 +26,7 @@ describe('ErpCalculator', () => {
     const { container } = renderWithProviders(<ErpCalculator />)
     fireEvent.change(container.querySelector('input#erp-g') as HTMLInputElement, { target: { value: '0' } })
     // gain 0 dBd, loss 1 dB → system gain −1.0 dB
-    expect(container.textContent).toMatch(/-1\.0/)
+    expect(container.textContent).toMatch(/−1\.0/)
   })
 
   it('renders the Ukrainian version', () => {

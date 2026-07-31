@@ -71,6 +71,13 @@ const OP_THEN_LETTER = new RegExp(`[${OP}]\\s?([A-Za-z])(?![\\p{L}])`, 'gu')
 // possessives «it's», «don't»), or an abbreviation dot («e.g.», «i.e.»).
 const STANDALONE_LC = /(?<![\p{L}\d°.'’/\-–—])(?<!\d\s)([b-z])(?![\p{L}'’/\-–—])(?!\.[\p{L}])/gu
 
+// A lone letter inside parentheses is a SYMBOL GLOSS, not a formula fragment:
+// «kilo (k)», «nano (n)», «47 × 10³ (k)», «micro (µ)». SI prefix and unit
+// symbols are set UPRIGHT by convention, so <var> — which renders math-italic
+// — would be the wrong markup, not the missing one. A real variable never
+// appears this way; formulas bring an operator with them.
+const SYMBOL_GLOSS = /\((\p{L})\)/gu
+
 // ── Baseline of pre-existing debt ────────────────────────────────────────
 // Part 0–1 was authored before this gate and carries ~hundreds of bare
 // variables in formulas (P = I²R, β, τ, …). Rewriting them all is a separate
@@ -85,10 +92,11 @@ const baseline = !UPDATE && fs.existsSync(BASELINE_PATH)
   ? JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf-8'))
   : {}
 
-/** Remove safe <var>…</var> spans, then strip all other markup tags. */
+/** Remove safe <var>…</var> spans, symbol glosses, then all other markup. */
 function strip(s) {
   return s
     .replace(/<var>[\s\S]*?<\/var>/g, ' ')
+    .replace(SYMBOL_GLOSS, ' ')
     .replace(/<[^>]+>/g, ' ')
 }
 

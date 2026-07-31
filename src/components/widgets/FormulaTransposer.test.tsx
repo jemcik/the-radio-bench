@@ -18,18 +18,20 @@ describe('FormulaTransposer', () => {
     expect(screen.getByRole('button', { name: /f = 1 \/ T/i })).toBeInTheDocument()
   })
 
-  it('defaults to the first formula with its first variable solved', () => {
+  it('opens on the first variable that has a rearrangement to show', () => {
     setup()
-    // Ohm's law is the first formula; V is its first variable — the "already
-    // isolated" path exercises the A7 fix (derived boilerplate).
-    const vBtn = screen.getByRole('button', { name: 'V' })
-    expect(vBtn.className).toMatch(/bg-primary\/20/)
+    // Ohm's law is the first formula, but V is already isolated in it — opening
+    // there showed a single step that demonstrates nothing. The default skips
+    // to I, the first variable with real solveSteps.
+    expect(screen.getByRole('button', { name: 'I' }).className).toMatch(/bg-primary\/20/)
+    expect(screen.getByRole('button', { name: 'V' }).className).not.toMatch(/bg-primary\/20/)
   })
 
   it('derives the already-isolated step from tex (A7 fix)', () => {
     setup()
-    // V is already isolated in V = I × R — a single step is shown whose
-    // result equals the tex string.
+    // V is already isolated in V = I × R — selecting it shows a single step
+    // whose result equals the tex string.
+    fireEvent.click(screen.getByRole('button', { name: 'V' }))
     expect(screen.getAllByText(/V = I × R/).length).toBeGreaterThan(0)
   })
 
@@ -46,10 +48,9 @@ describe('FormulaTransposer', () => {
     // Pick I from Ohm's law, then switch to P = V² / R (no I variable).
     fireEvent.click(screen.getByRole('button', { name: 'I' }))
     fireEvent.click(screen.getByRole('button', { name: /P = V² \/ R/i }))
-    // Variables for the new formula: P, V, R. The active one must default
-    // back to the first variable (P), which is the already-isolated case.
-    const pBtn = screen.getByRole('button', { name: 'P' })
-    expect(pBtn.className).toMatch(/bg-primary\/20/)
+    // Variables for the new formula: P, V, R. P is already isolated there, so
+    // the default lands on V — the first one that has a rearrangement.
+    expect(screen.getByRole('button', { name: 'V' }).className).toMatch(/bg-primary\/20/)
   })
 
   it('solving for V in P = V² / R uses the square-root step', () => {
@@ -71,9 +72,9 @@ describe('FormulaTransposer', () => {
 
   it('hides the "Rearranged" box for the already-isolated case (no duplication)', () => {
     setup()
-    // Default state: Ohm's law with V selected — V is already isolated, so
-    // there's only one step and the "Rearranged" highlight would just
-    // repeat it. The box must not render.
+    // Select V in Ohm's law — V is already isolated, so there's only one step
+    // and the "Rearranged" highlight would just repeat it. The box must not render.
+    fireEvent.click(screen.getByRole('button', { name: 'V' }))
     expect(screen.queryByText(/rearranged/i)).toBeNull()
 
     // Switching to a non-isolated variable brings the box back.
@@ -89,8 +90,9 @@ describe('FormulaTransposer', () => {
     expect(active).toHaveAttribute('aria-pressed', 'true')
     expect(inactive).toHaveAttribute('aria-pressed', 'false')
 
-    // Likewise for the variable picker (V is active by default on Ohm's law).
-    expect(screen.getByRole('button', { name: 'V' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'I' })).toHaveAttribute('aria-pressed', 'false')
+    // Likewise for the variable picker (I is active by default on Ohm's law —
+    // V is already isolated there, so the default skips it).
+    expect(screen.getByRole('button', { name: 'I' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'V' })).toHaveAttribute('aria-pressed', 'false')
   })
 })

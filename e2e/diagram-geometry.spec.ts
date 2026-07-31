@@ -11,6 +11,8 @@
  *
  * WHAT IT CHECKS, per chapter × locale, for every `<svg>`:
  *   • text ∩ text                     (labels colliding)
+ *   • text ∩ line/polyline/polygon    (a rule or arrow drawn through a label) —
+ *     the ch0.3 prefix-ladder case: ÷1000 arrows ran through the «p (п)» ticks
  *   • text ∩ meter/component circle    (label sitting on a symbol body) —
  *     excluding the symbol's OWN short centred letter (V / A / G / µA / S…)
  *   • text ∩ compact symbol path       (resistor zig-zag, diode triangle…)
@@ -74,6 +76,45 @@ function pageDetector(minPen: number) {
     const P = [...s.querySelectorAll('path')]
       .map(p => p.getBoundingClientRect())
       .filter(r => r.width > 8 && r.height > 8 && r.width < 90 && r.height < 90)
+    // ── STROKES: line / polyline / polygon ─────────────────────────────────
+    // The blind spot that shipped ch0.3's prefix ladder with its ÷1000 arrows
+    // drawn straight through the «p (п)» symbols: the checks above compare text
+    // to text, to circles and to paths — an arrow is a <line> plus a <polyline>,
+    // so nothing ever looked at it. It went green for as long as each symbol was
+    // one narrow glyph and broke the moment they became two.
+    //
+    // Axis lines, rails and baselines legitimately run right next to labels, so
+    // grazing an edge is not a defect. What IS a defect is a stroke crossing the
+    // glyph band itself. So a hit needs the stroke to fall inside the MIDDLE HALF
+    // of the text box on the axis it crosses, plus real penetration along the
+    // other axis. «p (п)» with an arrow at 35 % of its height is a hit; «10 kHz»
+    // resting on the axis it labels is not.
+    const S_ = [...s.querySelectorAll('line, polyline, polygon')]
+      .map(e => e.getBoundingClientRect())
+      .filter(r => r.width > 4 || r.height > 4)
+    // A stroke through a label is a defect only when the label is NOT sitting on
+    // it deliberately. The discriminator is the text's own centre point:
+    //   • tick label centred on its grid line → centre lies ON the stroke → fine
+    //   • arrow clipping a symbol from one side → centre lies OFF it → defect
+    // Plus the stroke has to reach the middle half of the glyph band; grazing an
+    // edge (a label resting just above its axis) never counts.
+    const crossesCore = (t: DOMRect, k: DOMRect) => {
+      const inMiddle = (lo: number, hi: number, a: number, b: number) => {
+        const q = (hi - lo) / 4
+        return b > lo + q && a < hi - q
+      }
+      const horizontal = k.height <= k.width
+      const reaches = horizontal
+        ? inMiddle(t.top, t.bottom, k.top, k.bottom) &&
+          Math.min(t.right, k.right) - Math.max(t.left, k.left) >= minPen
+        : inMiddle(t.left, t.right, k.left, k.right) &&
+          Math.min(t.bottom, k.bottom) - Math.max(t.top, k.top) >= minPen
+      if (!reaches) return false
+      const cx = (t.left + t.right) / 2, cy = (t.top + t.bottom) / 2
+      const onStroke =
+        cx >= k.left - 2 && cx <= k.right + 2 && cy >= k.top - 2 && cy <= k.bottom + 2
+      return !onStroke
+    }
     for (let i = 0; i < T.length; i++) {
       for (let j = i + 1; j < T.length; j++) {
         if (T[i].el.parentElement === T[j].el.parentElement) continue
@@ -92,6 +133,9 @@ function pageDetector(minPen: number) {
       for (const p of P) {
         if (t.r.width <= 26) continue // skip tiny glyphs / subscripts
         if (overlap(t.r, p) && !centreIn(t.r, p)) details.push(`T×PATH "${t.x}"`)
+      }
+      for (const k of S_) {
+        if (crossesCore(t.r, k)) details.push(`T×STROKE "${t.x}"`)
       }
       if (t.r.left < sr.left - 6 || t.r.right > sr.right + 6 || t.r.top < sr.top - 6 || t.r.bottom > sr.bottom + 6)
         details.push(`SPILL "${t.x}"`)

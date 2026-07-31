@@ -15,18 +15,37 @@
  * Thousands separators are NOT added — radio / EE numbers usually look
  * better without grouping (1000 Гц, not 1 000 Гц), and when grouping IS
  * desired the caller can build it explicitly.
+ *
+ * A negative sign is rendered as U+2212 MINUS SIGN, not the ASCII hyphen JS
+ * produces. The hyphen is a word-joiner glyph: it sits high and short, and next
+ * to a digit it reads as a dash rather than an operator (−2,4 vs -2,4). Since
+ * every display path goes through these helpers, normalising here is what keeps
+ * a widget from disagreeing with the prose beside it.
  */
+
+/** U+2212 MINUS SIGN — the typographic minus, not the ASCII hyphen. */
+const MINUS = '\u2212'
+
+/**
+ * Swap a leading ASCII hyphen for a real minus sign. Exported because some
+ * widgets print a value they did not compute — a raw input echo, an exponent
+ * dropped into `<sup>` — and those must match the numbers beside them.
+ */
+export function withMinusSign(s: string): string {
+  return s.startsWith('-') ? MINUS + s.slice(1) : s
+}
 
 /**
  * Format a number with a fixed number of fractional digits, using the
  * locale's decimal separator.
  *
  *   formatDecimal(20,    2, 'en')  → "20.00"
+ *   formatDecimal(-2.5,  1, 'uk')  → "−2,5"  (U+2212, not "-2,5")
  *   formatDecimal(20,    2, 'uk')  → "20,00"
  *   formatDecimal(3.014, 2, 'uk')  → "3,01"
  */
 export function formatDecimal(n: number, digits: number, locale: string): string {
-  const s = n.toFixed(digits)
+  const s = withMinusSign(n.toFixed(digits))
   return locale.startsWith('uk') ? s.replace('.', ',') : s
 }
 
@@ -40,7 +59,7 @@ export function formatDecimal(n: number, digits: number, locale: string): string
  *   formatNumber(3.14, 'en')  → "3.14"
  */
 export function formatNumber(n: number, locale: string): string {
-  const s = String(n)
+  const s = withMinusSign(String(n))
   return locale.startsWith('uk') ? s.replace('.', ',') : s
 }
 
@@ -72,7 +91,7 @@ export function formatScientific(n: number, sigFigs: number, locale: string): st
   // .toExponential(d) gives mantissa with d fractional digits → d+1 sig figs.
   const raw = n.toExponential(Math.max(0, sigFigs - 1))
   // Trim trailing zeros in the mantissa, e.g. "1.230e-9" → "1.23e-9", "1.000e0" → "1e0".
-  const trimmed = raw.replace(/\.?0+e/, 'e')
+  const trimmed = withMinusSign(raw.replace(/\.?0+e/, 'e'))
   return locale.startsWith('uk') ? trimmed.replace('.', ',') : trimmed
 }
 

@@ -22,15 +22,15 @@ describe('BodePlotter', () => {
 
   it('renders the default first-order slope of -20 dB/decade', () => {
     const { container } = setup()
-    // num(-20) uses ASCII hyphen-minus
-    expect(container.textContent).toMatch(/-20\s*dB\/decade/)
+    // formatDecimal renders U+2212 MINUS, not the ASCII hyphen.
+    expect(container.textContent).toMatch(/−20\s*dB\/decade/)
   })
 
   it('updates the slope when the order slider is dragged to 5', () => {
     const { container } = setup()
     const orderInput = document.getElementById('bode-order') as HTMLInputElement
     fireEvent.change(orderInput, { target: { value: '5' } })
-    expect(container.textContent).toMatch(/-100\s*dB\/decade/)
+    expect(container.textContent).toMatch(/−100\s*dB\/decade/)
   })
 
   it('renders an SVG plot trace', () => {

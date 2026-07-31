@@ -41,7 +41,8 @@ describe('formatNumber', () => {
   })
 
   it('handles negative numbers', () => {
-    expect(formatNumber(-3.14, 'uk')).toBe('-3,14')
+    // Display strings carry U+2212 MINUS, not the ASCII hyphen JS emits.
+    expect(formatNumber(-3.14, 'uk')).toBe('−3,14')
   })
 })
 
@@ -63,7 +64,7 @@ describe('roundTo', () => {
 
 describe('formatScientific', () => {
   it('produces canonical mantissa·10ⁿ with localized separator', () => {
-    expect(formatScientific(1.23e-9, 3, 'en')).toBe('1.23e-9')
+    expect(formatScientific(1.23e-9, 3, 'en')).toBe('1.23e-9')  // exponent sign stays ASCII inside the `e` form
     expect(formatScientific(1.23e-9, 3, 'uk')).toBe('1,23e-9')
   })
 

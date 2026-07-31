@@ -3,6 +3,7 @@ import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
 import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
+import { useSiLabels } from '@/features/si/useSiLabels'
 
 /**
  * Chapter 0.3 — SI Prefixes logarithmic scale
@@ -24,16 +25,23 @@ import { SI_PREFIXES, UNITY_PREFIX_INDEX } from '@/features/si/prefixes'
 // ── Geometry ────────────────────────────────────────────────────
 // Sized to fit 9 ticks comfortably AND keep the labels at a readable
 // font size (17/12.5/11 px). The SVG itself is responsive (width="100%").
-// Vertical budget (top → bottom):
-//   arrowY−6   = 24   arrow labels (×1000 / ÷1000)
-//   axisY−14   = 40   prefix symbol (fontSize 17)
-//   axisY      = 54   axis line
-//   axisY+24   = 78   power label (10ⁿ)
-//   axisY+34   = 88   ≈ descender of the power label → SVG ends here.
-// Example text used to live at axisY+40..+53; now it's HTML below the
-// SVG, freeing this vertical budget down to 90 px.
-const W = 820, H = 90
-const axisY = 54
+//
+// Vertical budget (top → bottom), as measured client rects, not intentions:
+//   arrowLabelY = 14   arrow labels (×1000 / ÷1000), fontSize 10 → ink ~4…16
+//   arrowY      = 26   arrow line + chevrons (±3.5)      → ink ~22…30
+//   axisY−14    = 54   prefix symbol, fontSize 17        → box ~36…58
+//   axisY       = 68   axis line (ticks span ±7)
+//   axisY+24    = 92   power label (10ⁿ)                 → box ~79…95
+//   H           = 100  ≈ descender of the power label.
+//
+// The arrow row and the symbol row USED to share a band (arrow line at 30,
+// symbol box 22.5…44) and the arrow ran from tick+6, i.e. straight through
+// the symbol. It only looked clean while each symbol was one narrow glyph;
+// the moment they became «p (п)» — ~41 px wide — the line crossed the text.
+// Hence two rules now: the bands above never touch, and the arrow is clipped
+// to the clear span between two symbol boxes (see ARROW_HALF_SPAN).
+const W = 820, H = 100
+const axisY = 68
 const axisStartX = 50
 const axisEndX = 770
 
@@ -45,17 +53,34 @@ const axisEndX = 770
 //   Col 0 should span [tick0 - step/2, tick0 + step/2] = [5, 95]
 //     → padding-left = 5; col_w = step; gap = 0; 9 cols of width step.
 const STEP = (axisEndX - axisStartX) / 8  // 90
+// Half-width of the arrow between two ticks. The widest symbol, «µ (мк)», is
+// ~46 px, so a symbol box reaches ~23 px either side of its tick and the clear
+// span between two of them is 90 − 46 = 44 px. 18 keeps 4 px of air at each end.
+const ARROW_HALF_SPAN = 18
 const HTML_PAD_X = axisStartX - STEP / 2   // 5
 const paddingPct = `${(HTML_PAD_X / W) * 100}%`  // ≈ 0.609756%
 
 export default function PrefixLadderDiagram() {
   const { t } = useTranslation('ui')
+  const { symBoth, nameOnly } = useSiLabels()
   // Ladder shows the full 9-prefix range that radio actually uses: pico → tera.
   // (Picofarads for capacitance up to terahertz for thermal radiation.)
+  //
+  // Each tick carries BOTH spellings — `k (к)` — in either locale, because the
+  // paragraph that points at this figure is about exactly that pair and is shown
+  // to English readers too. This is
+  // the reader's first meeting with prefixes, and the example printed under each
+  // tick uses the Cyrillic form («530 кГц»). A tick reading only `k` above it
+  // leaves them no way to know it is the same prefix, and a reader scanning the
+  // figure never reaches the paragraph that could have told them.
   const prefixes = SI_PREFIXES.map(p => ({
-    symbol: p.symbol || '—',  // '—' marker for unity so the axis is visibly centered
+    symbol: p.symbol
+      ? symBoth(p)
+      : '—',  // '—' marker for unity so the axis is visibly centered
     power: p.powerLabel,
+    nameKey: p.nameKey,
     exampleKey: p.exampleKey,
+    isUnity: !p.symbol,
   }))
   // SI_PREFIXES[UNITY_PREFIX_INDEX] is the '10⁰' row; that index also holds here
   // because prefixes[] is the same array.
@@ -76,7 +101,8 @@ export default function PrefixLadderDiagram() {
     'hsl(0 60% 55%)',   'hsl(340 55% 55%)',
   ]
 
-  const arrowY = axisY - 24
+  const arrowY = axisY - 42
+  const arrowLabelY = arrowY - 12
   const arrowC = svgTokens.mutedFg
   const axisC = svgTokens.border
   const labelC = svgTokens.mutedFg
@@ -103,8 +129,10 @@ export default function PrefixLadderDiagram() {
             const isLeftOfCenter = i < centerIndex
 
             // Left of center: ← ÷1000 ; right of center: ×1000 →
-            const arrowTipX  = isLeftOfCenter ? x + 10     : nextX - 10
-            const arrowTailX = isLeftOfCenter ? nextX - 6  : x + 6
+            // The arrow lives only in the clear span between the two symbol
+            // boxes either side of it — never under a symbol.
+            const arrowTipX  = isLeftOfCenter ? midX - ARROW_HALF_SPAN : midX + ARROW_HALF_SPAN
+            const arrowTailX = isLeftOfCenter ? midX + ARROW_HALF_SPAN : midX - ARROW_HALF_SPAN
             const label      = isLeftOfCenter ? '÷1000'    : '×1000'
             const dir        = isLeftOfCenter ? 'left'     : 'right'
 
@@ -114,7 +142,7 @@ export default function PrefixLadderDiagram() {
                   stroke={arrowC} strokeWidth="0.8" />
                 <polyline points={chevron(arrowTipX, dir)}
                   fill="none" stroke={arrowC} strokeWidth="0.8" />
-                <text x={midX} y={arrowY - 6}
+                <text x={midX} y={arrowLabelY}
                   textAnchor="middle" fontSize="0.625em" fill={arrowC}>{label}</text>
               </g>
             )
@@ -150,11 +178,38 @@ export default function PrefixLadderDiagram() {
           })}
         </SVGDiagram>
 
-        {/* Translatable example text — one column per tick, column centres
-            aligned with tick positions via percentage padding. Auto-wraps
-            inside its column when UA strings exceed the slot width. */}
+        {/* Translatable text — one column per tick, column centres aligned with
+            tick positions via percentage padding.
+
+            The NAME row is the reason this figure exists. Reader-flagged: the
+            ladder carried only the symbols («p (п)», «k (к)») and the powers, so
+            a reader who does not yet know what «к» stands for learned nothing
+            from the one figure whose whole job is to teach the prefixes. The
+            names live here rather than in the SVG because they translate, and
+            this grid is where the chapter already keeps its translatable ladder
+            text.
+
+            `break-words` is load-bearing, not decorative: a single long word
+            («випромінювання», «capacitance») is wider than the ~90 px column and
+            would otherwise bleed over the neighbouring example. */}
         <div
-          className="grid grid-cols-9 mt-1 text-center italic leading-snug"
+          className="grid grid-cols-9 mt-1 text-center leading-snug font-semibold"
+          style={{
+            paddingLeft: paddingPct,
+            paddingRight: paddingPct,
+            fontSize: 12,
+            color: 'hsl(var(--foreground))',
+          }}
+        >
+          {prefixes.map((p, i) => (
+            <span key={i} className="px-0.5 break-words">
+              {p.isUnity ? '' : nameOnly(p)}
+            </span>
+          ))}
+        </div>
+
+        <div
+          className="grid grid-cols-9 mt-0.5 text-center italic leading-snug"
           style={{
             paddingLeft: paddingPct,
             paddingRight: paddingPct,
@@ -163,7 +218,7 @@ export default function PrefixLadderDiagram() {
           }}
         >
           {prefixes.map((p, i) => (
-            <span key={i} className="px-0.5">
+            <span key={i} className="px-0.5 break-words">
               {t(`ch0_3.${p.exampleKey}`)}
             </span>
           ))}

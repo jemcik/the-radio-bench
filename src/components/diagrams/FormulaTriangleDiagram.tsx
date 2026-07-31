@@ -28,8 +28,8 @@ export default function FormulaTriangleDiagram() {
 
   const cases = [
     { covered: 'V', formula: 'V = I × R', label: t('ch0_3.findV') },
-    { covered: 'I', formula: 'I = V ÷ R', label: t('ch0_3.findI') },
-    { covered: 'R', formula: 'R = V ÷ I', label: t('ch0_3.findR') },
+    { covered: 'I', formula: 'I = V / R', label: t('ch0_3.findI') },
+    { covered: 'R', formula: 'R = V / I', label: t('ch0_3.findR') },
   ]
 
   // Triangle geometry
