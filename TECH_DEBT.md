@@ -484,8 +484,8 @@ Six of the eight chapters (0.2, 0.4, 1.6, 1.8, 1.10, 1.11) are already in the §
 prose — the diagram is open in the browser anyway. **3.4 and 4.3 are not in that queue and
 need scheduling on their own.**
 
-Until then, freeze the counts so no NEW overlap can slip in. The baseline **must be
-captured in CI**, not locally — macOS and CI's Linux Chromium disagree on font metrics, so
-a locally-captured baseline flips borderline cases and reddens CI. Run the
-`Re-baseline visual gate` workflow (`.github/workflows/rebaseline-visual.yml`) and commit
-its artifact.
+The counts are frozen in `e2e/diagram-geometry.baseline.json`, captured on CI's Linux
+Chromium via the `Re-baseline visual gate` workflow — never locally. The two environments
+genuinely disagree: 18 of 46 entries differ between macOS and CI, `ch1_6` by 8 and
+`ch1_8` by 2 in the other direction. Freezing the counts means a NEW overlap still fails
+the gate; the table above is what has to be worked off.
