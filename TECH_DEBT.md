@@ -438,7 +438,7 @@ same thing. Then re-snapshot with
 ## 7. `text ∩ stroke` hits the visual gate never looked for
 
 **Found** 2026-07-29, when ch 0.3's prefix ladder shipped with its ÷1000 arrows drawn
-straight through the `p (п)` symbols. **Scale:** 15 of 56 chapter/locale runs, 8 chapters.
+straight through the `p (п)` symbols. **Scale:** 51 newly frozen hits across 10 chapters.
 **Gate:** `npm run test:visual` — RED until the baseline is re-captured (see below).
 
 ### What the defect is
@@ -464,25 +464,33 @@ per symbol; zero after the fix.
 
 ### The backlog
 
-| Chapter | Hits (en/uk) | Baseline | What the labels are |
+| Chapter | `en` was → now | `uk` was → now | What the labels are |
 |---|---|---|---|
-| `0.2` | 4 / 4 | 0 | oscilloscope panel text (`VOLT/DIV`, `TIME/DIV`) — does NOT reproduce at a 1728 px viewport, only at the gate's 1280; needs checking at that width |
-| `0.4` | 5 / 4 | 0 | log-axis tick labels, «Логарифмічна вісь», `fc · −3 dB` |
-| `1.6` | 14 / 14 | 5 | `SNSN` / `GG` / `vIII` — doubled strings, so suspect duplicated text nodes rather than layout |
-| `1.8` | 3 / 3 | 2 | «−20 дБ/декаду» along its slope |
-| `1.10` | 1 / 1 | 0 | — |
-| `1.11` | — / 2 | 1 | uk only |
-| `3.4` | 4 / 4 | 0 | band labels («80 м», «70 см») on the band ruler |
-| `4.3` | 5 / 5 | 0 | — |
+| `0.2` | 0 → **4** | 0 → **4** | oscilloscope panel text (`VOLT/DIV`, `TIME/DIV`) |
+| `0.4` | 0 → **4** | 0 → **4** | log-axis tick labels, «Логарифмічна вісь», `fc · −3 dB` |
+| `1.6` | 5 → **13** | 5 → **13** | `SNSN` / `GG` / `vIII` — doubled strings, so suspect duplicated text nodes rather than layout |
+| `1.10` | 0 → **1** | 0 → **1** | — |
+| `1.11` | — | 1 → **3** | uk only |
+| `2.2` | 2 → **4** | 2 → **3** | — |
+| `2.3` | — | 0 → **1** | uk only |
+| `3.1` | — | 2 → **4** | uk only |
+| `3.2` | — | 1 → **2** | uk only |
+| `3.4` | 0 → **4** | 0 → **4** | band labels («80 м», «70 см») on the band ruler |
+
+Counts are the CI baseline, not a local run — the two environments disagree on 18 of 46
+entries. 51 newly frozen hits across 10 chapters. Ch 0.3 is at zero.
+
+(An earlier version of this table was built from a local run and was wrong: it listed
+ch 1.8, where the count actually *fell*, and missed ch 2.2, 2.3, 3.1 and 3.2.)
 
 Ch 0.3 is at zero.
 
 ### How to work it off
 
-Six of the eight chapters (0.2, 0.4, 1.6, 1.8, 1.10, 1.11) are already in the §2
+Seven of the ten chapters (0.2, 0.4, 1.6, 1.10, 1.11, 2.2, 2.3) are already in the §2
 `beginner-review` queue, so the diagram fix belongs in the same pass as that chapter's
-prose — the diagram is open in the browser anyway. **3.4 and 4.3 are not in that queue and
-need scheduling on their own.**
+prose — the diagram is open in the browser anyway. **3.1, 3.2 and 3.4 are not in that
+queue and need scheduling on their own.**
 
 The counts are frozen in `e2e/diagram-geometry.baseline.json`, captured on CI's Linux
 Chromium via the `Re-baseline visual gate` workflow — never locally. The two environments
