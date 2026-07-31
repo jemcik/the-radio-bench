@@ -63,7 +63,7 @@ export const PARTS: Part[] = [
         number: '0.3',
         part: 0,
         title: 'Math Toolkit for Radio',
-        subtitle: 'Fractions, powers of 10, SI prefixes, square roots, transposing formulae',
+        subtitle: 'Fractions, powers of 10, SI prefixes, squares and square roots, transposing formulas, units at a glance',
         status: 'published',
         hasLab: true,
         hasQuiz: true,

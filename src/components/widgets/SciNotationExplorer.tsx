@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSiLabels } from '@/features/si/useSiLabels'
 import Widget from '@/components/ui/widget'
 import { Input } from '@/components/ui/input'
 import { ResultBox } from '@/components/ui/result-box'
 import { cn } from '@/lib/utils'
-import { formatNumber, roundTo } from '@/lib/format'
+import { withMinusSign } from '@/lib/format'
 import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { SI_PREFIXES, type SIPrefix } from '@/features/si/prefixes'
 
@@ -12,12 +13,57 @@ type NotationResult =
   | { ok: false }
   | {
       ok: true
-      mantissa: number
+      /** Mantissa as an exact decimal string, already using the locale separator. */
+      mantissa: string
       exponent: number
-      engineeringMantissa: number
+      engineeringMantissa: string
       engineeringExponent: number
       siPrefix?: SIPrefix
     }
+
+/**
+ * Split a decimal string into its significant digits and the exponent of the
+ * leading one — exactly, by counting positions, with no floating point.
+ *
+ * `parseFloat` cannot do this job. A double holds ~17 significant digits, so
+ * `parseFloat('11111222233333444455565544444444')` already stores
+ * 11111222233333443505249379680256 — wrong from the 17th digit — and the widget
+ * then rounded the mantissa to six decimals on top of that and printed
+ * «input = 1,111122 × 10³¹» with an equals sign. The two sides differed by
+ * 2.2 × 10²⁴. Reader-flagged, and fair: this is a chapter about notation, so the
+ * one thing the widget must never do is lose the digits the reader typed.
+ *
+ * Returns null for anything that is not a decimal number. Zero (in any spelling
+ * — «0», «0.000») comes back as digits «0», exponent 0.
+ */
+function decompose(raw: string): { sign: string; digits: string; exponent: number } | null {
+  let s = raw.trim()
+  let sign = ''
+  if (s.startsWith('-')) { sign = '\u2212'; s = s.slice(1) }
+  else if (s.startsWith('+')) s = s.slice(1)
+  if (!/^\d*\.?\d*$/.test(s) || !/\d/.test(s)) return null
+
+  const dot = s.indexOf('.')
+  const intPart = dot === -1 ? s : s.slice(0, dot)
+  const all = intPart + (dot === -1 ? '' : s.slice(dot + 1))
+  const first = all.search(/[1-9]/)
+  if (first === -1) return { sign: '', digits: '0', exponent: 0 }
+
+  return {
+    sign,
+    digits: all.slice(first).replace(/0+$/, '') || '0',
+    // The leading significant digit sits `first` places into the digit run; the
+    // point sits after `intPart.length` of them.
+    exponent: intPart.length - first - 1,
+  }
+}
+
+/** Place the decimal point `intDigits` digits in, using the locale separator. */
+function withPoint(digits: string, intDigits: number, locale: string): string {
+  const padded = digits.padEnd(intDigits, '0')
+  const tail = padded.slice(intDigits).replace(/0+$/, '')
+  return tail ? `${padded.slice(0, intDigits)}${locale.startsWith('uk') ? ',' : '.'}${tail}` : padded.slice(0, intDigits)
+}
 
 /** Render a signed integer exponent using Unicode superscript glyphs. */
 function toSuperscript(n: number): string {
@@ -30,6 +76,7 @@ function toSuperscript(n: number): string {
 
 export default function SciNotationExplorer() {
   const { t } = useTranslation('ui')
+  const { sym } = useSiLabels()
   const { locale } = useLocaleFormatter()
   const [inputValue, setInputValue] = useState('')
   const [isEngineering, setIsEngineering] = useState(false)
@@ -41,41 +88,37 @@ export default function SciNotationExplorer() {
     const trimmed = inputValue.trim().replace(',', '.')
     if (!trimmed) return { ok: false }
 
-    const num = parseFloat(trimmed)
-    if (isNaN(num)) return { ok: false }
+    const d = decompose(trimmed)
+    if (!d) return { ok: false }
 
     // Zero is a valid input even though log10(0) is undefined.
-    if (num === 0) {
+    if (d.digits === '0') {
       return {
         ok: true,
-        mantissa: 0, exponent: 0,
-        engineeringMantissa: 0, engineeringExponent: 0,
+        mantissa: '0', exponent: 0,
+        engineeringMantissa: '0', engineeringExponent: 0,
         siPrefix: SI_PREFIXES.find(p => p.exponent === 0),
       }
     }
 
-    // Standard: 1 ≤ |mantissa| < 10
-    const exponent = Math.floor(Math.log10(Math.abs(num)))
-    const mantissa = num / Math.pow(10, exponent)
-
-    // Engineering: exponent is a multiple of 3
-    const engineeringExponent = Math.floor(exponent / 3) * 3
-    const engineeringMantissa = num / Math.pow(10, engineeringExponent)
+    // Standard: one digit before the point, so 1 ≤ |mantissa| < 10.
+    // Engineering: the exponent drops to the multiple of 3 at or below it, and
+    // the mantissa gains the 1 or 2 digits that shift left across the point.
+    const engineeringExponent = Math.floor(d.exponent / 3) * 3
 
     return {
       ok: true,
-      mantissa: roundTo(mantissa, 6),
-      exponent,
-      engineeringMantissa: roundTo(engineeringMantissa, 6),
+      mantissa: d.sign + withPoint(d.digits, 1, locale),
+      exponent: d.exponent,
+      engineeringMantissa: d.sign + withPoint(d.digits, 1 + (d.exponent - engineeringExponent), locale),
       engineeringExponent,
       siPrefix: SI_PREFIXES.find(p => p.exponent === engineeringExponent),
     }
-  }, [inputValue])
+  }, [inputValue, locale])
 
   const currentExponent = result.ok ? (isEngineering ? result.engineeringExponent : result.exponent) : 0
-  const currentMantissaRaw = result.ok ? (isEngineering ? result.engineeringMantissa : result.mantissa) : 0
-  // Localize the decimal separator so a uk reader sees "2,4 × 10⁹".
-  const currentMantissa = formatNumber(currentMantissaRaw, locale)
+  // Already an exact string carrying the locale separator and the sign.
+  const currentMantissa = result.ok ? (isEngineering ? result.engineeringMantissa : result.mantissa) : '0'
 
   return (
     <Widget
@@ -139,13 +182,16 @@ export default function SciNotationExplorer() {
             tone="info"
             label={isEngineering ? t('ch0_3.sciNotationEngineering') : t('ch0_3.sciNotationStandard')}
           >
-            <div className="text-3xl font-mono font-bold text-foreground flex items-baseline gap-2">
-              <span className="bg-callout-key/20 border border-callout-key/40 px-3 py-1 rounded text-callout-key">
+            {/* `break-all` + `min-w-0` are load-bearing: the mantissa now carries
+                every digit the reader typed, so a 60-digit entry has to wrap
+                inside its box instead of being clipped by it. */}
+            <div className="text-3xl font-mono font-bold text-foreground flex items-baseline gap-2 flex-wrap">
+              <span className="bg-callout-key/20 border border-callout-key/40 px-3 py-1 rounded text-callout-key break-all min-w-0">
                 {currentMantissa}
               </span>
               <span className="text-2xl text-muted-foreground">×</span>
               <span className="text-lg">
-                10<sup className="text-lg text-callout-onair font-bold">{currentExponent}</sup>
+                10<sup className="text-lg text-callout-onair font-bold">{toSuperscript(currentExponent)}</sup>
               </span>
             </div>
           </ResultBox>
@@ -153,7 +199,7 @@ export default function SciNotationExplorer() {
           {/* Breakdown */}
           <div className="grid grid-cols-2 gap-3">
             <ResultBox tone="warn" label={t('ch0_3.sciNotationMantissa')} className="p-3">
-              <p className="text-lg font-mono font-bold text-foreground">{currentMantissa}</p>
+              <p className="text-lg font-mono font-bold text-foreground break-all">{currentMantissa}</p>
               <p className="text-[13px] text-muted-foreground mt-1">
                 {isEngineering
                   ? t('ch0_3.sciNotationMantissaEngDesc')
@@ -162,7 +208,7 @@ export default function SciNotationExplorer() {
             </ResultBox>
 
             <ResultBox tone="primary" label={t('ch0_3.sciNotationExponent')} className="p-3">
-              <p className="text-lg font-mono font-bold text-foreground">{currentExponent}</p>
+              <p className="text-lg font-mono font-bold text-foreground">{withMinusSign(String(currentExponent))}</p>
               <p className="text-[13px] text-muted-foreground mt-1">
                 {isEngineering
                   ? t('ch0_3.sciNotationExponentEngDesc')
@@ -175,10 +221,10 @@ export default function SciNotationExplorer() {
           {isEngineering && result.siPrefix && result.siPrefix.symbol && (
             <ResultBox tone="success" label={t('ch0_3.sciNotationSIPrefix')}>
               <div className="flex items-center gap-4">
-                <p className="text-2xl font-mono font-bold text-foreground">
+                <p className="text-2xl font-mono font-bold text-foreground break-all min-w-0">
                   {currentMantissa}
                   <span className="text-callout-experiment text-xl ml-1">
-                    {result.siPrefix.symbol}
+                    {sym(result.siPrefix)}
                   </span>
                 </p>
                 <div className="text-sm">
@@ -189,7 +235,7 @@ export default function SciNotationExplorer() {
                     </span>
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    {result.siPrefix.symbol} = 10<sup>{result.siPrefix.exponent}</sup>
+                    {sym(result.siPrefix)} = 10<sup>{toSuperscript(result.siPrefix.exponent)}</sup>
                   </p>
                 </div>
               </div>
@@ -200,8 +246,8 @@ export default function SciNotationExplorer() {
           {!isEngineering && result.engineeringExponent !== result.exponent && (
             <ResultBox tone="info" label={t('ch0_3.sciNotationAlsoWritten')}>
               <p className="text-lg font-mono font-bold text-foreground">
-                <span className="bg-callout-key/20 border border-callout-key/40 px-2 py-0.5 rounded">
-                  {formatNumber(result.engineeringMantissa, locale)}
+                <span className="bg-callout-key/20 border border-callout-key/40 px-2 py-0.5 rounded break-all">
+                  {result.engineeringMantissa}
                 </span>
                 <span className="text-muted-foreground mx-2">×</span>
                 <span>10</span>
@@ -214,8 +260,8 @@ export default function SciNotationExplorer() {
 
           {/* Formula line */}
           <ResultBox tone="success" label={t('ch0_3.sciNotationFormula')} className="p-3">
-            <p className="text-sm font-mono text-muted-foreground">
-              {inputValue} = {currentMantissa} × 10<sup>{currentExponent}</sup>
+            <p className="text-sm font-mono text-muted-foreground break-all">
+              {withMinusSign(inputValue)} = {currentMantissa} × 10<sup>{withMinusSign(String(currentExponent))}</sup>
             </p>
           </ResultBox>
         </div>

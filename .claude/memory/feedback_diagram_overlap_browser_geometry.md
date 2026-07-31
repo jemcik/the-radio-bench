@@ -1,0 +1,27 @@
+---
+name: verify-diagram-text-size-with-real-browser-geometry-not-the-gate-or-eyeballing
+description: "How to actually catch text-overlap and oversized-font bugs in SVG diagrams (Circuit maxWidth pitfall, gate blind spots, getBoundingClientRect detector)"
+metadata: 
+  node_type: memory
+  type: feedback
+  originSessionId: 8652357b-8809-4955-83cf-386052a5237f
+---
+
+User got angry TWICE in one task (ch 3.4) because SVG diagrams shipped with text overlapping symbols AND disproportionately large text — and my "visual verification" (glancing at screenshots) plus green gates both missed it.
+
+**Why the gate misses it:** `diagram-text-overlap.test.tsx` renders in jsdom at **viewBox coordinates with no scaling**, and it **filters out elements inside `<g transform>`** (all `@/lib/circuit` primitives — Meter, Diode, Resistor — render inside transformed groups). So the gate never checks text-vs-symbol-body for schematics, and never sees the real on-screen font size.
+
+**Two real bug classes it lets through:**
+1. **`<Circuit>` without `maxWidth`** → `SVGDiagram` sets `width="100%"`, so a small viewBox (e.g. 470) scales up ~2× to fill the column. `TerminalLabel` fontSize is in user units → text renders ~2× (e.g. 34px) and descends onto symbols. FIX: always pass `maxWidth={W}` to `<Circuit>` (same as `width`). Reused `MultimeterDiagram` is fine only because it uses em fonts (which don't scale).
+2. **Label offset too small for the symbol.** `Meter` circle radius ≈ 20 user units; a `Meter` letter is fine (centered) but a description label above it needs offset ≥ ~32 from center (radius 20 + text descent ~5 + gap ~6), NOT −24. Same for a `Diode` — its triangle is ~±14 tall around the rail, so a label above it needs ≥ ~26 clearance.
+
+**The reliable check — run in the browser (Claude-in-Chrome `javascript_tool`), NOT the gate, NOT eyeballing:** for every `<svg>`, use `getBoundingClientRect()` (real rendered px, includes transforms) to flag: text∩text, text∩circle (exclude the meter's own letter via center-in-circle test), text∩compact-path (symbols: bbox both dims < ~90), text∩component-rect, and text spilling the svg rect. Also report `scale = clientWidth/viewBox.width` and `getComputedStyle(text).fontSize` per svg — any scale > 1 with a user-unit-font (Circuit) diagram means oversized text. Working detector script pattern is in the ch 3.4 session transcript. Target: "ZERO OVERLAPS" + all fonts 13–16px (a large font is only OK if it's an intentional display readout).
+
+**Now automated (July 2026):** this detector is a real-browser CI gate — `npm run test:visual` (Playwright, `e2e/diagram-geometry.spec.ts`), opens every published chapter × locale in Chromium and fails if a chapter's overlap count exceeds `e2e/diagram-geometry.baseline.json`. New chapters have no baseline entry → must ship 0 overlaps. Regenerate after an intentional, browser-verified change: `UPDATE_BASELINE=1 npm run test:visual`. Also a static gate `check:circuit-maxwidth` (in `check:all`) fails any `<Circuit>` missing `maxWidth`. Baseline is generated per-platform (macOS locally); if CI/Linux font metrics drift a grandfathered graze, re-baseline on that platform. Cross-platform caveat aside, the Playwright gate + maxWidth gate are the machine enforcement; still run the detector by hand during authoring for fast feedback.
+
+**How to apply:** after building/editing ANY diagram, reload the user's dev page and run the getBoundingClientRect detector across all SVGs before saying done (and `npm run test:visual` before shipping). Trust that output over a screenshot glance and over green jsdom gates. See [[feedback_verify_visually_before_done]] and [[feedback_visual_verification_via_chrome]].
+
+**The TEXT-ONLY blind spot (ch4.3 hero, user furious, Jul 2026).** The ch4.3 hero shipped with its lightning-cloud glyph sliced by the top frame edge (`getBoundingClientRect` top −1.4). Every gate was green and I had "verified" — because BOTH my hand-run detector AND the Playwright `pageDetector` only iterated over `<text>` elements. **A chapter hero is a pure illustration with ZERO `<text>` (aria-label only), so the whole detector loop was a no-op on it and reported "0 overlaps" — meaning "0 text elements", not "it fits".** I read 0 as pass. Two lessons:
+- **The hand-check MUST include non-text graphical elements against the SVG frame**, not just text-vs-text/symbol. For every `path/circle/rect/line/polygon`, convert its `getBoundingClientRect` to viewBox coords and flag any edge past `0..VB` (tolerance ~2px = ink + half-stroke). Snippet lives in the ch4.3 session. Run it on heroes ESPECIALLY, since they have no text to trip the text checks.
+- **Then LOOK at the hero's four frame edges specifically** — "does the composition read" is NOT "does anything touch the edge". I looked at composition and missed a sliced cloud.
+- **Intentional bleed exists and geometry can't tell it from an accidental slice:** dipole/antenna radiation arcs (ch2.1/2.2 heroes AND in-chapter diagrams) sweep past the frame and fade on purpose; ch4.2's hero herringbone has a bbox past-frame but is clipPath'd to the TV. So the automated check is **HERO-SCOPED** (`svg` inside the `[data-hero]` ChapterHero wrapper) AND **clipPath-aware** (skip elements with a `clip-path` ancestor), and the two genuine radiation-bleed heroes are grandfathered in the baseline (2-1, 2-2 → 2). A NEW graphical spill in any clean-baseline hero (incl. ch4.3) now fails `test:visual`. The gate is the backstop; the eye + hand-check on every hero is primary.

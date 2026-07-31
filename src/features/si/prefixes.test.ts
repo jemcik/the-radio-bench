@@ -36,7 +36,8 @@ describe('SI_PREFIXES', () => {
   it('every prefix carries matching powerLabel and valueLabel', () => {
     const kilo = SI_PREFIXES.find(p => p.name === 'kilo')!
     expect(kilo.powerLabel).toBe('10³')
-    expect(kilo.valueLabel).toBe('1 000')
+    // 4-digit values are unspaced, matching the prose beside the table.
+    expect(kilo.valueLabel).toBe('1000')
     expect(kilo.symbol).toBe('k')
 
     const micro = SI_PREFIXES.find(p => p.name === 'micro')!

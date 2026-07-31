@@ -186,9 +186,9 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['voltage', 'resistance'],
   },
   'scientific notation': {
-    tip: 'A way of writing very large or very small numbers as a mantissa times a power of 10.',
+    tip: 'A way of writing very large or very small numbers as a single-digit coefficient times a power of 10.',
     detail:
-      'Scientific notation expresses any number in the form a × 10ⁿ, where a (the mantissa) is between 1 and 10, and n (the exponent) is an integer. For example, 2,400,000,000 Hz = 2.4 × 10⁹ Hz. Engineering notation is a variant where the exponent is always a multiple of 3, aligning with SI prefixes (kilo, mega, giga). Scientific notation makes arithmetic with very large or very small numbers much easier — you add exponents when multiplying and subtract when dividing.',
+      'Scientific notation expresses any number in the form m × 10ⁿ. The exponent n is a whole number. The coefficient m — also called the mantissa — has exactly one digit before the point, from 1 to 9. Ten is excluded: 10 × 10ⁿ is just 1 × 10ⁿ⁺¹, so it would never be written that way. For example, 2,400,000,000 Hz = 2.4 × 10⁹ Hz. Engineering notation is a variant where the exponent is always a multiple of 3, aligning with SI prefixes (kilo, mega, giga). Scientific notation makes arithmetic with very large or very small numbers much easier — you add exponents when multiplying and subtract when dividing.',
     see: ['frequency'],
   },
   capacitance: {
@@ -564,7 +564,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['resistance', 'resistor'],
   },
   capacitor: {
-    tip: 'Stores energy in an electric field. Blocks DC, passes AC.',
+    tip: 'A capacitor is a component that stores energy in an electric field between two plates. It blocks steady (DC) current and passes alternating (AC) current.',
     detail:
       'Capacitors come in many types: ceramic (small, cheap, unpolarised), electrolytic (large values, polarised — watch the polarity!), and film (precise, stable). In AC circuits, a capacitor\'s opposition to current (reactance) decreases with frequency — this is why capacitors are used in filters and tuning circuits.',
     unit: 'Farad (F)',

@@ -139,8 +139,8 @@ It is a filter, not a guarantee.
 | Done | Chapter |
 |---|---|
 | [x] | `0.1` — 2026-07-27. 12 findings fixed (see below); 6 further calls made at review. |
-| [ ] | `0.2` |
-| [ ] | `0.3` |
+| [x] | `0.2` — 2026-07-29 (#60). Two review rounds; blockers fixed, polish taken in the same pass. |
+| [x] | `0.3` — 2026-07-29. Four review rounds (71 → 53 → 35 → 34 findings); all applied. §3 math-var debt for this chapter cleared in the same pass. |
 | [ ] | `0.4` |
 | [ ] | `0.5` |
 | [ ] | `1.1` |
@@ -159,8 +159,10 @@ It is a filter, not a guarantee.
 ## 3. Math variables in prose that are not wrapped in `<var>`
 
 **Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
-(`da1c413`). **Scale:** 533 keys across 14 chapters (0.2 – 1.11).
-**Gate:** `check:unwrapped-math-var` (green — all 533 are grandfathered in
+(`da1c413`). **Scale:** 486 keys across 13 chapters (0.2 – 1.11); originally 533 across
+14. Ch 0.3 was worked off 2026-07-29, and the symbol-gloss exemption added the same day
+cleared a further fifteen keys spread over ch 0.2, 1.1, 1.3, 1.5 and 1.6.
+**Gate:** `check:unwrapped-math-var` (green — all 486 are grandfathered in
 `scripts/unwrapped-math-var-baseline.json`).
 
 ### What the defect is
@@ -210,21 +212,20 @@ unwrapped variable.
 
 | Chapter | `en` | `uk` | Total |
 |---|---|---|---|
-| `ch0_2` | 2 | 2 | 4 |
-| `ch0_3` | 20 | 12 | 32 |
+| `ch0_2` | 1 | 1 | 2 |
 | `ch0_4` | 3 | 1 | 4 |
-| `ch1_1` | 3 | 2 | 5 |
+| `ch1_1` | 2 | 2 | 4 |
 | `ch1_2` | 16 | 16 | 32 |
-| `ch1_3` | 13 | 13 | 26 |
+| `ch1_3` | 11 | 11 | 22 |
 | `ch1_4` | 6 | 8 | 14 |
-| `ch1_5` | 35 | 35 | 70 |
-| `ch1_6` | 43 | 43 | 86 |
+| `ch1_5` | 34 | 34 | 68 |
+| `ch1_6` | 40 | 40 | 80 |
 | `ch1_7` | 43 | 43 | 86 |
 | `ch1_8` | 29 | 28 | 57 |
 | `ch1_9` | 2 | 2 | 4 |
 | `ch1_10` | 13 | 13 | 26 |
 | `ch1_11` | 44 | 43 | 87 |
-| **Total** | **272** | **261** | **533** |
+| **Total** | **244** | **242** | **486** |
 
 Note that `ch1_11` carries the largest share despite post-dating the `beginner-review`
 rule — the two backlogs are independent, and a chapter can be clear of one and not the
@@ -243,6 +244,16 @@ renders math-italic. Rule B flagged exactly this in ch 0.1 (`maths2`, «the k in
 M in MHz»). The fix is neither to wrap nor to baseline — it is to name the prefixes as
 words («kilo in kHz, mega in MHz»), which is also what a beginner needs and what the
 `scientific notation` glossary popover already says.
+
+The **symbol-gloss** shape — a lone letter in parentheses, «kilo (k)», «micro (µ)»,
+«47 × 10³ (k)» — is the same trap in a form the gate can recognise, so as of 2026-07-29
+`strip()` removes `(x)` before scanning and those keys no longer need baselining. That
+is what cleared eight of ch 0.3's twenty English entries; the other twelve were real
+variables in quiz strings and got wrapped.
+
+**Units are the mirror trap.** «<var>V</var> = 12 V» — the first `V` is the variable, the
+second is the volt, and only the first takes `<var>`. A blanket regex sweep gets this
+wrong every time; check each occurrence against its sentence.
 
 ---
 
@@ -421,3 +432,60 @@ same thing. Then re-snapshot with
 - **`gemini-translate.py` cannot write entries whose key contains a slash** (`time/div`,
   `volt/div`) — it derives the output filename from the key and the intermediate directory
   does not exist. `mkdir -p /tmp/gemini-section/time /tmp/gemini-section/volt` first.
+
+---
+
+## 7. `text ∩ stroke` hits the visual gate never looked for
+
+**Found** 2026-07-29, when ch 0.3's prefix ladder shipped with its ÷1000 arrows drawn
+straight through the `p (п)` symbols. **Scale:** 15 of 56 chapter/locale runs, 8 chapters.
+**Gate:** `npm run test:visual` — RED until the baseline is re-captured (see below).
+
+### What the defect is
+
+`e2e/diagram-geometry.spec.ts` compared text against text, against circles and against
+paths. An arrow is a `<line>` plus a `<polyline>`, so nothing ever looked at it. The ladder
+went green for as long as each tick carried one narrow glyph (`p`); the moment the symbols
+became two forms (`p (п)`, ~41 px instead of ~8), the arrow — which started at `tick + 6` —
+ran through the text. Every gate stayed green, and the ad-hoc browser check used to verify
+that change grouped labels into rows with an 8 px tolerance while the two rows sat 9 px
+apart, so it compared nothing and printed `overlaps: []`.
+
+### How the rule decides
+
+A stroke has to reach the **middle half** of the glyph band with ≥ 3 px penetration along
+the other axis — grazing an edge is what a label resting on its axis does, and that is
+fine. On top of that, the text's own **centre point must NOT lie on the stroke**: a tick
+label centred on its grid line is deliberate, an arrow clipping a symbol from one side is
+not. That second test is what took the course-wide residue from 21 runs to 15.
+
+Verified against the defect by reproducing the shipped geometry in the DOM: 14 hits, one
+per symbol; zero after the fix.
+
+### The backlog
+
+| Chapter | Hits (en/uk) | Baseline | What the labels are |
+|---|---|---|---|
+| `0.2` | 4 / 4 | 0 | oscilloscope panel text (`VOLT/DIV`, `TIME/DIV`) — does NOT reproduce at a 1728 px viewport, only at the gate's 1280; needs checking at that width |
+| `0.4` | 5 / 4 | 0 | log-axis tick labels, «Логарифмічна вісь», `fc · −3 dB` |
+| `1.6` | 14 / 14 | 5 | `SNSN` / `GG` / `vIII` — doubled strings, so suspect duplicated text nodes rather than layout |
+| `1.8` | 3 / 3 | 2 | «−20 дБ/декаду» along its slope |
+| `1.10` | 1 / 1 | 0 | — |
+| `1.11` | — / 2 | 1 | uk only |
+| `3.4` | 4 / 4 | 0 | band labels («80 м», «70 см») on the band ruler |
+| `4.3` | 5 / 5 | 0 | — |
+
+Ch 0.3 is at zero.
+
+### How to work it off
+
+Six of the eight chapters (0.2, 0.4, 1.6, 1.8, 1.10, 1.11) are already in the §2
+`beginner-review` queue, so the diagram fix belongs in the same pass as that chapter's
+prose — the diagram is open in the browser anyway. **3.4 and 4.3 are not in that queue and
+need scheduling on their own.**
+
+The counts are frozen in `e2e/diagram-geometry.baseline.json`, captured on CI's Linux
+Chromium via the `Re-baseline visual gate` workflow — never locally. The two environments
+genuinely disagree: 18 of 46 entries differ between macOS and CI, `ch1_6` by 8 and
+`ch1_8` by 2 in the other direction. Freezing the counts means a NEW overlap still fails
+the gate; the table above is what has to be worked off.

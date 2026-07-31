@@ -15,6 +15,18 @@ export interface SIPrefix {
   name: string
   /** Unit symbol (`k`, `M`, `µ`, …). Empty string for 10⁰. */
   symbol: string
+  /**
+   * Ukrainian (ДСТУ) form of the same symbol — `к`, `М`, `мк`, …
+   *
+   * Both spellings are legitimate: the Latin ones are the international SI
+   * symbols, the Cyrillic ones are what Ukrainian text and component markings
+   * actually use («4,7 кОм», «22 пФ»). Chapter 0.3 is the reader's FIRST meeting
+   * with prefixes, so a diagram labelled `k` sitting above an example reading
+   * «530 кГц» leaves them with no way to know it is the same prefix. The ladder
+   * therefore shows both, and the converter — whose output the lab tells the
+   * reader to check against «4,7 кОм» — shows the Ukrainian form in the uk locale.
+   */
+  symbolUk: string
   /** Power of 10 */
   exponent: number
   /** Unicode-formatted label (e.g. `10⁻⁶`) for display */
@@ -28,15 +40,15 @@ export interface SIPrefix {
 }
 
 export const SI_PREFIXES: SIPrefix[] = [
-  { name: 'pico',  symbol: 'p', exponent: -12, powerLabel: '10⁻¹²', valueLabel: '0.000000000001',     nameKey: 'prefixPico',  exampleKey: 'prefixPicoEx'  },
-  { name: 'nano',  symbol: 'n', exponent: -9,  powerLabel: '10⁻⁹',  valueLabel: '0.000000001',        nameKey: 'prefixNano',  exampleKey: 'prefixNanoEx'  },
-  { name: 'micro', symbol: 'µ', exponent: -6,  powerLabel: '10⁻⁶',  valueLabel: '0.000001',           nameKey: 'prefixMicro', exampleKey: 'prefixMicroEx' },
-  { name: 'milli', symbol: 'm', exponent: -3,  powerLabel: '10⁻³',  valueLabel: '0.001',              nameKey: 'prefixMilli', exampleKey: 'prefixMilliEx' },
-  { name: 'none',  symbol: '',  exponent: 0,   powerLabel: '10⁰',   valueLabel: '1',                  nameKey: 'prefixNone',  exampleKey: 'prefixNoneEx'  },
-  { name: 'kilo',  symbol: 'k', exponent: 3,   powerLabel: '10³',   valueLabel: '1 000',              nameKey: 'prefixKilo',  exampleKey: 'prefixKiloEx'  },
-  { name: 'mega',  symbol: 'M', exponent: 6,   powerLabel: '10⁶',   valueLabel: '1 000 000',          nameKey: 'prefixMega',  exampleKey: 'prefixMegaEx'  },
-  { name: 'giga',  symbol: 'G', exponent: 9,   powerLabel: '10⁹',   valueLabel: '1 000 000 000',      nameKey: 'prefixGiga',  exampleKey: 'prefixGigaEx'  },
-  { name: 'tera',  symbol: 'T', exponent: 12,  powerLabel: '10¹²',  valueLabel: '1 000 000 000 000',  nameKey: 'prefixTera',  exampleKey: 'prefixTeraEx'  },
+  { name: 'pico',  symbol: 'p', symbolUk: 'п', exponent: -12, powerLabel: '10⁻¹²', valueLabel: '0.000000000001',     nameKey: 'prefixPico',  exampleKey: 'prefixPicoEx'  },
+  { name: 'nano',  symbol: 'n', symbolUk: 'н', exponent: -9,  powerLabel: '10⁻⁹',  valueLabel: '0.000000001',        nameKey: 'prefixNano',  exampleKey: 'prefixNanoEx'  },
+  { name: 'micro', symbol: 'µ', symbolUk: 'мк', exponent: -6,  powerLabel: '10⁻⁶',  valueLabel: '0.000001',           nameKey: 'prefixMicro', exampleKey: 'prefixMicroEx' },
+  { name: 'milli', symbol: 'm', symbolUk: 'м', exponent: -3,  powerLabel: '10⁻³',  valueLabel: '0.001',              nameKey: 'prefixMilli', exampleKey: 'prefixMilliEx' },
+  { name: 'none',  symbol: '', symbolUk: '',  exponent: 0,   powerLabel: '10⁰',   valueLabel: '1',                  nameKey: 'prefixNone',  exampleKey: 'prefixNoneEx'  },
+  { name: 'kilo',  symbol: 'k', symbolUk: 'к', exponent: 3,   powerLabel: '10³',   valueLabel: '1000',              nameKey: 'prefixKilo',  exampleKey: 'prefixKiloEx'  },
+  { name: 'mega',  symbol: 'M', symbolUk: 'М', exponent: 6,   powerLabel: '10⁶',   valueLabel: '1 000 000',          nameKey: 'prefixMega',  exampleKey: 'prefixMegaEx'  },
+  { name: 'giga',  symbol: 'G', symbolUk: 'Г', exponent: 9,   powerLabel: '10⁹',   valueLabel: '1 000 000 000',      nameKey: 'prefixGiga',  exampleKey: 'prefixGigaEx'  },
+  { name: 'tera',  symbol: 'T', symbolUk: 'Т', exponent: 12,  powerLabel: '10¹²',  valueLabel: '1 000 000 000 000',  nameKey: 'prefixTera',  exampleKey: 'prefixTeraEx'  },
 ]
 
 /** Index of the `none` (10⁰) prefix — useful as a default selection. */

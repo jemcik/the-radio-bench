@@ -17,7 +17,8 @@ describe('PowersOfTenTable', () => {
     // Sanity-check a couple of entries from the shared list.
     expect(screen.getByText('10⁶')).toBeInTheDocument()
     expect(screen.getByText('10⁻¹²')).toBeInTheDocument()
-    expect(screen.getByText('1 000 000')).toBeInTheDocument()
+    // Thousands grouping follows the locale: comma in en, space in uk.
+    expect(screen.getByText('1,000,000')).toBeInTheDocument()
   })
 
   it('renders a header row with four columns', () => {

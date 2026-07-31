@@ -25,11 +25,11 @@ const buildFormulas = (t: (key: string) => string): Formula[] => [
     variables: ['V', 'I', 'R'],
     solveSteps: {
       I: [
-        { description: 'V = I × R', result: 'V = I × R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'V = I × R' },
         { description: `${t('ch0_3.formulaDivideBothSides')} R`, result: 'I = V / R' },
       ],
       R: [
-        { description: 'V = I × R', result: 'V = I × R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'V = I × R' },
         { description: `${t('ch0_3.formulaDivideBothSides')} I`, result: 'R = V / I' },
       ],
     },
@@ -40,11 +40,11 @@ const buildFormulas = (t: (key: string) => string): Formula[] => [
     variables: ['P', 'I', 'V'],
     solveSteps: {
       I: [
-        { description: 'P = I × V', result: 'P = I × V' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = I × V' },
         { description: `${t('ch0_3.formulaDivideBothSides')} V`, result: 'I = P / V' },
       ],
       V: [
-        { description: 'P = I × V', result: 'P = I × V' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = I × V' },
         { description: `${t('ch0_3.formulaDivideBothSides')} I`, result: 'V = P / I' },
       ],
     },
@@ -55,12 +55,12 @@ const buildFormulas = (t: (key: string) => string): Formula[] => [
     variables: ['P', 'I', 'R'],
     solveSteps: {
       I: [
-        { description: 'P = I² × R', result: 'P = I² × R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = I² × R' },
         { description: `${t('ch0_3.formulaDivideBothSides')} R`, result: 'P / R = I²' },
         { description: t('ch0_3.formulaTakeSquareRoot'), result: 'I = √(P / R)' },
       ],
       R: [
-        { description: 'P = I² × R', result: 'P = I² × R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = I² × R' },
         { description: `${t('ch0_3.formulaDivideBothSides')} I²`, result: 'R = P / I²' },
       ],
     },
@@ -71,12 +71,12 @@ const buildFormulas = (t: (key: string) => string): Formula[] => [
     variables: ['P', 'V', 'R'],
     solveSteps: {
       V: [
-        { description: 'P = V² / R', result: 'P = V² / R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = V² / R' },
         { description: `${t('ch0_3.formulaMultiplyBothSides')} R`, result: 'P × R = V²' },
         { description: t('ch0_3.formulaTakeSquareRoot'), result: 'V = √(P × R)' },
       ],
       R: [
-        { description: 'P = V² / R', result: 'P = V² / R' },
+        { description: t('ch0_3.formulaStartWith'), result: 'P = V² / R' },
         { description: `${t('ch0_3.formulaMultiplyBothSides')} R`, result: 'P × R = V²' },
         { description: `${t('ch0_3.formulaDivideBothSides')} P`, result: 'R = V² / P' },
       ],
@@ -88,7 +88,7 @@ const buildFormulas = (t: (key: string) => string): Formula[] => [
     variables: ['f', 'T'],
     solveSteps: {
       T: [
-        { description: 'f = 1 / T', result: 'f = 1 / T' },
+        { description: t('ch0_3.formulaStartWith'), result: 'f = 1 / T' },
         { description: t('ch0_3.formulaTakeReciprocal'), result: 'T = 1 / f' },
       ],
     },
@@ -111,7 +111,12 @@ export default function FormulaTransposer() {
   const variable =
     selectedVariable && selectedFormula.variables.includes(selectedVariable)
       ? selectedVariable
-      : selectedFormula.variables[0]
+      // Fall back to the first variable that actually has a rearrangement to show.
+      // Defaulting to variables[0] opened Ohm's law on «V already stands on its
+      // own» — a step that demonstrates nothing — and opened f = 1/T on `f`,
+      // hiding the reciprocal move the prose sends the reader there to see.
+      : (selectedFormula.variables.find(v => selectedFormula.solveSteps[v])
+         ?? selectedFormula.variables[0])
 
   const steps: Step[] = useMemo(() => {
     const custom = selectedFormula.solveSteps[variable]
@@ -150,7 +155,12 @@ export default function FormulaTransposer() {
                   : 'border-border bg-card text-foreground hover:border-primary/50',
               )}
             >
-              <span className="font-mono">{formula.tex}</span>
+              {/* `formula.name` was computed and never rendered, so the reader saw a
+                  bare `f = 1 / T` with neither letter defined anywhere in this chapter. */}
+              <span className="flex flex-col items-center gap-0.5">
+                <span className="text-[11px] opacity-80">{formula.name}</span>
+                <span className="font-mono">{formula.tex}</span>
+              </span>
             </button>
           ))}
         </div>

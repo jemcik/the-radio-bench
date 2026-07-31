@@ -19,7 +19,7 @@ describe('SciNotationExplorer', () => {
     // The Standard/Engineering toggle buttons only appear once the result
     // panel renders — use their absence as a proxy for "no result".
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
-    expect(screen.queryByRole('button', { name: /^standard$/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^scientific$/i })).toBeNull()
   })
 
   it('breaks 2_400_000_000 into mantissa 2.4 and exponent 9 (standard)', () => {
@@ -61,7 +61,8 @@ describe('SciNotationExplorer', () => {
     fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
 
     expect(screen.getAllByText('470').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('-6').length).toBeGreaterThan(0)
+    // The exponent box renders U+2212 MINUS, matching the 10⁻⁶ beside it.
+    expect(screen.getAllByText('−6').length).toBeGreaterThan(0)
     // 10⁻⁶ is the micro (µ) band.
     expect(screen.getByText(/micro/i)).toBeInTheDocument()
   })
@@ -89,15 +90,15 @@ describe('SciNotationExplorer', () => {
     expect(screen.queryByRole('button', { name: /engineering/i })).toBeNull()
   })
 
-  it('switches notation mode via the Standard/Engineering buttons', () => {
+  it('switches notation mode via the Scientific/Engineering buttons', () => {
     setup()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '12345' } })
 
-    const std = screen.getByRole('button', { name: /standard/i })
+    const std = screen.getByRole('button', { name: /scientific/i })
     const eng = screen.getByRole('button', { name: /engineering/i })
 
-    // Standard highlights standard, engineering highlights engineering.
+    // Scientific highlights scientific, engineering highlights engineering.
     expect(std.className).toMatch(/border-callout-note\/50/)
     expect(eng.className).not.toMatch(/border-callout-experiment\/50/)
 
@@ -113,7 +114,7 @@ describe('SciNotationExplorer', () => {
     fireEvent.change(input, { target: { value: '-2400000000' } })
     // Some readout text contains the negative mantissa.
     expect(
-      screen.getAllByText((_, el) => /-2\.4/.test(el?.textContent ?? '')).length,
+      screen.getAllByText((_, el) => /−2\.4/.test(el?.textContent ?? '')).length,
     ).toBeGreaterThan(0)
   })
 
@@ -128,11 +129,74 @@ describe('SciNotationExplorer', () => {
     ).toBeGreaterThan(0)
   })
 
+  // ── Exactness ──────────────────────────────────────────────────────────
+  // Reader-flagged: entering a 32-digit number returned «1,111122 × 10³¹» and
+  // printed it with an equals sign. Two independent losses — `roundTo(m, 6)`
+  // threw away ten digits, and `parseFloat` had already corrupted everything
+  // past the 17th, because a double holds ~17 significant digits. The widget now
+  // decomposes the decimal STRING, so the digits the reader typed survive.
+  it('keeps every digit of a 32-digit input (no float rounding)', () => {
+    setup()
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '11111222233333444455565544444444' },
+    })
+    // 32 digits ⇒ exponent 31, mantissa = the same digit run with the point
+    // after the first digit. parseFloat would have given 1.1111222233333444.
+    expect(
+      screen.getAllByText('1.1111222233333444455565544444444').length,
+    ).toBeGreaterThan(0)
+    expect(screen.getAllByText('31').length).toBeGreaterThan(0)
+  })
+
+  it('the «number and its notation» line is a true equality', () => {
+    const { container } = setup()
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '11111222233333444455565544444444' },
+    })
+    // Both sides must carry the same digit run — that is what makes the «=» honest.
+    expect(container.textContent).toContain(
+      '11111222233333444455565544444444 = 1.1111222233333444455565544444444',
+    )
+  })
+
+  it('keeps every digit in engineering form too', () => {
+    setup()
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '11111222233333444455565544444444' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /engineering/i }))
+    // Exponent drops 31 → 30, so one digit crosses the point.
+    expect(
+      screen.getAllByText('11.111222233333444455565544444444').length,
+    ).toBeGreaterThan(0)
+    expect(screen.getAllByText('30').length).toBeGreaterThan(0)
+  })
+
+  it('does not invent digits for a short input', () => {
+    setup()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '7' } })
+    // «7» is 7 × 10⁰ — not «7.000000».
+    expect(screen.getAllByText('7').length).toBeGreaterThan(0)
+  })
+
+  it('trailing zeros do not survive as false precision', () => {
+    setup()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '4700' } })
+    expect(screen.getAllByText('4.7').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('3').length).toBeGreaterThan(0)
+  })
+
+  it('treats every spelling of zero as zero', () => {
+    setup()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '0.000' } })
+    expect(screen.getAllByText('0').length).toBeGreaterThan(0)
+  })
+
   it('exposes aria-pressed on the Standard/Engineering toggle', () => {
     setup()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '42' } })
 
-    const std = screen.getByRole('button', { name: /standard/i })
+    const std = screen.getByRole('button', { name: /scientific/i })
     const eng = screen.getByRole('button', { name: /engineering/i })
 
     expect(std).toHaveAttribute('aria-pressed', 'true')

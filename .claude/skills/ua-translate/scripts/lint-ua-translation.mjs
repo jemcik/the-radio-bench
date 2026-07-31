@@ -209,6 +209,49 @@ const RULES = [
   // ── Forbidden words from landmines.md ───────────────────────────────────
 
   {
+    id: 'forbidden.cyrillic-latin-homoglyph-collision',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // A one-letter Ukrainian word followed by its Latin look-alike renders as the
+    // same glyph twice. User-flagged on `glossary.scientific notation.detail`:
+    // «…у вигляді a × 10ⁿ, … а a (коефіцієнт…)» — the conjunction «а» and the
+    // variable `a` are indistinguishable, so the reader sees «а а».
+    // The colliding pairs that matter in Ukrainian prose are а/a, і/i, о/o, у/y,
+    // е/e, с/c, х/x — all of which are also common variable names.
+    // Fix by renaming the variable (the source for scientific notation uses `m`)
+    // or restructuring so the conjunction does not sit before it.
+    pattern: /(?<![\p{L}\d])(?:а[\s ]+(?:<var>)?a|і[\s ]+(?:<var>)?i|о[\s ]+(?:<var>)?o|у[\s ]+(?:<var>)?y|е[\s ]+(?:<var>)?e|с[\s ]+(?:<var>)?c|х[\s ]+(?:<var>)?x)(?![\p{L}\d])/gu,
+    hint: 'A Cyrillic one-letter word next to its Latin homoglyph reads as the same letter twice («а a» → «а а»). Rename the variable or restructure the clause.',
+  },
+  {
+    id: 'forbidden.course-part-capital-or-arabic',
+    category: 'FORBIDDEN',
+    severity: 'ERROR',
+    // The course's five divisions are numbered 0, I, II, III, IV — that is what
+    // the sidebar and the landing page render (`['0','I','II','III','IV']` in
+    // Welcome.tsx). Two things go wrong when prose refers to one of them:
+    //   • «Частина» capitalised — it is a common noun in Ukrainian, so «частина
+    //     III», «у частині I», never «Частині 3». (Standalone UI labels like
+    //     welcome.statParts «Частин» are a heading, not prose, and are exempt
+    //     by the numeral requirement below.)
+    //   • an Arabic numeral — «частина 1» names a division the reader cannot
+    //     find, because every surface calls it «I».
+    // User-flagged on ch0_3.intro («для Частин 0 та 1»); the same shape was in
+    // eight other keys across ch0_1, ch0_2, ch1_11, ch2_1 and ch2_2.
+    // Part 0 has no Roman form and stays «0».
+    // Two shapes are wrong; everything else here is correct and must stay quiet:
+    //   ✗ «Частині 3», «Частина 1»  — capitalised, and/or an Arabic numeral
+    //   ✓ «частина I», «у частині III», «частин 0»
+    // A numeral followed by a unit is a measured quantity, not a division —
+    // «R «з'їдає» частину 3 В батареї» is three volts. The unit alternatives end
+    // with a negative lookahead for a lowercase Cyrillic letter so «частині 3 ми
+    // розглянемо» is not mistaken for «3 м».
+    // The middle alternative catches a list — «для частин 0 та 1», the shape the
+    // rule was written for, where the bad numeral is not adjacent to the noun.
+    pattern: /Частин\p{L}*[\s ]*[0-9IVX]+|частин\p{L}*[\s ]*[0-9IVX]+[\s ]*(?:та|і|й|,)[\s ]*[1-9]\d*|частин\p{L}*[\s ]*[1-9]\d*(?![\s ]*(?:[пнмкМГТ]?(?:В|А|Ом|Гц|Вт|Ф|Гн)|дБ|мкс|нс|мс|мм|см|км|[см])(?![а-яєіїґ]))/gu,
+    hint: 'Course divisions are «частина» (lowercase) + a Roman numeral: «частина I», «у частині III». Part 0 keeps «0». Capitalised «Частина», or an Arabic numeral above 0, names something the reader cannot find.',
+  },
+  {
     id: 'forbidden.section-symbol',
     category: 'FORBIDDEN',
     severity: 'ERROR',

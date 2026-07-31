@@ -8,7 +8,7 @@ import { SI_PREFIXES } from '@/features/si/prefixes'
  * drift from the prefix diagrams or converter widget.
  */
 export default function PowersOfTenTable() {
-  const { t } = useTranslation('ui')
+  const { t, i18n } = useTranslation('ui')
 
   return (
     <div className="my-4 overflow-x-auto">
@@ -25,7 +25,18 @@ export default function PowersOfTenTable() {
           {SI_PREFIXES.map(({ powerLabel, valueLabel, nameKey, exampleKey }) => (
             <tr key={powerLabel} className="border-b border-border/50">
               <td className="py-2 px-3 font-mono text-primary">{powerLabel}</td>
-              <td className="py-2 px-3 font-mono text-muted-foreground">{valueLabel}</td>
+              {/* `valueLabel` is a locale-independent literal with a decimal POINT.
+                  Ukrainian uses a comma — and this is the one table whose job is
+                  teaching decimal notation, so showing the wrong separator here
+                  contradicts the prose two paragraphs below. */}
+              <td className="py-2 px-3 font-mono text-muted-foreground">
+                {i18n.language.startsWith('uk')
+                  ? valueLabel.replace('.', ',')
+                  /* English groups thousands with commas — the prose around this
+                     table writes «2,400,000,000», so the table must not write
+                     «2 400 000 000» three lines below it. */
+                  : valueLabel.replace(/\u202f|\u00a0| (?=\d{3})/g, ',')}
+              </td>
               <td className="py-2 px-3">{t(`ch0_3.${nameKey}`)}</td>
               <td className="py-2 px-3 text-muted-foreground">{t(`ch0_3.${exampleKey}`)}</td>
             </tr>

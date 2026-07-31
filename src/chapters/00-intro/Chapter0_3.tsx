@@ -33,6 +33,18 @@ const UNIT_QUANTITIES = [
   'inductance',
 ] as const
 
+// The formula symbol for each quantity. Latin in every locale — that is the
+// point `unitsIntro` makes, and the table has to show it for the claim to land.
+const QUANTITY_SYMBOLS: Record<(typeof UNIT_QUANTITIES)[number], string> = {
+  voltage: 'V',
+  current: 'I',
+  resistance: 'R',
+  power: 'P',
+  frequency: 'f',
+  capacitance: 'C',
+  inductance: 'L',
+}
+
 export default function Chapter0_3() {
   const { t } = useTranslation('ui')
   const quizQuestions = useMemo(
@@ -50,7 +62,7 @@ export default function Chapter0_3() {
     <>
       <p>
         <Trans i18nKey="ch0_3.intro" ns="ui"
-          components={{ ...mathComponents, freq: <G k="frequency" />, cap: <G k="capacitance" />, res: <G k="resistance" /> }}
+          components={{ ...mathComponents, freq: <G k="frequency" />, cap: <G k="capacitance" />, res: <G k="resistance" />, si: <G k="si" /> }}
         />
       </p>
 
@@ -80,13 +92,24 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.powersIntro" ns="ui"
-          components={{ ...mathComponents, strong: <strong />, fm: <G k="fm" />, sciNotation: <G k="scientific notation" /> }}
+          components={{ ...mathComponents, strong: <strong />, fm: <G k="fm" />, am: <G k="am" />,
+            modulation: <G k="modulation" />, sciNotation: <G k="scientific notation" /> }}
         />
       </p>
 
       <p>{t('ch0_3.powersTable')}</p>
 
       <PowersOfTenTable />
+
+      {/* This paragraph must stay ABOVE the explorer: the widget's second toggle
+          is labelled «Engineering», and a reader who meets that button before the
+          word has been explained has no idea what it switches. */}
+      <p>
+        <Trans i18nKey="ch0_3.sciNotationEngineering2" ns="ui"
+          components={{ ...mathComponents, strong: <strong />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
 
       <SciNotationExplorer />
 
@@ -108,9 +131,32 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.prefixesRule" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
+
+      <p>
+        <Trans i18nKey="ch0_3.prefixesConvert" ns="ui"
+          components={{ ...mathComponents, strong: <strong />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
+
+      {/* The two directions were the tail of a nine-idea paragraph, ending on an
+          elliptical dash («moving to a smaller unit — right»). A two-item list is
+          what the sentence was already trying to be. */}
+      <p>{t('ch0_3.prefixesRuleDirections')}</p>
+      <ul>
+        <li>
+          <Trans i18nKey="ch0_3.prefixesRuleBigger" ns="ui"
+            components={{ ...mathComponents, strong: <strong /> }} />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_3.prefixesRuleSmaller" ns="ui"
+            components={{ ...mathComponents, strong: <strong /> }} />
+        </li>
+      </ul>
 
       <PrefixConverter />
 
@@ -122,6 +168,7 @@ export default function Chapter0_3() {
           components={{
             voltage: <G k="voltage" />,
             current: <G k="current" />,
+            power: <G k="power" />,
             nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
           }}
         />
@@ -129,15 +176,17 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.squaringPower" ns="ui"
-          components={{ strong: <strong />, var: <MathVar /> }}
+          components={{ strong: <strong />, var: <MathVar />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
-      <MBlock tex="P = I^2 \times R \qquad P = \frac{V^2}{R}" />
+      <MBlock tex="P = I \times V \qquad P = I^2 \times R \qquad P = \frac{V^2}{R}" />
 
       <p>
         <Trans i18nKey="ch0_3.squaringWhy" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
@@ -154,20 +203,36 @@ export default function Chapter0_3() {
 
       <p>
         <Trans i18nKey="ch0_3.transposingCover" ns="ui"
-          components={{ ...mathComponents, i: <i /> }}
+          components={{ ...mathComponents, i: <i />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
       <FormulaTriangleDiagram />
 
-      <p>{t('ch0_3.transposingSteps')}</p>
+      <p>{t('ch0_3.transposingStepsLead')}</p>
+      <ol>
+        <li>{t('ch0_3.transposingStep1')}</li>
+        <li>{t('ch0_3.transposingStep2')}</li>
+        <li>{t('ch0_3.transposingStep3')}</li>
+      </ol>
+      <p>{t('ch0_3.transposingStepsClosing')}</p>
+
+      <p>
+        <Trans i18nKey="ch0_3.transposingWidgetIntro" ns="ui"
+          components={{ ...mathComponents, strong: <strong />, freq: <G k="frequency" />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
 
       <FormulaTransposer />
 
       {/* ── Units at a glance (cheat sheet) ───────────────────── */}
       <Section id="units-at-a-glance" labelKey="ch0_3.sectionUnits" />
 
-      <p>{t('ch0_3.unitsIntro')}</p>
+      <p>
+        <Trans i18nKey="ch0_3.unitsIntro" ns="ui" components={{ ...mathComponents }} />
+      </p>
 
       {/* `not-prose` so chapter prose typography doesn't fight the
           compact table padding. Mirrors the Ch0.4 dBm-table pattern. */}
@@ -190,7 +255,12 @@ export default function Chapter0_3() {
             {UNIT_QUANTITIES.map(q => (
               <tr key={q} className="border-b border-border/40">
                 <td className="py-1.5 px-4 font-semibold text-foreground">
-                  {t(`ch0_3.unitsQuantity_${q}`)}
+                  {t(`ch0_3.unitsQuantity_${q}`)}{' '}
+                  {/* The symbol is what `unitsIntro` claims stays Latin in every
+                      locale — without it in the table, the claim points at nothing. */}
+                  <span className="text-muted-foreground font-normal">
+                    (<MathVar>{QUANTITY_SYMBOLS[q]}</MathVar>)
+                  </span>
                 </td>
                 <td className="py-1.5 px-4 text-foreground">
                   {t(`ch0_3.unitsUnit_${q}`)}

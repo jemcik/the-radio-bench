@@ -29,6 +29,35 @@ node .claude/skills/ua-translate/scripts/lint-ua-translation.mjs src/i18n/locale
 ```
 After a push, verify CI (`gh pr checks <PR>`, `gh run view <id> --log-failed`); CI uses `npm ci` + pinned Node, so a local build passing ≠ CI green.
 
+## Project memory — read it before anything non-trivial
+
+`.claude/memory/` holds the conventions that are NOT derivable from the code, and the
+mistakes that cost the most to discover. `MEMORY.md` there is the index — one line per
+entry; read it first, then open what is relevant. 28 of the 38 entries exist because
+something shipped broken.
+
+It is version-controlled on purpose: it used to live only in the local
+`~/.claude/projects/<project>/memory/`, so a fresh `git clone` began with none of it.
+Write new entries there too — see `.claude/memory/README.md`.
+
+## Working from a fresh clone
+
+Everything needed is in the repo except two things:
+
+```bash
+npm ci
+cp .env.example .env.local     # then paste a Gemini key — the UA pipeline needs it
+npm run check:all && npm test  # should be green before you touch anything
+```
+
+- **`.env.local`** — `GEMINI_API_KEY`, git-ignored. Without it `ua-translate` cannot run,
+  and hand-authoring Ukrainian is forbidden beyond a clause.
+- **Reference PDFs** — the ARRL Handbook and The Art of Electronics live in the owner's
+  Google Drive; paths in `.claude/memory/reference_research_pdfs.md`. Only needed when
+  fact-checking a claim.
+- `.claude/settings.local.json` (permission allow-list) is machine-local and regenerates
+  itself; its absence just means more permission prompts.
+
 ## Technical debt
 
 `TECH_DEBT.md` is the register of accepted, deferred quality work — each entry says what
