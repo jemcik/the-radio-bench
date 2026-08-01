@@ -90,6 +90,23 @@ function extractTemplatePatterns(source) {
   return patterns
 }
 
+/** Namespace-wide lookups that switch this gate OFF for a whole chapter.
+ *
+ *  A pattern whose prefix is exactly a chapter namespace and whose suffix is
+ *  empty matches EVERY key in that chapter, so no orphan there can ever be
+ *  reported. Found 2026-07-31 in ch0_4: one such lookup in DbCalculator had
+ *  been hiding four dead keys, and the gate reported green the whole time.
+ *
+ *  The fix at the call site is to move the interpolation further right — keep a
+ *  literal key family in the prefix (…dbCalculatorRef${suffix}) so the pattern
+ *  constrains something. The entries below are the ones that predate this rule;
+ *  each is a chapter whose orphan detection is currently inert. Do not add to
+ *  this list — narrow the lookup instead. Tracked in TECH_DEBT.md §9.
+ */
+const NAMESPACE_WIDE_BASELINE = new Set([
+  'ch0_3.', 'ch1_10.', 'ch2_2.', 'ch4_3.', 'ch4_5.',
+])
+
 /** Quiz strings are reached through `buildQuizFromI18n(t, 'chX', …)`, which
  *  builds keys like `chX.quiz_q3_b` via a fully-dynamic `t(`${prefix}.${key}`)`
  *  the static analysis can't resolve. Extract each call's literal chapter
@@ -154,6 +171,29 @@ const PLURAL_SUFFIXES = ['_zero', '_one', '_two', '_few', '_many', '_other']
 const pluralBase = key => {
   const s = PLURAL_SUFFIXES.find(sfx => key.endsWith(sfx))
   return s ? key.slice(0, -s.length) : null
+}
+
+// ── Guard: no NEW namespace-wide lookup may appear ───────────────────────
+const nsWide = [...new Set(
+  allPatterns
+    .filter(({ prefix, suffix }) => suffix === '' && /^ch\d+_\d+\.$/.test(prefix))
+    .map(p => p.prefix),
+)].filter(p => !NAMESPACE_WIDE_BASELINE.has(p))
+
+if (nsWide.length > 0) {
+  console.error(
+    `i18n-usage FAIL — these lookups interpolate the key straight after the chapter\n` +
+    `namespace, so every key in that chapter counts as referenced and orphan\n` +
+    `detection is off for the whole chapter:\n`,
+  )
+  for (const p of nsWide) console.error(`  ${p}\${…}`)
+  console.error(
+    '\nFix: keep a literal key family in the prefix — `ch0_4.dbCalculatorRef${suffix}`,' +
+    '\nnot the whole key name — so the pattern constrains something.' +
+    '\nThe pre-existing offenders are listed in NAMESPACE_WIDE_BASELINE in this script' +
+    '\nand in TECH_DEBT.md §9; do not add to them.',
+  )
+  process.exit(1)
 }
 
 const orphans = keys.filter(key => {

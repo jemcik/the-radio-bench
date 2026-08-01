@@ -45,6 +45,9 @@ export default function LogVsLinearDiagram() {
   const TITLE_DY = -22  // title sits this far above its axis
   const LABEL_ROW_A = 26  // first row of tick labels below the axis
   const LABEL_ROW_B = 44  // second row, used only for the colliding "10 Hz"
+  // Half the ink height of a tick label at fontSize 0.812em, plus a little air.
+  // Used to break the leader line around the row-A label it would otherwise cross.
+  const LABEL_HALF_HEIGHT = 9
 
   const ticks = [1, 10, 100, 1000]
   const F_MAX = 1000
@@ -102,15 +105,29 @@ export default function LogVsLinearDiagram() {
               stroke={accent} strokeWidth="1.6"
             />
             <circle cx={x} cy={y} r={3.2} fill={accent} />
-            {/* Leader line from tick down to the staggered label so the
-                eye still associates label with tick. */}
+            {/* Leader line from tick down to the staggered label so the eye
+                still associates label with tick.
+
+                Drawn in TWO segments with a gap across row A. The ticks that
+                trigger a stagger are ~6 px apart, so the leader's x sits inside
+                the row-A label's box — one continuous line ran straight through
+                the «1 Hz» glyphs. The gap reads as the leader passing behind the
+                label, which is what a drawn chart does. */}
             {i === staggerIndex && (
-              <line
-                x1={x} y1={y + 8}
-                x2={x} y2={y + LABEL_ROW_B - 10}
-                stroke={muted} strokeWidth="0.8"
-                strokeDasharray="2 2"
-              />
+              <>
+                <line
+                  x1={x} y1={y + 8}
+                  x2={x} y2={y + LABEL_ROW_A - LABEL_HALF_HEIGHT}
+                  stroke={muted} strokeWidth="0.8"
+                  strokeDasharray="2 2"
+                />
+                <line
+                  x1={x} y1={y + LABEL_ROW_A + LABEL_HALF_HEIGHT}
+                  x2={x} y2={y + LABEL_ROW_B - 10}
+                  stroke={muted} strokeWidth="0.8"
+                  strokeDasharray="2 2"
+                />
+              </>
             )}
             <text
               x={x} y={labelY}

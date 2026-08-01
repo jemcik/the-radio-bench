@@ -141,7 +141,7 @@ It is a filter, not a guarantee.
 | [x] | `0.1` — 2026-07-27. 12 findings fixed (see below); 6 further calls made at review. |
 | [x] | `0.2` — 2026-07-29 (#60). Two review rounds; blockers fixed, polish taken in the same pass. |
 | [x] | `0.3` — 2026-07-29. Four review rounds (71 → 53 → 35 → 34 findings); all applied. §3 math-var debt for this chapter cleared in the same pass. |
-| [ ] | `0.4` |
+| [x] | `0.4` — 2026-07-31. Six review rounds (85 → 45 → 19 → 35 → 12 → 7 findings); all applied. §3 math-var debt cleared in the same pass, and the chapter got the lab schematic its steps had been describing without one. |
 | [ ] | `0.5` |
 | [ ] | `1.1` |
 | [ ] | `1.2` |
@@ -159,10 +159,11 @@ It is a filter, not a guarantee.
 ## 3. Math variables in prose that are not wrapped in `<var>`
 
 **Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
-(`da1c413`). **Scale:** 486 keys across 13 chapters (0.2 – 1.11); originally 533 across
-14. Ch 0.3 was worked off 2026-07-29, and the symbol-gloss exemption added the same day
-cleared a further fifteen keys spread over ch 0.2, 1.1, 1.3, 1.5 and 1.6.
-**Gate:** `check:unwrapped-math-var` (green — all 486 are grandfathered in
+(`da1c413`). **Scale:** 482 keys across 12 chapters (0.2 – 1.11); originally 533 across
+14. Ch 0.3 was worked off 2026-07-29 and ch 0.4 on 2026-07-31, and the symbol-gloss
+exemption added on 2026-07-29 cleared a further fifteen keys spread over ch 0.2, 1.1,
+1.3, 1.5 and 1.6.
+**Gate:** `check:unwrapped-math-var` (green — all 482 are grandfathered in
 `scripts/unwrapped-math-var-baseline.json`).
 
 ### What the defect is
@@ -213,7 +214,6 @@ unwrapped variable.
 | Chapter | `en` | `uk` | Total |
 |---|---|---|---|
 | `ch0_2` | 1 | 1 | 2 |
-| `ch0_4` | 3 | 1 | 4 |
 | `ch1_1` | 2 | 2 | 4 |
 | `ch1_2` | 16 | 16 | 32 |
 | `ch1_3` | 11 | 11 | 22 |
@@ -225,7 +225,7 @@ unwrapped variable.
 | `ch1_9` | 2 | 2 | 4 |
 | `ch1_10` | 13 | 13 | 26 |
 | `ch1_11` | 44 | 43 | 87 |
-| **Total** | **244** | **242** | **486** |
+| **Total** | **241** | **241** | **482** |
 
 Note that `ch1_11` carries the largest share despite post-dating the `beginner-review`
 rule — the two backlogs are independent, and a chapter can be clear of one and not the
@@ -497,3 +497,118 @@ Chromium via the `Re-baseline visual gate` workflow — never locally. The two e
 genuinely disagree: 18 of 46 entries differ between macOS and CI, `ch1_6` by 8 and
 `ch1_8` by 2 in the other direction. Freezing the counts means a NEW overlap still fails
 the gate; the table above is what has to be worked off.
+
+---
+
+## 8. «співвідношення» and «відношення» both used for *ratio* in Ukrainian
+
+**Found** 2026-07-31, while working ch 0.4 off §2. **Scale:** 57 occurrences of
+«співвідношення» — 38 across 13 chapter blocks, 19 more in glossary entries; the rival
+«відношення» appears 84 times. (Count both forms case-insensitively: a first pass here
+missed the capitalised «Співвідношення» sitting in two widget labels.) **Gate:** none —
+see the trap below.
+
+### What the defect is
+
+Ukrainian has two words here and they are not synonyms in technical writing:
+
+- **«відношення»** is the arithmetic *ratio* of two quantities — the thing a decibel
+  expresses, the thing a transformer's turns give you, the thing signal-to-noise is.
+- **«співвідношення»** is a *relationship* or *proportion* between things: the way two
+  quantities track each other, without a single number being divided by another.
+
+The course uses them interchangeably, so the same idea arrives under two names. The
+reader has no way to tell whether a change of word signals a change of meaning. Chapter
+0.4 — the chapter whose whole subject is «дБ виражає відношення» — was mixed until this
+pass and is now uniformly «відношення» (30 occurrences, 0 rivals); the three glossary
+entries it links (`decibel`, `dbm`, `decade`) were aligned with it in the same commit.
+The rest of the course is still mixed.
+
+The clearest arithmetic-ratio hits still carrying «співвідношення»: `ch1_8.bodeFact2` and
+`ch1_8.quiz_q4_explanation` (voltage and power ratios behind a dB figure), `ch1_9` ×8
+(turns ratio and impedance ratio, where the standard term is «коефіцієнт трансформації»
+in any case), `ch1_11` ×6 (the β relation and the resistor ratio that sets the gain),
+`ch3_3.linesP3`/`linesP3b` (the voltage-to-current ratio that defines the line
+impedance), `glossary.cw.detail` (signal-to-noise), `glossary.folded dipole.detail` and
+`glossary.efhw.detail` (balun turns and impedance ratios).
+
+### The trap — do NOT sweep this with a regex
+
+«співвідношення» is correct in a good number of the places it appears, and a blanket
+replace would break them: `glossary.oscilloscope.detail` («часові співвідношення між
+сигналами» — timing relationships, not one number over another), `ch1_1.circuitOhmPreview`
+(«у цього співвідношення є назва — закон Ома» — a law relating three quantities),
+`glossary.near field.detail` («сталого співвідношення» between the E and H fields),
+`ch1_3.rmsSelectorIntro` («співвідношення між ними видно» — how four readings relate).
+Each hit has to be read for sense, exactly like §4's «ланцюг».
+
+For the same reason no linter rule is proposed: neither word is a defect on its own. What
+a rule *could* catch, if this recurs, is «співвідношення» within a few words of a colon
+ratio («1:4», «49:1») or of «дБ» — those are always arithmetic.
+
+### How to work it off
+
+Fold it into each chapter's §2 pass; every affected chapter except 3.3 is on that backlog
+already, and the strings are being re-read there anyway. Two rules for the pass: judge
+each hit for ratio-vs-relationship sense before touching it, and when a hit is a
+transformer's turns, prefer the settled Ukrainian term «коефіцієнт трансформації» over
+either word.
+
+---
+
+## 9. Five chapters where `check:i18n-usage` cannot see orphan keys
+
+**Found** 2026-07-31, during ch 0.4's `beginner-review` pass — the reviewer noticed four
+dead `ch0_4` keys that the gate had been reporting as referenced. **Scale:** five chapter
+namespaces (`ch0_3`, `ch1_10`, `ch2_2`, `ch4_3`, `ch4_5`) across eleven files.
+**Gate:** `check:i18n-usage` (green — the five are listed in `NAMESPACE_WIDE_BASELINE`
+in `scripts/check-i18n-usage.mjs`, and the gate now FAILS on any new one).
+
+### What the defect is
+
+The gate resolves dynamic lookups by pattern: a key counts as referenced if it starts
+with the literal text before the first `${` and ends with the literal text after the last
+`}`. A lookup that interpolates the key immediately after the chapter namespace therefore
+yields the pattern «prefix = `chN_M.`, suffix = empty» — which matches **every key in that
+chapter**. Orphan detection is silently off there, and stays off, and nothing says so.
+
+Chapter 0.4 is the worked example. `DbCalculator.tsx` looked up its reference-card entries
+by whole key name, so four keys — three headers of a table that had been removed, plus one
+stale unit label — sat in both locale files, translated and maintained, referenced by
+nothing. `npm run check:i18n-usage` printed «all 6711 keys referenced» throughout.
+
+The script's header already warned about the same shape one level up (`t(\`ch${id}.…\`)`
+yielding the bare prefix `ch`), and the fix used there — keep a real suffix — is the same
+fix needed here, one dot to the right.
+
+### Why it was deferred
+
+Narrowing a lookup means restructuring the data it iterates: the ch0.4 fix moved the key
+family into the literal prefix and left only the varying suffix in the array
+(`ch0_4.dbCalculatorRef${suffix}`). That is a small change per site, but each of the
+remaining eleven sites has its own table shape, and every orphan the fix then exposes has
+to be judged — deleted, or wired up — chapter by chapter. Doing that for five chapters at
+once would bury the chapter review it was found during.
+
+### How to work it off
+
+One chapter at a time, ideally in that chapter's §2 pass:
+
+1. Narrow the lookup so the prefix keeps a literal key family.
+2. Remove the chapter from `NAMESPACE_WIDE_BASELINE`.
+3. Run `npm run check:i18n-usage` — the orphans it now reports are the real backlog.
+4. Judge each: delete from **both** locale files, or wire it into the UI.
+
+The new guard means this cannot grow: any lookup that neuters a whole chapter namespace
+fails the gate with the offending prefix named. Verified with a negative control — putting
+the ch0.4 lookup back the old way makes the gate fail with `ch0_4.${…}`.
+
+### The backlog
+
+| Chapter | Sites |
+|---|---|
+| `ch0_3` | `PowersOfTenTable.tsx`, `PrefixLadderDiagram.tsx`, `features/si/useSiLabels.ts` |
+| `ch1_10` | `Chapter1_10.tsx` |
+| `ch2_2` | `Chapter2_2.tsx` |
+| `ch4_3` | `MainsColourCode.tsx`, `MpeFrequencyCurve.tsx`, `ShockCurrentScale.tsx`, `BodyCurrentCalculator.tsx`, `SafetyChecklist.tsx` |
+| `ch4_5` | `AllocationVsPlanVsLicence.tsx` |

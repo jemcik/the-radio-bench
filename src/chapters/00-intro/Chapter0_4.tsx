@@ -10,6 +10,7 @@ import DbCalculator from '@/components/widgets/DbCalculator'
 import LogAxisToggle from '@/components/widgets/LogAxisToggle'
 import LogVsLinearDiagram from '@/components/diagrams/LogVsLinearDiagram'
 import DbRulerDiagram from '@/components/diagrams/DbRulerDiagram'
+import LabDividerSchematic from '@/components/diagrams/LabDividerSchematic'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
@@ -23,15 +24,26 @@ import { mathComponents } from '@/lib/trans-defaults'
 // Explicitly typed (rather than `as const`) so `anchor?` is optional
 // on every row — otherwise the destructure in .map() would complain
 // that rows without `anchor: true` don't have the property.
-interface DbmRow { dbm: string; unit: string; anchor?: boolean }
+//
+// `prefix` / `power` decode the unit symbol in the second column. Reader-flagged:
+// the −120 dBm row read «1 fW» and femto had never been introduced — chapter 0.3's
+// prefix ladder stops at pico (see SI_PREFIXES), so «f» arrived with nothing to
+// decode it against. Naming the prefix and its power of ten next to the symbol
+// closes that without widening 0.3's nine-tick ladder to ten.
+//
+// `prefix` is the SUFFIX of an i18n key, not the whole key: the lookup below builds
+// `ch0_4.dbmPrefix${row.prefix}` so check:i18n-usage keeps a literal prefix to
+// constrain on (see NAMESPACE_WIDE_BASELINE in scripts/check-i18n-usage.mjs).
+// The watt row has no prefix and deliberately carries no parenthetical.
+interface DbmRow { dbm: string; unit: string; prefix?: string; power?: string; anchor?: boolean }
 const DBM_TABLE: readonly DbmRow[] = [
-  { dbm: '+60',  unit: 'kw' },
+  { dbm: '+60',  unit: 'kw', prefix: 'Kilo',  power: '10³'   },
   { dbm: '+30',  unit: 'w'  },
-  { dbm: '0',    unit: 'mw', anchor: true },
-  { dbm: '−30',  unit: 'uw' },
-  { dbm: '−60',  unit: 'nw' },
-  { dbm: '−90',  unit: 'pw' },
-  { dbm: '−120', unit: 'fw' },
+  { dbm: '0',    unit: 'mw', prefix: 'Milli', power: '10⁻³',  anchor: true },
+  { dbm: '−30',  unit: 'uw', prefix: 'Micro', power: '10⁻⁶'  },
+  { dbm: '−60',  unit: 'nw', prefix: 'Nano',  power: '10⁻⁹'  },
+  { dbm: '−90',  unit: 'pw', prefix: 'Pico',  power: '10⁻¹²' },
+  { dbm: '−120', unit: 'fw', prefix: 'Femto', power: '10⁻¹⁵' },
 ]
 
 const CHAPTER_ID = '0-4'
@@ -63,7 +75,7 @@ export default function Chapter0_4() {
 
       <DbRulerDiagram />
 
-      {/* ── Logarithms in Three Examples ───────────────────────── */}
+      {/* ── Logarithms in Four Examples ────────────────────────── */}
       <Section id="logarithms" labelKey="ch0_4.sectionLogs" />
 
       <p>
@@ -72,12 +84,13 @@ export default function Chapter0_4() {
         />
       </p>
 
-      <p>{t('ch0_4.logsThree')}</p>
+      <p>{t('ch0_4.logsFour')}</p>
 
       <ul>
         <li><code>{t('ch0_4.logsBullet1')}</code></li>
         <li><code>{t('ch0_4.logsBullet2')}</code></li>
         <li><code>{t('ch0_4.logsBullet3')}</code></li>
+        <li><code>{t('ch0_4.logsBullet4')}</code></li>
       </ul>
 
       <p>
@@ -93,7 +106,8 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.ratioIntro" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />,
+            power: <G k="power" />, voltage: <G k="voltage" />, current: <G k="current" /> }}
         />
       </p>
 
@@ -104,6 +118,12 @@ export default function Chapter0_4() {
       <p>{t('ch0_4.ratioVoltage')}</p>
 
       <MBlock tex="\text{dB} = 20 \cdot \log_{10}\!\left(\frac{V_1}{V_2}\right)" />
+
+      {/* P, V and R appear in both formulas above, in the derivation below and on
+          the calculator's input labels, and were never once named. */}
+      <p>
+        <Trans i18nKey="ch0_4.ratioSymbols" ns="ui" components={{ ...mathComponents }} />
+      </p>
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyTen" ns="ui"
@@ -119,19 +139,21 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.ratioWhyPowerUnit" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
-        />
-      </p>
-
-      <p>
-        <Trans i18nKey="ch0_4.ratioWhyPowerUnitDetail" ns="ui"
           components={{ ...mathComponents, strong: <strong />, i: <i /> }}
         />
       </p>
 
       <p>
+        <Trans i18nKey="ch0_4.ratioWhyPowerUnitDetail" ns="ui"
+          components={{ ...mathComponents, strong: <strong />, i: <i />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
+
+      <p>
         <Trans i18nKey="ch0_4.ratioWhy" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />,
+            nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
         />
       </p>
 
@@ -141,6 +163,7 @@ export default function Chapter0_4() {
       <MBlock tex="\begin{aligned}
         \text{dB} &= 10 \cdot \log_{10}\!\left(\tfrac{P_1}{P_2}\right) \\
                   &= 10 \cdot \log_{10}\!\left(\tfrac{V_1^{\,2}}{V_2^{\,2}}\right) \\
+                  &= 10 \cdot \log_{10}\!\left(\left(\tfrac{V_1}{V_2}\right)^{\,2}\right) \\
                   &= 10 \cdot 2 \cdot \log_{10}\!\left(\tfrac{V_1}{V_2}\right) \\
                   &= 20 \cdot \log_{10}\!\left(\tfrac{V_1}{V_2}\right)
       \end{aligned}" />
@@ -168,11 +191,9 @@ export default function Chapter0_4() {
         <li><code>{t('ch0_4.shortcutEg4')}</code></li>
       </ul>
 
-      <Callout variant="tip">
-        <Trans i18nKey="ch0_4.shortcutTip" ns="ui"
-          components={{ ...mathComponents, ham: <G k="ham radio" /> }}
-        />
-      </Callout>
+      <p>{t('ch0_4.shortcutVoltage')}</p>
+
+      <Callout variant="tip">{t('ch0_4.shortcutTip')}</Callout>
 
       <DbCalculator />
 
@@ -204,7 +225,7 @@ export default function Chapter0_4() {
             </tr>
           </thead>
           <tbody>
-            {DBM_TABLE.map(({ dbm, unit, anchor }) => (
+            {DBM_TABLE.map(({ dbm, unit, prefix, power, anchor }) => (
               <tr key={dbm}
                   className={anchor
                     ? 'bg-callout-experiment/10 font-bold'
@@ -214,6 +235,11 @@ export default function Chapter0_4() {
                 </td>
                 <td className="text-left py-1.5 px-4 text-foreground">
                   1 {tUnit(unit)}
+                  {prefix && (
+                    <span className="ml-2 font-sans font-normal text-xs text-muted-foreground">
+                      ({t(`ch0_4.dbmPrefix${prefix}`)}, {power})
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -223,7 +249,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.dbmNegative" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, hf: <G k="hf" /> }}
         />
       </p>
 
@@ -251,7 +277,11 @@ export default function Chapter0_4() {
         />
       </p>
 
-      <Callout variant="caution">{t('ch0_4.antennaCaution')}</Callout>
+      <Callout variant="caution">
+        <Trans i18nKey="ch0_4.antennaCaution" ns="ui"
+          components={{ ...mathComponents, eirp: <G k="eirp" /> }}
+        />
+      </Callout>
 
       <p>{t('ch0_4.antennaPreview')}</p>
 
@@ -260,7 +290,8 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.logAxisIntro" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />,
+            cf: <G k="cutoff frequency" /> }}
         />
       </p>
 
@@ -272,7 +303,14 @@ export default function Chapter0_4() {
         </li>
         <li>
           <Trans i18nKey="ch0_4.logAxisFact2" ns="ui"
-            components={{ ...mathComponents, strong: <strong />, i: <i />, filt: <G k="filter" /> }}
+            components={{ ...mathComponents, strong: <strong />, i: <i /> }}
+          />
+        </li>
+        <li>
+          <Trans i18nKey="ch0_4.logAxisFact3" ns="ui"
+            components={{ ...mathComponents, filt: <G k="filter" />,
+              cf: <G k="cutoff frequency" />,
+              res: <G k="resistor" />, cap: <G k="capacitor" /> }}
           />
         </li>
       </ul>
@@ -288,7 +326,7 @@ export default function Chapter0_4() {
 
       <p>
         <Trans i18nKey="ch0_4.recogniseIntro" ns="ui"
-          components={{ ...mathComponents, qso: <G k="qso" />, bp: <G k="band plan" /> }}
+          components={{ ...mathComponents, qso: <G k="qso" /> }}
         />
       </p>
 
@@ -328,6 +366,10 @@ export default function Chapter0_4() {
       </ul>
 
       {/* ── Lab Activity ──────────────────────────────────────── */}
+      {/* Schematic BEFORE the steps: «top» and «bottom» in labStep2 are
+          defined against this picture (CLAUDE.md — schematic before prose). */}
+      <LabDividerSchematic />
+
       <LabActivity
         label="0.4"
         goal={t('ch0_4.labGoal')}
@@ -335,13 +377,14 @@ export default function Chapter0_4() {
           <Trans key="e1" i18nKey="ch0_4.labEquip1" ns="ui" components={{ dc: <G k="dc" /> }} />,
           t('ch0_4.labEquip2'),
           t('ch0_4.labEquip3'),
+          t('ch0_4.labEquip4'),
         ]}
         procedure={[
           { text: <Trans i18nKey="ch0_4.labStep1" ns="ui" components={{ ...mathComponents, multimeter: <G k="multimeter" /> }} /> },
-          { text: <Trans i18nKey="ch0_4.labStep2" ns="ui" components={{ ...mathComponents, voltageDivider: <G k="voltage divider" /> }} /> },
+          { text: <Trans i18nKey="ch0_4.labStep2" ns="ui" components={{ ...mathComponents, i: <i />, voltageDivider: <G k="voltage divider" /> }} /> },
           { text: <Trans i18nKey="ch0_4.labStep3" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
           { text: <Trans i18nKey="ch0_4.labStep4" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
-          { text: t('ch0_4.labStep5') },
+          { text: <Trans i18nKey="ch0_4.labStep5" ns="ui" components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }} /> },
         ]}
         expectedResult={t('ch0_4.labExpected')}
         connectionToTheory={t('ch0_4.labConnection')}
