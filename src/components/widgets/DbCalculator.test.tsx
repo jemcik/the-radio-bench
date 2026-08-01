@@ -20,6 +20,25 @@ describe('DbCalculator', () => {
     expect(screen.getAllByText(/×100/).length).toBeGreaterThan(0)
   })
 
+  // The lab (ch0.4 labStep4/5) tells the reader to type 0.75 and 0.099. The
+  // result box used to answer «÷1.3333» and «÷10.101» — numbers that appear
+  // nowhere in the chapter and that the reader cannot tie to what they typed.
+  // The ÷ form is for the landmarks the chapter teaches, and nothing else.
+  it('shows the ÷ form only when the reciprocal is a whole number', () => {
+    setup()
+    const [naturalInput] = screen.getAllByRole('textbox') as HTMLInputElement[]
+    fireEvent.change(naturalInput, { target: { value: '0.5' } })
+    expect(screen.getAllByText(/÷2/).length).toBeGreaterThan(0)
+    fireEvent.change(naturalInput, { target: { value: '0.01' } })
+    expect(screen.getAllByText(/÷100/).length).toBeGreaterThan(0)
+    fireEvent.change(naturalInput, { target: { value: '0.75' } })
+    expect(screen.getAllByText(/×0\.75/).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/÷1\.33/)).toBeNull()
+    fireEvent.change(naturalInput, { target: { value: '0.099' } })
+    expect(screen.getAllByText(/×0\.099/).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/÷10\.1/)).toBeNull()
+  })
+
   it('updates dB when the natural ratio is edited (power mode)', () => {
     setup()
     const [naturalInput] = screen.getAllByRole('textbox') as HTMLInputElement[]

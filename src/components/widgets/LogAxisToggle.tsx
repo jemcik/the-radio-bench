@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { G } from '@/features/glossary/glossary-term'
+import { useTranslation } from 'react-i18next'
 import { scaleLinear, scaleLog } from '@visx/scale'
 import { AxisBottom, AxisLeft } from '@visx/axis'
 import { GridColumns, GridRows } from '@visx/grid'
@@ -175,11 +174,11 @@ export default function LogAxisToggle() {
         <p>
           <strong>{t('ch0_4.logAxisToggleAboutFilterTitle')}</strong>
           {' — '}
-          <Trans
-            i18nKey="ch0_4.logAxisToggleAboutFilterBody"
-            ns="ui"
-            components={{ res: <G k="resistor" />, cap: <G k="capacitor" /> }}
-          />
+          {/* The glossary wraps for resistor/capacitor live on the FIRST
+              occurrence, in ch0_4.logAxisFact3 above this widget — a reader
+              who needs them must not have to scroll past the bare words to
+              reach the link. */}
+          {t('ch0_4.logAxisToggleAboutFilterBody')}
         </p>
         <p>
           <strong>{t('ch0_4.logAxisToggleAboutCutoffTitle')}</strong>

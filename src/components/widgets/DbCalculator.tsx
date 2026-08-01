@@ -64,7 +64,20 @@ function formatNatural(
     const expStr = n.toExponential(2)
     return `${locale.startsWith('uk') ? expStr.replace('.', ',') : expStr} ${tUnit('w')}`
   }
-  // Ratio modes — show as a plain number, with a "×" prefix for clarity.
+  // Ratio modes. Below 1, show the division the chapter actually teaches: the
+  // reference card says «−20 dB = ÷100» and the shortcut section says the same,
+  // while the result box used to answer «×0,01» for the identical input.
+  //
+  // Only when the reciprocal is a WHOLE number, though. The lab asks the reader
+  // to type 0.75; answering «÷1,3333» hands back a number the chapter never
+  // mentions and that the reader cannot match to what they typed. Landmark
+  // ratios (0.5 → ÷2, 0.01 → ÷100) still pass the test; 0.75 and 0.099 come
+  // back as «×0,75» and «×0,099», exactly as entered.
+  if (n > 0 && n < 1) {
+    const inv = 1 / n
+    const whole = Math.round(inv)
+    if (whole >= 2 && Math.abs(inv - whole) < whole * 5e-3) return `÷${num(whole)}`
+  }
   return `×${num(n)}`
 }
 
@@ -202,16 +215,36 @@ export default function DbCalculator() {
 
   // Power-ratio reference table — same eight landmarks the prose called out.
   // Used in all three modes; the units differ but the +/− dB landmarks are universal.
-  const REF = [
-    { key: 'dbCalculatorRefMinus20', accent: false },
-    { key: 'dbCalculatorRefMinus10', accent: false },
-    { key: 'dbCalculatorRefMinus3',  accent: false },
-    { key: 'dbCalculatorRef0',       accent: true  },
-    { key: 'dbCalculatorRefPlus3',   accent: false },
-    { key: 'dbCalculatorRefPlus10',  accent: false },
-    { key: 'dbCalculatorRefPlus20',  accent: false },
-    { key: 'dbCalculatorRefPlus30',  accent: false },
-  ] as const
+  // Landmark dB values. The grid MUST follow the mode: in voltage mode the power
+  // card «+3 dB = ×2» sat two rows under a result box reading «×2 ↔ 6,0 dB», and
+  // for the reader this chapter is written for that is a plain contradiction.
+  // dBm is a power scale, so it reuses the power landmarks.
+  // Suffixes only, joined onto «ch0_4.dbCalculatorRef» at the lookup below.
+  // NOT whole key names: interpolating the key right after the namespace dot
+  // extracts as prefix «ch0_4.» with an empty suffix, which tells
+  // check:i18n-usage that EVERY key in the ch0_4 namespace is referenced. That
+  // silently switched orphan detection off for the whole chapter, and four dead
+  // keys sat there until a reader review found them. (Do not write that pattern
+  // in a comment either — the checker scans comments too, as this one learned.)
+  const REF = mode === 'voltage'
+    ? [
+        { key: 'VMinus20', accent: false },
+        { key: 'VMinus6',  accent: false },
+        { key: 'V0',       accent: true  },
+        { key: 'VPlus6',   accent: false },
+        { key: 'VPlus20',  accent: false },
+        { key: 'VPlus40',  accent: false },
+      ] as const
+    : [
+        { key: 'Minus20', accent: false },
+        { key: 'Minus10', accent: false },
+        { key: 'Minus3',  accent: false },
+        { key: '0',       accent: true  },
+        { key: 'Plus3',   accent: false },
+        { key: 'Plus10',  accent: false },
+        { key: 'Plus20',  accent: false },
+        { key: 'Plus30',  accent: false },
+      ] as const
 
   return (
     <Widget
@@ -327,7 +360,7 @@ export default function DbCalculator() {
       {/* Quick reference — 8 landmark dB values */}
       <div className="pt-2 border-t border-border">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-          {t('ch0_4.dbCalculatorReference')}
+          {t(mode === 'voltage' ? 'ch0_4.dbCalculatorReferenceVoltage' : 'ch0_4.dbCalculatorReference')}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           {REF.map((r) => (
@@ -340,7 +373,7 @@ export default function DbCalculator() {
                   : 'bg-muted border-border text-foreground',
               )}
             >
-              {t(`ch0_4.${r.key}`)}
+              {t(`ch0_4.dbCalculatorRef${r.key}`)}
             </div>
           ))}
         </div>

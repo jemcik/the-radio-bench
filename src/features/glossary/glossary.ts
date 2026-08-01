@@ -1166,14 +1166,14 @@ export const glossary: Record<string, GlossaryEntry> = {
   dbd: {
     tip: 'Antenna gain measured against a half-wave dipole as the reference.',
     detail:
-      'dBd expresses an antenna\'s gain relative to a half-wave dipole — the simplest practical antenna. A dipole itself is 0 dBd. A 3-element Yagi might be 5 dBd, meaning it concentrates roughly three times more power in its preferred direction than a dipole would. dBd is the more honest quote for amateur antennas because it compares to something real and easy to build.',
+      'dBd expresses an antenna\'s gain relative to a half-wave dipole — the simplest practical antenna. A dipole itself is 0 dBd. A 3-element Yagi might be 5 dBd, meaning it concentrates roughly three times more power in its preferred direction than a dipole would. dBd compares against an antenna you can actually build, which is why amateur antenna descriptions often use it.',
     unit: 'dBd',
     see: ['dbi', 'antenna'],
   },
   dbi: {
     tip: 'Antenna gain measured against an isotropic radiator as the reference.',
     detail:
-      'dBi is gain compared to an isotropic radiator — an imaginary point source that radiates equally in every direction. Because a real dipole already has about 2.15 dB of gain over isotropic, dBi numbers are always 2.15 dB larger than dBd numbers for the same antenna (dBi ≈ dBd + 2.15). Manufacturers prefer dBi because the larger number sells better; the underlying antenna is the same.',
+      'dBi is gain compared to an isotropic radiator — an imaginary point source that radiates equally in every direction. Because a real dipole already has about 2.15 dB of gain over isotropic, dBi numbers are always 2.15 dB larger than dBd numbers for the same antenna (dBi ≈ dBd + 2.15), so two figures must be brought to the same reference before they can be compared.',
     unit: 'dBi',
     formula: 'dBi ≈ dBd + 2.15',
     see: ['dbd', 'antenna'],
