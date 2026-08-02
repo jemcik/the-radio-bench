@@ -7,10 +7,11 @@ import { Section } from '@/components/ui/section-heading'
 import { G } from '@/features/glossary/glossary-term'
 import { MathVar } from '@/components/ui/math'
 import SVGDiagram from '@/components/diagrams/SVGDiagram'
+import WireRulesDiagram from '@/components/diagrams/WireRulesDiagram'
 import {
   Circuit, Wire,
-  Resistor, Capacitor, Inductor,
-  Battery, Ground,
+  Resistor, ResistorIEC, Capacitor, CapacitorElectrolytic, Inductor,
+  BatteryMulti, Ground,
   Diode, LED, TransistorNPN,
   Meter,
   pins2,
@@ -69,14 +70,32 @@ function SymbolCell({
 // the project has the same top/bottom padding — see that file for the
 // reasoning behind the specific numbers. The author only picks the
 // rail-to-rail span; top/bottom padding and total height follow.
-// Resistor intentionally carries NO value prop: PassiveLabel's value
-// placement sits right on top of the zigzag (y−2, i.e. inside the ±8
-// body band). The value is stated in the caption and in step 2 below.
+// Designators carry their subscripts (B₁ / R₁ / D₁) so the reference-designator
+// convention `symbolsIntro` teaches is visible on the one schematic the chapter
+// walks through — reader-review finding: R₁ appeared in a sentence and nowhere
+// else, C₁ and Q₁ nowhere at all.
+//
+// R₁ carries its value for the same reason: `symbolResistorDesc` tells the reader
+// values are «written next to the symbol», and this drawing used to carry none.
+// Schematic values use the compact form (`220Ω`, not `220 Ω`) per diagram-quality
+// §9; the prose keeps the spaced form. The battery deliberately carries none —
+// CenteredLabel puts a vertical symbol's value at y+9, exactly where BatteryMulti
+// draws its «−» marker (measured overlap in the browser), and the legend beside
+// the drawing already reads «battery (3 V)».
+//
+// BatteryMulti, not Battery: `exampleIntro` calls this a 3 V pack of two AA
+// cells, and the single-cell `Battery` symbol drew one cell. Its wider plate gap
+// also separates the «+» and «−» markers, which used to merge into one glyph.
 const SCHEMATIC_W = 340
 const RAIL_SPAN = 130
-const TOP_Y = SCHEMATIC_PAD_TOP
+// R₁ sits on the top rail with both a label and a value, which PassiveLabel
+// stacks at y−32 — 6 px above the canvas at the shared padding. Measured: the
+// «R₁» glyph spilled 11 px past the SVG top edge. EXTRA_TOP buys that back here
+// rather than raising SCHEMATIC_PAD_TOP for every schematic in the course.
+const EXTRA_TOP = 14
+const TOP_Y = SCHEMATIC_PAD_TOP + EXTRA_TOP
 const BOT_Y = TOP_Y + RAIL_SPAN
-const SCHEMATIC_H = schematicHeight(RAIL_SPAN)
+const SCHEMATIC_H = schematicHeight(RAIL_SPAN) + EXTRA_TOP
 const LEFT_X = 60
 const RIGHT_X = 280
 const BAT_Y = (TOP_Y + BOT_Y) / 2 // battery centred on the left rail
@@ -84,6 +103,10 @@ const bat = pins2(LEFT_X, BAT_Y, 'down')
 const r1  = pins2(150, TOP_Y)
 const led = pins2(230, TOP_Y)
 
+// No maxWidth on the Circuit below: with a legend, Circuit puts the cap on the
+// OUTER wrapper holding BOTH columns, so a 340 px cap squeezes the SVG column to
+// a sliver (measured scale 0.09 in the browser). The legend branch already caps
+// itself — which is why check:circuit-maxwidth exempts legend Circuits.
 function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[] }) {
   return (
     <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} legend={legend}>
@@ -99,12 +122,14 @@ function LedCircuit({ caption, legend }: { caption: string; legend: LegendItem[]
         { x: LEFT_X,  y: BOT_Y },
         bat.p2,
       ]} />
-      {/* Designator subscripts omitted — only one of each component in this
-          schematic, so numbering adds no information. The symbols-tour
-          section above still teaches the R₁/C₁/Q₁ convention. */}
-      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="B" />
-      <Resistor x={150} y={TOP_Y} label="R" />
-      <LED x={230} y={TOP_Y} label="D" />
+      {/* Designators carry their subscripts here on purpose: `symbolsIntro`
+          promises «(B₁, R₁, D₁, …) … you will see them on the worked schematic
+          below», and the walkthrough prose names R₁ and D₁ to match. Do not
+          strip them back to bare letters — the promise and the prose both
+          depend on them. */}
+      <BatteryMulti x={LEFT_X} y={BAT_Y} orient="down" label="B₁" />
+      <Resistor x={150} y={TOP_Y} label="R₁" value="220Ω" />
+      <LED x={230} y={TOP_Y} label="D₁" />
       {/* No <Junction>s — this is a single loop with only bends, no
           T-joins. Serves as a live example of the chapter's wire rule:
           every corner is a bend, not a junction. */}
@@ -153,10 +178,12 @@ export default function Chapter0_5() {
         </li>
         <li>
           <Trans i18nKey="ch0_5.wiresRule3" ns="ui"
-            components={{ ...mathComponents, strong: <strong /> }}
+            components={{ ...mathComponents, strong: <strong />, i: <i /> }}
           />
         </li>
       </ul>
+
+      <WireRulesDiagram />
 
       <Callout variant="key">
         <Trans i18nKey="ch0_5.wiresKey" ns="ui"
@@ -180,22 +207,42 @@ export default function Chapter0_5() {
           arrows in this tight 110×56 preview canvas. The full worked-example
           schematic below keeps them, where there's room to breathe. */}
       <div className="not-prose my-6 flex flex-col divide-y divide-border">
+        {/* Both styles in one cell: the description contrasts the zigzag with
+            the rectangle, and the reader has to be able to recognise the one
+            they will actually meet in IEC-style (European, Ukrainian) documents. */}
         <SymbolCell
           name={t('ch0_5.symbolResistorName')}
           description={
             <Trans i18nKey="ch0_5.symbolResistorDesc" ns="ui" components={{ var: <MathVar />, arrl: <G k="arrl" />, iec: <G k="iec" /> }} />
           }
+          svgWidth={150}
         >
-          <Resistor x={55} y={28} />
+          <Resistor x={40} y={28} />
+          <ResistorIEC x={112} y={28} />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolCapacitorName')}
           description={
-            <Trans i18nKey="ch0_5.symbolCapacitorDesc" ns="ui" components={{ var: <MathVar />, cap: <G k="capacitor" /> }} />
+            <Trans i18nKey="ch0_5.symbolCapacitorDesc" ns="ui" components={{ var: <MathVar />, cap: <G k="capacitor" />, chg: <G k="charge" /> }} />
           }
         >
           <Capacitor x={55} y={28} />
+        </SymbolCell>
+
+        {/* The polarised variant gets its own cell so the reader can see the two
+            side by side. `Capacitor` above draws two straight plates (the general
+            symbol in IEC 60617 and the one this course uses); this one draws a
+            curved plate plus a «+». Note the card does NOT say «curve ⇒
+            polarised» — IEEE 315 also curves a plate on ordinary capacitors to
+            mark the outside electrode. The «+» is the identifier. */}
+        <SymbolCell
+          name={t('ch0_5.symbolCapacitorPolarName')}
+          description={
+            <Trans i18nKey="ch0_5.symbolCapacitorPolarDesc" ns="ui" components={{ var: <MathVar />, strong: <strong /> }} />
+          }
+        >
+          <CapacitorElectrolytic x={55} y={28} />
         </SymbolCell>
 
         <SymbolCell
@@ -209,18 +256,25 @@ export default function Chapter0_5() {
 
         <SymbolCell
           name={t('ch0_5.symbolBatteryName')}
-          description={t('ch0_5.symbolBatteryDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolBatteryDesc" ns="ui" components={{ strong: <strong />, dc: <G k="dc" /> }} />
+          }
         >
-          {/* svgHeight inherits the default 56 — leads extend to ±30 and
-              get clipped by ~2 px at each end of the viewport, which is
-              the look we want here (the gallery cell doesn't need full
-              pin-length leads the way a wired schematic does). */}
-          <Battery x={55} y={28} orient="down" />
+          {/* BatteryMulti, not Battery: symbolBatteryDesc tells the reader that
+              cells drawn one above the other ARE that many cells, and points at
+              «two AA cells drawn this way». A single-cell symbol made that
+              sentence describe something not on screen. Same primitive as the
+              worked schematic, so the two agree.
+              svgHeight inherits the default 56 — leads extend to ±30 and get
+              clipped by ~2 px at each end, which is the look we want here. */}
+          <BatteryMulti x={55} y={28} orient="down" />
         </SymbolCell>
 
         <SymbolCell
           name={t('ch0_5.symbolGroundName')}
-          description={t('ch0_5.symbolGroundDesc')}
+          description={
+            <Trans i18nKey="ch0_5.symbolGroundDesc" ns="ui" components={{ strong: <strong /> }} />
+          }
         >
           {/* Ground in `orient='right'` (canonical pin-up, stripes-down).
               With the compact primitive: pin tip at y−10, stripes at
@@ -251,7 +305,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolTransistorName')}
           description={
-            <Trans i18nKey="ch0_5.symbolTransistorDesc" ns="ui" components={{ var: <MathVar /> }} />
+            <Trans i18nKey="ch0_5.symbolTransistorDesc" ns="ui" components={{ var: <MathVar />, strong: <strong /> }} />
           }
         >
           <TransistorNPN x={55} y={28} />
@@ -260,7 +314,7 @@ export default function Chapter0_5() {
         <SymbolCell
           name={t('ch0_5.symbolVoltmeterName')}
           description={
-            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar />, imp: <G k="impedance" /> }} />
+            <Trans i18nKey="ch0_5.symbolVoltmeterDesc" ns="ui" components={{ i: <i />, var: <MathVar />, imp: <G k="input impedance" /> }} />
           }
           svgHeight={56}
         >
@@ -347,10 +401,10 @@ export default function Chapter0_5() {
           t('ch0_5.labComp3'),
         ]}
         procedure={[
-          { text: t('ch0_5.labStep1') },
-          { text: t('ch0_5.labStep2') },
-          { text: t('ch0_5.labStep3') },
-          { text: t('ch0_5.labStep4') },
+          { text: <Trans i18nKey="ch0_5.labStep1" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch0_5.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch0_5.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
+          { text: <Trans i18nKey="ch0_5.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: t('ch0_5.labStep5') },
           {
             text: <Trans i18nKey="ch0_5.labStep6" ns="ui"
@@ -358,7 +412,7 @@ export default function Chapter0_5() {
             />,
           },
         ]}
-        expectedResult={t('ch0_5.labExpected')}
+        expectedResult={<Trans i18nKey="ch0_5.labExpected" ns="ui" components={{ ...mathComponents }} />}
         connectionToTheory={t('ch0_5.labConnection')}
         troubleshooting={[
           t('ch0_5.labTrouble1'),

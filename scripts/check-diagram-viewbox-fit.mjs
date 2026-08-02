@@ -58,6 +58,10 @@ const SKIP_FILES = new Set([
   // Runtime measurement via Claude-in-Chrome confirms no excessive
   // padding; the gate's parse-only view just misses what's there.
   'AtomicDiagram.tsx',         // verified runtime: nucleus + electrons fill 560×400
+  // Three separate 150×90 panels in one grid, not one canvas: the parser sees
+  // the shared W/RUN_R consts as a single content range. Each panel's wires
+  // span 20…130 of its own 150-wide viewBox — verified in the browser.
+  'WireRulesDiagram.tsx',
   'MaterialsComparison.tsx',   // verified runtime: 3-column layout fills 620 width
   'EmSpectrumLadder.tsx',      // verified runtime: spectrum bands + ticks fill 820 width; all x coords are computed via x(exp) so the parser only sees the lone 788 literal
   'IonosphereLayersDiagram.tsx', // two day/night panels; content x via NIGHT_X+PW derived exprs (parser sees only x={NIGHT_X}=388) — fills 680 width

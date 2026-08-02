@@ -179,7 +179,13 @@ const EXEMPT_PER_CHAPTER = {
   // symbolInductorName (one-word symbol-card heading «Inductor (coil)»;
   // wrapping the entire heading would turn the whole title into a
   // tooltip target and disrupt the symbol-card layout).
-  ch0_5: new Set(['dc', 'inductor', 'transistor', 'npn', 'pnp', 'base', 'collector', 'emitter', 'limiter']),
+  // «impedance» — same substring pattern as ch1_10's «capacitance». The
+  // voltmeter cell wraps «input impedance» / «вхідний імпеданс» via the `imp`
+  // alias, pointing at the instrument-shaped `input impedance` entry; the
+  // bare-word regex sees «impedance» inside it. The plain `impedance` entry
+  // opens on AC and reactance — deliberately NOT the tooltip a Part-0 reader
+  // should get beside a voltmeter symbol.
+  ch0_5: new Set(['dc', 'inductor', 'transistor', 'npn', 'pnp', 'base', 'collector', 'emitter', 'limiter', 'impedance']),
   // ch1_10 «capacitance» — same pattern as ch1_6's «time constant».
   // The varactor entry uses «junction capacitance» (a separate
   // glossary key with its own definition — depletion-region physics,

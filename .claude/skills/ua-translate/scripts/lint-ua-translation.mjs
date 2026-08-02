@@ -556,10 +556,15 @@ const RULES = [
     id: 'forbidden.postavte-component',
     category: 'FORBIDDEN',
     severity: 'WARN',
+    // NOTE the trailing `(?!\p{L})`, NOT `\b`. JavaScript defines `\b` over
+    // [A-Za-z0-9_] only, so `/конденсатор\b/u` never matches inside Cyrillic
+    // text — the rule sat here with eleven nouns and could not fire on any of
+    // them. Found 2026-08-02 when «Якщо поставити такий конденсатор навпаки»
+    // shipped through a green `check:uk`.
     // «Поставте резистор послідовно / Поставте обкладку / Поставте
     // конденсатор» — for component placement, not for «поставити задачу»
     // or «поставити крапку» (abstract, OK).
-    pattern: /(?<!\p{L})(?:поставте|поставити|постав)\s+(?:\S+\s+){0,2}?(резистор|конденсатор|індуктивність|котушку|діод|обкладк[уи]|пластин[уи]|компонент|мікросхему|транзистор|запобіжник)\b/giu,
+    pattern: /(?<!\p{L})(?:поставте|поставити|постав)\s+(?:\S+\s+){0,2}?(резистор|конденсатор|індуктивність|котушку|діод|обкладк[уи]|пластин[уи]|компонент|мікросхему|транзистор|запобіжник)(?!\p{L})/giu,
     hint: 'Playground-register «поставте» for a component. Use «розмістіть» / «установіть» / «увімкніть» (for connection) / «під\'єднайте». Compare the existing ch1_5 labStep1 fix: «Поставте резистор послідовно» → «Увімкніть резистор послідовно».',
   },
 
