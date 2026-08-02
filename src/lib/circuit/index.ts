@@ -54,7 +54,7 @@ export {
 } from './types'
 
 // Symbols — passives
-export { Resistor, Capacitor, CapacitorVariable, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
+export { Resistor, ResistorIEC, Capacitor, CapacitorVariable, CapacitorElectrolytic, Inductor, InductorCore } from './symbols'
 
 // Symbols — sources
 export { AcSource, Battery, BatteryMulti, Ground, GroundEarth, AC_SOURCE_RADIUS } from './symbols'

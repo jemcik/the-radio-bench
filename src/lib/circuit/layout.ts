@@ -26,6 +26,13 @@
  *   – A bold 12 px label above a horizontal passive (placed at
  *     TOP−18): glyph top ≈ TOP−24 = y=11, leaving 11 px clear.
  * Either case renders with comfortable (≥10 px) breathing room.
+ *
+ * NOT covered by this budget: a horizontal passive on the top rail carrying
+ * BOTH `label` and `value`. `PassiveLabel` then lifts the label to y−32, whose
+ * glyph top lands ~6 px ABOVE the canvas — measured on ch0.5's «R₁ / 220Ω».
+ * A schematic that needs that combination has to add its own headroom (see
+ * `EXTRA_TOP` in `Chapter0_5.tsx`); raising this constant would shift every
+ * schematic in the course and re-baseline the visual gate.
  */
 export const SCHEMATIC_PAD_TOP = 35
 

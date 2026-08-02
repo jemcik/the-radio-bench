@@ -47,8 +47,13 @@ export default function Ch0_5Hero() {
     bottomWire: roughLine(160, 58, 42, 58, { seed: 51, strokeWidth: 1.1 }),
     leftUp: roughLine(42, 28, 42, 48, { seed: 52, strokeWidth: 1.1 }),
     batStem: roughLine(42, 48, 42, 58, { seed: 53, strokeWidth: 1.1 }),
-    batLong: roughLine(36, 48, 48, 48, { seed: 54, strokeWidth: 1.4 }),
-    batShort: roughLine(38, 53, 46, 53, { seed: 55, strokeWidth: 1.1 }),
+    // Two cells, not one: the chapter teaches that the number of plate pairs IS
+    // the number of cells, and `exampleIntro` calls this the same 3 V two-AA
+    // circuit as the worked schematic. One pair here made the two disagree.
+    batLong: roughLine(36, 44, 48, 44, { seed: 54, strokeWidth: 1.4 }),
+    batShort: roughLine(38, 49, 46, 49, { seed: 55, strokeWidth: 1.1 }),
+    batLong2: roughLine(36, 53, 48, 53, { seed: 56, strokeWidth: 1.4 }),
+    batShort2: roughLine(38, 58, 46, 58, { seed: 57, strokeWidth: 1.1 }),
   }), [])
 
   // Pencil (tilted -38°)
@@ -97,6 +102,8 @@ export default function Ch0_5Hero() {
         <RoughPaths paths={sheet.batStem} />
         <RoughPaths paths={sheet.batLong} />
         <RoughPaths paths={sheet.batShort} />
+        <RoughPaths paths={sheet.batLong2} />
+        <RoughPaths paths={sheet.batShort2} />
 
         {/* Reference designators */}
         <text x="85"  y="18" fontFamily="inherit" fontStyle="italic" fontSize="0.5em"

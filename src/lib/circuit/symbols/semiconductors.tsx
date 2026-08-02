@@ -46,7 +46,10 @@ export function LED({ x, y, orient = 'right', label, value }: SymbolProps) {
         <path d="m118.75 50 18.75-18.75" />
         <path fill="currentColor" stroke="none" d="m141.24 38.09 3.87-14.45-14.45 3.87 10.58 10.58z" />
       </VendoredSymbol>
-      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} labelSide="below" />
+      {/* gap 26, not the default 20: the LED body spans ±12.4 schematic units
+          and a subscripted designator («D₁») is ~14 units tall, so the default
+          puts the label inside the triangle. Measured on ch0.5. */}
+      <CenteredLabel x={x} y={y} orient={orient} label={label} value={value} labelSide="below" gap={26} />
     </>
   )
 }

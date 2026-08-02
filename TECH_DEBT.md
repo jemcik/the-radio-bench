@@ -142,7 +142,7 @@ It is a filter, not a guarantee.
 | [x] | `0.2` — 2026-07-29 (#60). Two review rounds; blockers fixed, polish taken in the same pass. |
 | [x] | `0.3` — 2026-07-29. Four review rounds (71 → 53 → 35 → 34 findings); all applied. §3 math-var debt for this chapter cleared in the same pass. |
 | [x] | `0.4` — 2026-07-31. Six review rounds (85 → 45 → 19 → 35 → 12 → 7 findings); all applied. §3 math-var debt cleared in the same pass, and the chapter got the lab schematic its steps had been describing without one. |
-| [ ] | `0.5` |
+| [x] | `0.5` — 2026-08-02. Seven review rounds (32 → 18 → 15 → 11 → 17 → 14 → 21 findings); all applied. Gained the wires/junctions figure the section never had, plus a `ResistorIEC` primitive and a corrected `Capacitor` (it drew the polarised symbol). |
 | [ ] | `1.1` |
 | [ ] | `1.2` |
 | [ ] | `1.3` |

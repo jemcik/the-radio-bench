@@ -43,7 +43,7 @@ Generated 2026-05-11; updated when the symbol set changes.
 | `LED` | `Diode-COM-LED.svg` |
 | `DiodeZener` | `Diode-COM-Zener.svg` |
 | `Resistor` | `Resistor-IEEE-Standard.svg` |
-| `Capacitor` | `Capacitor-IEEE-NonPolarized.svg` |
+| `Capacitor` | `Capacitor-IEEE-NonPolarized.svg` — **body redrawn**, see below |
 | `CapacitorElectrolytic` | `Capacitor-IEEE-Polarized.svg` |
 | `Inductor` | `Inductor-COM-Air.svg` |
 | `InductorCore` | `Inductor-COM-Magnetic.svg` |
@@ -69,3 +69,14 @@ If new revisions of upstream become useful:
 2. Re-run the conversion script (`scripts/convert-electronic-symbol.mjs`)
 3. Update the «Source revision» commit hash above
 4. Re-verify pin coordinates in any symbol whose source path changed
+
+## Deviations from upstream
+
+- **`Capacitor` body redrawn (2026-08-02).** Upstream's
+  `Capacitor-IEEE-NonPolarized.svg` draws one plate as a curve
+  (`M54 44s12.5 12.25 12.5 31S54 106 54 106`), despite the file name. A curved
+  plate is not a stylistic variant: in IEC 60617 and ANSI/IEEE 315 it marks the
+  negative electrode of a *polarised* capacitor. We draw the non-polarised
+  symbol the way both standards define it — two straight parallel plates — and
+  keep the curve for `CapacitorElectrolytic`, where it belongs.
+  `CapacitorVariable` inherits the straight-plate body for the same reason.
