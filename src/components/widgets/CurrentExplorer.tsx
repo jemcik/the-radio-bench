@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
+import { MathVar } from '@/components/ui/math'
 import { Slider } from '@/components/ui/slider'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
@@ -169,7 +170,7 @@ export default function CurrentExplorer() {
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <label htmlFor="ce-voltage" className="text-sm font-medium text-foreground">
-              {t('ch1_1.widget.voltageLabel')}
+              <Trans i18nKey="ch1_1.widget.voltageLabel" ns="ui" components={{ var: <MathVar /> }} />
             </label>
             <span className="text-sm font-mono text-muted-foreground">
               {formatDecimal(voltage, 1, locale)} {tUnit('v')}
@@ -182,7 +183,7 @@ export default function CurrentExplorer() {
             step={V_STEP}
             value={[voltage]}
             onValueChange={([v]) => setVoltage(v ?? V_DEFAULT)}
-            aria-label={t('ch1_1.widget.voltageLabel')}
+            aria-label={t('ch1_1.widget.voltageAria')}
           />
           <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
             <span>0 {tUnit('v')}</span>
@@ -194,7 +195,7 @@ export default function CurrentExplorer() {
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <label htmlFor="ce-resistance" className="text-sm font-medium text-foreground">
-              {t('ch1_1.widget.resistanceLabel')}
+              <Trans i18nKey="ch1_1.widget.resistanceLabel" ns="ui" components={{ var: <MathVar /> }} />
             </label>
             <span className="text-sm font-mono text-muted-foreground">
               {formatResistance(resistance, tUnit, locale)}
@@ -207,7 +208,7 @@ export default function CurrentExplorer() {
             step={R_LOG_STEP}
             value={[rLog]}
             onValueChange={([v]) => setRLog(v ?? R_LOG_DEFAULT)}
-            aria-label={t('ch1_1.widget.resistanceLabel')}
+            aria-label={t('ch1_1.widget.resistanceAria')}
           />
           <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
             <span>1 {tUnit('ohm')}</span>
@@ -229,7 +230,7 @@ export default function CurrentExplorer() {
         <div className="flex flex-col gap-2">
           <div className="flex items-baseline justify-between gap-4">
             <span className="text-sm text-foreground">
-              {t('ch1_1.widget.currentLabel')}
+              <Trans i18nKey="ch1_1.widget.currentLabel" ns="ui" components={{ var: <MathVar /> }} />
             </span>
             <span className={`text-2xl font-mono font-semibold ${isDanger ? 'text-callout-danger' : 'text-foreground'}`}>
               {formatCurrent(currentA, tUnit, locale)}
@@ -253,7 +254,9 @@ export default function CurrentExplorer() {
       <DriftVisualisation driftPxPerSec={driftPxPerSec} />
 
       <p className="text-[13px] text-muted-foreground">
-        {t('ch1_1.widget.hint')}
+        <Trans i18nKey="ch1_1.widget.hint" ns="ui"
+          components={{ var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
       </p>
     </Widget>
   )
@@ -279,6 +282,7 @@ export default function CurrentExplorer() {
  * changes only affect speed; electrons in flight keep their position.
  */
 function DriftVisualisation({ driftPxPerSec }: { driftPxPerSec: number }) {
+  const { t } = useTranslation('ui')
   const WIRE_W = 400
   const WIRE_H = 60
   const PAD = 20
@@ -335,7 +339,7 @@ function DriftVisualisation({ driftPxPerSec }: { driftPxPerSec: number }) {
       <svg
         width="100%" viewBox={`0 0 ${WIRE_W + PAD * 2} ${WIRE_H}`}
         role="img"
-        aria-label={`Wire with electrons drifting at ${Math.round(driftPxPerSec)} pixels per second`}
+        aria-label={t('ch1_1.widget.driftAriaLabel')}
         style={{ display: 'block' }}
       >
         {/* Clip rect — cheap protection against any sub-pixel slop at
@@ -381,6 +385,13 @@ function DriftVisualisation({ driftPxPerSec }: { driftPxPerSec: number }) {
           })}
         </g>
       </svg>
+      {/* The arrow under the wire points the way the DOTS go — i.e. electron
+          drift, which is the opposite of conventional current. `currentConvention`
+          two sections earlier trained the reader to read an arrow as current, so
+          an unlabelled arrow here reads as exactly the wrong thing. */}
+      <p className="mt-1 text-center text-[12px] text-muted-foreground">
+        <Trans i18nKey="ch1_1.widget.driftCaption" ns="ui" components={{ var: <MathVar /> }} />
+      </p>
     </div>
   )
 }

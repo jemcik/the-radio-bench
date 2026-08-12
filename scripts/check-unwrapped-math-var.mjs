@@ -132,6 +132,13 @@ function collect(json, file, perKey, issues) {
   function walk(node, segs) {
     if (typeof node === 'string') {
       const key = segs.join('.')
+      // aria-label strings are read aloud, never rendered. They cannot carry
+      // <var> — react-i18next has no renderer inside an attribute, so the tag
+      // would ship literally into the label — and the defect this gate exists
+      // to catch (a variable shipping as upright body text) has no meaning for
+      // text nobody sees. A screen reader saying «e minus» is the correct
+      // output. Added 2026-08-02, ch 1.1 heroAriaLabel.
+      if (/AriaLabel$/.test(key)) return
       const text = strip(node)
       const hits = findIssues(text)
       if (hits.length === 0) return

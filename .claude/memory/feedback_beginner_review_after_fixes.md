@@ -43,5 +43,15 @@ converged» would have shipped all three. The count falls when the *text* stops 
 not on a schedule: a round that rewrites 30 keys will find more than the round before it.
 Stop when a round returns nothing that is a defect — not when the number looks small.
 
+**Scoping the reviewer to one chapter blinds it to cross-chapter claims.** Every
+round on ch 0.5 was scoped to that chapter's own keys and the files it renders —
+deliberately, so rounds would not re-read settled text. The cost: `labConnection`
+claimed «from here on every lab begins with reading a schematic and ends with
+building what you read», and it survived all seven rounds because it is unfalsifiable
+from inside ch 0.5. Ten of the course's 26 labs are in chapters that draw no
+schematic at all. Before shipping, grep any sentence that quantifies over the
+*course* («every lab», «each chapter», «from here on always») and check it against
+`src/data/chapters.ts` and the actual chapter files — no scoped reviewer can.
+
 Related: [[feedback_verify_visually_before_done]] — same class of failure, different
 sense. Both are «I declared done without the check that would have caught it».

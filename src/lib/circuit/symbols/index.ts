@@ -7,4 +7,4 @@ export {
   METER_ACCENT_V, METER_ACCENT_A, METER_PIN_SPAN, meterPins,
 } from './instruments'
 export { Antenna, Crystal, Speaker, Transformer } from './misc'
-export { NodePoint, TerminalLabel } from './annotations'
+export { NodePoint, TerminalLabel, CurrentArrow } from './annotations'

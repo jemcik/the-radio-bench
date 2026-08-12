@@ -117,7 +117,20 @@ const atomXs = (panelX: number) => [
 
 /** Small inline SVG dot used in the HTML legend row — visually identical
  *  to the per-electron / ion glyphs rendered inside the panels. */
-function LegendDot({ kind }: { kind: 'ion' | 'electron' }) {
+function LegendDot({ kind }: { kind: 'ion' | 'bound' | 'electron' }) {
+  // A bound electron differs from a free one ONLY by where it sits — on an
+  // orbital around an ion core rather than loose in the gap. In the panels that
+  // reads off the position; in a legend row there is no position, so a plain
+  // dot for «bound» and a plain dot for «free» were two identical swatches with
+  // different names. This one draws the orbital.
+  if (kind === 'bound') {
+    return (
+      <svg width={16} height={16} viewBox="0 0 16 16" aria-hidden="true" className="inline-block flex-shrink-0">
+        <circle cx={8} cy={8} r={5} fill="none" stroke={svgTokens.mutedFg} strokeWidth={1} opacity={0.7} />
+        <circle cx={8} cy={3} r={2.6} fill="hsl(var(--callout-note))" />
+      </svg>
+    )
+  }
   if (kind === 'ion') {
     return (
       <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden="true" className="inline-block flex-shrink-0">
@@ -354,26 +367,24 @@ export default function MaterialsComparison() {
           ))}
         </div>
 
-        {/* Legend row — one icon-and-label pair per panel, column-aligned
-            with the panel above so the eye reads
-            [title → frame → note → legend] as one stack per category. */}
+        {/* Legend — ONE centred row for the whole figure, NOT a 3-column grid.
+            It used to be column-aligned with the panels, one pair under each,
+            so the page read as three stacks: «conductor → ion core»,
+            «insulator → bound electron», «semiconductor → free electron».
+            That is the opposite of what the figure teaches — the conductor is
+            the panel with the most free electrons and no bound ones. The three
+            keys describe the three dot types used across all three panels, so
+            they belong in one row that clearly belongs to none of them. */}
         <div
-          className="grid grid-cols-3 mt-3 text-center"
-          style={{
-            paddingLeft: paddingPct,
-            paddingRight: paddingPct,
-            columnGap: gapPct,
-          }}
+          className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1"
+          style={{ fontSize: 13, color: svgTokens.mutedFg }}
         >
+          <span className="font-semibold">{t('ch1_1.materialsLegendLead')}</span>
           {panels.map((p) => (
-            <div
-              key={p.i}
-              className="flex items-center justify-center gap-1.5 leading-tight"
-              style={{ fontSize: 13, color: svgTokens.mutedFg }}
-            >
-              <LegendDot kind={p.i === 0 ? 'ion' : 'electron'} />
+            <span key={p.i} className="flex items-center gap-1.5 leading-tight">
+              <LegendDot kind={p.i === 0 ? 'ion' : p.i === 1 ? 'bound' : 'electron'} />
               <span>{t(legendKey(p.i))}</span>
-            </div>
+            </span>
           ))}
         </div>
       </div>

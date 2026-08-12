@@ -59,7 +59,6 @@ Ordered by chapter. «Worst» is the highest sentence-overlap score in that chap
 | Chapter | Pairs | Worst | Pairs (widget × prose) |
 |---|---|---|---|
 | `ch0_2` | 1 | 0.50 | `ammeterCaption` × `currentDesc` |
-| `ch1_1` | 4 | 0.83 | `atomicCaption` × `chargeIntro`<br>`circuitCaption` × `circuitOhmPreview`<br>`resistanceCollisionCaption` × `resistanceMechanism`<br>`waterPipeCaption` × `waterPipeAriaLabel` |
 | `ch1_3` | 3 | 1.00 | `widget.rmsSelector.hint_peak` × `levelsPeak`<br>`widget.rmsSelector.hint_rms` × `levelsRmsDerivation`<br>`widget.rmsSelector.hint_rms` × `levelsRmsIntro` |
 | `ch1_6` | 4 | 0.91 | `widget.builder.description` × `geometryBuilderIntro`<br>`widget.builder.hint` × `geometryBuilderIntro`<br>`widget.combine.hint` × `combinationsCalcIntro`<br>`widget.rl.hint` × `rlWidgetIntro` |
 | `ch1_7` | 2 | 0.86 | `schematicParallelCaption` × `keyTakeaway3`<br>`widget.vna.hint` × `vnaCurveBehaviour` |
@@ -100,8 +99,14 @@ The `beginner-review` skill was added on **2026-05-20**, in the same commit as c
 that date was therefore written, translated and shipped without ever being read by a
 fresh-context reader.
 
-Never reviewed (15): 0.1 – 0.5, 1.1 – 1.10.
+Never reviewed (14): 0.1 – 0.5, 1.1 – 1.10 — of which 0.1 – 0.5 and 1.1 are now done.
 Covered by the rule (12): 1.11, 2.1 – 2.3, 3.1 – 3.4, 4.1 – 4.4.
+
+The **glossary** was outside this backlog entirely — the skill excluded it by rule
+and every run was scoped to one chapter block, so none of its 341 entries had ever
+been read by a reviewer. Swept 2026-08-02 in the ch 1.1 pass: 144 of 341 (42 %) had
+defects, twelve of them wrong in the English too. The skill now covers glossary
+entries; see `memory/project_glossary_was_outside_every_review.md`.
 
 Boundary case worth checking first: **ch 1.11** shipped in the very commit that
 introduced the skill, so whether it was actually run on that chapter's prose is unknown.
@@ -143,7 +148,7 @@ It is a filter, not a guarantee.
 | [x] | `0.3` — 2026-07-29. Four review rounds (71 → 53 → 35 → 34 findings); all applied. §3 math-var debt for this chapter cleared in the same pass. |
 | [x] | `0.4` — 2026-07-31. Six review rounds (85 → 45 → 19 → 35 → 12 → 7 findings); all applied. §3 math-var debt cleared in the same pass, and the chapter got the lab schematic its steps had been describing without one. |
 | [x] | `0.5` — 2026-08-02. Seven review rounds (32 → 18 → 15 → 11 → 17 → 14 → 21 findings); all applied. Gained the wires/junctions figure the section never had, plus a `ResistorIEC` primitive and a corrected `Capacitor` (it drew the polarised symbol). |
-| [ ] | `1.1` |
+| [x] | `1.1` — 2026-08-02. Seven review rounds (40 → 47 → 37 → 21 → 15 → 2 → 1 findings); all applied. §1 and §3 debt for this chapter cleared in the same pass, and the chapter gained a `CurrentArrow` primitive — the schematic labelled the LED «I» and drew no arrow at all. Four numbers were wrong: the collision rate (the electrons-per-coulomb figure reused, off by 150 000×), the electrons per coulomb (6.25 → 6.24), a metre of copper wire (5 mΩ → 50 mΩ) and a 15 A breaker (not an IEC rating).
 | [ ] | `1.2` |
 | [ ] | `1.3` |
 | [ ] | `1.4` |
@@ -159,11 +164,13 @@ It is a filter, not a guarantee.
 ## 3. Math variables in prose that are not wrapped in `<var>`
 
 **Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
-(`da1c413`). **Scale:** 482 keys across 12 chapters (0.2 – 1.11); originally 533 across
-14. Ch 0.3 was worked off 2026-07-29 and ch 0.4 on 2026-07-31, and the symbol-gloss
-exemption added on 2026-07-29 cleared a further fifteen keys spread over ch 0.2, 1.1,
-1.3, 1.5 and 1.6.
-**Gate:** `check:unwrapped-math-var` (green — all 482 are grandfathered in
+(`da1c413`). **Scale:** 474 keys across 11 chapters (0.2 – 1.11); originally 533 across
+14. Ch 0.3 was worked off 2026-07-29, ch 0.4 on 2026-07-31 and ch 1.1 on 2026-08-02; the
+symbol-gloss exemption added on 2026-07-29 cleared a further fifteen keys spread over
+ch 0.2, 1.1, 1.3, 1.5 and 1.6, and the aria-label exemption added 2026-08-02 cleared four
+more (ch 1.7, 1.8) — an `aria-label` is read aloud, never rendered, so it cannot carry
+`<var>` and the defect this gate names does not apply to it.
+**Gate:** `check:unwrapped-math-var` (green — all 474 are grandfathered in
 `scripts/unwrapped-math-var-baseline.json`).
 
 ### What the defect is
@@ -214,18 +221,17 @@ unwrapped variable.
 | Chapter | `en` | `uk` | Total |
 |---|---|---|---|
 | `ch0_2` | 1 | 1 | 2 |
-| `ch1_1` | 2 | 2 | 4 |
 | `ch1_2` | 16 | 16 | 32 |
 | `ch1_3` | 11 | 11 | 22 |
 | `ch1_4` | 6 | 8 | 14 |
 | `ch1_5` | 34 | 34 | 68 |
 | `ch1_6` | 40 | 40 | 80 |
-| `ch1_7` | 43 | 43 | 86 |
-| `ch1_8` | 29 | 28 | 57 |
+| `ch1_7` | 42 | 42 | 84 |
+| `ch1_8` | 28 | 27 | 55 |
 | `ch1_9` | 2 | 2 | 4 |
 | `ch1_10` | 13 | 13 | 26 |
 | `ch1_11` | 44 | 43 | 87 |
-| **Total** | **241** | **241** | **482** |
+| **Total** | **237** | **237** | **474** |
 
 Note that `ch1_11` carries the largest share despite post-dating the `beginner-review`
 rule — the two backlogs are independent, and a chapter can be clear of one and not the
@@ -502,9 +508,10 @@ the gate; the table above is what has to be worked off.
 
 ## 8. «співвідношення» and «відношення» both used for *ratio* in Ukrainian
 
-**Found** 2026-07-31, while working ch 0.4 off §2. **Scale:** 57 occurrences of
-«співвідношення» — 38 across 13 chapter blocks, 19 more in glossary entries; the rival
-«відношення» appears 84 times. (Count both forms case-insensitively: a first pass here
+**Found** 2026-07-31, while working ch 0.4 off §2. **Scale:** 45 keys carry
+«співвідношення» — 31 across 12 chapter blocks, 14 more in glossary entries; the rival
+«відношення» appears in 76 keys. (Was 57 when found; ch 1.1 was cleared on 2026-08-02
+and ch 0.4 in the pass that found it.) (Count both forms case-insensitively: a first pass here
 missed the capitalised «Співвідношення» sitting in two widget labels.) **Gate:** none —
 see the trap below.
 
@@ -536,8 +543,7 @@ impedance), `glossary.cw.detail` (signal-to-noise), `glossary.folded dipole.deta
 
 «співвідношення» is correct in a good number of the places it appears, and a blanket
 replace would break them: `glossary.oscilloscope.detail` («часові співвідношення між
-сигналами» — timing relationships, not one number over another), `ch1_1.circuitOhmPreview`
-(«у цього співвідношення є назва — закон Ома» — a law relating three quantities),
+сигналами» — timing relationships, not one number over another),
 `glossary.near field.detail` («сталого співвідношення» between the E and H fields),
 `ch1_3.rmsSelectorIntro` («співвідношення між ними видно» — how four readings relate).
 Each hit has to be read for sense, exactly like §4's «ланцюг».

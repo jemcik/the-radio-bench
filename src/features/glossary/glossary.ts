@@ -532,7 +532,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'colour code': {
     tip: 'Coloured bands on a through-hole resistor that encode its value and tolerance.',
     detail:
-      'A through-hole resistor is normally too small to print numbers on, so the value is encoded as 3 to 6 coloured bands read from the tolerance-band end inward. 4-band parts: first two bands = significant digits, third band = decimal multiplier (×10ⁿ), fourth band = tolerance. 5-band (precision) parts have three significant-digit bands. The digit-colour mapping runs through the spectrum (black=0, brown=1, red=2, orange=3, yellow=4, green=5, blue=6, violet=7, grey=8, white=9); tolerance colours are a separate set (gold=±5 %, silver=±10 %, brown=±1 %, red=±2 %). Surface-mount resistors are too small for bands and use a printed 3- or 4-digit number instead.',
+      'A through-hole resistor is normally too small to print numbers on, so the value is encoded as 3 to 6 coloured bands read from the end opposite the tolerance band. 4-band parts: first two bands = significant digits, third band = decimal multiplier (×10ⁿ), fourth band = tolerance. 5-band (precision) parts have three significant-digit bands. The digit-colour mapping runs through the spectrum (black=0, brown=1, red=2, orange=3, yellow=4, green=5, blue=6, violet=7, grey=8, white=9); tolerance colours are a separate set (gold=±5 %, silver=±10 %, brown=±1 %, red=±2 %). Surface-mount resistors are too small for bands and use a printed 3- or 4-digit number instead.',
     see: ['resistor', 'tolerance'],
   },
   'power rating': {
@@ -586,7 +586,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   electrolytic: {
     tip: 'A polarised capacitor type using an oxide-on-metal-foil dielectric — gives large capacitance in a small can, but only works with correct polarity.',
     detail:
-      'In an electrolytic capacitor, the dielectric is a very thin oxide layer (aluminium oxide or tantalum pentoxide) grown on one metal foil; the "other plate" is a conductive electrolyte (liquid or gel) in contact with the oxide. The oxide is thin and the effective plate area is enormous (foils are rolled up or made of porous pressed powder), so capacitance can reach hundreds of thousands of microfarads in a finger-sized can. The catch is polarity: the oxide is grown electrochemically in one direction, so reverse voltage breaks it down — an aluminium electrolytic then heats, swells, and vents; a tantalum electrolytic can literally explode. The longer lead (or the un-striped side of SMT tantalums) is positive; the stripe on an aluminium can marks the negative lead.',
+      'In an electrolytic capacitor, the dielectric is a very thin oxide layer (aluminium oxide or tantalum pentoxide) grown on one metal foil; the "other plate" is a conductive electrolyte (liquid or gel) in contact with the oxide. The oxide is thin and the effective plate area is enormous (foils are rolled up or made of porous pressed powder), so capacitance can reach hundreds of thousands of microfarads in a finger-sized can. The catch is polarity: the oxide is grown electrochemically in one direction, so reverse voltage breaks it down — an aluminium electrolytic then heats, swells, and vents; a tantalum electrolytic can literally explode. The longer lead is positive and the stripe on an aluminium can marks the negative lead; on SMT tantalums it is the other way round — the marked end is the positive one.',
     see: ['capacitor', 'dielectric'],
   },
   mlcc: {
@@ -720,7 +720,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   balun: {
     tip: 'BALanced–UNbalanced — a transformer or choke that matches a balanced antenna feed (like a dipole) to an unbalanced coaxial cable, also blocking common-mode current from running on the outside of the coax shield.',
     detail:
-      'A balun sits between an antenna whose feed point is balanced — both feed wires carry equal currents 180° out of phase, like a dipole\'s two legs — and a coaxial transmission line, where the inner conductor and the grounded shield are not symmetric. Without one, common-mode current flows on the outside of the coax shield: the cable becomes part of the antenna, the radiation pattern distorts, RF appears in the shack (causing computer glitches and «RF in the audio»), and SWR readings become inconsistent. Two functional types are common in amateur radio. (1) Current / choke baluns (1:1) — pass the differential signal but choke off common-mode current with high impedance; built as a few turns of coax through a ferrite toroid, or as a stack of ferrite beads on the cable. (2) Voltage baluns (typically 4:1) — true transformers with a turns ratio that also transforms impedance, used for folded dipoles (≈ 200 Ω feed) and OCF (off-centre-fed) dipoles. Core material follows the job, and the two types want opposite things. A voltage/transformer balun for 100 W-class HF work is traditionally wound on mix 43, whose high permeability gives ample winding reactance with few turns. A choke (current) balun instead wants a lossy, resistive impedance, and there mix 31 is the best all-round performer across the HF bands — clearly the material of choice at 5 MHz and below, where it offers several dB more choking impedance than mix 43. Between 5 and 20 MHz mix 43 is about 1 dB ahead and above 20 MHz the two are equivalent, so that single decibel rarely decides anything and one mix 31 core covers every HF band — the HF transmitting chokes currently recommended in the ARRL Handbook are wound on mix 31 toroids. Mix 43 suppresses from roughly 20 MHz to 250 MHz, so it suits the upper HF and VHF end; mix 61 only suppresses above about 200 MHz, and below that it serves as an inductor material, useful up to about 25 MHz. SWR alone does NOT detect a missing balun — even a perfectly matched antenna will radiate from the cable.',
+      'A balun sits between an antenna whose feed point is balanced — both feed wires carry equal currents 180° out of phase, like a dipole\'s two legs — and a coaxial transmission line, where the inner conductor and the grounded shield are not symmetric. Without one, common-mode current flows on the outside of the coax shield: the cable becomes part of the antenna, the radiation pattern distorts, RF appears in the shack (causing computer glitches and «RF in the audio»), and SWR readings become inconsistent. Two functional types are common in amateur radio. (1) Current / choke baluns (1:1) — pass the differential signal but choke off common-mode current with high impedance; built as a few turns of coax through a ferrite toroid, or as a stack of ferrite beads on the cable. (2) Voltage baluns (typically 4:1) — true transformers with a turns ratio that also transforms impedance, used for folded dipoles (≈ 280 Ω feed) and OCF (off-centre-fed) dipoles (≈ 200 Ω). Core material follows the job, and the two types want opposite things. A voltage/transformer balun for 100 W-class HF work is traditionally wound on mix 43, whose high permeability gives ample winding reactance with few turns. A choke (current) balun instead wants a lossy, resistive impedance, and there mix 31 is the best all-round performer across the HF bands — clearly the material of choice at 5 MHz and below, where it offers several dB more choking impedance than mix 43. Between 5 and 20 MHz mix 43 is about 1 dB ahead and above 20 MHz the two are equivalent, so that single decibel rarely decides anything and one mix 31 core covers every HF band — the HF transmitting chokes currently recommended in the ARRL Handbook are wound on mix 31 toroids. Mix 43 suppresses from roughly 20 MHz to 250 MHz, so it suits the upper HF and VHF end; mix 61 only suppresses above about 200 MHz, and below that it serves as an inductor material, useful up to about 25 MHz. SWR alone does NOT detect a missing balun — even a perfectly matched antenna will radiate from the cable.',
     see: ['transformer', 'toroid', 'ferrite', 'antenna', 'coax'],
   },
   unun: {
@@ -772,7 +772,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['inductor', 'ferrite'],
   },
   'right-hand rule': {
-    tip: 'A mnemonic for finding the direction of the magnetic field around a current-carrying wire — curl your right hand\'s fingers in the direction of the current and your thumb points along the field.',
+    tip: 'A mnemonic for finding the direction of the magnetic field around a current-carrying wire — point your right thumb along the current and your curled fingers show which way the field circles the wire.',
     detail:
       'The right-hand rule is the standard mnemonic that links the direction of an electric current to the direction of the magnetic field it produces. There are two common forms. (1) STRAIGHT WIRE: point your right thumb in the direction the current flows; your curled fingers show the direction the magnetic field circles around the wire. (2) COIL: curl your right hand\'s fingers in the direction the current goes around the loops of the coil; your thumb then points along the axis in the direction of the magnetic field inside the coil (the «north» end). The rule works because of the convention that current flows from + to − through the external circuit (conventional current). Use it any time you need to know which way the field points without doing a cross-product by hand.',
     see: ['inductor', 'inductance'],
@@ -851,7 +851,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   trap: {
     tip: 'An LC circuit placed in a signal path to block or shunt one specific frequency — the standard tool for notching out a single unwanted carrier.',
     detail:
-      'A trap is an LC circuit deliberately tuned to one frequency and inserted into a signal path to reject it. Two common topologies, named by how the trap is connected to the signal path: SHUNT TRAP — series LC wired from signal line to ground; series LC has near-zero impedance at f₀, so the unwanted frequency is drained to ground while everything else passes. SERIES TRAP — parallel LC wired in series with the signal path; parallel LC has near-infinite impedance at f₀, so the unwanted frequency is blocked in the line while everything else passes through the residual reactance. Multi-band antennas use series traps to make a single radiator behave as different lengths on different bands (a typical trap dipole has 7 MHz parallel-LC traps that go high-Z at 14 MHz and disconnect the outer wire sections). TVI and RFI fixes routinely use shunt traps — a series LC across the input of a stereo to drain the 28 MHz signal a nearby ham\'s amplifier injects into the speaker leads.',
+      'A trap is an LC circuit deliberately tuned to one frequency and inserted into a signal path to reject it. Two common topologies, named by how the trap is connected to the signal path: SHUNT TRAP — series LC wired from signal line to ground; series LC has near-zero impedance at f₀, so the unwanted frequency is drained to ground while everything else passes. SERIES TRAP — parallel LC wired in series with the signal path; parallel LC has near-infinite impedance at f₀, so the unwanted frequency is blocked in the line while everything else passes through the residual reactance. Multi-band antennas use series traps to make a single radiator behave as different lengths on different bands (a typical 40 m/20 m trap dipole has 14 MHz parallel-LC traps that go high-Z on 20 m and disconnect the outer wire sections, leaving the whole wire radiating on 40 m). TVI and RFI fixes routinely use shunt traps — a series LC across the input of a stereo to drain the 28 MHz signal a nearby ham\'s amplifier injects into the speaker leads.',
     see: ['resonance', 'lc', 'filter'],
   },
   'antenna tuner': {
@@ -870,13 +870,13 @@ export const glossary: Record<string, GlossaryEntry> = {
   anode: {
     tip: 'The terminal of a diode, LED, or battery on the «positive» side — where conventional current enters the device.',
     detail:
-      'The anode is one of the two terminals of a diode, LED, or other polarised component. By convention, current enters the device through the anode and leaves through the cathode. In the diode schematic symbol, the anode sits at the flat side of the triangle (the wide end). On a real through-hole diode, the anode is the lead WITHOUT the band painted on the body. On an LED, the anode is the longer lead (and inside the bulb, the larger frame). Word origin: from Greek «ἄνοδος» — «way up», where positive current «enters».',
+      'The anode is one of the two terminals of a diode, LED, or other polarised component. By convention, current enters the device through the anode and leaves through the cathode. In the diode schematic symbol, the anode sits at the flat side of the triangle (the wide end). On a real through-hole diode, the anode is the lead WITHOUT the band painted on the body. On an LED, the anode is the longer lead (and inside the bulb, the smaller, thinner post). Word origin: from Greek «ἄνοδος» — «way up», where positive current «enters».',
     see: ['cathode', 'diode', 'led'],
   },
   cathode: {
     tip: 'The terminal of a diode, LED, or battery on the «negative» side — where conventional current leaves the device.',
     detail:
-      'The cathode is the second of the two terminals of a polarised component (the anode is the other). By convention, current leaves the device through the cathode. In the diode schematic symbol, the cathode is the bar at the tip of the triangle. On a real through-hole diode, the cathode is the lead with the painted BAND on the body — same end as the bar in the symbol. On an LED, the cathode is the shorter lead (and inside the bulb, the smaller frame next to the reflector). Get this end the wrong way round and the diode simply will not conduct in normal operation. Word origin: Greek «κάθοδος» — «way down».',
+      'The cathode is the second of the two terminals of a polarised component (the anode is the other). By convention, current leaves the device through the cathode. In the diode schematic symbol, the cathode is the bar at the tip of the triangle. On a real through-hole diode, the cathode is the lead with the painted BAND on the body — same end as the bar in the symbol. On an LED, the cathode is the shorter lead (and inside the bulb, the larger frame — the reflector cup the die sits in). Get this end the wrong way round and the diode simply will not conduct in normal operation. Word origin: Greek «κάθοδος» — «way down».',
     see: ['anode', 'diode', 'led'],
   },
   'forward voltage drop': {
@@ -1064,7 +1064,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'skip zone': {
     tip: 'The silent ring of ground beyond ground-wave range but nearer than the first sky-wave landing.',
     detail:
-      'Between the point where the ground wave has faded and the point where the first sky-wave hop returns to earth, neither wave reaches the ground — this silent ring is the skip zone (or dead zone). It is why a station 2000 km away can be perfectly readable while one 200 km away hears nothing. Raising the frequency toward the MUF (the maximum usable frequency), or using a higher take-off angle, shrinks the skip zone.',
+      'Between the point where the ground wave has faded and the point where the first sky-wave hop returns to earth, neither wave reaches the ground — this silent ring is the skip zone (or dead zone). It is why a station 2000 km away can be perfectly readable while one 200 km away hears nothing. Lowering the frequency, or using a higher take-off angle, shrinks the skip zone; the closer the frequency is to the MUF (the maximum usable frequency), the further out the first hop lands and the wider the zone becomes.',
     see: ['skip distance', 'skywave'],
   },
   muf: {
@@ -1158,7 +1158,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   dbm: {
     tip: 'Power expressed in dB referenced to one milliwatt — the standard absolute power unit in radio.',
     detail:
-      'dBm is decibels relative to 1 mW: dBm = 10 · log₁₀(P / 1 mW). Unlike plain dB (a pure ratio), dBm is an absolute power level. Key landmarks: 0 dBm = 1 mW, +30 dBm = 1 W, +60 dBm = 1 kW; on the receive side, −60 dBm = 1 µW and roughly −120 dBm is the noise floor of a sensitive HF receiver. Because dBm uses logs, a chain of gains and losses through cables, amplifiers, and antennas can be added together as +/− dB values instead of multiplied.',
+      'dBm is decibels relative to 1 mW: dBm = 10 · log₁₀(P / 1 mW). Unlike plain dB (a pure ratio), dBm is an absolute power level. Key landmarks: 0 dBm = 1 mW, +30 dBm = 1 W, +60 dBm = 1 kW; on the receive side, −30 dBm = 1 µW and roughly −120 dBm is the noise floor of a sensitive HF receiver. Because dBm uses logs, a chain of gains and losses through cables, amplifiers, and antennas can be added together as +/− dB values instead of multiplied.',
     unit: 'dBm',
     formula: 'P(dBm) = 10·log₁₀(P / 1 mW)',
     see: ['decibel', 'logarithm'],
@@ -1202,7 +1202,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   dipole: {
     tip: 'The simplest practical antenna — a straight wire cut to about half a wavelength and fed in the middle.',
     detail:
-      'A dipole is two pieces of conductor, each a quarter-wavelength long, fed by a feedline at the join in the middle. For the 20-metre amateur band (14 MHz) that\'s about 5 m of total wire. Despite being trivially simple, it works well: about 2.15 dBi of gain broadside to the wire, and it resonates naturally at the design frequency. The dipole is the reference antenna behind dBd, and the starting point for almost every other amateur antenna (Yagis, log-periodics, end-feds — all are elaborations of it).',
+      'A dipole is two pieces of conductor, each a quarter-wavelength long, fed by a feedline at the join in the middle. For the 20-metre amateur band (14 MHz) that\'s about 10 m of wire in total, roughly 5 m per leg. Despite being trivially simple, it works well: about 2.15 dBi of gain broadside to the wire, and it resonates naturally at the design frequency. The dipole is the reference antenna behind dBd, and the starting point for almost every other amateur antenna (Yagis, log-periodics, end-feds — all are elaborations of it).',
     see: ['dbd', 'antenna', 'yagi'],
   },
   'ham radio': {
@@ -1263,21 +1263,21 @@ export const glossary: Record<string, GlossaryEntry> = {
   charge: {
     tip: 'A property of matter: positive, negative, or neutral. Unlike charges attract, like charges repel.',
     detail:
-      'Electric charge is a fundamental property of matter, carried by protons (positive) and electrons (negative); neutrons have none. An atom with equal numbers of protons and electrons is electrically neutral. Imbalance one way or the other and you have an ion with a net charge. Charge is measured in coulombs. A single electron carries about −1.602 × 10⁻¹⁹ C, so one coulomb is an enormous pile of them (~6.25 × 10¹⁸). In circuits we rarely count individual electrons; we count the rate at which charge flows past a point, which is called current.',
+      'Electric charge is a fundamental property of matter, carried by protons (positive) and electrons (negative); neutrons have none. An atom with equal numbers of protons and electrons is electrically neutral. Imbalance one way or the other and you have an ion with a net charge. Charge is measured in coulombs. A single electron carries about −1.602 × 10⁻¹⁹ C, so one coulomb is an enormous pile of them (~6.24 × 10¹⁸). In circuits we rarely count individual electrons; we count the rate at which charge flows past a point, which is called current.',
     unit: 'Coulomb (C)',
     see: ['coulomb', 'current', 'voltage'],
   },
   coulomb: {
-    tip: 'The SI unit of electric charge — about 6.25 × 10¹⁸ electrons.',
+    tip: 'The SI unit of electric charge — about 6.24 × 10¹⁸ electrons.',
     detail:
-      'One coulomb (C) is the quantity of charge carried by approximately 6.25 × 10¹⁸ electrons, or equivalently, the charge delivered in one second by a current of one ampere (1 C = 1 A·s). Named after French physicist Charles-Augustin de Coulomb (1736–1806). The coulomb is a large unit in everyday electronics — a typical AA battery can deliver about 10 000 C of charge over its lifetime, but instantaneous currents of interest involve fractions of a coulomb per second.',
+      'One coulomb (C) is the quantity of charge carried by approximately 6.24 × 10¹⁸ electrons, or equivalently, the charge delivered in one second by a current of one ampere (1 C = 1 A·s). Named after French physicist Charles-Augustin de Coulomb (1736–1806). The coulomb is a large unit in everyday electronics — a typical AA battery can deliver about 10 000 C of charge over its lifetime, but instantaneous currents of interest involve fractions of a coulomb per second.',
     unit: 'Coulomb (C)',
     see: ['charge', 'current', 'ampere'],
   },
   ampere: {
     tip: 'The SI unit of current — one coulomb of charge flowing past a point per second.',
     detail:
-      'One ampere (A) is a flow rate of one coulomb per second (1 A = 1 C/s). Typical magnitudes: an LED runs on about 10 mA; an Arduino output pin can source or sink up to about 20 mA; a phone charger delivers 1–3 A; a household lighting circuit is protected at around 15 A; a lightning bolt peaks in the tens of thousands of amperes. The ampere is named after André-Marie Ampère (1775–1836), who worked out the mathematical laws relating currents to the magnetic fields they produce.',
+      'One ampere (A) is a flow rate of one coulomb per second (1 A = 1 C/s). Typical magnitudes: an LED runs on about 10 mA; an Arduino output pin can source or sink up to about 20 mA; a phone charger delivers 1–3 A; a household socket circuit is protected at 16 A; a lightning bolt peaks in the tens of thousands of amperes. The ampere is named after André-Marie Ampère (1775–1836), who worked out the mathematical laws relating currents to the magnetic fields they produce.',
     unit: 'Ampere (A)',
     formula: '1 A = 1 C/s',
     see: ['current', 'coulomb'],
@@ -1285,7 +1285,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   ohm: {
     tip: 'The SI unit of resistance — one volt across the component produces one ampere of current.',
     detail:
-      'One ohm (Ω) is the resistance that permits one ampere of current when one volt is applied across it (1 Ω = 1 V/A). Copper wire has a few milliohms per metre; a typical current-limiting resistor in a hobby circuit is in the range 100 Ω to 10 kΩ; dry human skin can measure 100 kΩ or more. The ohm is named after Georg Simon Ohm (1787–1854), who discovered that current is proportional to voltage in most materials — a relationship now known as Ohm\'s Law.',
+      'One ohm (Ω) is the resistance that permits one ampere of current when one volt is applied across it (1 Ω = 1 V/A). Copper wire has a few tens of milliohms per metre; a typical current-limiting resistor in a hobby circuit is in the range 100 Ω to 10 kΩ; dry human skin can measure 100 kΩ or more. The ohm is named after Georg Simon Ohm (1787–1854), who discovered that current is proportional to voltage in most materials — a relationship now known as Ohm\'s Law.',
     unit: 'Ohm (Ω)',
     formula: '1 Ω = 1 V/A',
     see: ['resistance', 'voltage', 'current'],
@@ -1305,13 +1305,13 @@ export const glossary: Record<string, GlossaryEntry> = {
   semiconductor: {
     tip: 'A material with conductivity between a conductor and an insulator — most often silicon.',
     detail:
-      'Semiconductors are materials like silicon and germanium whose conductivity is much lower than a metal but much higher than an insulator, and — crucially — can be controlled by chemical doping, electric fields, light, heat, or other stimuli. Their behaviour is what makes diodes, transistors, LEDs, photodiodes, and integrated circuits possible. Almost every modern electronic device is built from doped-silicon junctions. A full treatment of semiconductor physics is the subject of Chapter 1.10.',
+      'Semiconductors are materials like silicon and germanium whose conductivity is much lower than a metal but much higher than an insulator, and — crucially — can be controlled by chemical doping, electric fields, light, heat, or other stimuli. Their behaviour is what makes diodes, transistors, LEDs, photodiodes, and integrated circuits possible. Almost every modern electronic device is built from doped-silicon junctions. Chapters 1.10 and 1.11 build on this — diodes first, then transistors.',
     see: ['conductor', 'insulator', 'diode'],
   },
   'drift velocity': {
     tip: 'The average speed at which charge carriers crawl through a conductor when a voltage is applied — typically under 1 mm/s.',
     detail:
-      'When a voltage is applied to a wire, the free electrons inside do not zip along like water through a pipe. They collide constantly with the atoms of the metal, and the net effect of the applied field is only to nudge their random thermal motion slightly in one direction. The average forward speed — the drift velocity — is surprisingly slow: a fraction of a millimetre per second at everyday currents. The reason a light switch works instantly is that the electric field propagates through the wire near the speed of light, pushing every electron in the wire simultaneously; the same electron does not need to travel from switch to lamp. What you feel as "fast" is the field, not the carriers.',
+      'When a voltage is applied to a wire, the free electrons inside do not zip along like water through a pipe. They collide constantly with the metal\'s positive ions, and the net effect of the applied field is only to nudge their random thermal motion slightly in one direction. The average forward speed — the drift velocity — is surprisingly slow: a fraction of a millimetre per second at everyday currents. The reason a light switch works instantly is that the electric field propagates through the wire near the speed of light, pushing every electron in the wire simultaneously; the same electron does not need to travel from switch to lamp. What you feel as "fast" is the field, not the carriers.',
     see: ['current', 'conductor'],
   },
   'conventional current': {
@@ -1365,7 +1365,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'cutoff frequency': {
     tip: 'The frequency at which a filter\'s output has dropped to −3 dB — half the input power, 0.707 of the input voltage.',
     detail:
-      'The cutoff frequency f_c is the canonical descriptor of any filter: the frequency at which the response has dropped to −3 dB (half the input power, equivalent to 1 / √2 ≈ 0.707 of the input voltage). For a first-order RC filter, f_c = 1 / (2π·R·C); for an LC band-pass it is the resonant frequency f_0 = 1 / (2π√(LC)). The cutoff is also the hinge of the Bode plot — far above (or below, depending on filter type) f_c the magnitude follows a straight-line roll-off; far on the passband side it stays flat; the corner is centred on f_c.',
+      'The cutoff frequency f_c is the canonical descriptor of any filter: the frequency at which the response has dropped to −3 dB (half the input power, equivalent to 1 / √2 ≈ 0.707 of the input voltage). For a first-order RC filter, f_c = 1 / (2π·R·C); an LC band-pass has two cutoffs, one either side of its resonant centre f_0 = 1 / (2π√(LC)). The cutoff is also the hinge of the Bode plot — far above (or below, depending on filter type) f_c the magnitude follows a straight-line roll-off; far on the passband side it stays flat; the corner is centred on f_c.',
     formula: 'f_c = 1 / (2π·R·C)   (first-order RC)',
     see: ['filter', 'roll-off', 'bode plot', 'reactance'],
   },
@@ -1390,7 +1390,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'roll-off': {
     tip: 'How steeply a filter\'s response falls in the stopband — measured in dB per decade or dB per octave.',
     detail:
-      'Roll-off is the slope of the filter\'s magnitude response far from the cutoff, in dB per decade (a ×10 step in frequency) or dB per octave (a ×2 step). The fundamental rule is −20 dB per decade per pole: every additional reactive element doubles the slope. A 1st-order RC rolls off at −20 dB/decade (or equivalently −6 dB/octave); a 5-pole LC harmonic LPF rolls off at −100 dB/decade. On a Bode plot (log-log axes), the roll-off appears as a straight line — which is the main reason filter designers use log-log axes.',
+      'Roll-off is the slope of the filter\'s magnitude response far from the cutoff, in dB per decade (a ×10 step in frequency) or dB per octave (a ×2 step). The fundamental rule is −20 dB per decade per pole: every additional reactive element adds another −20 dB per decade. A 1st-order RC rolls off at −20 dB/decade (or equivalently −6 dB/octave); a 5-pole LC harmonic LPF rolls off at −100 dB/decade. On a Bode plot (log-log axes), the roll-off appears as a straight line — which is the main reason filter designers use log-log axes.',
     see: ['filter', 'order', 'bode plot', 'decade', 'decibel'],
   },
   'bode plot': {
@@ -1937,7 +1937,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['reference level', 'whole-body resonance', 'non-ionising', 'duty cycle'],
   },
   'reference level': {
-    tip: 'A reference level is an RF field strength in the air — volts per metre, or watts per square metre — set so that staying under it guarantees staying under the SAR limit inside the body.',
+    tip: 'A reference level is a limit on the RF field in the air — field strength in volts per metre, or power density in watts per square metre — set so that staying under it guarantees staying under the SAR limit inside the body.',
     detail:
       'The real limit is SAR, and SAR is unmeasurable in practice, so the guidelines translate it into something you can measure or model. Meeting the reference level always means meeting the SAR limit; exceeding it does not automatically mean you have exceeded the SAR limit, only that a proper assessment is now needed. The levels are frequency-dependent, dipping to their strictest across 30–400 MHz where the body is resonant. Below 30 MHz ICNIRP deliberately defines no power-density level at all, and requires the electric and magnetic fields to be checked separately.',
     see: ['sar', 'whole-body resonance', 'near field'],
@@ -2065,7 +2065,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'дсту': {
     tip: 'ДСТУ is the prefix on a Ukrainian national standard; ДСТУ EN or ДСТУ IEC means Ukraine has adopted a European or international standard as its own.',
     detail:
-      'The relevant one here is ДСТУ EN 60445:2022, which is where the harmonised conductor colours come from: brown for line, light blue for neutral, yellow-green for protective earth. Note the division of labour, because Ukrainian sources routinely get it wrong: the colour code is ДСТУ’s, not ПУЕ’s — the word «коричневий» does not appear anywhere in ПУЕ. ПУЕ mandates only the protective-earth and neutral colours.',
+      'The relevant one here is ДСТУ EN 60445:2022, which is where the harmonised conductor colours come from: brown for line, light blue for neutral, yellow-green for protective earth. Note the division of labour: the colour code is ДСТУ’s, not ПУЕ’s — the word «коричневий» does not appear anywhere in ПУЕ. ПУЕ mandates only the protective-earth and neutral colours.',
     see: ['пуе', 'protective earth', 'iec'],
   },
   'пзв': {
