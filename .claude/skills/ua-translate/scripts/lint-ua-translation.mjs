@@ -406,7 +406,10 @@ const RULES = [
     category: 'STYLE',
     severity: 'WARN',
     // Legacy Soviet 220 V mains reference. Ukraine harmonised to 230 V in 2003.
-    pattern: /(?<!\p{L})220\s*В(?!\p{L})/gu,
+    // The negative lookahead exempts a 220 В that is explicitly tied to 60 Hz:
+    // that is the Americas' mains, not Ukraine's, and naming it is the whole
+    // point of the sentence (glossary.mains lists the surviving standards).
+    pattern: /(?<!\p{L})220\s*В(?!\p{L})(?!\s*(?:при|за)\s*60)/gu,
     hint: 'Ukraine\'s mains is 230 В (harmonised with EU since 2003). If you\'re writing about historical Soviet-era 220 В specifically, ignore this. Otherwise use «230 В».',
   },
 

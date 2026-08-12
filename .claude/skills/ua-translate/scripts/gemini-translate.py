@@ -37,6 +37,7 @@ Requires GEMINI_API_KEY in .env.local (repo root).
 import json
 import re
 import sys
+import time
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -53,10 +54,19 @@ def load_api_key() -> str:
     sys.exit('GEMINI_API_KEY not found in .env.local')
 
 # ── CLI ───────────────────────────────────────────────────────────────
-if len(sys.argv) < 3:
-    sys.exit(f'Usage: {sys.argv[0]} <chapter_id> <key1> [<key2> ...]')
-chapter_id = sys.argv[1]
-keys = sys.argv[2:]
+argv = sys.argv[1:]
+# --only=2.5 / --only=3.1 re-runs a single model. Both candidates are still
+# REQUIRED before applying — this exists so that when one model 503s out you
+# can retry just that half instead of paying for the one that succeeded again.
+only = None
+for a in list(argv):
+    if a.startswith('--only='):
+        only = a.split('=', 1)[1]
+        argv.remove(a)
+if len(argv) < 2:
+    sys.exit(f'Usage: {sys.argv[0]} [--only=2.5|3.1] <chapter_id> <key1> [<key2> ...]')
+chapter_id = argv[0]
+keys = argv[1:]
 
 if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', chapter_id):
     sys.exit(f'Invalid block id {chapter_id!r}. Expected an i18n top-level block name (e.g. ch1_6, welcome, hero).')
@@ -290,11 +300,29 @@ def call_gemini(model: str) -> dict:
         headers={'Content-Type': 'application/json'},
         method='POST',
     )
-    try:
-        with urllib.request.urlopen(req, timeout=240) as resp:
-            return json.loads(resp.read().decode('utf-8'))
-    except urllib.error.HTTPError as e:
-        return {'error': e.read().decode('utf-8', errors='replace')}
+    # Retry on transient capacity failures. `gemini-3.1-pro-preview` returns
+    # 503 «This model is currently experiencing high demand» in bursts that
+    # last minutes, and a read timeout is the same condition seen from the
+    # other end. Without this, a batch silently ships with only the 2.5 Pro
+    # candidate — which is exactly the single-model output the workflow
+    # forbids. 5 attempts, doubling from 20 s ≈ 5 min of patience.
+    delay = 20
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(req, timeout=240) as resp:
+                return json.loads(resp.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            payload = e.read().decode('utf-8', errors='replace')
+            if e.code not in (429, 500, 503) or attempt == 4:
+                return {'error': payload}
+            print(f'  … {e.code}, retrying in {delay}s', flush=True)
+        except (TimeoutError, urllib.error.URLError) as e:
+            if attempt == 4:
+                return {'error': f'{type(e).__name__}: {e}'}
+            print(f'  … {type(e).__name__}, retrying in {delay}s', flush=True)
+        time.sleep(delay)
+        delay *= 2
+    return {'error': 'unreachable'}
 
 
 MODELS = [
@@ -309,6 +337,8 @@ out_dir.mkdir(exist_ok=True)
 section_id = keys[0]
 
 for model_id, label in MODELS:
+    if only and only not in label:
+        continue
     print(f'→ {label} ({model_id}) …', flush=True)
     resp = call_gemini(model_id)
     if 'error' in resp:

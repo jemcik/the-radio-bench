@@ -24,7 +24,24 @@ This skill is the **last gate** before declaring chapter prose ready. Running `c
 
 **Always** invoke as a **subagent** (spawn via the `Agent` tool with `subagent_type: "general-purpose"`), not in-line. The subagent's value is its independent context — it has not read the rest of the chapter recently, so it cannot resolve the same gaps the main agent's context fills in.
 
-The skill is NOT for: glossary entries (different reading mode — looked up, not read top-down), widget UI labels (single-line strings have no «before» context), or commit messages (audience is developers, not students).
+The skill is NOT for: widget UI labels (single-line strings have no «before» context) or commit messages (audience is developers, not students).
+
+**Glossary entries ARE in scope.** This line used to exclude them («different
+reading mode — looked up, not read top-down»), and that exclusion was the single
+most expensive sentence in this skill: because every review is also scoped to one
+`ch{N}_{M}` block, no reviewer had ever read a glossary entry. When the owner
+finally swept all 341 on 2026-08-02, **144 of them — 42 % — had defects**,
+including a dozen wrong numbers and physics claims. Review them with the same
+checks, plus three that only apply to them:
+
+- **A popover fires from any chapter**, so it must not assume where the reader
+  is («як ми побачимо в цьому розділі», «віджет у цьому розділі») or where the
+  reader lives («у вітчизняній літературі»).
+- **It must not contradict the term's own display name** in `glossary._names`,
+  or the prose that links it. Several entries called the same thing two names.
+- **Compare it against the English line by line.** A dropped closing sentence is
+  invisible in the popover, and «guessed» → «вгадав» reverses a claim the next
+  clause then denies.
 
 ## What the subagent should do
 

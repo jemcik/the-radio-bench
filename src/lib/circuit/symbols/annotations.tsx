@@ -14,6 +14,7 @@
  */
 import { svgTokens } from '@/components/diagrams/svgTokens'
 import { renderLabelContent } from '../SymbolLabel'
+import { STROKE } from '../types'
 
 interface NodePointProps {
   /** Logical x-coordinate (centre of the circle). */
@@ -166,3 +167,70 @@ export function TerminalLabel({
 // the chris-pikul `Source-COM-Transformer-Variable.svg` or drawn
 // inline with `<path d="M tip → tail …">` — no general primitive
 // needed.
+
+interface CurrentArrowProps {
+  /** Centre of the arrow, on the wire it annotates. */
+  x: number
+  y: number
+  /** Which way conventional current flows here. */
+  dir?: 'right' | 'left'
+  /** Usually «I» — rendered above the arrow. */
+  label?: string
+  /** Distance above the wire. Negative puts the arrow below it. */
+  offset?: number
+  /** Half-length of the shaft. */
+  half?: number
+}
+
+/**
+ * Current-direction arrow — the teaching mark this file's header has always
+ * listed as the example of what belongs here.
+ *
+ * Drawn ALONGSIDE a wire, never on it, so it reads as an annotation rather than
+ * as part of the circuit. Points the way conventional current flows (+ → −),
+ * which is the convention ch 1.1 teaches: «whenever you see a current arrow, it
+ * is pointing the way positive charge would go».
+ *
+ * Added for ch 1.1, whose schematic had the letter «I» hung on the LED as if it
+ * were a designator, with no arrow anywhere — while the caption told the reader
+ * that V pushes I through R.
+ */
+export function CurrentArrow({
+  x, y, dir = 'right', label, offset = 14, half = 16,
+}: CurrentArrowProps) {
+  const ay = y - offset
+  const tipX = dir === 'right' ? x + half : x - half
+  const tailX = dir === 'right' ? x - half : x + half
+  const back = dir === 'right' ? -5 : 5
+  return (
+    <>
+      <path
+        d={`M${tailX} ${ay}H${tipX}`}
+        stroke={svgTokens.fg}
+        strokeWidth={STROKE}
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d={`M${tipX + back} ${ay - 3.5}L${tipX} ${ay}L${tipX + back} ${ay + 3.5}`}
+        stroke={svgTokens.fg}
+        strokeWidth={STROKE}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {label && (
+        <text
+          x={x} y={ay - 6}
+          fontFamily="inherit"
+          fontSize="0.875em"
+          fontStyle="italic"
+          textAnchor="middle"
+          fill={svgTokens.fg}
+        >
+          {renderLabelContent(label)}
+        </text>
+      )}
+    </>
+  )
+}

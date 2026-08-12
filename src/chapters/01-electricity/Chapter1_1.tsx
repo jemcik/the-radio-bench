@@ -8,7 +8,8 @@ import { G } from '@/features/glossary/glossary-term'
 import { MathVar } from '@/components/ui/math'
 import {
   Circuit, Wire,
-  Resistor, Battery, LED,
+  Resistor, BatteryMulti, LED,
+  CurrentArrow,
   pins2,
   SCHEMATIC_PAD_TOP,
   schematicHeight,
@@ -22,6 +23,7 @@ import MaterialsComparison from '@/components/diagrams/MaterialsComparison'
 import MagnitudeLadder from '@/components/diagrams/MagnitudeLadder'
 import ResistanceCollision from '@/components/diagrams/ResistanceCollision'
 import AtomicDiagram from '@/components/diagrams/AtomicDiagram'
+import LabCurrentSchematic from '@/components/diagrams/LabCurrentSchematic'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
 import { useUnitFormatter, useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatNumber } from '@/lib/format'
@@ -46,7 +48,7 @@ const bat = pins2(LEFT_X, BAT_Y, 'down')
 const r1 = pins2(150, TOP_Y)
 const led = pins2(230, TOP_Y)
 
-function LedCircuit({ caption, legend }: { caption: string; legend: LegendEntry[] }) {
+function LedCircuit({ caption, legend, batteryValue }: { caption: React.ReactNode; legend: LegendEntry[]; batteryValue: string }) {
   return (
     <Circuit width={SCHEMATIC_W} height={SCHEMATIC_H} caption={caption} legend={legend}>
       <Wire points={[bat.p1, { x: LEFT_X, y: TOP_Y }, r1.p1]} />
@@ -58,9 +60,26 @@ function LedCircuit({ caption, legend }: { caption: string; legend: LegendEntry[
         { x: LEFT_X,  y: BOT_Y },
         bat.p2,
       ]} />
-      <Battery x={LEFT_X} y={BAT_Y} orient="down" label="V" />
+      {/* `V = 3 V` as a single value label, not label «V» + value «3 V»: the
+          legend says «voltage (3 V)», and until now 3 V appeared nowhere on
+          the drawing the legend describes. Split across the two label slots
+          it renders as «V ⊣⊢ 3 V», two captions that read as unrelated. It
+          goes in the LABEL slot, not the value slot: OrientedLabel puts a
+          vertical symbol's value at y+16, exactly where BatteryMulti draws
+          its «−» marker (measured overlap — the same one Chapter 0.5 hit).
+
+          BatteryMulti, not Battery: circuitIntro says this is the Chapter 0.5
+          circuit again, and 0.5 draws it as two cells (a 3 V pack of two AA
+          cells). A single-cell symbol here would contradict the figure the
+          sentence points back to. */}
+      <BatteryMulti x={LEFT_X} y={BAT_Y} orient="down" label={batteryValue} />
       <Resistor x={150} y={TOP_Y} label="R" />
-      <LED x={230} y={TOP_Y} label="I" />
+      <LED x={230} y={TOP_Y} />
+      {/* Current arrow on the top rail, pointing + → −, labelled I. It used to
+          be a bare label="I" on the LED — i.e. the letter sat exactly where a
+          designator belongs, and `currentConvention` had just taught the reader
+          to read arrows, not letters, as current. */}
+      <CurrentArrow x={190} y={TOP_Y} dir="right" label="I" />
     </Circuit>
   )
 }
@@ -102,7 +121,7 @@ export default function Chapter1_1() {
       <p>{t('ch1_1.waterPayoff')}</p>
 
       <Callout variant="note">
-        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ ...mathComponents, strong: <strong />, ac: <G k="ac" /> }} />
+        <Trans i18nKey="ch1_1.waterBreaks" ns="ui" components={{ ...mathComponents, strong: <strong />, ac: <G k="ac" />, ind: <G k="inductance" /> }} />
       </Callout>
 
       {/* ── Section 2: Charge ─────────────────────────────────────── */}
@@ -157,8 +176,10 @@ export default function Chapter1_1() {
         items={[
           { value: 0.01,  label: `10 ${u('ma')}`, description: t('ch1_1.currentLadderLed') },
           { value: 0.02,  label: `20 ${u('ma')}`, description: t('ch1_1.currentLadderArduino') },
-          { value: 2,     label: `1–3 ${u('a')}`, description: t('ch1_1.currentLadderCharger') },
-          { value: 15,    label: `15 ${u('a')}`,  description: t('ch1_1.currentLadderFuse') },
+          { value: 2,     label: `2 ${u('a')}`,   description: t('ch1_1.currentLadderCharger') },
+          // IEC 60898-1 ratings are 6/10/13/16/20/25/32 A — no 15 A step. This
+          // course is on IEC values elsewhere (230 V mains on the voltage ladder).
+          { value: 16,    label: `16 ${u('a')}`,  description: t('ch1_1.currentLadderFuse') },
           { value: 30000, label: `30 ${u('ka')}`, description: t('ch1_1.currentLadderLightning') },
         ]}
       />
@@ -201,7 +222,7 @@ export default function Chapter1_1() {
         tone="primary"
         items={[
           { value: 1.5,    label: `${formatNumber(1.5, locale)} ${u('v')}`,                       description: t('ch1_1.voltageLadderAA') },
-          { value: 5,      label: `${formatNumber(3.3, locale)}–5 ${u('v')}`,                     description: t('ch1_1.voltageLadderLogic') },
+          { value: 5,      label: `5 ${u('v')}`,                                                   description: t('ch1_1.voltageLadderLogic') },
           { value: 12,     label: `12 ${u('v')}`,                                                  description: t('ch1_1.voltageLadderCar') },
           { value: 230,    label: `230 ${u('v')}`,                                                 description: t('ch1_1.voltageLadderMains') },
           { value: 400000, label: `400 ${u('kv')}`,                                                description: t('ch1_1.voltageLadderTransmission') },
@@ -223,7 +244,11 @@ export default function Chapter1_1() {
         />
       </p>
 
-      <p>{t('ch1_1.resistanceMechanism')}</p>
+      <p>
+        <Trans i18nKey="ch1_1.resistanceMechanism" ns="ui"
+          components={{ ...mathComponents, strong: <strong /> }}
+        />
+      </p>
 
       <ResistanceCollision />
 
@@ -242,7 +267,7 @@ export default function Chapter1_1() {
         </li>
         <li>
           <Trans i18nKey="ch1_1.resistanceCat3" ns="ui"
-            components={{ ...mathComponents, strong: <strong />, semiconductor: <G k="semiconductor" /> }}
+            components={{ ...mathComponents, strong: <strong />, semiconductor: <G k="semiconductor" />, trans: <G k="transistor" /> }}
           />
         </li>
       </ul>
@@ -263,7 +288,9 @@ export default function Chapter1_1() {
         caption={t('ch1_1.resistanceLadderCaption')}
         tone="caution"
         items={[
-          { value: 0.005,  label: `5 ${u('milliohm')}`,  description: t('ch1_1.resistanceLadderWire') },
+          // 22 AWG hook-up wire: ρ_Cu·L/A = 1.68e-8 / 3.26e-7 ≈ 52 mΩ per metre.
+          // The old 5 mΩ would need ~3.4 mm² — 12 AWG mains cable, not hook-up wire.
+          { value: 0.05,   label: `50 ${u('milliohm')}`, description: t('ch1_1.resistanceLadderWire') },
           { value: 1000,   label: `1 ${u('kohm')}`,      description: t('ch1_1.resistanceLadderLimiting') },
           { value: 10000,  label: `10 ${u('kohm')}`,     description: t('ch1_1.resistanceLadderPullup') },
           { value: 100000, label: `100 ${u('kohm')}`,    description: t('ch1_1.resistanceLadderSkin') },
@@ -273,10 +300,17 @@ export default function Chapter1_1() {
       {/* ── Section 6: Putting it together ────────────────────────── */}
       <Section id="circuit" labelKey="ch1_1.sectionCircuit" />
 
-      <p>{t('ch1_1.circuitIntro')}</p>
+      <p>
+        <Trans i18nKey="ch1_1.circuitIntro" ns="ui"
+          components={{ ...mathComponents, led: <G k="led" /> }}
+        />
+      </p>
 
       <LedCircuit
-        caption={t('ch1_1.circuitCaption')}
+        caption={
+          <Trans i18nKey="ch1_1.circuitCaption" ns="ui" components={{ ...mathComponents }} />
+        }
+        batteryValue={`V = 3 ${u('v')}`}
         legend={[
           { heading: t('ch1_1.circuitLegendQuantitiesTitle') },
           // Quantity letter lives in the swatch column, right-aligned there
@@ -297,7 +331,7 @@ export default function Chapter1_1() {
 
       <p>
         <Trans i18nKey="ch1_1.circuitOhmPreview" ns="ui"
-          components={{ ...mathComponents, strong: <strong /> }}
+          components={{ ...mathComponents, strong: <strong />, diode: <G k="diode" /> }}
         />
       </p>
 
@@ -370,6 +404,11 @@ export default function Chapter1_1() {
       </Callout>
 
       {/* ── Lab Activity ──────────────────────────────────────────── */}
+      {/* Schematic first: step 4 describes a loop with the meter inside the
+          break, and the step used to be a chain of arrows that read as
+          «join the red probe to the black probe». Reader-flagged. */}
+      <LabCurrentSchematic />
+
       <LabActivity
         label="1.1"
         goal={t('ch1_1.labGoal')}
