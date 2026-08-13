@@ -49,9 +49,9 @@ export const glossary: Record<string, GlossaryEntry> = {
     see: ['diode', 'resistor'],
   },
   psu: {
-    tip: 'Power Supply Unit — converts wall AC (or a battery) into the regulated DC voltages a circuit needs.',
+    tip: 'Power Supply Unit — converts alternating-current (AC) mains into the steady direct-current (DC) voltages a circuit needs.',
     detail:
-      'A PSU is whatever stands between the wall socket and your circuit\'s "+5 V" rail: a transformer-rectifier-regulator chain in a linear bench supply, or a switching converter in a phone charger. The two numbers that matter are the output voltage range and the maximum output current; a 0–30 V / 0–3 A bench PSU with current-limit knobs is the standard tool for prototyping. Switching PSUs are smaller and more efficient but inject high-frequency noise into the rail; linear PSUs are cleaner but heavier and run hot. "PSU" is the everyday acronym in datasheets, schematics, and product blurbs.',
+      'A PSU is whatever stands between the wall socket and your circuit\'s "+5 V" supply line — its «rail»: a transformer-rectifier-regulator chain in a linear bench supply, or a switching converter in a phone charger. The two numbers that matter are the output voltage range and the maximum output current; a 0–30 V / 0–3 A bench PSU with current-limit knobs is a common choice for prototyping. Switching PSUs are smaller and more efficient but inject high-frequency noise into the rail; linear PSUs are cleaner but heavier and run hot. "PSU" is the everyday acronym in datasheets, schematics, and product blurbs.',
     see: ['ac', 'dc', 'rectification'],
   },
   emi: {
@@ -142,7 +142,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   resistance: {
     tip: 'The opposition to current flow in a material.',
     detail:
-      'Resistance converts electrical energy into heat. Every conductor has some resistance; insulators have very high resistance. Resistors are components designed to provide a precise, known resistance. In series they add up; in parallel the total is less than any individual value.',
+      'A component\'s resistance is what turns electrical energy into heat as current passes through it. Every conductor has some resistance; insulators have very high resistance. Resistors are components designed to provide a precise, known resistance. In series they add up; in parallel the total is less than any individual value.',
     unit: 'Ohm (Ω)',
     formula: 'R = V / I',
     see: ['voltage', 'current', 'impedance'],
@@ -395,7 +395,7 @@ export const glossary: Record<string, GlossaryEntry> = {
   'dummy load': {
     tip: 'A non-radiating 50 Ω resistor that stands in for an antenna, soaking up a transmitter\'s full output as heat so you can test it without going on the air.',
     detail:
-      'A dummy load is a resistor — close to 50 Ω so it matches the transmitter\'s output — built to absorb full transmit power and turn it into heat instead of radiating it. It lets you tune up, measure output power, or test a rig without transmitting on a real antenna, and so without interfering with anyone. The two things that matter are its impedance (50 Ω, for a low SWR) and its power rating: a homebrew load of four 200 Ω resistors in parallel makes 50 Ω, while oil-filled «cantenna» loads handle high power. Reading the RF voltage across a dummy load on an oscilloscope is a common way to measure output power.',
+      'A dummy load is a resistor — close to 50 Ω so it matches the transmitter\'s output — built to absorb full transmit power and turn it into heat instead of radiating it. It lets you tune up, measure output power, or test a rig without transmitting on a real antenna, and so without interfering with anyone. The two things that matter are its impedance (50 Ω, for a low standing-wave ratio, SWR) and its power rating: a homebrew load of four 200 Ω resistors in parallel makes 50 Ω, while oil-filled «cantenna» loads handle high power. Reading the RF voltage across a dummy load on an oscilloscope is a common way to measure output power.',
     see: ['impedance', 'swr'],
   },
   wavemeter: {

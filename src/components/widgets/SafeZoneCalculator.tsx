@@ -160,7 +160,7 @@ export default function SafeZoneCalculator() {
             </span>
           </div>
           <p className="text-xs font-mono text-muted-foreground self-end">
-            R ≥ V² / P = ({formatDecimal(vSI, vSI < 10 ? 1 : 0, locale)} {tUnit('v')})² / {rating.label} {tUnit('w')}
+            R ≥ V² / P = ({formatDecimal(vSI, vSI < 10 ? 1 : 0, locale)} {tUnit('v')})² / ({rating.label} {tUnit('w')})
           </p>
         </div>
       </ResultBox>

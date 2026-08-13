@@ -139,11 +139,28 @@ export default function MagnitudeLadder({
                               // for 2 lines) still fit vertically-centred
   const BOX_X = 60            // ≈ right padding too, so content is centred
   const GAP_H = 44            // vertical gap between consecutive boxes
+  // The description column is allowed to be TALLER than the badge box.
+  // `foreignObject` clips to its own bounds in Chrome, so a description that
+  // wrapped to three lines (54 px) inside a 42 px box lost its first and last
+  // line to the clip — measured on ch1.2's Ukrainian ratings ladder, where
+  // four of six rungs were cut. The extra height is centred on the box, so
+  // rungs that already fitted render pixel-identically; only the ones that
+  // were being clipped change. 72 px holds four lines, and the ±15 px of
+  // overhang stays inside the 44 px gap, so neighbouring rungs never meet.
   const TOP_MARGIN = 18       // title is now rendered in HTML above the
                               // SVG via DiagramFigure's `title` prop, so
                               // the SVG itself only needs a small top
                               // breathing-room for the first rough box.
   const BOTTOM_MARGIN = 22
+
+  // 72 px = four lines at 16.52 px. That is the HARD budget for a rung
+  // description: Chrome clips `foreignObject`, so a fifth line loses ~5 px off
+  // the top and bottom of the block (measured on ch1.2's UA SMD rung). At
+  // ~43 Cyrillic characters per line in the 356 px column, keep Ukrainian rung
+  // text under ~172 characters. Raising this further is not the escape hatch —
+  // the overhang is (DESC_H − BOX_H) / 2 per side against GAP_H = 44, so
+  // anything past ~86 makes adjacent rungs' text collide.
+  const DESC_H = BOX_H + 30
 
   const H = TOP_MARGIN + sorted.length * BOX_H + (sorted.length - 1) * GAP_H + BOTTOM_MARGIN
 
@@ -247,9 +264,9 @@ export default function MagnitudeLadder({
                   approach clipped descriptions > ~40 chars EN / ~30 UK. */}
               <foreignObject
                 x={descriptionX}
-                y={y}
+                y={y - (DESC_H - BOX_H) / 2}
                 width={W - descriptionX - 8}
-                height={BOX_H}
+                height={DESC_H}
               >
                 <div
                   style={{

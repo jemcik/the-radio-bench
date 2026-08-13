@@ -37,3 +37,5 @@
 - [i18n editing traps: NBSP, apostrophes, cross-chapter key collisions](project_i18n_editing_traps.md) — scripted edits to ui.json fail silently three ways; scope every regex to the chapter block and diff which keys changed EN vs UA at the end
 - [Translation restores terms the English avoided](feedback_translation_reintroduces_avoided_terms.md) — «joined end to end» came back as «послідовно»; grep the applied UA for each settled term's rivals after every Gemini run
 - [Course parts: lowercase «частина» + Roman numeral](feedback_course_parts_lowercase_roman.md) — «частина III», never «Частині 3»; Part 0 stays 0; enforced by the UA linter + check:course-part-numbering
+- [Diagram gates measure bounding boxes, not ink](project_diagram_gates_measure_bboxes_not_ink.md) — an L-shaped `<Wire>` is one path whose bbox owns the empty quadrant too (`T×PATH`), and `check:diagram-viewbox-fit` cannot see `TerminalLabel` text; run both gates before polishing a new diagram
+- [Made it? Then it ships](feedback_made_it_then_ship_it.md) — never ask whether an already-made, already-green change belongs in the diff; scope of finished work is my call, not a question back

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
+import { MathVar } from '@/components/ui/math'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatDecimal, formatNumber } from '@/lib/format'
@@ -164,7 +165,9 @@ export default function RuntimeCalculator() {
       </div>
 
       <p className="text-[13px] text-muted-foreground">
-        {t('ch1_2.widget.runtime.hint')}
+        {/* <Trans>, not t(): the hint names V · Q, and a bare `t()` would ship
+            the <var> tags literally. */}
+        <Trans i18nKey="ch1_2.widget.runtime.hint" ns="ui" components={{ var: <MathVar /> }} />
       </p>
     </Widget>
   )

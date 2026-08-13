@@ -265,6 +265,7 @@ export default function OhmsCalculator() {
         siP={results.P}
         voltageLabel={formatQuantityLabel('V', results.V, tUnit, locale)}
         resistanceLabel={formatQuantityLabel('R', results.R, tUnit, locale)}
+        currentLabel={formatQuantityLabel('I', results.I, tUnit, locale)}
       />
 
       <p className="text-[13px] text-muted-foreground">
@@ -314,9 +315,11 @@ interface CircuitFlowProps {
   siP: number | null
   voltageLabel: string
   resistanceLabel: string
+  currentLabel: string
 }
 
-function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel }: CircuitFlowProps) {
+function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel, currentLabel }: CircuitFlowProps) {
+  const { t } = useTranslation('ui')
   // Layout constants — viewBox 420 × 84 so everything renders at
   // designed size on screen (no CSS scaling).
   const VB_W = 420
@@ -410,7 +413,7 @@ function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel }: CircuitFlowPro
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"
-        aria-label={`Circuit: battery at ${voltageLabel}, resistor at ${resistanceLabel}, current flowing at ${driftPxPerSec.toFixed(0)} pixels per second`}
+        aria-label={t('ch1_2.widget.ohmCalc.circuitAria', { voltage: voltageLabel, resistance: resistanceLabel, current: currentLabel })}
         style={{ display: 'block' }}
       >
         <defs>
