@@ -99,7 +99,7 @@ The `beginner-review` skill was added on **2026-05-20**, in the same commit as c
 that date was therefore written, translated and shipped without ever being read by a
 fresh-context reader.
 
-Never reviewed (14): 0.1 – 0.5, 1.1 – 1.10 — of which 0.1 – 0.5 and 1.1 are now done.
+Never reviewed (14): 0.1 – 0.5, 1.1 – 1.10 — of which 0.1 – 0.5, 1.1 and 1.2 are now done.
 Covered by the rule (12): 1.11, 2.1 – 2.3, 3.1 – 3.4, 4.1 – 4.4.
 
 The **glossary** was outside this backlog entirely — the skill excluded it by rule
@@ -149,7 +149,7 @@ It is a filter, not a guarantee.
 | [x] | `0.4` — 2026-07-31. Six review rounds (85 → 45 → 19 → 35 → 12 → 7 findings); all applied. §3 math-var debt cleared in the same pass, and the chapter got the lab schematic its steps had been describing without one. |
 | [x] | `0.5` — 2026-08-02. Seven review rounds (32 → 18 → 15 → 11 → 17 → 14 → 21 findings); all applied. Gained the wires/junctions figure the section never had, plus a `ResistorIEC` primitive and a corrected `Capacitor` (it drew the polarised symbol). |
 | [x] | `1.1` — 2026-08-02. Seven review rounds (40 → 47 → 37 → 21 → 15 → 2 → 1 findings); all applied. §1 and §3 debt for this chapter cleared in the same pass, and the chapter gained a `CurrentArrow` primitive — the schematic labelled the LED «I» and drew no arrow at all. Four numbers were wrong: the collision rate (the electrons-per-coulomb figure reused, off by 150 000×), the electrons per coulomb (6.25 → 6.24), a metre of copper wire (5 mΩ → 50 mΩ) and a 15 A breaker (not an IEC rating).
-| [ ] | `1.2` |
+| [x] | `1.2` — 2026-08-12. Eight review rounds (62 → 29 → 16 → 15 → 7 → 5 → 1 → 0 findings); all applied. §3 math-var debt cleared in the same pass (26 keys — the first batch that also needed two **render paths** changed, `kirchhoffClose` and `widget.runtime.hint`, because a bare `t()` would have shipped the new `<var>` literally). The chapter gained the lab schematic its steps had been describing without one. Four claims were wrong: a 220 Ω resistor was said to pass 23 mA *through an LED* (the LED takes ~2 V of the 5 V, so ≈14 mA); a filament's 2700 K was written as 2700 °C; «coulombs with amps give … joules» (joules come from coulombs × volts); and the quiz explanation derived two distractors from a division that does not produce them. The subtitle promised «the two equations that explain everything» while §7 adds Kirchhoff's two laws. |
 | [ ] | `1.3` |
 | [ ] | `1.4` |
 | [ ] | `1.5` |
@@ -164,14 +164,20 @@ It is a filter, not a guarantee.
 ## 3. Math variables in prose that are not wrapped in `<var>`
 
 **Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
-(`da1c413`). **Scale:** 474 keys across 11 chapters (0.2 – 1.11); originally 533 across
-14. Ch 0.3 was worked off 2026-07-29, ch 0.4 on 2026-07-31 and ch 1.1 on 2026-08-02; the
-symbol-gloss exemption added on 2026-07-29 cleared a further fifteen keys spread over
-ch 0.2, 1.1, 1.3, 1.5 and 1.6, and the aria-label exemption added 2026-08-02 cleared four
-more (ch 1.7, 1.8) — an `aria-label` is read aloud, never rendered, so it cannot carry
-`<var>` and the defect this gate names does not apply to it.
-**Gate:** `check:unwrapped-math-var` (green — all 474 are grandfathered in
+(`da1c413`). **Scale:** 441 keys across 10 chapters (0.2 – 1.11); originally 533 across
+14. Ch 0.3 was worked off 2026-07-29, ch 0.4 on 2026-07-31, ch 1.1 on 2026-08-02 and
+ch 1.2 on 2026-08-12; the symbol-gloss exemption added on 2026-07-29 cleared a further
+fifteen keys spread over ch 0.2, 1.1, 1.3, 1.5 and 1.6, and the aria-label exemption
+added 2026-08-02 cleared four more (ch 1.7, 1.8) — an `aria-label` is read aloud, never
+rendered, so it cannot carry `<var>` and the defect this gate names does not apply to it.
+**Gate:** `check:unwrapped-math-var` (green — all 441 are grandfathered in
 `scripts/unwrapped-math-var-baseline.json`).
+
+Ch 1.2's 26 keys were the first batch where clearing the debt also required changing a
+**render path**: `kirchhoffClose` and `widget.runtime.hint` were both emitted with a bare
+`t()`, so a `<var>` added to them would have shipped as literal text. Both are now
+`<Trans>` with a `var` → `<MathVar>` map. Expect the same in other chapters — check the
+render site before wrapping, not after.
 
 ### What the defect is
 

@@ -37,7 +37,9 @@
  *
  * Algorithm
  * ─────────
- * 1. Load every EN i18n value; extract its set of tag names; classify:
+ * 1. Load every i18n value from BOTH locales (a tag present only in the
+ *    Ukrainian value still has to reach a renderer); union the tag names
+ *    per key; classify:
  *    a. No tags → not flagged.
  *    b. Only `<var>`/`<nowrap>`/`<sub>` → MathText OR Trans is safe.
  *    c. Anything else → ONLY Trans is safe.
@@ -53,7 +55,10 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(__dirname, '..')
-const EN_PATH = path.join(REPO, 'src/i18n/locales/en/ui.json')
+const LOCALE_PATHS = [
+  path.join(REPO, 'src/i18n/locales/en/ui.json'),
+  path.join(REPO, 'src/i18n/locales/uk/ui.json'),
+]
 const SRC_DIR = path.join(REPO, 'src')
 
 // Tag names that <MathText> parses natively. Everything else needs <Trans>.
@@ -95,12 +100,29 @@ function classify(v) {
   return { onlyMathText, tags: [...names].sort() }
 }
 
-const en = JSON.parse(readFileSync(EN_PATH, 'utf8'))
-const flat = flatten(en)
+// BOTH locales, not just EN. A tag that exists only in the Ukrainian value
+// still has to reach a renderer, and reading EN alone made every such key
+// invisible: `ch1_2.efficiencyExample` shipped «<transceiver>трансивер
+// </transceiver>» as literal text on screen, through a green gate, because the
+// English value carried no tag. Repo-wide there were 36 UA-only tagged keys.
 const flaggedKeys = new Map()
-for (const [k, v] of Object.entries(flat)) {
-  const c = classify(v)
-  if (c) flaggedKeys.set(k, c)
+const sampleValue = {}
+for (const localePath of LOCALE_PATHS) {
+  const json = JSON.parse(readFileSync(localePath, 'utf8'))
+  for (const [k, v] of Object.entries(flatten(json))) {
+    const c = classify(v)
+    if (!c) continue
+    if (sampleValue[k] === undefined) sampleValue[k] = v
+    const prev = flaggedKeys.get(k)
+    // Union the tag sets across locales, so a key tagged in one locale and not
+    // the other is still classified by everything it can contain.
+    if (prev) {
+      const tags = [...new Set([...prev.tags, ...c.tags])].sort()
+      flaggedKeys.set(k, { onlyMathText: prev.onlyMathText && c.onlyMathText, tags })
+    } else {
+      flaggedKeys.set(k, c)
+    }
+  }
 }
 
 if (flaggedKeys.size === 0) {
@@ -225,7 +247,7 @@ for (const file of files) {
       file: path.relative(REPO, file),
       line,
       key,
-      value: flat[key],
+      value: sampleValue[key],
       tags: classification.tags,
       onlyMathText: classification.onlyMathText,
     })
@@ -302,7 +324,7 @@ for (const file of files) {
         file: path.relative(REPO, file),
         line,
         key,
-        value: flat[key],
+        value: sampleValue[key],
         tags: cls.tags,
         onlyMathText: cls.onlyMathText,
         kind: 'dynamic-through-t',

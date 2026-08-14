@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/section-heading'
 import { MBlock, MathVar } from '@/components/ui/math'
 import { G } from '@/features/glossary/glossary-term'
 import LabActivity from '@/components/lab/LabActivity'
+import OhmLabSchematic from '@/components/diagrams/OhmLabSchematic'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import OhmsLawPlot from '@/components/widgets/OhmsLawPlot'
 import OhmsCalculator from '@/components/widgets/OhmsCalculator'
@@ -13,7 +14,8 @@ import SafeZoneCalculator from '@/components/widgets/SafeZoneCalculator'
 import RuntimeCalculator from '@/components/widgets/RuntimeCalculator'
 import MagnitudeLadder from '@/components/diagrams/MagnitudeLadder'
 import { STORAGE_KEYS } from '@/lib/storage-keys'
-import { useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useUnitFormatter, useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { formatDecimal } from '@/lib/format'
 import { mathComponents } from '@/lib/trans-defaults'
 
 const CHAPTER_ID = '1-2'
@@ -22,6 +24,7 @@ const QUIZ_QUESTION_COUNT = 8
 export default function Chapter1_2() {
   const { t } = useTranslation('ui')
   const u = useUnitFormatter()
+  const { locale } = useLocaleFormatter()
   const quizQuestions = useMemo(
     () => buildQuizFromI18n(t, 'ch1_2', QUIZ_QUESTION_COUNT, {
       nowrap: <span style={{ whiteSpace: 'nowrap' }} />,
@@ -100,6 +103,19 @@ export default function Chapter1_2() {
         </li>
       </ul>
 
+      {/* Structure contract: every formula gets a worked example. §1 gave
+          V = I·R a plot and two rearrangements but no numbers — the first
+          worked example in the chapter used to be in §2, and opened from
+          P = V·I rather than from Ohm's law. It sits AFTER the rearrangements
+          because it applies I = V / R, which the list above is what states. */}
+      <p>
+        <Trans
+          i18nKey="ch1_2.ohmFirstExample"
+          ns="ui"
+          components={{ ...mathComponents, strong: <strong /> }}
+        />
+      </p>
+
       {/* ── Section 2: Power ─────────────────────────────────────── */}
       <Section id="power" labelKey="ch1_2.sectionPower" />
 
@@ -156,10 +172,10 @@ export default function Chapter1_2() {
         tone="caution"
         items={[
           { value: 0.02,   label: `20 ${u('mw')}`,  description: t('ch1_2.powerLadderLed') },
-          { value: 0.5,    label: `500 ${u('mw')}`, description: t('ch1_2.powerLadderHandheld') },
+          { value: 1,      label: `1 ${u('w')}`,    description: t('ch1_2.powerLadderHandheld') },
           { value: 5,      label: `5 ${u('w')}`,    description: t('ch1_2.powerLadderQrp') },
           { value: 60,     label: `60 ${u('w')}`,   description: t('ch1_2.powerLadderBulb') },
-          { value: 1500,   label: `1.5 ${u('kw')}`, description: t('ch1_2.powerLadderKettle') },
+          { value: 1500,   label: `${formatDecimal(1.5, 1, locale)} ${u('kw')}`, description: t('ch1_2.powerLadderKettle') },
           { value: 100000, label: `100 ${u('kw')}`, description: t('ch1_2.powerLadderBroadcast') },
         ]}
       />
@@ -188,7 +204,9 @@ export default function Chapter1_2() {
       {/* ── Section 4: Resistor power ratings ─────────────────────── */}
       <Section id="ratings" labelKey="ch1_2.sectionRatings" />
 
-      <p>{t('ch1_2.ratingsIntro')}</p>
+      <p>
+        <Trans i18nKey="ch1_2.ratingsIntro" ns="ui" components={{ ...mathComponents }} />
+      </p>
 
       <MagnitudeLadder
         title={t('ch1_2.ratingsLadderTitle')}
@@ -197,7 +215,10 @@ export default function Chapter1_2() {
         tone="primary"
         items={[
           { value: 0.0625, label: `1/16 ${u('w')}`, description: t('ch1_2.ratingsLadderSmd') },
-          { value: 0.25,   label: `1/4 ${u('w')}`,  description: t('ch1_2.ratingsLadderQuarterW') },
+          // «¼», not «1/4»: the rung's own description and the rest of the
+          // chapter (deratingNote, labComp2, labStep5, quiz 3 and 8) all use
+          // the glyph, and the badge sat next to it in the same row.
+          { value: 0.25,   label: `¼ ${u('w')}`,  description: t('ch1_2.ratingsLadderQuarterW') },
           { value: 1,      label: `1 ${u('w')}`,    description: t('ch1_2.ratingsLadderOneW') },
           { value: 5,      label: `5 ${u('w')}`,    description: t('ch1_2.ratingsLadderFiveW') },
           { value: 50,     label: `50 ${u('w')}`,   description: t('ch1_2.ratingsLadderFiftyW') },
@@ -290,9 +311,18 @@ export default function Chapter1_2() {
 
       <MBlock tex="\eta = \dfrac{P_{\mathrm{out}}}{P_{\mathrm{in}}}" />
 
-      <p>{t('ch1_2.efficiencyExample')}</p>
+      <p>
+        <Trans i18nKey="ch1_2.efficiencyExample" ns="ui"
+          components={{ ...mathComponents, transceiver: <G k="transceiver" /> }}
+        />
+      </p>
 
-      {/* ── Kirchhoff's laws teaser — forward-pointer to Ch 1.4 ─── */}
+      {/* ── Section 7: Kirchhoff's laws ───────────────────────────── */}
+      {/* Own section, not a callout inside §6: the outline used to file
+          Kirchhoff's laws under «Efficiency», which is where a reader
+          scanning headings would never look for them. */}
+      <Section id="kirchhoff" labelKey="ch1_2.sectionKirchhoff" />
+
       <Callout variant="note">
         <p>{t('ch1_2.kirchhoffIntro')}</p>
         <ul>
@@ -311,7 +341,13 @@ export default function Chapter1_2() {
             />
           </li>
         </ul>
-        <p>{t('ch1_2.kirchhoffClose')}</p>
+        <p>
+          <Trans
+            i18nKey="ch1_2.kirchhoffClose"
+            ns="ui"
+            components={{ var: <MathVar /> }}
+          />
+        </p>
       </Callout>
 
       {/* ── Summary ───────────────────────────────────────────────── */}
@@ -326,6 +362,11 @@ export default function Chapter1_2() {
       </Callout>
 
       {/* ── Lab Activity ──────────────────────────────────────────── */}
+      {/* Schematic first: steps 2 and 3 describe two hookups of the same
+          meter — across the resistor for volts, inside the break of the
+          loop for amps — and neither had a picture. */}
+      <OhmLabSchematic />
+
       <LabActivity
         label="1.2"
         goal={t('ch1_2.labGoal')}

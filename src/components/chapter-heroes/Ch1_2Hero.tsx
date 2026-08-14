@@ -53,6 +53,16 @@ const PIPE_TOP_Y = 56
 const PIPE_BOT_Y = 70
 const PIPE_MID_Y = (PIPE_TOP_Y + PIPE_BOT_Y) / 2  // 63
 
+// Constriction in the pipe — resistance. Chapter 1.1's water-pipe diagram
+// already teaches «narrow section = resistance»; without it this hero shows
+// V, I and P and silently omits the third quantity of its own chapter title.
+const GATE_X = 232          // clear of the «current» caption centred at 180
+const GATE_INSET = 4.5      // per plate; leaves a 5 px gap in the 14 px bore
+                            // — a narrowing, not a closed valve. At 3.5 the
+                            // two stubs read as one hairline crossing the
+                            // pipe rather than as a constriction, so they are
+                            // also drawn thicker than the pipe walls below.
+
 const WHEEL_CX = 320
 const WHEEL_CY = 115
 const WHEEL_R = 22
@@ -153,6 +163,14 @@ function rotationArrow(seed: number) {
   return { arc, head }
 }
 
+/** Two plates narrowing the pipe bore — the resistance in the analogy. */
+function gateStrokes(seed: number): RoughPath[] {
+  return [
+    ...roughLine(GATE_X, PIPE_TOP_Y, GATE_X, PIPE_TOP_Y + GATE_INSET, { seed, strokeWidth: 2.6, roughness: 0.4 }),
+    ...roughLine(GATE_X, PIPE_BOT_Y, GATE_X, PIPE_BOT_Y - GATE_INSET, { seed: seed + 1, strokeWidth: 2.6, roughness: 0.4 }),
+  ]
+}
+
 export default function Ch1_2Hero() {
   const { t } = useTranslation('ui')
 
@@ -160,6 +178,7 @@ export default function Ch1_2Hero() {
     () => ({
       tank: tankStrokes(20),
       pipe: pipeStrokes(40),
+      gate: gateStrokes(50),
       arc: arcStrokes(60),
       wheel: wheelStrokes(80),
       rotation: rotationArrow(110),
@@ -228,6 +247,21 @@ export default function Ch1_2Hero() {
       <g opacity={0.6}>
         <RoughPaths paths={s.pipe.flow} />
       </g>
+      {/* ─── GATE (resistance) — narrows the bore partway along ──── */}
+      <RoughPaths paths={s.gate} />
+      <text
+        x={GATE_X}
+        y={PIPE_TOP_Y - 5}
+        fontFamily="inherit"
+        fontSize="0.812em"
+        fontStyle="italic"
+        fontWeight="700"
+        fill="currentColor"
+        textAnchor="middle"
+      >
+        R
+      </text>
+
       {/* I glyph below the pipe midpoint, in the open space between the
           pipe and the wheel. */}
       <text

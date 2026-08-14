@@ -291,8 +291,8 @@ export default function OhmsLawPlot() {
         <div className="flex flex-col gap-1">
           <p className="text-sm text-foreground">{readout}</p>
           <p className="text-xs font-mono text-muted-foreground">
-            V = I · R = {formatResistance(resistance, tUnit, locale)} ·{' '}
-            {formatDecimal(endpoint.iMa, 1, locale)} {tUnit('ma')} ={' '}
+            V = I · R = {formatDecimal(endpoint.iMa, 1, locale)} {tUnit('ma')} ·{' '}
+            {formatResistance(resistance, tUnit, locale)} ={' '}
             {formatDecimal(endpoint.v, 2, locale)} {tUnit('v')}
           </p>
         </div>
