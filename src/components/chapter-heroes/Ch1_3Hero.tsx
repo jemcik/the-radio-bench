@@ -17,9 +17,19 @@
  *     once (stable seed) and translated as a whole, so the hand-drawn
  *     wobble does NOT re-roll every frame.
  *
- * Animation respects `prefers-reduced-motion` — snapshot at scrollX=0.
+ * Animation respects `prefers-reduced-motion` — snapshot at translate(0).
+ *
+ * The scroll is written straight to the <g>'s transform attribute from the
+ * animation-frame callback, never through React state. A `setState` per
+ * frame is a default-priority update sixty times a second, and this hero
+ * mounts OUTSIDE the chapter body's <Suspense>: React 19 gives the body's
+ * retry render a lane that never expires, so the hero's updates restarted
+ * that render on every frame, and whenever the body could not finish inside
+ * one frame gap (cold dev server, slower machine, headless Chromium) the
+ * spinner under this hero stayed forever. Found 2026-09-17; present since
+ * the chapter's first commit.
  */
-import { useEffect, useMemo, useState, useId } from 'react'
+import { useEffect, useMemo, useRef, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   RoughPaths,
@@ -144,9 +154,9 @@ export default function Ch1_3Hero() {
   )
   const gridDots = useMemo(() => buildGridDots(), [])
 
-  // scrollX animates from 0 down to -VISIBLE_CYCLE_PX, then wraps to 0.
+  // The AC group scrolls from 0 down to -VISIBLE_CYCLE_PX, then wraps to 0.
   // The wrap is seamless because sine has that exact period in x.
-  const [scrollX, setScrollX] = useState<number>(0)
+  const acGroupRef = useRef<SVGGElement>(null)
 
   useEffect(() => {
     if (
@@ -156,12 +166,15 @@ export default function Ch1_3Hero() {
     ) {
       return
     }
+    const group = acGroupRef.current
+    if (!group) return
     let rafId = 0
     let startTime: number | null = null
     const tick = (now: number) => {
       if (startTime === null) startTime = now
       const elapsed = (now - startTime) % PERIOD_MS
-      setScrollX(-(elapsed / PERIOD_MS) * VISIBLE_CYCLE_PX)
+      const scrollX = -(elapsed / PERIOD_MS) * VISIBLE_CYCLE_PX
+      group.setAttribute('transform', `translate(${scrollX.toFixed(2)} 0)`)
       rafId = requestAnimationFrame(tick)
     }
     rafId = requestAnimationFrame(tick)
@@ -210,7 +223,7 @@ export default function Ch1_3Hero() {
 
       {/* ─── AC TRACE (scrolling sine, clipped to plot area) ─────── */}
       <g clipPath={`url(#${clipId})`}>
-        <g transform={`translate(${scrollX.toFixed(2)} 0)`}>
+        <g ref={acGroupRef} transform="translate(0 0)">
           <RoughPaths paths={strokes.ac} />
         </g>
       </g>
