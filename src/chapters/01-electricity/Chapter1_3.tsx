@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/section-heading'
 import { MBlock, MathVar } from '@/components/ui/math'
 import { G } from '@/features/glossary/glossary-term'
 import LabActivity from '@/components/lab/LabActivity'
+import PwmLabSchematic from '@/components/diagrams/PwmLabSchematic'
 import Quiz, { buildQuizFromI18n } from '@/components/quiz/Quiz'
 import SineExplorer from '@/components/widgets/SineExplorer'
 import RmsSelector from '@/components/widgets/RmsSelector'
@@ -29,7 +30,7 @@ export default function Chapter1_3() {
   return (
     <>
       <p>
-        <Trans i18nKey="ch1_3.intro" ns="ui" components={{ ...mathComponents, strong: <strong />, res: <G k="resistor" /> }} />
+        <Trans i18nKey="ch1_3.intro" ns="ui" components={{ ...mathComponents, strong: <strong />, res: <G k="resistor" />, mains: <G k="mains" /> }} />
       </p>
 
       <p>
@@ -43,7 +44,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.sourcesIntro"
           ns="ui"
-          components={{ ...mathComponents, dc: <G k="dc" /> }}
+          components={{ ...mathComponents, dc: <G k="dc" />, scope: <G k="oscilloscope" /> }}
         />
       </p>
 
@@ -66,7 +67,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.sineWaveIntro"
           ns="ui"
-          components={{ ...mathComponents, sine: <G k="sine wave" />, lc: <G k="lc" />, cap: <G k="capacitor" />, ind: <G k="inductor" /> }}
+          components={{ ...mathComponents, em: <em />, sine: <G k="sine wave" />, lc: <G k="lc" />, cap: <G k="capacitor" />, ind: <G k="inductor" />, carrier: <G k="carrier" /> }}
         />
       </p>
 
@@ -115,13 +116,22 @@ export default function Chapter1_3() {
         />
       </p>
 
+
+      <p>
+        <Trans
+          i18nKey="ch1_3.sineWavePhaseNote"
+          ns="ui"
+          components={{ strong: <strong />, var: <MathVar />, nowrap: <span style={{ whiteSpace: 'nowrap' }} /> }}
+        />
+      </p>
+
       <p>{t('ch1_3.sineWavePeriodNote')}</p>
 
       <p>
         <Trans
           i18nKey="ch1_3.sineWaveExplorerIntro"
           ns="ui"
-          components={{ var: <MathVar /> }}
+          components={{ nowrap: <span style={{ whiteSpace: 'nowrap' }} />, var: <MathVar /> }}
         />
       </p>
 
@@ -136,7 +146,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.levelsPeak"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
+          components={{ dielectric: <G k="dielectric" />, strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
         />
       </p>
 
@@ -172,7 +182,11 @@ export default function Chapter1_3() {
         />
       </p>
 
-      <MBlock tex="V_{\mathrm{rms}} = \dfrac{V_{\mathrm{pk}}}{\sqrt{2}} \approx 0.707 \cdot V_{\mathrm{pk}}" />
+      {/* The only MBlock in the course carrying a decimal, so it is the only one
+          that has to follow the locale: Ukrainian writes «0,707», and the prose
+          three lines below already does. KaTeX needs the comma brace-protected
+          (`0{,}707`) or it spaces it as a separator. */}
+      <MBlock tex={t('ch1_3.levelsRmsFormulaTex')} />
 
       <Callout variant="note">
         <Trans
@@ -223,7 +237,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.mainsWorkedEurope"
           ns="ui"
-          components={{ strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
+          components={{ elec: <G k="electrolytic" />, strong: <strong />, var: <MathVar />, sub: <sub />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
         />
       </p>
 
@@ -250,7 +264,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.nonSineIntro"
           ns="ui"
-          components={{ var: <MathVar />, sub: <sub />, square: <G k="square wave" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
+          components={{ pwm: <G k="pwm" />, modulation: <G k="modulation" />, var: <MathVar />, sub: <sub />, square: <G k="square wave" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
         />
       </p>
 
@@ -326,6 +340,11 @@ export default function Chapter1_3() {
       </Callout>
 
       {/* ── Lab ──────────────────────────────────────────────────── */}
+      {/* Schematic first: steps 3–6 describe a circuit — pin 9 through the
+          10 kΩ resistor to GND, meter across it — that the chapter never drew,
+          and the resistor's purpose is never stated in the prose. */}
+      <PwmLabSchematic />
+
       <LabActivity
         label="1.3"
         goal={t('ch1_3.labGoal')}

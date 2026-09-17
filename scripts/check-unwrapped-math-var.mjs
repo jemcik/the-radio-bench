@@ -49,7 +49,14 @@ const ROOT = path.resolve(__dirname, '..')
 
 // Greek letters treated as variables. Ω (U+03A9 / U+2126 ohm) and µ/μ
 // (U+00B5 / U+03BC micro) are omitted on purpose — they are unit symbols.
-const GREEK_VARS = 'αβγδεζηθικλνξπρστφχψωΓΔΘΛΞΠΣΦΨ'
+//
+// π (and its capital Π) are omitted too, added 2026-08-13 during the ch1.3
+// pass. π is a mathematical CONSTANT, not a variable, and ISO 80000-2 sets
+// constants upright — which is exactly what plain prose text already gives it.
+// Wrapping it in <var> would render it math-ITALIC and make it wrong. Ch1.3
+// alone carried eleven π hits (2/π, 2π·f·t, π/2 ≈ 1.57) that no author should
+// ever «fix».
+const GREEK_VARS = 'αβγδεζηθικλνξρστφχψωΓΔΘΛΞΣΦΨ'
 const GREEK_RE = new RegExp(`[${GREEK_VARS}]`, 'u')
 
 // Math operators whose adjacency to a single Latin letter marks a formula.

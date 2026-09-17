@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
+import { MathVar } from '@/components/ui/math'
 import { Slider } from '@/components/ui/slider'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
@@ -68,6 +69,9 @@ const V_AXIS_MAX = V_MAX * 1.1
 
 const X_TICKS_MS = [0, 4, 8, 12, 16, 20]
 const Y_TICKS_V = [-10, -5, 0, 5, 10]
+// Rendered with U+2212, not the ASCII hyphen the numbers carry in source —
+// the prose on either side of this widget writes «−10 V».
+const fmtTick = (v: number) => (v < 0 ? `\u2212${Math.abs(v)}` : String(v))
 
 // Playhead sweep — one pass across the visible 20 ms in PLAYHEAD_PERIOD_MS.
 // Slow enough to follow, fast enough to feel alive.
@@ -94,8 +98,15 @@ export default function SineExplorer() {
   // PLAYHEAD_PERIOD_MS, then wraps.
   const [playheadMs, setPlayheadMs] = useState<number>(0)
   const [fLog, setFLog] = useState<number>(F_LOG_DEFAULT)
-  const frequency = Math.pow(10, fLog)      // Hz
-  const periodMs = 1000 / frequency         // ms
+  // Round ONCE, here, and derive everything — readout, period, plot — from the
+  // rounded value. Previously the label showed `Math.round(frequency)` while the
+  // period came from the raw slider value, so 58 of the 101 reachable positions
+  // printed an equation whose two sides disagreed: «T = 1 / 50 Hz = 19.95 ms»
+  // (the slider snaps to 2 decimals, so 10^1.70 is 50.119 Hz). This is the
+  // widget that exists to teach T = 1/f. The range is 50–500 Hz, so rounding to
+  // a whole hertz can never reach zero.
+  const frequency = Math.round(Math.pow(10, fLog))   // Hz
+  const periodMs = 1000 / frequency                  // ms
 
   // Playhead animation: sweeps 0 → T_VIEW_MS repeatedly.
   useEffect(() => {
@@ -197,7 +208,7 @@ export default function SineExplorer() {
             {t('ch1_3.widget.sineExplorer.frequencyLabel')}
           </label>
           <span className="text-sm font-mono text-muted-foreground">
-            {formatNumber(Math.round(frequency), locale)} {tUnit('hz')}
+            {formatNumber(frequency, locale)} {tUnit('hz')}
           </span>
         </div>
         <Slider
@@ -303,7 +314,7 @@ export default function SineExplorer() {
                 y={vToY(y) + 4}
                 textAnchor="end"
               >
-                {y}
+                {fmtTick(y)}
               </text>
             ))}
           </g>
@@ -424,21 +435,23 @@ export default function SineExplorer() {
       <ResultBox tone="success">
         <div className="flex flex-col gap-1">
           <p className="text-sm text-foreground">
-            {t('ch1_3.widget.sineExplorer.readoutAmplitude')} ={' '}
+            <Trans i18nKey="ch1_3.widget.sineExplorer.readoutAmplitude" ns="ui" components={{ var: <MathVar /> }} /> ={' '}
             <span className="font-mono">{formatDecimal(amplitude, 1, locale)} {tUnit('v')}</span>
             {'  ·  '}
-            {t('ch1_3.widget.sineExplorer.readoutFrequency')} ={' '}
-            <span className="font-mono">{formatNumber(Math.round(frequency), locale)} {tUnit('hz')}</span>
+            <Trans i18nKey="ch1_3.widget.sineExplorer.readoutFrequency" ns="ui" components={{ var: <MathVar /> }} /> ={' '}
+            <span className="font-mono">{formatNumber(frequency, locale)} {tUnit('hz')}</span>
           </p>
           <p className="text-xs font-mono text-muted-foreground">
-            T = 1 / f = 1 / {formatNumber(Math.round(frequency), locale)} {tUnit('hz')} ={' '}
+            T = 1 / f = 1 / {formatNumber(frequency, locale)} {tUnit('hz')} ={' '}
             {formatDecimal(periodMs, 2, locale)} {tUnit('ms')}
           </p>
         </div>
       </ResultBox>
 
       <p className="text-[13px] text-muted-foreground">
-        {t('ch1_3.widget.sineExplorer.hint')}
+        {/* <Trans>, not t(): the hint spells out V(t) = A · sin(2π · f · t), and a
+            bare t() would ship the <var> tags literally. */}
+        <Trans i18nKey="ch1_3.widget.sineExplorer.hint" ns="ui" components={{ var: <MathVar /> }} />
       </p>
     </Widget>
   )

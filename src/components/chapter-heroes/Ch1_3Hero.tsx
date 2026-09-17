@@ -47,7 +47,11 @@ const PLOT_H = BEZEL_H - 20
 const PLOT_X1 = PLOT_X0 + PLOT_W
 
 // DC trace — flat line in the upper third.
-const DC_Y = PLOT_Y0 + Math.round(PLOT_H * 0.28)
+// 0.18, not 0.28: the AC tag sits between the DC trace and the sine crest, and
+// at 0.28 the 19-unit gap could not hold a 15-unit-tall label — the tag ended up
+// touching whichever line it was nudged towards. Lifting the flat DC line opens
+// the band so the tag clears both.
+const DC_Y = PLOT_Y0 + Math.round(PLOT_H * 0.18)
 
 // AC trace geometry
 const AC_CY = PLOT_Y0 + Math.round(PLOT_H * 0.70)
@@ -210,18 +214,22 @@ export default function Ch1_3Hero() {
           <RoughPaths paths={strokes.ac} />
         </g>
       </g>
-      {/* AC tag above the first peak — stays fixed while the trace
-          scrolls underneath (the peak is still visible in the leftmost
-          cycle at any moment). */}
+      {/* AC tag at the RIGHT end, above the sine. At the left end it landed
+          ~15 units under the DC label with the flat DC trace between the two,
+          so the pair read as a two-line legend belonging to that one line —
+          and the sine's nearest point was FURTHER from the «AC» tag than the
+          DC trace was. Opposite corners remove the ambiguity: each tag is now
+          nearest its own trace. The sine scrolls, so a peak sits under this
+          tag at every moment. */}
       <text
-        x={PLOT_X0 + 6}
-        y={AC_CY - AC_AMP - 4}
+        x={PLOT_X0 + PLOT_W - 6}
+        y={AC_CY - AC_AMP - 6}
         fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
         fill="currentColor"
-        textAnchor="start"
+        textAnchor="end"
       >
         {t('ch1_3.heroAcLabel')}
       </text>

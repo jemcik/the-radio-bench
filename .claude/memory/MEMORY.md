@@ -39,3 +39,4 @@
 - [Course parts: lowercase «частина» + Roman numeral](feedback_course_parts_lowercase_roman.md) — «частина III», never «Частині 3»; Part 0 stays 0; enforced by the UA linter + check:course-part-numbering
 - [Diagram gates measure bounding boxes, not ink](project_diagram_gates_measure_bboxes_not_ink.md) — an L-shaped `<Wire>` is one path whose bbox owns the empty quadrant too (`T×PATH`), and `check:diagram-viewbox-fit` cannot see `TerminalLabel` text; run both gates before polishing a new diagram
 - [Made it? Then it ships](feedback_made_it_then_ship_it.md) — never ask whether an already-made, already-green change belongs in the diff; scope of finished work is my call, not a question back
+- [Vite can serve a stale module](project_vite_serves_stale_module.md) — a browser check confirmed code that was no longer on disk; assert on something only the new revision emits, and cache-bust the URL rather than plain-reloading

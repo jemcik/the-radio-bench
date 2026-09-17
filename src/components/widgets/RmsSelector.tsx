@@ -63,6 +63,9 @@ const PLOT_H = VB_H - PAD_T - PAD_B
 
 const X_TICKS_MS = [0, 4, 8, 12, 16, 20]
 const Y_TICKS_V = [-10, -5, 0, 5, 10]
+// Rendered with U+2212, not the ASCII hyphen the numbers carry in source —
+// the prose on either side of this widget writes «−10 V».
+const fmtTick = (v: number) => (v < 0 ? `\u2212${Math.abs(v)}` : String(v))
 const V_MAX = 10
 // Headroom beyond the labelled ±10 V so the sine's peaks don't graze
 // the clipPath boundary (which would clip half the stroke width and
@@ -221,7 +224,7 @@ export default function RmsSelector() {
                 y={vToY(y) + 4}
                 textAnchor="end"
               >
-                {y}
+                {fmtTick(y)}
               </text>
             ))}
           </g>
@@ -268,7 +271,8 @@ export default function RmsSelector() {
 
           {/* ── Mode-specific overlay ─────────────────────────────── */}
           {mode === 'peak' && (
-            <g clipPath={`url(#${clipId})`}>
+            <>
+              <g clipPath={`url(#${clipId})`}>
               <line
                 x1={PLOT_X0}
                 y1={vToY(V_PEAK)}
@@ -278,6 +282,7 @@ export default function RmsSelector() {
                 strokeWidth={2}
                 strokeDasharray="6 3"
               />
+              </g>
               <text
                 x={labelX}
                 y={vToY(V_PEAK) + 4}
@@ -288,7 +293,7 @@ export default function RmsSelector() {
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">pk</tspan>
               </text>
-            </g>
+            </>
           )}
 
           {mode === 'pp' && (
@@ -340,7 +345,8 @@ export default function RmsSelector() {
           )}
 
           {mode === 'avg' && (
-            <g clipPath={`url(#${clipId})`}>
+            <>
+              <g clipPath={`url(#${clipId})`}>
               <line
                 x1={PLOT_X0}
                 y1={vToY(V_AVG)}
@@ -350,6 +356,7 @@ export default function RmsSelector() {
                 strokeWidth={2}
                 strokeDasharray="6 3"
               />
+              </g>
               <text
                 x={labelX}
                 y={vToY(V_AVG) + 4}
@@ -361,11 +368,12 @@ export default function RmsSelector() {
                 {/* hardcoded-jsx-text-ok: math subscript «avg» — same convention across locales (cf. min/max/rms). */}
                 <tspan dy="4" fontSize="0.625em">avg</tspan>
               </text>
-            </g>
+            </>
           )}
 
           {mode === 'rms' && (
-            <g clipPath={`url(#${clipId})`}>
+            <>
+              <g clipPath={`url(#${clipId})`}>
               <line
                 x1={PLOT_X0}
                 y1={vToY(V_RMS)}
@@ -375,6 +383,7 @@ export default function RmsSelector() {
                 strokeWidth={2}
                 strokeDasharray="6 3"
               />
+              </g>
               <text
                 x={labelX}
                 y={vToY(V_RMS) + 4}
@@ -385,7 +394,7 @@ export default function RmsSelector() {
                 <tspan fontStyle="italic" fontWeight="700">V</tspan>
                 <tspan dy="4" fontSize="0.625em">rms</tspan>
               </text>
-            </g>
+            </>
           )}
         </svg>
       </div>

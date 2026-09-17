@@ -198,28 +198,32 @@ export default function WaveformGallery() {
               />
             </svg>
             <dl className="mt-2 space-y-0.5 text-[13px]">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.trueRmsLabel')}
                 </dt>
                 <dd className="font-mono text-foreground">
                   {formatDecimal(tile.rms, 3, locale)}
                 </dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.formFactorLabel')}
                 </dt>
                 <dd className="font-mono text-foreground">
                   {formatDecimal(tile.formFactor, 3, locale)}
                 </dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.avgDmmLabel')}
                 </dt>
+                {/* The ✓ / ✗ glyph, not just the colour, carries «this row
+                    agrees with the true RMS». Colour alone was the only
+                    channel here, which a colour-blind reader cannot use — and
+                    the caption points at this mark. */}
                 <dd
-                  className="font-mono"
+                  className="font-mono whitespace-nowrap shrink-0"
                   style={{
                     color: tile.correct
                       ? svgTokens.experiment
@@ -227,6 +231,20 @@ export default function WaveformGallery() {
                   }}
                 >
                   {formatDecimal(tile.meterReads, 3, locale)}
+                  {/* font-sans, not the row's mono: U+2717 has no monospace
+                      glyph and fell back to something that read as a slanted
+                      letter «x» beside a decimal number — i.e. the non-colour
+                      channel was not doing its job. U+2715 in the UI font is
+                      an unambiguous cross. */}
+                  <span aria-hidden="true" className="font-sans">{tile.correct ? ' ✓' : ' ✕'}</span>
+                  <span className="sr-only">
+                    {' '}
+                    {t(
+                      tile.correct
+                        ? 'ch1_3.waveformGallery.matchesRms'
+                        : 'ch1_3.waveformGallery.mismatchRms',
+                    )}
+                  </span>
                 </dd>
               </div>
             </dl>
