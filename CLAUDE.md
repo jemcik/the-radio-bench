@@ -111,6 +111,7 @@ Only then: outline → visuals → prose. (Jumping straight to building is the c
 
 ## Conventions & non-derivable facts
 
+- **Animation** — every per-frame loop goes through `useAnimationLoop` (`src/lib/hooks/`): runs only on screen, pauses in a hidden tab, never under `prefers-reduced-motion`. Write the frame through a ref where you can; a **chapter hero must** (it mounts outside the chapter `<Suspense>` — a `setState` per frame there starved the body's load for five months, spinner forever, no error). Enforced by `check:animation-loop`; how-to in the diagram-quality skill §8.
 - **Glossary entries** — `tip` leads with WHAT the noun is (`ham` → «A ham is a licensed amateur radio operator…», not «Amateur radio is the activity of…»); every entry links ≥1 `see`; wrap the first occurrence per section in `<G k="…">` (not every occurrence).
 - **Lab activities** — prefer AA (1.5 V) batteries, not 9 V (a niche format in many countries). `LabActivity` cards need `not-prose` + explicit `text-foreground`; copy the bullet-flex pattern from `src/components/lab/LabActivity.tsx`.
 - **Ukraine — the licensing body is УДЦР** (issues callsigns); the regulator above it is **НКЕК** (replaced НКРЗІ in 2022) — never write «НКРЗІ».

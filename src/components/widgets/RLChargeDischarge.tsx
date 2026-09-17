@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 
@@ -101,8 +102,7 @@ export default function RLChargeDischarge() {
   const [iAnchor, setIAnchor] = useState(0)
   const [iCurrent, setICurrent] = useState(0)
   const [lastAction, setLastAction] = useState<Exclude<Mode, 'idle'> | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const startTimeRef = useRef<number | null>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
 
   const iNow = useMemo(() => {
     if (mode === 'charging') {
@@ -118,35 +118,27 @@ export default function RLChargeDischarge() {
   // this re-formats every frame; in idle it shows the held value.
   const iNowFmt = formatCurrent(iNow, fmt, tUnit)
 
-  useEffect(() => {
-    if (mode === 'idle') return
-    const target5tauMs = (Number.isFinite(tau) && tau > 0 ? tau : 1) * 5 * 1000
-    const durationMs = Math.max(300, Math.min(30000, target5tauMs))
-    const tick = (nowMs: number) => {
-      if (startTimeRef.current == null) {
-        startTimeRef.current = nowMs
-      }
-      const dt = (nowMs - startTimeRef.current) / durationMs
-      const e = Math.min(dt * T_SPAN, T_SPAN)
+  // Runs only while charging / discharging, restarts from t = 0 whenever the
+  // inputs change (the duration depends on τ), and pauses while the plot is
+  // scrolled off screen so the reader never misses the curve they started.
+  useAnimationLoop(
+    svgRef,
+    ({ elapsed: runMs }) => {
+      const target5tauMs = (Number.isFinite(tau) && tau > 0 ? tau : 1) * 5 * 1000
+      const durationMs = Math.max(300, Math.min(30000, target5tauMs))
+      const e = Math.min((runMs / durationMs) * T_SPAN, T_SPAN)
       setElapsed(e)
-      if (e < T_SPAN) {
-        rafRef.current = requestAnimationFrame(tick)
-      } else {
+      if (e >= T_SPAN) {
         const finalI = mode === 'charging'
           ? iAnchor + (iSteady - iAnchor) * (1 - Math.exp(-T_SPAN))
           : iAnchor * Math.exp(-T_SPAN)
         setICurrent(finalI)
         setElapsed(T_SPAN)
         setMode('idle')
-        startTimeRef.current = null
       }
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-      startTimeRef.current = null
-    }
-  }, [mode, iAnchor, iSteady, tau])
+    },
+    { enabled: mode !== 'idle', resetKey: `${mode}|${iAnchor}|${iSteady}|${tau}` },
+  )
 
   const isFullyCharged = iSteady > 0 && iCurrent >= 0.99 * iSteady
   const isFullyDischarged = iCurrent <= 0.01 * Math.max(iSteady, 1e-12)
@@ -170,8 +162,7 @@ export default function RLChargeDischarge() {
     setMode('discharging')
   }
   function onReset() {
-    if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-    startTimeRef.current = null
+    // mode 'idle' also stops the animation loop.
     setMode('idle')
     setElapsed(0)
     setIAnchor(0)
@@ -289,6 +280,7 @@ export default function RLChargeDischarge() {
       </div>
 
       <svg
+        ref={svgRef}
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"

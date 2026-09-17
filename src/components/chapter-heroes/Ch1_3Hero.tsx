@@ -27,10 +27,11 @@
  * that render on every frame, and whenever the body could not finish inside
  * one frame gap (cold dev server, slower machine, headless Chromium) the
  * spinner under this hero stayed forever. Found 2026-09-17; present since
- * the chapter's first commit.
+ * the chapter's first commit. `check:animation-loop` now forbids the pattern.
  */
-import { useEffect, useMemo, useRef, useId } from 'react'
+import { useMemo, useRef, useId } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import {
   RoughPaths,
   type RoughPath,
@@ -156,33 +157,16 @@ export default function Ch1_3Hero() {
 
   // The AC group scrolls from 0 down to -VISIBLE_CYCLE_PX, then wraps to 0.
   // The wrap is seamless because sine has that exact period in x.
+  const svgRef = useRef<SVGSVGElement>(null)
   const acGroupRef = useRef<SVGGElement>(null)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    const group = acGroupRef.current
-    if (!group) return
-    let rafId = 0
-    let startTime: number | null = null
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now
-      const elapsed = (now - startTime) % PERIOD_MS
-      const scrollX = -(elapsed / PERIOD_MS) * VISIBLE_CYCLE_PX
-      group.setAttribute('transform', `translate(${scrollX.toFixed(2)} 0)`)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const scrollX = -((elapsed % PERIOD_MS) / PERIOD_MS) * VISIBLE_CYCLE_PX
+    acGroupRef.current?.setAttribute('transform', `translate(${scrollX.toFixed(2)} 0)`)
+  })
 
   return (
     <svg
+      ref={svgRef}
       width="540"
       height="190"
       viewBox={`0 0 ${VB_W} ${VB_H}`}

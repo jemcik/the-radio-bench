@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import {
   RoughPaths,
   roughLine,
@@ -49,26 +50,14 @@ const DRIFT_PERIOD_MS = 12000
 const STATIC_PHASE = 0.35 // snapshot used under prefers-reduced-motion
 export default function DriftVelocitySketch() {
   const { t } = useTranslation('ui')
+  // The initial `ts` is the still under prefers-reduced-motion and until the
+  // sketch scrolls into view. Thermal jitter and drift are both functions of
+  // it, so the frame goes through state; the hook limits it to visible frames.
   const [ts, setTs] = useState<number>(STATIC_PHASE * DRIFT_PERIOD_MS)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      setTs(now - start)
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setTs(elapsed)
+  })
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 620
@@ -161,6 +150,7 @@ export default function DriftVelocitySketch() {
   return (
     <DiagramFigure caption={t('ch1_1.driftSketchCaption')}>
       <SVGDiagram
+        ref={svgRef}
         width={W}
         height={H}
         aria-label={t('ch1_1.driftSketchAriaLabel')}

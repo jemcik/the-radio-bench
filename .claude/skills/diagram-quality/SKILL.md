@@ -180,15 +180,16 @@ This is a browser course, not a book. If the diagram depicts a **process in time
 - V–I characteristic curves at one instant
 - Formula-illustration figures (e.g. triangle for V = I · R)
 
-**Implementation pattern** — follow `SineOriginDiagram.tsx`:
+**Implementation pattern** — every loop goes through `useAnimationLoop` from `src/lib/hooks/useAnimationLoop.ts` (`check:animation-loop` rejects a raw `requestAnimationFrame` / `setInterval`). The hook runs the loop only while the element is on screen, pauses it in a hidden tab, never starts it under `prefers-reduced-motion`, and hands the callback `{ elapsed, dt, now }` where `elapsed` counts running time only — so `elapsed % PERIOD` resumes where it paused. Before the hook (2026-09-17), 21 hand-rolled loops ran from mount to unmount and an idle chapter 1.3 tab sat at ~73 % main-thread busy with every diagram scrolled out of view.
 
-1. `useState<number>` for the animated parameter (angle, phase, progress), initialised to a static-snapshot value.
-2. `useEffect` + `requestAnimationFrame` loop that updates state each frame.
-3. **Respect `prefers-reduced-motion`**: if the media query matches, early-return from the effect — the initial state value is the static snapshot. **Do not call `setState` in that branch** or ESLint (`react-hooks/set-state-in-effect`) will complain.
-4. Clean up with `cancelAnimationFrame` in the effect return.
-5. Derive all animated geometry from the single state variable in the render body.
+1. Put a ref on the diagram's root (`<svg ref={svgRef}>`; `SVGDiagram` forwards `ref`) and pass it as the hook's target.
+2. **Prefer writing the frame through a ref** — `el.setAttribute('transform', …)` on one `<g>` (`OscilloscopeDiagram`, `Ch1_3Hero`), `cx` on a few circles (`OhmsCalculator`), `stroke-dashoffset` (`CouplingPathsExplorer`). No React render per frame. **A chapter hero must do this** — it mounts outside the chapter body's `<Suspense>`, and a re-render per frame starved the body's load for five months (see the hero's header comment).
+3. `useState` per frame only when the whole figure is derived from the phase (`SineOriginDiagram`, `EMWaveDiagram`) — small diagrams, inside the chapter body.
+4. The initial render is the **still**: it is what a reader with `prefers-reduced-motion` sees, and what everyone sees until the diagram scrolls into view. Initialise to a readable snapshot, not to a blank.
+5. User-gated animation (Play / Charge): pass `{ enabled: playing }`; an animation that must replay from `t = 0` when its inputs change: `{ resetKey: `${mode}|${tau}` }` (`RCChargeDischarge`).
 6. Pace: **3–5 s per cycle**. Faster than 2 s is dizzying; slower than 8 s is boring.
 7. Include a **riding marker** (dot/line) that helps the eye connect motion on one side to progress on the other. A bare animated curve is much less instructive than one with a leading dot.
+8. Tests that drive frames use `stubAnimationFrames()` from `src/test/animation-frames.ts` — its `cancelAnimationFrame` really drops the frame, which the hook relies on when its inputs change.
 
 ### 9. Schematic-specific rules
 

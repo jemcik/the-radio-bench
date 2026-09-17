@@ -1,10 +1,11 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { MathVar } from '@/components/ui/math'
 import { Slider } from '@/components/ui/slider'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { formatDecimal, formatNumber } from '@/lib/format'
 import { svgTokens } from '@/components/diagrams/svgTokens'
 
@@ -96,7 +97,6 @@ export default function SineExplorer() {
   // A/T markers — it just advances the reader's sense of «where in
   // the signal we are right now». Sweeps from 0 to T_VIEW_MS in
   // PLAYHEAD_PERIOD_MS, then wraps.
-  const [playheadMs, setPlayheadMs] = useState<number>(0)
   const [fLog, setFLog] = useState<number>(F_LOG_DEFAULT)
   // Round ONCE, here, and derive everything — readout, period, plot — from the
   // rounded value. Previously the label showed `Math.round(frequency)` while the
@@ -108,31 +108,33 @@ export default function SineExplorer() {
   const frequency = Math.round(Math.pow(10, fLog))   // Hz
   const periodMs = 1000 / frequency                  // ms
 
-  // Playhead animation: sweeps 0 → T_VIEW_MS repeatedly.
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
+  // Playhead animation: sweeps 0 → T_VIEW_MS repeatedly. The playhead is a
+  // line and a dot, so each frame is written straight to those two elements —
+  // the widget does not re-render sixty times a second for it. The SVG is the
+  // hook's visibility target: the sweep runs only while the plot is on screen
+  // and never under prefers-reduced-motion (the markup below is its t = 0 still).
+  const svgRef = useRef<SVGSVGElement>(null)
+  const playheadLineRef = useRef<SVGLineElement>(null)
+  const playheadDotRef = useRef<SVGCircleElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const playheadMs = ((elapsed % PLAYHEAD_PERIOD_MS) / PLAYHEAD_PERIOD_MS) * T_VIEW_MS
+    const x = tMsToX(playheadMs).toFixed(2)
+    const y = vToY(amplitude * Math.sin(2 * Math.PI * frequency * (playheadMs / 1000))).toFixed(2)
+    const line = playheadLineRef.current
+    const dot = playheadDotRef.current
+    if (line) {
+      line.setAttribute('x1', x)
+      line.setAttribute('x2', x)
     }
-    let rafId = 0
-    let startTime: number | null = null
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now
-      const elapsed = (now - startTime) % PLAYHEAD_PERIOD_MS
-      setPlayheadMs((elapsed / PLAYHEAD_PERIOD_MS) * T_VIEW_MS)
-      rafId = requestAnimationFrame(tick)
+    if (dot) {
+      dot.setAttribute('cx', x)
+      dot.setAttribute('cy', y)
     }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  })
 
-  // Playhead position on the plot
-  const playheadX = tMsToX(playheadMs)
-  const playheadV = amplitude * Math.sin(2 * Math.PI * frequency * (playheadMs / 1000))
-  const playheadY = vToY(playheadV)
+  // Playhead at t = 0 — the still the animation loop moves from.
+  const playheadX = tMsToX(0)
+  const playheadY = vToY(0)
 
   // ── Waveform path ────────────────────────────────────────────────
   // 600 samples across the 20 ms window — dense enough that even 500 Hz
@@ -229,6 +231,7 @@ export default function SineExplorer() {
       {/* ── Plot ──────────────────────────────────────────────────── */}
       <div className="rounded-lg border border-border bg-card/60 p-3">
         <svg
+          ref={svgRef}
           width={VB_W}
           height={VB_H}
           viewBox={`0 0 ${VB_W} ${VB_H}`}
@@ -363,6 +366,7 @@ export default function SineExplorer() {
               "time is flowing" without disturbing the static A/T markers. */}
           <g clipPath={`url(#${clipId})`} opacity={0.85}>
             <line
+              ref={playheadLineRef}
               x1={playheadX}
               y1={PLOT_Y0}
               x2={playheadX}
@@ -373,6 +377,7 @@ export default function SineExplorer() {
               opacity={0.55}
             />
             <circle
+              ref={playheadDotRef}
               cx={playheadX}
               cy={playheadY}
               r={3.5}

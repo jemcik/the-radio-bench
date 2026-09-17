@@ -1,9 +1,10 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Play, Pause } from 'lucide-react'
 import Widget from '@/components/ui/widget'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { formatDecimal } from '@/lib/format'
 import { svgTokens } from '@/components/diagrams/svgTokens'
@@ -89,25 +90,18 @@ export default function MagnetisingCurrentExplorer() {
   const [phaseDeg, setPhaseDeg] = useState<number>(PHASE_DEFAULT)
   const [playing, setPlaying] = useState<boolean>(false)
 
-  // Autoplay loop — advances `phaseDeg` smoothly, wrapping at 360°.
-  // The functional setState read inside the rAF tick avoids needing a
-  // ref to track the latest phase: each tick computes the next value
-  // off the current state without re-running the effect on every drag.
-  // The play button is the only entry point — we never auto-start.
-  useEffect(() => {
-    if (!playing) return
-    let rafId = 0
-    let prev: number | null = null
-    const tick = (now: number) => {
-      if (prev === null) prev = now
-      const dt = now - prev
-      prev = now
+  // Autoplay loop — advances `phaseDeg` smoothly, wrapping at 360°. The
+  // functional setState reads the current phase, so a drag mid-play needs no
+  // ref. The play button is the only entry point — we never auto-start — and
+  // the loop also pauses while the plot is scrolled off screen.
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(
+    svgRef,
+    ({ dt }) => {
       setPhaseDeg((p) => (p + (dt / PLAY_PERIOD_MS) * 360) % 360)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [playing])
+    },
+    { enabled: playing },
+  )
 
   // ── Curves (memoised; static — the cursor is what moves) ─────────
   const pathV = useMemo(() => buildPath((d) => Math.sin(toRad(d))), [])
@@ -190,6 +184,7 @@ export default function MagnetisingCurrentExplorer() {
       {/* ── Plot ─────────────────────────────────────────────────── */}
       <div className="rounded-lg border border-border bg-card/60 p-3">
         <svg
+          ref={svgRef}
           width={VB_W}
           height={VB_H}
           viewBox={`0 0 ${VB_W} ${VB_H}`}

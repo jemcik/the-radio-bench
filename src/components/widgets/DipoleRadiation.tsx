@@ -21,6 +21,7 @@
  * Respects prefers-reduced-motion (renders one static frame, no loop).
  */
 import { useEffect, useRef, useState } from 'react'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { mathComponents } from '@/lib/trans-defaults'
@@ -76,10 +77,10 @@ export default function DipoleRadiation() {
   const [playing, setPlaying] = useState(true)
   const [speed, setSpeed] = useState(0.18) // cycles per second (slow)
   const phaseRef = useRef(0.6)
-  const playingRef = useRef(playing)
-  const speedRef = useRef(speed)
-  useEffect(() => { playingRef.current = playing }, [playing])
-  useEffect(() => { speedRef.current = speed }, [speed])
+  // The frame painter, rebuilt by the setup effect whenever the labels change
+  // (it captures `t`); the animation loop below always calls the latest one.
+  const drawRef = useRef<((phase: number) => void) | null>(null)
+  const lastIdleDrawRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -172,24 +173,31 @@ export default function DipoleRadiation() {
       c.fillText(t('ch3_3.radiation.traceLabel'), TRACE_X0, TRACE_Y - TRACE_AMP - 10)
     }
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduced) {
-      draw(phaseRef.current)
-      return
+    drawRef.current = draw
+    // First paint — also the still under prefers-reduced-motion, when the
+    // loop below never runs.
+    draw(phaseRef.current)
+    return () => {
+      drawRef.current = null
     }
-    let raf = 0
-    let last = 0
-    const loop = (ts: number) => {
-      if (!last) last = ts
-      const dt = Math.min(0.05, (ts - last) / 1000)
-      last = ts
-      if (playingRef.current) phaseRef.current += speedRef.current * 2 * Math.PI * dt
-      draw(phaseRef.current)
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
   }, [t, i18n.language])
+
+  // Field animation. Runs only while the canvas is on screen and never under
+  // prefers-reduced-motion. Paused by the reader, it repaints twice a second
+  // instead of sixty times — enough to follow a theme change (the colours are
+  // read from CSS variables at draw time) at a fraction of the cost.
+  useAnimationLoop(canvasRef, ({ dt: dtMs, elapsed }) => {
+    const draw = drawRef.current
+    if (!draw) return
+    if (playing) {
+      phaseRef.current += speed * 2 * Math.PI * Math.min(0.05, dtMs / 1000)
+      draw(phaseRef.current)
+      lastIdleDrawRef.current = elapsed
+    } else if (elapsed - lastIdleDrawRef.current >= 500) {
+      lastIdleDrawRef.current = elapsed
+      draw(phaseRef.current)
+    }
+  })
 
   return (
     <Widget

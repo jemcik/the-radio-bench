@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import {
   RoughPaths,
   roughCircle,
@@ -87,27 +88,14 @@ const LABEL_BG      = 'hsl(var(--background))'
 
 export default function AtomicDiagram() {
   const { t } = useTranslation('ui')
+  // orbitAngle = 0 is the still under prefers-reduced-motion and until the
+  // diagram scrolls into view; every electron is placed from it, so the frame
+  // goes through state and the hook limits it to visible frames.
   const [orbitAngle, setOrbitAngle] = useState<number>(0)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      const elapsed = now - start
-      setOrbitAngle(((elapsed % ORBIT_PERIOD_MS) / ORBIT_PERIOD_MS) * 2 * Math.PI)
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setOrbitAngle(((elapsed % ORBIT_PERIOD_MS) / ORBIT_PERIOD_MS) * 2 * Math.PI)
+  })
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 560
@@ -243,6 +231,7 @@ export default function AtomicDiagram() {
   return (
     <DiagramFigure caption={t('ch1_1.atomicCaption')}>
       <SVGDiagram
+        ref={svgRef}
         width={W}
         height={H}
         aria-label={t('ch1_1.atomicAriaLabel')}

@@ -21,9 +21,13 @@ rejected promise, no console line. The Suspense fiber shows the fallback with a 
 rendered *hidden* primary tree and `lanes = 0` — and React's MessageChannel loop spins at
 ~250 posts/s. That signature = starvation, not a stuck promise.
 
-**Rule (enforced by `check:hero-no-state-animation`):** a hero may animate, but writes
-each frame to the DOM through a ref (`setAttribute` / `style`) or a CSS animation — never
-a state update. Animations inside the body are fine; they start after the body commits.
+**Rule (enforced by `check:animation-loop`):** every frame loop goes through
+`useAnimationLoop` (`src/lib/hooks/`) — it runs only while the element is on screen, pauses
+in a hidden tab and never starts under `prefers-reduced-motion`. A hero additionally writes
+each frame through a ref (`setAttribute` / `style`), never a state update. Animations inside
+the body may use state per frame (they start after the body commits), but the audit that
+followed this bug found 21 loops running from mount to unmount whatever was on screen — an
+idle chapter 1.3 tab at ~73 % main-thread busy — so the off-screen pause is not optional.
 
 **Diagnosing a silent spinner next time**, in order: (1) `page.emulateMedia({ reducedMotion:
 'reduce' })` — if the chapter appears, something animates through state outside the

@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { formatDecimal } from '@/lib/format'
 
 /**
@@ -343,50 +344,30 @@ function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel, currentLabel }: 
   const driftPxPerSec = currentToDriftPxPerSec(siI)
   const heatIntensity = powerToHeatIntensity(siP)
 
-  const speedRef = useRef(driftPxPerSec)
-  useEffect(() => {
-    speedRef.current = driftPxPerSec
-  }, [driftPxPerSec])
+  const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      // Paint the initial tiled positions once, then stop.
-      const span = wireEndX - wireStartX
-      for (let i = 0; i < ELECTRON_COUNT; i++) {
-        const el = circleRefs.current[i]
-        if (el) el.setAttribute('cx', String(wireStartX + phasesRef.current[i] * span))
-      }
-      return
-    }
-    let raf = 0
-    let lastT = performance.now()
+  // Electron drift — each frame is written straight to the circles; no React
+  // render. The loop reads the latest `driftPxPerSec`, runs only while the
+  // circuit is on screen, and never under prefers-reduced-motion (the circles
+  // then keep the tiled positions they are rendered with).
+  useAnimationLoop(svgRef, ({ dt: dtMs }) => {
+    const dt = dtMs / 1000
+    const speed = driftPxPerSec
+    const phases = phasesRef.current
     const span = wireEndX - wireStartX
-    const frame = (now: number) => {
-      const dt = (now - lastT) / 1000
-      lastT = now
-      const speed = speedRef.current
-      const phases = phasesRef.current
-      if (speed > 0.1) {
-        const dp = (speed * dt) / span
-        for (let i = 0; i < phases.length; i++) {
-          let p = phases[i] + dp
-          if (p >= 1) p -= 1
-          phases[i] = p
-        }
-      }
+    if (speed > 0.1) {
+      const dp = (speed * dt) / span
       for (let i = 0; i < phases.length; i++) {
-        const el = circleRefs.current[i]
-        if (el) el.setAttribute('cx', String(wireStartX + phases[i] * span))
+        let p = phases[i] + dp
+        if (p >= 1) p -= 1
+        phases[i] = p
       }
-      raf = requestAnimationFrame(frame)
     }
-    raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+    for (let i = 0; i < phases.length; i++) {
+      const el = circleRefs.current[i]
+      if (el) el.setAttribute('cx', String(wireStartX + phases[i] * span))
+    }
+  })
 
   // Resistor zigzag path — 4 triangles inside the resistor band.
   const resistorPath = (() => {
@@ -410,6 +391,7 @@ function CircuitFlow({ siI, siP, voltageLabel, resistanceLabel, currentLabel }: 
   return (
     <div className="rounded-lg border border-border bg-card/60 p-3 text-[hsl(var(--sketch-stroke))]">
       <svg
+        ref={svgRef}
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"

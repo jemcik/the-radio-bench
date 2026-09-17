@@ -21,13 +21,14 @@
  * bezel hides the overhang. Respects `prefers-reduced-motion`: the
  * scroll offset freezes at 0, recovering the previous static look.
  */
-import { useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { useTheme } from '@/context/ThemeContext'
 import { THEMES } from '@/lib/themes'
 import { mathComponents } from '@/lib/trans-defaults'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 
 const SCROLL_PERIOD_MS = 4000
 
@@ -35,26 +36,12 @@ export default function OscilloscopeDiagram() {
   const { t } = useTranslation('ui')
   const { theme } = useTheme()
   const isDark = THEMES.find(th => th.id === theme)?.isDark ?? false
-  const [scrollPhase, setScrollPhase] = useState<number>(0)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      setScrollPhase(((now - start) % SCROLL_PERIOD_MS) / SCROLL_PERIOD_MS)
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  // The trace scrolls by translating one <g>; each frame is written straight to
+  // its transform, so the diagram never re-renders for the motion. translate(0)
+  // is the still under prefers-reduced-motion and until the scope scrolls into
+  // view.
+  const svgRef = useRef<SVGSVGElement>(null)
+  const traceRef = useRef<SVGGElement>(null)
 
   // Two hand-tuned palettes. Opacity is bundled with each colour because
   // the light/dark contrast budgets differ — e.g. a slightly denser grid
@@ -144,7 +131,10 @@ export default function OscilloscopeDiagram() {
     return d
   }
 
-  const scrollOffsetX = scrollPhase * periodDivs * cellW
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const scrollOffsetX = ((elapsed % SCROLL_PERIOD_MS) / SCROLL_PERIOD_MS) * periodDivs * cellW
+    traceRef.current?.setAttribute('transform', `translate(${(-scrollOffsetX).toFixed(2)} 0)`)
+  })
 
   const nowrap = <span style={{ whiteSpace: 'nowrap' }} />
   const caption = (
@@ -158,6 +148,7 @@ export default function OscilloscopeDiagram() {
   return (
     <DiagramFigure caption={caption}>
       <SVGDiagram
+        ref={svgRef}
         width={W} height={H}
         style={{ maxWidth: 560, margin: '0 auto' }}
         fontFamily="inherit"
@@ -215,7 +206,7 @@ export default function OscilloscopeDiagram() {
             <rect x={scrX} y={scrY} width={scrW} height={scrH} />
           </clipPath>
           <g clipPath="url(#screenClip)">
-            <g transform={`translate(${-scrollOffsetX} 0)`}>
+            <g ref={traceRef} transform="translate(0 0)">
               <path d={buildWave()}
                 fill="none"
                 stroke={c.trace}

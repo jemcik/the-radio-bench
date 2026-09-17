@@ -19,7 +19,7 @@
     "check:quiz-trans": "node scripts/check-quiz-trans-components.mjs",
     "check:glossary-coverage": "node scripts/check-glossary-coverage.mjs",
     "check:glossary-tag-parity": "node scripts/check-glossary-tag-parity.mjs",
-    "check:hero-no-state-animation": "node scripts/check-hero-no-state-animation.mjs",
+    "check:animation-loop": "node scripts/check-animation-loop.mjs",
     "check:glossary-locale-parity": "node scripts/check-glossary-locale-parity.mjs",
     "check:glossary-overwrap": "node scripts/check-glossary-overwrap.mjs",
     "check:bare-subscripts": "node scripts/check-bare-subscript-renders.mjs",

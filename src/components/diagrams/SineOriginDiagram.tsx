@@ -21,9 +21,10 @@
  * enabled, the diagram freezes at a single illustrative snapshot
  * (angle ≈ 40°) instead of animating.
  */
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 
 // ── Geometry ──────────────────────────────────────────────────────
 // viewBox 600 × 220. No scaling: on-screen pixels = viewBox units,
@@ -89,31 +90,17 @@ function buildAngleArc(currentAngle: number): string {
 
 export default function SineOriginDiagram() {
   const { t } = useTranslation('ui')
+  // STATIC_ANGLE_RAD is the still the reader gets under prefers-reduced-motion
+  // (the loop never starts) and before the diagram scrolls into view.
   const [angle, setAngle] = useState<number>(STATIC_ANGLE_RAD)
+  const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
-    // Respect prefers-reduced-motion — the state already initialises
-    // to STATIC_ANGLE_RAD, so just skip the rAF loop entirely.
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-
-    let rafId = 0
-    let startTime: number | null = null
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now
-      const elapsed = (now - startTime) % PERIOD_MS
-      const a = (elapsed / PERIOD_MS) * 2 * Math.PI
-      setAngle(a)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  // The whole figure is derived from `angle` (sine path, arc, marker), so a
+  // state update per frame is the honest way to draw it; the hook keeps the
+  // loop to the frames the reader can see.
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setAngle(((elapsed % PERIOD_MS) / PERIOD_MS) * 2 * Math.PI)
+  })
 
   // Derived positions — update every frame.
   const Px = CIRCLE_CX + CIRCLE_R * Math.cos(angle)
@@ -127,6 +114,7 @@ export default function SineOriginDiagram() {
   return (
     <figure className="my-6 not-prose">
       <svg
+        ref={svgRef}
         width={VB_W}
         height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}

@@ -5,6 +5,7 @@ import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
 import { withSubscripts } from '@/lib/text-with-subscripts'
 import { svgTokens } from '@/components/diagrams/svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { MathVar } from '@/components/ui/math'
 
 /**
@@ -290,7 +291,7 @@ export default function BjtOperationVisualizer() {
   // the render body.
   const [particles, setParticles] = useState<Particle[]>([])
   const lastFrameRef = useRef<number>(0)
-  const prevFrameTimeRef = useRef<number>(0)
+  const svgRef = useRef<SVGSVGElement>(null)
 
   // PRNG seeded per-mount; deterministic for tests / SSR.
   const rngRef = useRef<() => number>(() => 0)
@@ -302,20 +303,20 @@ export default function BjtOperationVisualizer() {
     }
   }, [])
 
-  useEffect(() => {
-    let rafId = 0
-    const FRAME_MS = 1000 / 30
-    const SPAWN_TIME_AT_FULL_MA = 50  // ms between spawns at i_c = 10 mA
-
-    const tick = (now: number) => {
-      // Throttle to ~30 fps so SVG render stays cheap.
-      if (now - lastFrameRef.current < FRAME_MS) {
-        rafId = requestAnimationFrame(tick)
-        return
-      }
-      const dt = prevFrameTimeRef.current === 0 ? FRAME_MS : (now - prevFrameTimeRef.current)
-      prevFrameTimeRef.current = now
-      lastFrameRef.current = now
+  // Particle flow. The loop runs only while the visualiser is on screen and
+  // never under prefers-reduced-motion; it restarts when the operating point
+  // changes so the spawn rate follows the new current.
+  const FRAME_MS = 1000 / 30
+  const SPAWN_TIME_AT_FULL_MA = 50  // ms between spawns at i_c = 10 mA
+  useAnimationLoop(
+    svgRef,
+    ({ elapsed }) => {
+      // Throttle to ~30 fps so SVG render stays cheap. `elapsed` only
+      // advances while the loop runs, so a pause never produces one giant dt.
+      const sinceLast = elapsed - lastFrameRef.current
+      if (sinceLast < FRAME_MS && elapsed !== 0) return
+      const dt = elapsed === 0 ? FRAME_MS : sinceLast
+      lastFrameRef.current = elapsed
 
       const rng = rngRef.current
 
@@ -418,13 +419,9 @@ export default function BjtOperationVisualizer() {
 
         return next
       })
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [i_c_mA, beta])
+    },
+    { resetKey: `${i_c_mA}|${beta}` },
+  )
 
   const regionLabel = t(`ch1_11.widget.bjtOp.region.${region}`)
   // Active uses `font-semibold` WITHOUT a colour tint — the project's
@@ -471,6 +468,7 @@ export default function BjtOperationVisualizer() {
       </div>
 
       <svg
+        ref={svgRef}
         width={VB_W}
         height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}

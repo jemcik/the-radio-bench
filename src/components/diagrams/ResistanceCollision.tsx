@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { RoughPaths, roughLine, roughLinearPath } from '@/lib/rough'
 
 /**
@@ -87,26 +88,15 @@ function shortened(from: Pt, to: Pt, dist: number): Pt {
 
 export default function ResistanceCollision() {
   const { t } = useTranslation('ui')
+  // STATIC_PHASE is the still under prefers-reduced-motion and until the
+  // diagram scrolls into view. The approach / impact / rebound geometry is all
+  // a function of `phase`, so the frame goes through state; the hook limits it
+  // to visible frames.
   const [phase, setPhase] = useState<number>(STATIC_PHASE)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      setPhase(((now - start) % CYCLE_MS) / CYCLE_MS)
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setPhase((elapsed % CYCLE_MS) / CYCLE_MS)
+  })
 
   // ── Geometry ────────────────────────────────────────────────────
   const W = 500
@@ -183,6 +173,7 @@ export default function ResistanceCollision() {
   return (
     <DiagramFigure caption={t('ch1_1.resistanceCollisionCaption')}>
       <SVGDiagram
+        ref={svgRef}
         width={W}
         height={H}
         aria-label={t('ch1_1.resistanceCollisionAriaLabel')}

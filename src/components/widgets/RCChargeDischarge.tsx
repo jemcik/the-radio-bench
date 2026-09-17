@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
 
@@ -120,8 +121,7 @@ export default function RCChargeDischarge() {
   const [vAnchor, setVAnchor] = useState(0)
   const [vCurrent, setVCurrent] = useState(0)
   const [lastAction, setLastAction] = useState<Exclude<Mode, 'idle'> | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const startTimeRef = useRef<number | null>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
 
   // Current V on the capacitor given the animation state.
   // During animation: compute from the active formula with vAnchor + elapsed.
@@ -151,20 +151,17 @@ export default function RCChargeDischarge() {
   //   τ = 1 s    →  5τ =   5 s   →  durationMs =   5 s
   //   τ = 4 s    →  5τ =  20 s   →  durationMs =  20 s
   //   τ = 10 s   →  5τ =  50 s   →  durationMs =  30 s (clamp)
-  useEffect(() => {
-    if (mode === 'idle') return
-    const target5tauMs = (Number.isFinite(tau) && tau > 0 ? tau : 1) * 5 * 1000
-    const durationMs = Math.max(300, Math.min(30000, target5tauMs))
-    const tick = (nowMs: number) => {
-      if (startTimeRef.current == null) {
-        startTimeRef.current = nowMs
-      }
-      const dt = (nowMs - startTimeRef.current) / durationMs
-      const e = Math.min(dt * T_SPAN, T_SPAN)
+  // Runs only while charging / discharging, restarts from t = 0 whenever the
+  // inputs change (the duration depends on τ), and pauses while the plot is
+  // scrolled off screen so the reader never misses the curve they started.
+  useAnimationLoop(
+    svgRef,
+    ({ elapsed: runMs }) => {
+      const target5tauMs = (Number.isFinite(tau) && tau > 0 ? tau : 1) * 5 * 1000
+      const durationMs = Math.max(300, Math.min(30000, target5tauMs))
+      const e = Math.min((runMs / durationMs) * T_SPAN, T_SPAN)
       setElapsed(e)
-      if (e < T_SPAN) {
-        rafRef.current = requestAnimationFrame(tick)
-      } else {
+      if (e >= T_SPAN) {
         // Animation finished. Freeze the final voltage as `vCurrent`
         // (for the readout and for the next Charge/Discharge press),
         // but DON'T touch `vAnchor` — the idle ghost curve needs
@@ -177,15 +174,10 @@ export default function RCChargeDischarge() {
         setVCurrent(finalV)
         setElapsed(T_SPAN)
         setMode('idle')
-        startTimeRef.current = null
       }
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-      startTimeRef.current = null
-    }
-  }, [mode, vAnchor, Vin, tau])
+    },
+    { enabled: mode !== 'idle', resetKey: `${mode}|${vAnchor}|${Vin}|${tau}` },
+  )
 
   // «Already at extreme» detection — used to decide whether a button
   // press should resume from the current voltage (partial state) or
@@ -219,9 +211,7 @@ export default function RCChargeDischarge() {
     setMode('discharging')
   }
   function onReset() {
-    if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-    startTimeRef.current = null
-    // Reset animation state
+    // Reset animation state — mode 'idle' also stops the animation loop.
     setMode('idle')
     setElapsed(0)
     setVAnchor(0)
@@ -357,6 +347,7 @@ export default function RCChargeDischarge() {
 
       {/* ── Plot ───────────────────────────────────────────────────── */}
       <svg
+        ref={svgRef}
         width="100%"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         role="img"

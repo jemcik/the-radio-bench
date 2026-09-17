@@ -200,7 +200,7 @@ for (const chapter of chapters) {
       // Suspense spinner has zero diagrams and therefore zero overlaps, so
       // without this the gate passed for five months on a body that never
       // rendered (Ch1_3Hero starved the retry render — see
-      // check-hero-no-state-animation.mjs).
+      // check-animation-loop.mjs).
       await expect(page.locator('.prose-chapter'), `${key}: chapter body never left the Suspense fallback`).toBeVisible({ timeout: 15_000 })
       await page.evaluate(() => document.fonts.ready)
       await page.waitForTimeout(300)
