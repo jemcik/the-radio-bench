@@ -42,12 +42,13 @@ Write new entries there too — see `.claude/memory/README.md`.
 
 ## Working from a fresh clone
 
-Everything needed is in the repo except two things:
+Everything needed is in the repo except what follows:
 
 ```bash
-npm ci
-cp .env.example .env.local     # then paste a Gemini key — the UA pipeline needs it
-npm run check:all && npm test  # should be green before you touch anything
+npm ci && npx playwright install chromium   # the Chromium for `test:visual` is not an npm package
+brew install poppler gh                     # pdftotext is needed for PDFs over 100 MB; gh for PR checks
+cp .env.example .env.local                  # then paste a Gemini key — the UA pipeline needs it
+npm run check:all && npm test               # should be green before you touch anything
 ```
 
 - **`.env.local`** — `GEMINI_API_KEY`, git-ignored. Without it `ua-translate` cannot run,
@@ -55,6 +56,9 @@ npm run check:all && npm test  # should be green before you touch anything
 - **Reference PDFs** — the ARRL Handbook and The Art of Electronics live in the owner's
   Google Drive; paths in `.claude/memory/reference_research_pdfs.md`. Only needed when
   fact-checking a claim.
+- **Chrome with the Claude-in-Chrome extension, and Google Drive for desktop** signed in as
+  the owner — the visual-verify workflow and the PDF paths in `.claude/memory/` depend on them.
+  Those paths assume the user `jemcik`, so the clone lives at `/Users/jemcik/Public/code/Radiopedia`.
 - `.claude/settings.local.json` (permission allow-list) is machine-local and regenerates
   itself; its absence just means more permission prompts.
 
