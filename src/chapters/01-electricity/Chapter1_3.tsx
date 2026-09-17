@@ -264,7 +264,7 @@ export default function Chapter1_3() {
         <Trans
           i18nKey="ch1_3.nonSineIntro"
           ns="ui"
-          components={{ pwm: <G k="pwm" />, modulation: <G k="modulation" />, var: <MathVar />, sub: <sub />, square: <G k="square wave" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
+          components={{ pwm: <G k="pwm" />, var: <MathVar />, sub: <sub />, square: <G k="square wave" />, nowrap: <span style={{ whiteSpace: "nowrap" }} /> }}
         />
       </p>
 
@@ -364,7 +364,7 @@ export default function Chapter1_3() {
           { text: <Trans i18nKey="ch1_3.labStep2" ns="ui" components={{ ...mathComponents, strong: <strong />, em: <em />, ripple: <G k="ripple" /> }} /> },
           { text: <Trans i18nKey="ch1_3.labStep3" ns="ui" components={{ ...mathComponents, strong: <strong />, code: <code />, duty: <G k="duty cycle" /> }} /> },
           { text: <Trans i18nKey="ch1_3.labStep4" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
-          { text: <Trans i18nKey="ch1_3.labStep5" ns="ui" components={{ ...mathComponents, strong: <strong />, bw: <G k="bandwidth" /> }} /> },
+          { text: <Trans i18nKey="ch1_3.labStep5" ns="ui" components={{ ...mathComponents, strong: <strong /> }} /> },
           { text: <Trans i18nKey="ch1_3.labStep6" ns="ui" components={{ ...mathComponents, strong: <strong />, code: <code /> }} /> },
         ]}
         expectedResult={t('ch1_3.labExpected')}
