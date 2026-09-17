@@ -99,7 +99,7 @@ The `beginner-review` skill was added on **2026-05-20**, in the same commit as c
 that date was therefore written, translated and shipped without ever being read by a
 fresh-context reader.
 
-Never reviewed (14): 0.1 – 0.5, 1.1 – 1.10 — of which 0.1 – 0.5, 1.1 and 1.2 are now done.
+Never reviewed (14): 0.1 – 0.5, 1.1 – 1.10 — of which 0.1 – 0.5, 1.1, 1.2 and 1.3 are now done.
 Covered by the rule (12): 1.11, 2.1 – 2.3, 3.1 – 3.4, 4.1 – 4.4.
 
 The **glossary** was outside this backlog entirely — the skill excluded it by rule
@@ -150,7 +150,7 @@ It is a filter, not a guarantee.
 | [x] | `0.5` — 2026-08-02. Seven review rounds (32 → 18 → 15 → 11 → 17 → 14 → 21 findings); all applied. Gained the wires/junctions figure the section never had, plus a `ResistorIEC` primitive and a corrected `Capacitor` (it drew the polarised symbol). |
 | [x] | `1.1` — 2026-08-02. Seven review rounds (40 → 47 → 37 → 21 → 15 → 2 → 1 findings); all applied. §1 and §3 debt for this chapter cleared in the same pass, and the chapter gained a `CurrentArrow` primitive — the schematic labelled the LED «I» and drew no arrow at all. Four numbers were wrong: the collision rate (the electrons-per-coulomb figure reused, off by 150 000×), the electrons per coulomb (6.25 → 6.24), a metre of copper wire (5 mΩ → 50 mΩ) and a 15 A breaker (not an IEC rating).
 | [x] | `1.2` — 2026-08-12. Eight review rounds (62 → 29 → 16 → 15 → 7 → 5 → 1 → 0 findings); all applied. §3 math-var debt cleared in the same pass (26 keys — the first batch that also needed two **render paths** changed, `kirchhoffClose` and `widget.runtime.hint`, because a bare `t()` would have shipped the new `<var>` literally). The chapter gained the lab schematic its steps had been describing without one. Four claims were wrong: a 220 Ω resistor was said to pass 23 mA *through an LED* (the LED takes ~2 V of the 5 V, so ≈14 mA); a filament's 2700 K was written as 2700 °C; «coulombs with amps give … joules» (joules come from coulombs × volts); and the quiz explanation derived two distractors from a division that does not produce them. The subtitle promised «the two equations that explain everything» while §7 adds Kirchhoff's two laws. |
-| [ ] | `1.3` |
+| [x] | `1.3` — 2026-08-13. Seven review rounds (18 → 31 → 35 → 8 → 2 → 0 → 0 findings); all applied. The last two rounds were clean — the seventh existed only because five keys were edited after the sixth had already started reading. §3 math-var debt cleared bar two SVG annotation labels that already render italic, and the π correction below came out of this pass. The chapter gained the lab schematic its PWM steps had been describing without one, plus a new gate (`check:glossary-tag-parity`, §10). Four things were broken rather than unclear: `SineExplorer` printed «T = 1 / 50 Hz = 19.95 ms» on 58 of 101 slider positions (it rounded the frequency for display but derived the period from the raw value — in the widget whose whole job is T = 1/f); the lab schematic drew its ground rotated 90°, reading as a capacitor in the return rail; `RmsSelector` clipped its on-plot level label away entirely in three of four modes; and `sourcesBridge` had a receiver «extracting DC to drive a speaker coil», which holds the cone still and makes no sound. `mainsWorkedEurope` also told the reader to fit a 400 V capacitor across the live mains two paragraphs before the callout explaining that is the wrong class of part. |
 | [ ] | `1.4` |
 | [ ] | `1.5` |
 | [ ] | `1.6` |
@@ -164,13 +164,22 @@ It is a filter, not a guarantee.
 ## 3. Math variables in prose that are not wrapped in `<var>`
 
 **Found** 2026-05-24, when `check:unwrapped-math-var` was added alongside ch 2.1
-(`da1c413`). **Scale:** 441 keys across 10 chapters (0.2 – 1.11); originally 533 across
-14. Ch 0.3 was worked off 2026-07-29, ch 0.4 on 2026-07-31, ch 1.1 on 2026-08-02 and
-ch 1.2 on 2026-08-12; the symbol-gloss exemption added on 2026-07-29 cleared a further
-fifteen keys spread over ch 0.2, 1.1, 1.3, 1.5 and 1.6, and the aria-label exemption
-added 2026-08-02 cleared four more (ch 1.7, 1.8) — an `aria-label` is read aloud, never
-rendered, so it cannot carry `<var>` and the defect this gate names does not apply to it.
-**Gate:** `check:unwrapped-math-var` (green — all 441 are grandfathered in
+(`da1c413`). **Scale:** 387 keys across 10 chapters (0.2 – 1.11); originally 533 across
+14. Ch 0.3 was worked off 2026-07-29, ch 0.4 on 2026-07-31, ch 1.1 on 2026-08-02, ch 1.2
+on 2026-08-12 and ch 1.3 on 2026-08-13; the symbol-gloss exemption added on 2026-07-29
+cleared a further fifteen keys spread over ch 0.2, 1.1, 1.3, 1.5 and 1.6, and the
+aria-label exemption added 2026-08-02 cleared four more (ch 1.7, 1.8) — an `aria-label` is
+read aloud, never rendered, so it cannot carry `<var>` and the defect this gate names does
+not apply to it.
+
+**π was never debt.** The ch 1.3 pass found the gate counting π as a variable. It is a
+mathematical *constant*, and ISO 80000-2 sets constants upright — which is what plain prose
+already gives it, and what `<var>` would take away by rendering it math-italic. Of the 441
+keys baselined before that pass, **46 were nothing but π** (`2/π`, `2π · f · t`,
+`π/2 ≈ 1.57`) and twelve more shrank. Anyone «working those off» would have made the
+typography wrong. π and Π left the flag set on 2026-08-13.
+
+**Gate:** `check:unwrapped-math-var` (green — all 387 are grandfathered in
 `scripts/unwrapped-math-var-baseline.json`).
 
 Ch 1.2's 26 keys were the first batch where clearing the debt also required changing a
@@ -227,17 +236,25 @@ unwrapped variable.
 | Chapter | `en` | `uk` | Total |
 |---|---|---|---|
 | `ch0_2` | 1 | 1 | 2 |
-| `ch1_2` | 16 | 16 | 32 |
-| `ch1_3` | 11 | 11 | 22 |
-| `ch1_4` | 6 | 8 | 14 |
+| `ch1_3` | 2 | 2 | 4 |
+| `ch1_4` | 6 | 7 | 13 |
 | `ch1_5` | 34 | 34 | 68 |
-| `ch1_6` | 40 | 40 | 80 |
-| `ch1_7` | 42 | 42 | 84 |
-| `ch1_8` | 28 | 27 | 55 |
+| `ch1_6` | 38 | 38 | 76 |
+| `ch1_7` | 37 | 37 | 74 |
+| `ch1_8` | 20 | 19 | 39 |
 | `ch1_9` | 2 | 2 | 4 |
-| `ch1_10` | 13 | 13 | 26 |
-| `ch1_11` | 44 | 43 | 87 |
-| **Total** | **237** | **237** | **474** |
+| `ch1_10` | 12 | 12 | 24 |
+| `ch1_11` | 42 | 41 | 83 |
+| **Total** | **194** | **193** | **387** |
+
+Ch 1.3's four remaining entries are `sineOrigin.angleLabel` («θ») and `sineOrigin.sineLabel`
+in both locales. Both are annotation labels inside a hand-rolled `<text fontStyle="italic">`
+in `SineOriginDiagram.tsx`: the letters already render italic, and a `<var>` there would
+ship literally, because a raw `<text>` has no renderer. They are correct as drawn — the gate
+simply cannot see the render site.
+
+(This table was left at its pre-ch-1.2 numbers when that chapter was worked off; it is
+regenerated from the baseline file here, so ch 1.2's cleared rows are gone too.)
 
 Note that `ch1_11` carries the largest share despite post-dating the `beginner-review`
 rule — the two backlogs are independent, and a chapter can be clear of one and not the
@@ -624,3 +641,64 @@ the ch0.4 lookup back the old way makes the gate fail with `ch0_4.${…}`.
 | `ch2_2` | `Chapter2_2.tsx` |
 | `ch4_3` | `MainsColourCode.tsx`, `MpeFrequencyCurve.tsx`, `ShockCurrentScale.tsx`, `BodyCurrentCalculator.tsx`, `SafetyChecklist.tsx` |
 | `ch4_5` | `AllocationVsPlanVsLicence.tsx` |
+
+---
+
+## 10. Glossary links the Ukrainian reader never gets
+
+**Found** 2026-08-13, during the ch 1.3 pass. **Scale:** 19 keys across 6 chapters.
+**Gate:** `check:glossary-tag-parity` (green — the 19 are baselined in
+`scripts/glossary-tag-parity-baseline.json`).
+
+### What the defect is
+
+A chapter string wraps a term in a glossary alias (`<ind>`, `<dmm>`, `<lc>`, …) in
+English and not in Ukrainian. The English reader gets the dotted underline and the
+popover; the Ukrainian reader gets a bare word and no way to look the term up.
+
+ch 1.3's `sineWaveIntro` is the shape to remember. English:
+
+> An `<lc>`LC`</lc>` circuit — a `<cap>`capacitor`</cap>` and an `<ind>`inductor`</ind>`
+> tied together, which we meet properly in Chapter 1.7 — rings at a pure sine.
+
+Ukrainian carried only `<cap>`. So the one sentence that introduces the LC circuit,
+four chapters before it gets its own, offered a Ukrainian reader no definition of
+either «LC» or «котушка індуктивності» — and, because the translation had rendered
+«LC circuit» as «коливальний контур», never showed them the letters *LC* at all.
+
+### Why no gate caught it
+
+`check:glossary-coverage` reads `en/ui.json` only. It is written to answer «does this
+chapter ever wrap this term», which is a question about the English file. An EN-only
+wrap is a correct answer to that question and a defect to the reader.
+
+This is the same shape as the bug `check:tag-renders` carried until the ch 1.2 pass
+widened it to both locales. **A gate that reads one locale cannot see a defect that
+lives in the other** — worth checking the remaining single-locale gates for the same
+blind spot.
+
+### Why it was deferred
+
+Each hit needs its Ukrainian sentence re-read and usually rephrased, not a mechanical
+tag insert: in half the cases the translated sentence does not contain the term at all
+(«коливальний контур» for «LC circuit»), so restoring the link means rewriting the
+clause and re-running it through `ua-translate`. That is chapter-review work.
+
+### How to work it off
+
+Fold into each chapter's §2 pass. Per chapter: run
+`node scripts/check-glossary-tag-parity.mjs`, wrap the same term in the Ukrainian value
+(rephrasing if the term is absent), re-run the UA linter for that block, then
+`--update-baseline` and check the diff shows only the keys you meant to clear.
+
+### The backlog
+
+| Chapter | Keys |
+|---|---|
+| `ch1_11` | 10 |
+| `ch1_4` | 3 |
+| `ch1_5` | 2 |
+| `ch4_4` | 2 |
+| `ch1_6` | 1 |
+| `ch1_8` | 1 |
+| **Total** | **19** |

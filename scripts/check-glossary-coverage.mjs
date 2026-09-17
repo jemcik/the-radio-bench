@@ -203,7 +203,11 @@ const EXEMPT_PER_CHAPTER = {
   ch1_2: new Set(['drain', 'modulation', 'envelope']),
   // ch1_3 «base» — passing reference (e.g. «base of …»), not a BJT
   // base terminal. The English bare word collides.
-  ch1_3: new Set(['base']),
+  // «modulation» — same case as ch0_2: only inside «PWM (pulse-width
+  // modulation)». The wrap shipped with the 2026-09 review pass and the
+  // popover («the way a radio signal carries information») misled the
+  // proofreader on the spot; the «pwm» entry already explains the term.
+  ch1_3: new Set(['base', 'modulation']),
   // ch1_5 «drain» — passing reference (charge draining off a cap),
   // not a FET drain. «radial» — capacitor lead geometry («radial
   // electrolytic», «two downward radial leads»), NOT an antenna radial

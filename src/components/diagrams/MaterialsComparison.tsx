@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
@@ -156,38 +157,26 @@ export default function MaterialsComparison() {
   const conductorPanelX = panelStartX
   const semiPanelX = panelStartX + 2 * (panelW + gutter)
 
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      const elapsed = now - start
-      const cBase = (elapsed % CONDUCTOR_PERIOD_MS) / CONDUCTOR_PERIOD_MS
-      conductorFreeOffsets.forEach((off, i) => {
-        const initialPhase = off[0] / panelW
-        const p = (cBase + initialPhase) % 1
-        const el = conductorRefs.current[i]
-        if (el) el.setAttribute('cx', String(conductorPanelX + p * panelW))
-      })
-      const sBase = (elapsed % SEMI_PERIOD_MS) / SEMI_PERIOD_MS
-      semiFreeOffsets.forEach((off, i) => {
-        const initialPhase = off[0] / panelW
-        const p = (sBase + initialPhase) % 1
-        const el = semiRefs.current[i]
-        if (el) el.setAttribute('cx', String(semiPanelX + p * panelW))
-      })
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [conductorPanelX, semiPanelX])
+  // Free-electron drift in the conductor and semiconductor panels — each frame
+  // is written straight to the circles; no React render. Runs only while the
+  // figure is on screen, never under prefers-reduced-motion.
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const cBase = (elapsed % CONDUCTOR_PERIOD_MS) / CONDUCTOR_PERIOD_MS
+    conductorFreeOffsets.forEach((off, i) => {
+      const initialPhase = off[0] / panelW
+      const p = (cBase + initialPhase) % 1
+      const el = conductorRefs.current[i]
+      if (el) el.setAttribute('cx', String(conductorPanelX + p * panelW))
+    })
+    const sBase = (elapsed % SEMI_PERIOD_MS) / SEMI_PERIOD_MS
+    semiFreeOffsets.forEach((off, i) => {
+      const initialPhase = off[0] / panelW
+      const p = (sBase + initialPhase) % 1
+      const el = semiRefs.current[i]
+      if (el) el.setAttribute('cx', String(semiPanelX + p * panelW))
+    })
+  })
 
   // ── Rough.js geometry ──────────────────────────────────────────
   const sketch = useMemo(() => {
@@ -268,6 +257,7 @@ export default function MaterialsComparison() {
 
         {/* SVG: panel frames, atoms, electrons — graphic content only. */}
         <SVGDiagram
+          ref={svgRef}
           width={W}
           height={H}
           aria-label={t('ch1_1.materialsAriaLabel')}

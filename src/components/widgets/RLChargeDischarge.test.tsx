@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@/test/render'
+import { stubAnimationFrames } from '@/test/animation-frames'
 import RLChargeDischarge from './RLChargeDischarge'
 
 /* RLChargeDischarge smoke tests.
@@ -25,30 +26,25 @@ describe('RLChargeDischarge', () => {
   })
 
   it('shows ↗ charging arrow during animation, ↘ discharging during the other direction', async () => {
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     try {
       const { container } = setup()
       // Charge button kicks off animation
       await act(async () => { fireEvent.click(screen.getByRole('button', { name: /^charge$/ })) })
-      await act(async () => { rafCallbacks.shift()?.(0) })
+      await raf.frame(0)
       expect(container.textContent).toMatch(/↗ charging/)
 
       // Pump to end
-      await act(async () => { rafCallbacks.shift()?.(60000) })
+      await raf.frame(60000)
       expect(container.textContent).toMatch(/— idle/)
 
       // Discharge — direction changes
       await act(async () => { fireEvent.click(screen.getByRole('button', { name: /^discharge$/ })) })
-      await act(async () => { rafCallbacks.shift()?.(0) })
+      await raf.frame(0)
       expect(container.textContent).toMatch(/↘ discharging/)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 

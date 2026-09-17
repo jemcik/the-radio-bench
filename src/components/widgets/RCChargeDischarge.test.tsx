@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@/test/render'
+import { stubAnimationFrames } from '@/test/animation-frames'
 import RCChargeDischarge from './RCChargeDischarge'
 
 /* RCChargeDischarge smoke tests.
@@ -53,12 +54,7 @@ describe('RCChargeDischarge', () => {
     // We test the upper edge: τ = 4 s (R = 40 kΩ × C = 100 µF), so
     // target 5τ = 20 s, which falls inside the band and should
     // produce a 20-s animation (not the old 4-s flat value).
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     try {
       const { container } = setup()
@@ -67,21 +63,21 @@ describe('RCChargeDischarge', () => {
       // R unit already kΩ, C already 100 µF → τ = 40e3 · 100e-6 = 4 s
 
       await act(async () => { fireEvent.click(screen.getByRole('button', { name: /^Charge$/ })) })
-      await act(async () => { rafCallbacks.shift()?.(0) })
+      await raf.frame(0)
 
       // At 18 000 ms wall-clock: animation should still be running
       // (target duration ≈ 20 000 ms). Old hardcoded 4 s would have
       // finished by now, and the [1.5 s, 10 s] clamp would also
       // have finished.
-      await act(async () => { rafCallbacks.shift()?.(18000) })
+      await raf.frame(18000)
       expect(screen.getByRole('button', { name: /^Discharge$/ })).toBeDisabled()
 
       // Step past target — animation should finish.
-      await act(async () => { rafCallbacks.shift()?.(21000) })
+      await raf.frame(21000)
       expect(screen.getByRole('button', { name: /^Discharge$/ })).not.toBeDisabled()
       expect(container.textContent).toMatch(/4\.97\s*V/)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 
@@ -90,16 +86,11 @@ describe('RCChargeDischarge', () => {
     // should NOT be blocked and should NOT draw a flat line at V_in.
     // Instead, the handler snaps vCurrent back to 0 V so the full
     // 0 → V_in arc plays again.
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     const pumpEnd = async () => {
-      await act(async () => { rafCallbacks.shift()?.(0) })
-      await act(async () => { rafCallbacks.shift()?.(6000) })
+      await raf.frame(0)
+      await raf.frame(6000)
     }
 
     try {
@@ -119,7 +110,7 @@ describe('RCChargeDischarge', () => {
       await pumpEnd()
       expect(container.textContent).toMatch(/4\.97\s*V/)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 
@@ -127,12 +118,7 @@ describe('RCChargeDischarge', () => {
     // Symmetric UX: on a freshly-loaded widget (vCurrent = 0) the
     // user can press Discharge directly and see the full V_in → 0
     // decay without having to press Charge first.
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     try {
       const { container } = setup()
@@ -141,11 +127,11 @@ describe('RCChargeDischarge', () => {
       expect(container.textContent).toMatch(/5\.00\s*V/)
 
       // Let the animation finish → ≈ 0 V.
-      await act(async () => { rafCallbacks.shift()?.(0) })
-      await act(async () => { rafCallbacks.shift()?.(6000) })
+      await raf.frame(0)
+      await raf.frame(6000)
       expect(container.textContent).toMatch(/0\.03\s*V/)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 
@@ -200,12 +186,7 @@ describe('RCChargeDischarge', () => {
     //
     // We fake RAF so the whole 5τ animation collapses into a
     // deterministic sequence of synchronous ticks.
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     try {
       const { container } = setup()
@@ -215,21 +196,15 @@ describe('RCChargeDischarge', () => {
       // Drive the animation past 5τ of wall-clock time. The widget
       // maps 5τ onto 4000 ms of wall clock, so a single tick at
       // t = 4000 ms is enough to hit the end branch.
-      await act(async () => {
-        const cb = rafCallbacks.shift()
-        cb?.(0)
-      })
-      await act(async () => {
-        const cb = rafCallbacks.shift()
-        cb?.(5000)
-      })
+      await raf.frame(0)
+      await raf.frame(5000)
 
       // V_in = 5 V, charged for 5τ → V_C ≈ 5 · (1 − e^-5) ≈ 4.97 V.
       // Was 0.00 before the fix.
       expect(container.textContent).toMatch(/4\.97\s*V/)
       expect(container.textContent).not.toMatch(/0\.00\s*V/)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 
@@ -241,18 +216,13 @@ describe('RCChargeDischarge', () => {
     // line near V_in — so the graph «disappeared» once charging
     // finished. Splitting into vAnchor (sticky start point) + vCurrent
     // (endpoint, for the readout) restores the full 0 → V_in arc.
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     try {
       const { container } = setup()
       await act(async () => { fireEvent.click(screen.getByRole('button', { name: /^Charge$/ })) })
-      await act(async () => { rafCallbacks.shift()?.(0) })
-      await act(async () => { rafCallbacks.shift()?.(5000) })
+      await raf.frame(0)
+      await raf.frame(5000)
 
       const path = container.querySelector('path')
       const d = path?.getAttribute('d') ?? ''
@@ -269,7 +239,7 @@ describe('RCChargeDischarge', () => {
       expect(lastY).toBeLessThan(25)        // ends near top
       expect(firstY).toBeGreaterThan(lastY) // rises on screen
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 
@@ -284,16 +254,11 @@ describe('RCChargeDischarge', () => {
     // This test locks in the correct behaviour: after Charge→Discharge,
     // the idle ghost curve is the full 4.97 → 0.03 arc — starts
     // high on the plot (low y), ends low (high y).
-    const rafCallbacks: FrameRequestCallback[] = []
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
-    vi.stubGlobal('cancelAnimationFrame', () => {})
+    const raf = stubAnimationFrames()
 
     const pumpAnimationToEnd = async () => {
-      await act(async () => { rafCallbacks.shift()?.(0) })
-      await act(async () => { rafCallbacks.shift()?.(5000) })
+      await raf.frame(0)
+      await raf.frame(5000)
     }
 
     try {
@@ -319,7 +284,7 @@ describe('RCChargeDischarge', () => {
       expect(lastY).toBeGreaterThan(170) // ends near bottom
       expect(lastY).toBeGreaterThan(firstY) // falls on screen (V decreases)
     } finally {
-      vi.unstubAllGlobals()
+      raf.restore()
     }
   })
 })

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import Widget from '@/components/ui/widget'
 import { MathVar } from '@/components/ui/math'
 import { Slider } from '@/components/ui/slider'
 import { ResultBox } from '@/components/ui/result-box'
 import { useLocaleFormatter, useUnitFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { formatDecimal, formatNumber } from '@/lib/format'
 
 /**
@@ -300,43 +301,36 @@ function DriftVisualisation({ driftPxPerSec }: { driftPxPerSec: number }) {
   const phasesRef = useRef<number[]>(
     Array.from({ length: ELECTRON_COUNT }, (_, i) => i / ELECTRON_COUNT),
   )
-  const speedRef = useRef(driftPxPerSec)
-  useEffect(() => {
-    speedRef.current = driftPxPerSec
-  }, [driftPxPerSec])
+  const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
-    let raf = 0
-    let lastT = performance.now()
-
-    const frame = (now: number) => {
-      const dt = (now - lastT) / 1000
-      lastT = now
-      const speed = speedRef.current
-      const phases = phasesRef.current
-      if (speed > 0.1) {
-        const dp = (speed * dt) / WIRE_W
-        for (let i = 0; i < phases.length; i++) {
-          let p = phases[i] + dp
-          if (p >= 1) p -= 1 // wrap: re-enter at the left
-          phases[i] = p
-        }
-      }
-      // Write every frame (even when stationary, harmless); this keeps
-      // DOM in sync if the initial mount caught mid-frame.
+  // Electron drift — each frame is written straight to the circles; no React
+  // render. The loop reads the latest `driftPxPerSec` (the hook always calls
+  // the current render's callback), runs only while the wire is on screen,
+  // and never under prefers-reduced-motion.
+  useAnimationLoop(svgRef, ({ dt: dtMs }) => {
+    const dt = dtMs / 1000
+    const speed = driftPxPerSec
+    const phases = phasesRef.current
+    if (speed > 0.1) {
+      const dp = (speed * dt) / WIRE_W
       for (let i = 0; i < phases.length; i++) {
-        const el = circleRefs.current[i]
-        if (el) el.setAttribute('cx', String(PAD + phases[i] * WIRE_W))
+        let p = phases[i] + dp
+        if (p >= 1) p -= 1 // wrap: re-enter at the left
+        phases[i] = p
       }
-      raf = requestAnimationFrame(frame)
     }
-    raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+    // Write every frame (even when stationary, harmless); this keeps
+    // DOM in sync if the initial mount caught mid-frame.
+    for (let i = 0; i < phases.length; i++) {
+      const el = circleRefs.current[i]
+      if (el) el.setAttribute('cx', String(PAD + phases[i] * WIRE_W))
+    }
+  })
 
   return (
     <div className="rounded-lg border border-border bg-card/60 p-3 text-[hsl(var(--sketch-stroke))]">
       <svg
+        ref={svgRef}
         width="100%" viewBox={`0 0 ${WIRE_W + PAD * 2} ${WIRE_H}`}
         role="img"
         aria-label={t('ch1_1.widget.driftAriaLabel')}

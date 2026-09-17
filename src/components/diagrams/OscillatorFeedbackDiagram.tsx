@@ -19,10 +19,11 @@
  *
  * Bare <svg>, fixed px = viewBox, numeric fontSize, per diagram-quality.
  */
-import { useEffect, useId, useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 
 const VB_W = 560
 const VB_H = 205
@@ -76,24 +77,17 @@ export default function OscillatorFeedbackDiagram() {
 
   // progress: 0 → 1 sawtooth driving the start-up build-up. Init at 1 so the
   // static snapshot (reduced-motion, tests, SSR) is the steady-state sine.
+  // The steady-state sine (progress = 1, phase = 0) is the still under
+  // prefers-reduced-motion and until the diagram scrolls into view. The growth
+  // envelope and the phase are both drawn from state; the hook limits the
+  // frames to visible ones.
   const [progress, setProgress] = useState(1)
   const [phase, setPhase] = useState(0)
-  const t0 = useRef<number | null>(null)
-
-  useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return // keep the steady-state snapshot
-    let raf = 0
-    const loop = (ts: number) => {
-      if (t0.current === null) t0.current = ts
-      const elapsed = ts - t0.current
-      setProgress(((elapsed % CYCLE_MS) / CYCLE_MS))
-      setPhase((elapsed / 1000) * 1.6)
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setProgress((elapsed % CYCLE_MS) / CYCLE_MS)
+    setPhase((elapsed / 1000) * 1.6)
+  })
 
   // envelope: grow fast, then hold steady for the last quarter of the cycle.
   const env = easeOutCubic(Math.min(1, progress / 0.75))
@@ -104,6 +98,7 @@ export default function OscillatorFeedbackDiagram() {
   return (
     <DiagramFigure caption={t('ch1_11.oscBlock.caption')}>
       <svg
+        ref={svgRef}
         width={VB_W}
         height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}

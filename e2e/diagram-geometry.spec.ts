@@ -196,6 +196,12 @@ for (const chapter of chapters) {
       await page.goto(`/#/chapter/${chapter.id}`)
       // Let lazy chapter chunk + fonts + rough.js settle so boxes are final.
       await page.waitForLoadState('networkidle')
+      // The chapter body must actually be on screen. A chapter stuck on its
+      // Suspense spinner has zero diagrams and therefore zero overlaps, so
+      // without this the gate passed for five months on a body that never
+      // rendered (Ch1_3Hero starved the retry render — see
+      // check-animation-loop.mjs).
+      await expect(page.locator('.prose-chapter'), `${key}: chapter body never left the Suspense fallback`).toBeVisible({ timeout: 15_000 })
       await page.evaluate(() => document.fonts.ready)
       await page.waitForTimeout(300)
 

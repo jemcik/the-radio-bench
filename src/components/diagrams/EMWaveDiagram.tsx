@@ -25,9 +25,10 @@
  *
  * hardcoded-fontsize-file-ok: none — all <text> uses em tokens from svgTokens.
  */
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { svgTokens } from './svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 
 const VB_W = 620
 const VB_H = 280
@@ -105,27 +106,14 @@ function arrow(x1: number, y1: number, x2: number, y2: number, color: string, ke
 
 export default function EMWaveDiagram() {
   const { t } = useTranslation('ui')
+  // phase = 0.6 is the readable still under prefers-reduced-motion and until
+  // the diagram scrolls into view. Both field curves are rebuilt from it, so
+  // the frame goes through state; the hook limits it to visible frames.
   const [phase, setPhase] = useState<number>(0.6)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let rafId = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      const elapsed = (now - start) % PERIOD_MS
-      setPhase((elapsed / PERIOD_MS) * 2 * Math.PI)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    setPhase(((elapsed % PERIOD_MS) / PERIOD_MS) * 2 * Math.PI)
+  })
 
   // Field-vector sample points (fixed x; the vectors pulse as the wave passes).
   const NARROWS = 6
@@ -141,6 +129,7 @@ export default function EMWaveDiagram() {
   return (
     <figure className="my-6 not-prose">
       <svg
+        ref={svgRef}
         width={VB_W}
         height={VB_H}
         viewBox={`0 0 ${VB_W} ${VB_H}`}

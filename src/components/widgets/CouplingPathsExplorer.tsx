@@ -17,6 +17,7 @@ import Widget from '@/components/ui/widget'
 import { ResultBox } from '@/components/ui/result-box'
 import { mathComponents } from '@/lib/trans-defaults'
 import { svgTokens } from '@/components/diagrams/svgTokens'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 
 const VB_W = 580
 const VB_H = 270
@@ -41,7 +42,6 @@ type PathKey = (typeof PATHS)[number]['key']
 export default function CouplingPathsExplorer() {
   const { t } = useTranslation('ui')
   const [selected, setSelected] = useState<PathKey>('antenna')
-  const [dash, setDash] = useState(0)
   const pathEls = useRef<(SVGPathElement | null)[]>([])
   const [badgePos, setBadgePos] = useState<ReadonlyArray<readonly [number, number]>>(
     () => PATHS.map(p => p.badge),
@@ -67,19 +67,13 @@ export default function CouplingPathsExplorer() {
   }, [])
 
   // Flowing dash on the selected path — energy travelling source → victim.
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (mq.matches) return
-    let raf = 0
-    let t0: number | null = null
-    const loop = (ts: number) => {
-      if (t0 === null) t0 = ts
-      setDash(-((ts - t0) / 1000) * 22)
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+  // The offset is written straight to the selected <path>; the widget does not
+  // re-render per frame. Under prefers-reduced-motion the dashes stand still.
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const i = PATHS.findIndex(p => p.key === selected)
+    pathEls.current[i]?.setAttribute('stroke-dashoffset', (-(elapsed / 1000) * 22).toFixed(2))
+  })
 
   return (
     <Widget
@@ -88,6 +82,7 @@ export default function CouplingPathsExplorer() {
     >
       <div className="overflow-x-auto">
         <svg
+          ref={svgRef}
           width={VB_W}
           height={VB_H}
           viewBox={`0 0 ${VB_W} ${VB_H}`}
@@ -137,7 +132,7 @@ export default function CouplingPathsExplorer() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray={on ? '8 8' : undefined}
-                strokeDashoffset={on ? dash : undefined}
+                strokeDashoffset={on ? 0 : undefined}
               />
             )
           })}

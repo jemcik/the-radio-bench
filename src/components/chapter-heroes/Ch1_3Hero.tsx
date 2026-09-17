@@ -17,10 +17,21 @@
  *     once (stable seed) and translated as a whole, so the hand-drawn
  *     wobble does NOT re-roll every frame.
  *
- * Animation respects `prefers-reduced-motion` — snapshot at scrollX=0.
+ * Animation respects `prefers-reduced-motion` — snapshot at translate(0).
+ *
+ * The scroll is written straight to the <g>'s transform attribute from the
+ * animation-frame callback, never through React state. A `setState` per
+ * frame is a default-priority update sixty times a second, and this hero
+ * mounts OUTSIDE the chapter body's <Suspense>: React 19 gives the body's
+ * retry render a lane that never expires, so the hero's updates restarted
+ * that render on every frame, and whenever the body could not finish inside
+ * one frame gap (cold dev server, slower machine, headless Chromium) the
+ * spinner under this hero stayed forever. Found 2026-09-17; present since
+ * the chapter's first commit. `check:animation-loop` now forbids the pattern.
  */
-import { useEffect, useMemo, useState, useId } from 'react'
+import { useMemo, useRef, useId } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import {
   RoughPaths,
   type RoughPath,
@@ -47,7 +58,11 @@ const PLOT_H = BEZEL_H - 20
 const PLOT_X1 = PLOT_X0 + PLOT_W
 
 // DC trace — flat line in the upper third.
-const DC_Y = PLOT_Y0 + Math.round(PLOT_H * 0.28)
+// 0.18, not 0.28: the AC tag sits between the DC trace and the sine crest, and
+// at 0.28 the 19-unit gap could not hold a 15-unit-tall label — the tag ended up
+// touching whichever line it was nudged towards. Lifting the flat DC line opens
+// the band so the tag clears both.
+const DC_Y = PLOT_Y0 + Math.round(PLOT_H * 0.18)
 
 // AC trace geometry
 const AC_CY = PLOT_Y0 + Math.round(PLOT_H * 0.70)
@@ -140,32 +155,18 @@ export default function Ch1_3Hero() {
   )
   const gridDots = useMemo(() => buildGridDots(), [])
 
-  // scrollX animates from 0 down to -VISIBLE_CYCLE_PX, then wraps to 0.
+  // The AC group scrolls from 0 down to -VISIBLE_CYCLE_PX, then wraps to 0.
   // The wrap is seamless because sine has that exact period in x.
-  const [scrollX, setScrollX] = useState<number>(0)
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-    let rafId = 0
-    let startTime: number | null = null
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now
-      const elapsed = (now - startTime) % PERIOD_MS
-      setScrollX(-(elapsed / PERIOD_MS) * VISIBLE_CYCLE_PX)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  const svgRef = useRef<SVGSVGElement>(null)
+  const acGroupRef = useRef<SVGGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    const scrollX = -((elapsed % PERIOD_MS) / PERIOD_MS) * VISIBLE_CYCLE_PX
+    acGroupRef.current?.setAttribute('transform', `translate(${scrollX.toFixed(2)} 0)`)
+  })
 
   return (
     <svg
+      ref={svgRef}
       width="540"
       height="190"
       viewBox={`0 0 ${VB_W} ${VB_H}`}
@@ -206,22 +207,26 @@ export default function Ch1_3Hero() {
 
       {/* ─── AC TRACE (scrolling sine, clipped to plot area) ─────── */}
       <g clipPath={`url(#${clipId})`}>
-        <g transform={`translate(${scrollX.toFixed(2)} 0)`}>
+        <g ref={acGroupRef} transform="translate(0 0)">
           <RoughPaths paths={strokes.ac} />
         </g>
       </g>
-      {/* AC tag above the first peak — stays fixed while the trace
-          scrolls underneath (the peak is still visible in the leftmost
-          cycle at any moment). */}
+      {/* AC tag at the RIGHT end, above the sine. At the left end it landed
+          ~15 units under the DC label with the flat DC trace between the two,
+          so the pair read as a two-line legend belonging to that one line —
+          and the sine's nearest point was FURTHER from the «AC» tag than the
+          DC trace was. Opposite corners remove the ambiguity: each tag is now
+          nearest its own trace. The sine scrolls, so a peak sits under this
+          tag at every moment. */}
       <text
-        x={PLOT_X0 + 6}
-        y={AC_CY - AC_AMP - 4}
+        x={PLOT_X0 + PLOT_W - 6}
+        y={AC_CY - AC_AMP - 6}
         fontFamily="inherit"
         fontSize="0.812em"
         fontStyle="italic"
         fontWeight="700"
         fill="currentColor"
-        textAnchor="start"
+        textAnchor="end"
       >
         {t('ch1_3.heroAcLabel')}
       </text>

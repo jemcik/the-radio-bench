@@ -15,9 +15,10 @@
  * Animation respects `prefers-reduced-motion` — if the user has set
  * that preference, the wave freezes at phase 0 (standard static view).
  */
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocaleFormatter } from '@/lib/hooks/useLocaleFormatter'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import { formatDecimal } from '@/lib/format'
 import { svgTokens } from './svgTokens'
 
@@ -92,32 +93,18 @@ export default function WaveformGallery() {
   const { t } = useTranslation('ui')
   const { locale } = useLocaleFormatter()
 
+  // phase = 0 is the still shown under prefers-reduced-motion and before the
+  // gallery scrolls into view. Each tile's path is rebuilt from `phase`, so
+  // the frame goes through state; the hook limits it to visible frames.
   const [phase, setPhase] = useState<number>(0)
+  const galleryRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    // Respect prefers-reduced-motion: keep phase at 0, static view.
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
-
-    let rafId = 0
-    let startTime: number | null = null
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now
-      const elapsed = (now - startTime) % PERIOD_MS
-      // Phase advances 0 → 2π per PERIOD_MS. Since each waveform has
-      // period 2π in its `angle` argument, the content at x=0 cycles
-      // through once every PERIOD_MS → seamless leftward scroll.
-      setPhase((elapsed / PERIOD_MS) * 2 * Math.PI)
-      rafId = requestAnimationFrame(tick)
-    }
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  useAnimationLoop(galleryRef, ({ elapsed }) => {
+    // Phase advances 0 → 2π per PERIOD_MS. Since each waveform has period 2π
+    // in its `angle` argument, the content at x=0 cycles through once every
+    // PERIOD_MS → seamless leftward scroll.
+    setPhase(((elapsed % PERIOD_MS) / PERIOD_MS) * 2 * Math.PI)
+  })
 
   const tiles: Array<{
     key: 'sine' | 'square' | 'triangle'
@@ -160,7 +147,7 @@ export default function WaveformGallery() {
           and above we flip to a 3-column grid centred in the available
           width. Each tile is capped at its natural width so on mobile
           it doesn't stretch wider than the SVG's designed viewBox. */}
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 sm:justify-center">
+      <div ref={galleryRef} className="grid gap-3 grid-cols-1 sm:grid-cols-3 sm:justify-center">
         {tiles.map((tile) => (
           <div
             key={tile.key}
@@ -198,28 +185,32 @@ export default function WaveformGallery() {
               />
             </svg>
             <dl className="mt-2 space-y-0.5 text-[13px]">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.trueRmsLabel')}
                 </dt>
                 <dd className="font-mono text-foreground">
                   {formatDecimal(tile.rms, 3, locale)}
                 </dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.formFactorLabel')}
                 </dt>
                 <dd className="font-mono text-foreground">
                   {formatDecimal(tile.formFactor, 3, locale)}
                 </dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">
+              <div className="flex justify-between items-baseline gap-2">
+                <dt className="text-muted-foreground min-w-0">
                   {t('ch1_3.waveformGallery.avgDmmLabel')}
                 </dt>
+                {/* The ✓ / ✗ glyph, not just the colour, carries «this row
+                    agrees with the true RMS». Colour alone was the only
+                    channel here, which a colour-blind reader cannot use — and
+                    the caption points at this mark. */}
                 <dd
-                  className="font-mono"
+                  className="font-mono whitespace-nowrap shrink-0"
                   style={{
                     color: tile.correct
                       ? svgTokens.experiment
@@ -227,6 +218,20 @@ export default function WaveformGallery() {
                   }}
                 >
                   {formatDecimal(tile.meterReads, 3, locale)}
+                  {/* font-sans, not the row's mono: U+2717 has no monospace
+                      glyph and fell back to something that read as a slanted
+                      letter «x» beside a decimal number — i.e. the non-colour
+                      channel was not doing its job. U+2715 in the UI font is
+                      an unambiguous cross. */}
+                  <span aria-hidden="true" className="font-sans">{tile.correct ? ' ✓' : ' ✕'}</span>
+                  <span className="sr-only">
+                    {' '}
+                    {t(
+                      tile.correct
+                        ? 'ch1_3.waveformGallery.matchesRms'
+                        : 'ch1_3.waveformGallery.mismatchRms',
+                    )}
+                  </span>
                 </dd>
               </div>
             </dl>

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnimationLoop } from '@/lib/hooks/useAnimationLoop'
 import SVGDiagram from './SVGDiagram'
 import DiagramFigure from './DiagramFigure'
 import { svgTokens } from './svgTokens'
@@ -140,72 +141,57 @@ export default function WaterPipeDiagram() {
   }
   const pipeCenterY = (pipeTopY + pipeBottomY) / 2
 
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
+  // Droplets in the pipe, the falling stream and the splash — each frame is
+  // written straight to the circles; no React render. Runs only while the
+  // figure is on screen, never under prefers-reduced-motion.
+  const svgRef = useRef<SVGSVGElement>(null)
+  useAnimationLoop(svgRef, ({ elapsed }) => {
+    // Pipe droplets — constant-speed flow along the horizontal pipe.
+    // cy is compressed as the droplet transits the restriction so it
+    // never pokes outside the narrow section.
+    const pipePhase = (elapsed % FLOW_PERIOD_MS) / FLOW_PERIOD_MS
+    for (let i = 0; i < DROPLET_COUNT; i++) {
+      const p = (pipePhase + i / DROPLET_COUNT) % 1
+      const cx = pipeStartX + p * pipeSpanX
+      const jitter = dropletJitterY[i] ?? 0
+      const cy = pipeCenterY + jitter * compressionAt(cx)
+      const el = dropletRefs.current[i]
+      if (el) {
+        el.setAttribute('cx', String(cx))
+        el.setAttribute('cy', String(cy))
+      }
     }
-    let raf = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      if (start === null) start = now
-      const elapsed = now - start
 
-      // Pipe droplets — constant-speed flow along the horizontal pipe.
-      // cy is compressed as the droplet transits the restriction so it
-      // never pokes outside the narrow section.
-      const pipePhase = (elapsed % FLOW_PERIOD_MS) / FLOW_PERIOD_MS
-      for (let i = 0; i < DROPLET_COUNT; i++) {
-        const p = (pipePhase + i / DROPLET_COUNT) % 1
-        const cx = pipeStartX + p * pipeSpanX
-        const jitter = dropletJitterY[i] ?? 0
-        const cy = pipeCenterY + jitter * compressionAt(cx)
-        const el = dropletRefs.current[i]
-        if (el) {
-          el.setAttribute('cx', String(cx))
-          el.setAttribute('cy', String(cy))
-        }
-      }
-
-      // Stream droplets — falling along the parabola from pipe exit to
-      // ground. x is linear in phase (constant horizontal velocity),
-      // y accelerates as p², matching projectile motion. Opacity fades
-      // in over the first 15 % and out over the last 15 % so the eye
-      // can track individual droplets; without this the uniform tiled
-      // pattern reads as frozen even while it updates every frame.
-      const streamPhase = (elapsed % STREAM_PERIOD_MS) / STREAM_PERIOD_MS
-      for (let i = 0; i < STREAM_DROPLET_COUNT; i++) {
-        const p = (streamPhase + i / STREAM_DROPLET_COUNT) % 1
-        const el = streamRefs.current[i]
-        if (!el) continue
-        el.setAttribute('cx', String(streamExitX + p * streamArcLenX))
-        el.setAttribute('cy', String(streamExitY + streamDropY * p * p))
-        const fadeIn = Math.min(1, p / 0.15)
-        const fadeOut = Math.min(1, (1 - p) / 0.15)
-        const alpha = Math.min(fadeIn, fadeOut)
-        el.setAttribute('opacity', alpha.toFixed(2))
-      }
-
-      // Splash droplets — small vertical bounce at the landing point,
-      // phase-shifted so the six droplets don't pulse in unison.
-      const splashBase = (elapsed % SPLASH_PERIOD_MS) / SPLASH_PERIOD_MS
-      for (let i = 0; i < splashAnchors.length; i++) {
-        const a = splashAnchors[i]
-        const phase = (splashBase + i / splashAnchors.length) * 2 * Math.PI
-        const bounce = 1.6 * Math.abs(Math.sin(phase))
-        const el = splashRefs.current[i]
-        if (el) el.setAttribute('cy', String(streamExitY + streamDropY + a.dy - bounce))
-      }
-
-      raf = requestAnimationFrame(tick)
+    // Stream droplets — falling along the parabola from pipe exit to
+    // ground. x is linear in phase (constant horizontal velocity),
+    // y accelerates as p², matching projectile motion. Opacity fades
+    // in over the first 15 % and out over the last 15 % so the eye
+    // can track individual droplets; without this the uniform tiled
+    // pattern reads as frozen even while it updates every frame.
+    const streamPhase = (elapsed % STREAM_PERIOD_MS) / STREAM_PERIOD_MS
+    for (let i = 0; i < STREAM_DROPLET_COUNT; i++) {
+      const p = (streamPhase + i / STREAM_DROPLET_COUNT) % 1
+      const el = streamRefs.current[i]
+      if (!el) continue
+      el.setAttribute('cx', String(streamExitX + p * streamArcLenX))
+      el.setAttribute('cy', String(streamExitY + streamDropY * p * p))
+      const fadeIn = Math.min(1, p / 0.15)
+      const fadeOut = Math.min(1, (1 - p) / 0.15)
+      const alpha = Math.min(fadeIn, fadeOut)
+      el.setAttribute('opacity', alpha.toFixed(2))
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pipeStartX, pipeSpanX, streamExitX, streamExitY, streamArcLenX, streamDropY])
+
+    // Splash droplets — small vertical bounce at the landing point,
+    // phase-shifted so the six droplets don't pulse in unison.
+    const splashBase = (elapsed % SPLASH_PERIOD_MS) / SPLASH_PERIOD_MS
+    for (let i = 0; i < splashAnchors.length; i++) {
+      const a = splashAnchors[i]
+      const phase = (splashBase + i / splashAnchors.length) * 2 * Math.PI
+      const bounce = 1.6 * Math.abs(Math.sin(phase))
+      const el = splashRefs.current[i]
+      if (el) el.setAttribute('cy', String(streamExitY + streamDropY + a.dy - bounce))
+    }
+  })
 
   // ── Rough.js geometry (memoised, stable seeds) ──────────────────────
   const sketch = useMemo(() => {
@@ -282,6 +268,7 @@ export default function WaterPipeDiagram() {
   return (
     <DiagramFigure caption={t('ch1_1.waterPipeCaption')}>
       <SVGDiagram
+        ref={svgRef}
         width={W}
         height={H}
         aria-label={t('ch1_1.waterPipeAriaLabel')}
